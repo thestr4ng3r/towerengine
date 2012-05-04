@@ -6,6 +6,9 @@
 *.swp
 *.out
 *.o
+*.a
+*.so
+*.so.*
 
 # git scripts
 push.sh
