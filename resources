@@ -1,0 +1,3 @@
+source: src/resources.cpp
+header: tresources.h
+data: shader/resources

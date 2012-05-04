@@ -1,0 +1,12 @@
+# generic files to ignore
+# backup files (*~) and vim swap file (.swp), MacOS dir file (.DS_Store)
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+*.o
+
+# git scripts
+push.sh
+sf_push.sh
