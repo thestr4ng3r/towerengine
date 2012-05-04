@@ -131,6 +131,8 @@ class CMesh
 
 		CMaterial *GetIdleMaterial(void)			{ return idle_material; }
 
+		map<string, CEntity *> GetEntitiesInGroup(const char *group = "");
+
 		void AddVertex(CVertex *v);
 		void AddTriangle(CTriangle *t);
 		void AddMaterial(CMaterial *m);

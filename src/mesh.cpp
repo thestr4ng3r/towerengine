@@ -1355,6 +1355,8 @@ int CMesh::SaveToFile(const char *file)
 	CVertexPosition *vp;
 	vector<CAnimation *>::iterator a;
 	CKeyFrame *k;
+	vector<CEntity *>::iterator e;
+	map<string, CEntityAttribute *>::iterator ea;
 
 	SetIDs();
 	ChangePosition(idle_position);
@@ -1468,6 +1470,47 @@ int CMesh::SaveToFile(const char *file)
 		xmlAddChild(root, cur);
 	}
 
+	for(e=entities.begin(); e!=entities.end(); e++)
+	{
+		cur = xmlNewNode(0, (const xmlChar *)"entity");
+		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)(*e)->name.c_str());
+		xmlNewProp(cur, (const xmlChar *)"group", (const xmlChar *)(*e)->group.c_str());
+		for(ea=(*e)->attributes.begin(); ea!=(*e)->attributes.end(); ea++)
+		{
+			switch(ea->second->type)
+			{
+			case CEntityAttribute::VECTOR:
+				child = xmlNewNode(0, (const xmlChar *)"vec3");
+				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
+				xmlNewProp(child, (const xmlChar *)"x", (const xmlChar *)ftoa(ea->second->vec_v.x));
+				xmlNewProp(child, (const xmlChar *)"y", (const xmlChar *)ftoa(ea->second->vec_v.y));
+				xmlNewProp(child, (const xmlChar *)"z", (const xmlChar *)ftoa(ea->second->vec_v.z));
+				break;
+			case CEntityAttribute::VECTOR2:
+				child = xmlNewNode(0, (const xmlChar *)"vec2");
+				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
+				xmlNewProp(child, (const xmlChar *)"x", (const xmlChar *)ftoa(ea->second->vec2_v.x));
+				xmlNewProp(child, (const xmlChar *)"y", (const xmlChar *)ftoa(ea->second->vec2_v.y));
+				break;
+			case CEntityAttribute::FLOAT:
+				child = xmlNewNode(0, (const xmlChar *)"float");
+				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
+				xmlNewProp(child, (const xmlChar *)"v", (const xmlChar *)ftoa(ea->second->float_v));
+				break;
+			case CEntityAttribute::INT:
+				child = xmlNewNode(0, (const xmlChar *)"int");
+				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
+				xmlNewProp(child, (const xmlChar *)"v", (const xmlChar *)itoa(ea->second->int_v));
+				break;
+			case CEntityAttribute::STRING:
+				child = xmlNewNode(0, (const xmlChar *)"string");
+				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
+				xmlNewProp(child, (const xmlChar *)"v", (const xmlChar *)ea->second->string_v.c_str());
+				break;
+			}
+		}
+	}
+
 	xmlDocDumpFormatMemory(doc, &buf, &buffer_size, 1);
 	int r = xmlSaveFormatFile(file, doc, 1);
 	xmlFree(buf);
@@ -1542,6 +1585,19 @@ CEntity *CMesh::ParseEntityNode(xmlNodePtr root)
 	return e;
 }
 
+
+
+map<string, CEntity *> CMesh::GetEntitiesInGroup(const char *group)
+{
+	map<string, CEntity *> r;
+	vector<CEntity *>::iterator i;
+
+	for(i=entities.begin(); i!=entities.end(); i++)
+		if((*i)->name.compare(group) == 0)
+			r.insert(pair<string, CEntity *>((*i)->name, *i));
+
+	return r;
+}
 
 
 CCustomPosition *CMesh::GetPositionByName(const char *name)
