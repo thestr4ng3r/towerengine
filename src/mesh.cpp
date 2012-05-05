@@ -1535,11 +1535,9 @@ CEntity *CMesh::ParseEntityNode(xmlNodePtr root)
 
 	e->group = string((const char *)xmlGetProp(root, (const xmlChar *)"group"));
 
-
 	for(cur=root->children; cur; cur=cur->next)
 	{
-		a_type = string((const char *)xmlGetProp(cur, (const xmlChar *)"type"));
-		a_name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
+		a_type = string((const char *)cur->name);
 
 		a = new CEntityAttribute();
 
@@ -1558,7 +1556,7 @@ CEntity *CMesh::ParseEntityNode(xmlNodePtr root)
 		}
 		else if(a_type.compare("float") == 0)
 		{
-			a->type = CEntityAttribute::VECTOR2;
+			a->type = CEntityAttribute::FLOAT;
 			a->float_v = atof((const char *)xmlGetProp(cur, (const xmlChar *)"v"));
 		}
 		else if(a_type.compare("int") == 0)
@@ -1576,6 +1574,8 @@ CEntity *CMesh::ParseEntityNode(xmlNodePtr root)
 			delete a;
 			continue;
 		}
+
+		a_name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
 
 		e->attributes.insert(pair<string, CEntityAttribute *>(a_name, a));
 	}

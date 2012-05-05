@@ -122,12 +122,14 @@ class CMesh
 		int GetMaterialCount(void)					{ return materials.size(); }
 		int GetCustomPositionCount(void)			{ return custom_positions.size(); }
 		int GetAnimationCount(void)					{ return animations.size(); }
+		int GetEntityCount(void)						{ return entities.size(); }
 
 		CVertex *GetVertex(int i)					{ return vertices.at(i); }
 		CTriangle *GetTriangle(int i)				{ return triangles.at(i); }
 		CMaterial *GetMaterial(int i)				{ return materials.at(i); }
 		CCustomPosition *GetCustomPosition(int i) 	{ return custom_positions.at(i); }
 		CAnimation *GetAnimation(int i)				{ return animations.at(i); }
+		CEntity *GetEntity(int i)						{ return entities.at(i); }
 
 		CMaterial *GetIdleMaterial(void)			{ return idle_material; }
 
