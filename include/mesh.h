@@ -146,6 +146,7 @@ class CMesh
 		void RemoveMaterial(CMaterial *m);
 		void RemoveCustomPosition(CCustomPosition *p);
 		void RemoveAnimation(CAnimation *a);
+		void RemoveEntity(CEntity *e);
 
 		IBO *CreateIBO(void)						{ return new IBO(vao); }
 
@@ -176,6 +177,9 @@ class CMesh
 		CMaterial *CreateMaterialRelative(const char *path, const char *diffuse, const char *specular, float exponent, const char *normal,
 		const char *aeb, float b_factor, const char *height, float h_factor, char name[100]);
 		CCustomPosition *CreatePosition(const char *name);
+		CEntity *CreateEntity(string name, string group = string());
+
+
 		void ChangePosition(const char *name, const char *idle = "Idle");
 		void ChangePosition(CMeshPosition *pos);
 		void CopyPositionFromVertices(void);

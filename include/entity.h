@@ -2,15 +2,18 @@
 #ifndef _ENTITY_H
 #define _ENTITY_H
 
+// TODO: CEntity and CEntityAttribute as class with private attributes instead of struct
+
 struct CEntityAttribute;
 
 struct CEntity
 {
-public:
 	string name;
 	string group;
 
 	map<string, CEntityAttribute *> attributes;
+
+	void RemoveAttribute(string name) { attributes.erase(name); }
 };
 
 

@@ -392,6 +392,14 @@ CTriangle *CMesh::CreateTriangleAuto(CVector v1, CVector v2, CVector v3, CVector
                t3);			    // t3
 }
 
+CEntity *CMesh::CreateEntity(string name, string group)
+{
+	CEntity *e = new CEntity();
+	e->name = name;
+	e->group = group;
+	entities.push_back(e);
+	return e;
+}
 
 CMaterial *CMesh::GetMaterialByName(char name[100])
 {
@@ -547,6 +555,18 @@ void CMesh::RemoveAnimation(CAnimation *a)
 		if(*i == a)
 		{
 			animations.erase(i);
+			break;
+		}
+}
+
+void CMesh::RemoveEntity(CEntity *e)
+{
+	vector<CEntity *>::iterator i;
+
+	for(i=entities.begin(); i!=entities.end(); i++)
+		if(*i == e)
+		{
+			entities.erase(i);
 			break;
 		}
 }
