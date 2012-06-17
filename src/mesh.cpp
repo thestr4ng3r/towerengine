@@ -290,9 +290,9 @@ CMesh *CMesh::Copy(void)
 	for(m=materials.begin(); m!=materials.end(); m++)
 	{
 		mn = new CMaterial(r);
-		mn->SetValues((*m)->diffuse_filename, (*m)->specular_filename, (*m)->specular_exponent, (*m)->normal_filename, (*m)->aeb_filename,
-				(*m)->bump_factor, (*m)->height_filename, (*m)->height_factor);
-		(*m)->tex->Copy(mn->tex);
+		mn->SetValues((*m)->diffuse.filename.c_str(), (*m)->specular.filename.c_str(), (*m)->specular.exponent, (*m)->normal.filename.c_str(), (*m)->aeb.filename.c_str(),
+				(*m)->aeb.bump_factor, (*m)->height.filename.c_str(), (*m)->height.factor);
+		//(*m)->tex->Copy(mn->tex);
 		mn->name = cstr((*m)->name);
 	}
 
@@ -1395,26 +1395,26 @@ int CMesh::SaveToFile(const char *file)
 		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)(*m)->name);
 
 		child = xmlNewNode(0, (const xmlChar *)"diffuse");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->diffuse_filename);
+		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->diffuse.filename.c_str());
 		xmlAddChild(cur, child);
 
 		child = xmlNewNode(0, (const xmlChar *)"specular");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->specular_filename);
-		xmlNewProp(child, (const xmlChar *)"exponent", (const xmlChar *)ftoa((*m)->specular_exponent));
+		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->specular.filename.c_str());
+		xmlNewProp(child, (const xmlChar *)"exponent", (const xmlChar *)ftoa((*m)->specular.exponent));
 		xmlAddChild(cur, child);
 
 		child = xmlNewNode(0, (const xmlChar *)"normal");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->normal_filename);
+		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->normal.filename.c_str());
 		xmlAddChild(cur, child);
 
 		child = xmlNewNode(0, (const xmlChar *)"aeb");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->aeb_filename);
-		xmlNewProp(child, (const xmlChar *)"factor", (const xmlChar *)ftoa((*m)->bump_factor));
+		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->aeb.filename.c_str());
+		xmlNewProp(child, (const xmlChar *)"factor", (const xmlChar *)ftoa((*m)->aeb.bump_factor));
 		xmlAddChild(cur, child);
 
 		child = xmlNewNode(0, (const xmlChar *)"height");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->height_filename);
-		xmlNewProp(child, (const xmlChar *)"factor", (const xmlChar *)ftoa((*m)->height_factor));
+		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->height.filename.c_str());
+		xmlNewProp(child, (const xmlChar *)"factor", (const xmlChar *)ftoa((*m)->height.factor));
 		xmlAddChild(cur, child);
 
 		xmlAddChild(root, cur);
@@ -1776,18 +1776,18 @@ bool CompareTriangleMaterial(CTriangle *a, CTriangle *b)
 	//if(a->mat == b->mat)
 	//	return CompareDist(a, b);
 	//else
-	if(b->mat->tex->transparent == a->mat->tex->transparent)
+	if(b->mat->transparent == a->mat->transparent)
 		return a->mat < b->mat;
 	else
-		return b->mat->tex->transparent && !a->mat->tex->transparent;
+		return b->mat->transparent && !a->mat->transparent;
 }
 
 bool CompareMaterialTransparency(CMaterial *a, CMaterial *b)
 {
-	if(b->tex->transparent == a->tex->transparent)
+	if(b->transparent == a->transparent)
 		return a < b;
 	else
-		return b->tex->transparent && !a->tex->transparent;
+		return b->transparent && !a->transparent;
 }
 
 void CMesh::SortTriangles(CVector cam)

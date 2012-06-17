@@ -20,7 +20,6 @@ struct CEntity;
 #include "buffers.h"
 #include "shader.h"
 #include "face_shader.h"
-#include "texture.h"
 #include "vertex.h"
 #include "triangle.h"
 #include "material.h"

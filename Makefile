@@ -21,7 +21,6 @@ OBJ := $(OBJPATH)mesh.o \
        $(OBJPATH)buffers.o \
        $(OBJPATH)utils.o \
        $(OBJPATH)face_shader.o \
-       $(OBJPATH)texture.o \
        $(OBJPATH)vector.o \
        $(OBJPATH)vector2.o \
        $(OBJPATH)position.o \

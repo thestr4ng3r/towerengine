@@ -61,10 +61,7 @@ void CTriangle::PutToGL(int wireframe, int both_sides)
 
 	if(!wireframe)
 	{
-		if(mat)
-		    mat->tex->PutToGL();
-		else
-			CTexture::PutDefaultToGL();
+		mat->PutToGL();
 
 		if(both_sides)
 			CEngine::GetFaceShader()->SetTwoSide(1);

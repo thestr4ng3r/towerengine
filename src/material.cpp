@@ -10,19 +10,44 @@ CMaterial::CMaterial(CMesh *mesh)
     	ibo = mesh->CreateIBO();
     }
 
-    tex = new CTexture;
+    diffuse.tex = 0;
+	specular.tex = 0;
+	normal.tex = 0;
+	aeb.tex = 0;
+	height.tex = 0;
+	diffuse.filename = string("$NONE");
+	diffuse.color.Set(1.0, 1.0, 1.0);
+	diffuse.ambient_color.Set(0.5, 0.5, 0.5);
+	specular.filename = string("$NONE");
+	specular.color.Set(1.0, 1.0, 1.0);
+	normal.filename = string("$NONE");
+	aeb.filename = string("$NONE");
+	aeb.bump_factor = 0.0;
+	specular.exponent = 64.0;
+	height.filename = string("$NONE");
+	transparent = false;
+	height.factor = 0.0;
 
-    diffuse_filename = 0;
-    specular_filename = 0;
-    normal_filename = 0;
+    //tex = new CTexture;
 }
 
 CMaterial::~CMaterial(void)
 {
+	if(diffuse.tex != 0)
+		glDeleteTextures(1, &diffuse.tex);
+	if(specular.tex != 0)
+		glDeleteTextures(1, &specular.tex);
+	if(normal.tex != 0)
+		glDeleteTextures(1, &normal.tex);
+	if(aeb.tex != 0)
+		glDeleteTextures(1, &aeb.tex);
+	if(height.tex != 0)
+		glDeleteTextures(1, &height.tex);
+
 	if(mesh)
 		mesh->RemoveMaterial(this);
 
-    delete tex;
+    //delete tex;
 }
 
 CMaterial *CMaterial::CreateMaterial(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb,
@@ -55,65 +80,61 @@ CMaterial *CMaterial::CreateMaterialRelative(const char *path, const char *diffu
 void CMaterial::SetValues(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb,
 		       float b_factor, const char *height, float h_factor)
 {
-	diffuse_filename = new char[100];
-	strcpy(diffuse_filename, diffuse);
-	specular_filename = new char[100];
-	strcpy(specular_filename, specular);
-	normal_filename = new char[100];
-	strcpy(normal_filename, normal);
-	aeb_filename = new char[100];
-	strcpy(aeb_filename, aeb);
-	height_filename = new char[100];
-	strcpy(height_filename, height);
-	bump_factor = b_factor;
-	height_factor = h_factor;
-	specular_exponent = exponent;
+	this->diffuse.filename = cstr(diffuse);
+	this->specular.filename = cstr(specular);
+	this->normal.filename = cstr(normal);
+	this->aeb.filename = cstr(aeb);
+	this->height.filename = cstr(height);
+	this->aeb.bump_factor = b_factor;
+	this->height.factor = h_factor;
+	this->specular.exponent = exponent;
 }
 
-void CMaterial::Load(const char *path)
+void CMaterial::Load(string path)
 {
-    struct stat s;
+	string file;
+	struct stat s;
 
-    char *diffusea = new char[strlen(path) + strlen(diffuse_filename) + 1];
-    char *speculara = new char[strlen(path) + strlen(specular_filename) + 1];
-    char *normala = new char[strlen(path) + strlen(normal_filename) + 1];
-    char *aeba = new char[strlen(path) + strlen(aeb_filename) + 1];
-    char *heighta = new char[strlen(path) + strlen(height_filename) + 1];
+	file = path + diffuse.filename;
+	if(diffuse.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
+		diffuse.tex = GLTextureFromColor(Vec(1.0, 1.0, 1.0));
+	else
+		diffuse.tex = LoadGLTexture(file.c_str());
 
-    snprintf(diffusea, strlen(path) + strlen(diffuse_filename) + 1, "%s%s", path, diffuse_filename);
-    snprintf(speculara, strlen(path) + strlen(specular_filename) + 1, "%s%s", path, specular_filename);
-    snprintf(normala, strlen(path) + strlen(normal_filename) + 1, "%s%s", path, normal_filename);
-    snprintf(aeba, strlen(path) + strlen(aeb_filename) + 1, "%s%s", path, aeb_filename);
-    snprintf(heighta, strlen(path) + strlen(height_filename) + 1, "%s%s", path, height_filename);
+	file = path + specular.filename;
+	if(specular.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
+		specular.tex = GLTextureFromColor(Vec(0.5, 0.5, 0.5));
+	else
+		specular.tex = LoadGLTexture(file.c_str());
 
-    if(strcmp(diffuse_filename, "$NONE") == 0 || (stat(diffusea, &s) != 0 && errno == ENOENT))
-        tex->diffuse.color.Set(1.0, 1.0, 1.0);
-    else
-        tex->diffuse.filename = diffusea;
+	file = path + normal.filename;
+	if(normal.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
+		normal.tex = GLTextureFromColor(Vec(0.5, 0.5, 1.0));
+	else
+		normal.tex = LoadGLTexture(file.c_str());
 
-    if(strcmp(specular_filename, "$NONE") == 0 || (stat(speculara, &s) != 0 && errno == ENOENT))
-        tex->specular.color.Set(1.0, 1.0, 1.0);
-    else
-        tex->specular.filename = speculara;
+	file = path + aeb.filename;
+	if(aeb.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
+		aeb.tex = GLTextureFromColor(Vec(1.0, 1.0, 1.0));
+	else
+		aeb.tex = LoadGLTexture(file.c_str(), &transparent, 0);
 
-    tex->aeb.exponent_factor = specular_exponent;
+	file = path + height.filename;
+	if(height.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
+		height.tex = GLTextureFromColor(Vec(0.5, 0.5, 0.5));
+	else
+		height.tex = LoadGLTexture(file.c_str());
+}
 
-    if(strcmp(normal_filename, "$NONE") == 0 || (stat(normala, &s) != 0 && errno == ENOENT))
-        tex->normal.filename = NULL;
-    else
-        tex->normal.filename = normala;
-
-    if(strcmp(aeb_filename, "$NONE") == 0 || (stat(aeba, &s) != 0 && errno == ENOENT))
-        tex->aeb.filename = NULL;
-    else
-        tex->aeb.filename = aeba;
-
-    if(strcmp(height_filename, "$NONE") == 0 || (stat(heighta, &s) != 0 && errno == ENOENT))
-        tex->height.filename = NULL;
-    else
-        tex->height.filename = heighta;
-
-    tex->aeb.bump_factor = bump_factor;
-    tex->height.factor = Vec(1.0, 1.0, 1.0) * height_factor;
-    tex->Load();
+void CMaterial::PutToGL(void)
+{
+	CEngine::GetFaceShader()->SetTexture(diffuse.tex, aeb.tex, normal.tex, height.tex, specular.tex);
+	CEngine::GetFaceShader()->SetDiffuseColor(diffuse.color);
+	CEngine::GetFaceShader()->SetSpecularColor(specular.color);
+	CEngine::GetFaceShader()->SetAmbientColor(diffuse.ambient_color);
+	CEngine::GetFaceShader()->SetSpecular(specular.exponent);
+	CEngine::GetFaceShader()->SetBumpFactor(aeb.bump_factor);
+	CEngine::GetFaceShader()->SetHeightFactor(Vec(1.0, 1.0, 1.0) * height.factor);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
