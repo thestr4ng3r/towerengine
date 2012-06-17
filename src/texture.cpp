@@ -80,13 +80,13 @@ void CTexture::PutToGL(void)
 {
 	Load();
 
-	face_shader.SetTexture(diffuse_image, aeb_image, normal_image, height_image, specular_image);
-	face_shader.SetDiffuseColor(diffuse.color);
-	face_shader.SetSpecularColor(specular.color);
-	face_shader.SetAmbientColor(diffuse.ambient_color);
-	face_shader.SetSpecular(aeb.exponent_factor);
-	face_shader.SetBumpFactor(aeb.bump_factor);
-	face_shader.SetHeightFactor(height.factor);
+	CEngine::GetFaceShader()->SetTexture(diffuse_image, aeb_image, normal_image, height_image, specular_image);
+	CEngine::GetFaceShader()->SetDiffuseColor(diffuse.color);
+	CEngine::GetFaceShader()->SetSpecularColor(specular.color);
+	CEngine::GetFaceShader()->SetAmbientColor(diffuse.ambient_color);
+	CEngine::GetFaceShader()->SetSpecular(aeb.exponent_factor);
+	CEngine::GetFaceShader()->SetBumpFactor(aeb.bump_factor);
+	CEngine::GetFaceShader()->SetHeightFactor(height.factor);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -107,13 +107,13 @@ void CTexture::PutDefaultToGL(void)
 {
 	LoadDefaultTextures();
 
-	face_shader.SetTexture(default_white, default_white, default_normal, default_white, default_white);
-	face_shader.SetDiffuseColor(Vec(1.0, 1.0, 1.0));
-	face_shader.SetSpecularColor(Vec(0.0, 0.0, 0.0));
-	face_shader.SetAmbientColor(Vec(0.5, 0.5, 0.5));
-	face_shader.SetSpecular(16.0);
-	face_shader.SetBumpFactor(0.0);
-	face_shader.SetHeightFactor(Vec(0.0, 0.0, 0.0));
+	CEngine::GetFaceShader()->SetTexture(default_white, default_white, default_normal, default_white, default_white);
+	CEngine::GetFaceShader()->SetDiffuseColor(Vec(1.0, 1.0, 1.0));
+	CEngine::GetFaceShader()->SetSpecularColor(Vec(0.0, 0.0, 0.0));
+	CEngine::GetFaceShader()->SetAmbientColor(Vec(0.5, 0.5, 0.5));
+	CEngine::GetFaceShader()->SetSpecular(16.0);
+	CEngine::GetFaceShader()->SetBumpFactor(0.0);
+	CEngine::GetFaceShader()->SetHeightFactor(Vec(0.0, 0.0, 0.0));
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

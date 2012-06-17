@@ -72,8 +72,6 @@ class CFaceShader : public CShader
 		void ResetUniforms(void);
 };
 
-extern CFaceShader face_shader;
-
 extern int shader_enabled;
 
 #endif

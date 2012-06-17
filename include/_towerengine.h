@@ -28,5 +28,6 @@ struct CEntity;
 #include "position.h"
 #include "animation.h"
 #include "entity.h"
+#include "engine.h"
 
 #endif

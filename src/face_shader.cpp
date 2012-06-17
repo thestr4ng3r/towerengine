@@ -2,7 +2,10 @@
 
 int shader_enabled = 1;
 
-CFaceShader face_shader;
+const GLint CFaceShader::vertex_attribute;
+const GLint CFaceShader::normal_attribute;
+const GLint CFaceShader::face_normal_attribute;
+const GLint CFaceShader::uvcoord_attribute;
 
 void CFaceShader::Init(void)
 {

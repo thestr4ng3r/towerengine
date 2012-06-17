@@ -1,16 +1,19 @@
 #ifndef _SHADER_H
 #define _SHADER_H
 
-class CShader
+struct CShaderProgram
+{
+	const char *vertex_src;
+	const char *fragment_src;
+
+	GLhandleARB vertex_shader;
+	GLhandleARB fragment_shader;
+	GLhandleARB program;
+};
+
+class CShader : protected CShaderProgram
 {
 	protected:
-		const char *vertex_src;
-		const char *fragment_src;
-
-		GLhandleARB vertex_shader;
-		GLhandleARB fragment_shader;
-		GLhandleARB program;
-
 		void SetSource(const char *vertex, const char *fragment);
 		void CreateVertexShader(void);
 		void CreateFragmentShader(void);

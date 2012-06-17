@@ -711,10 +711,10 @@ void CMesh::RefreshVBO(void)
 	}
 
 	vao->Bind();
-	vertex_vbo->SetAttribute(face_shader.vertex_attribute, GL_FLOAT);
-	normal_vbo->SetAttribute(face_shader.normal_attribute, GL_FLOAT);
-	face_normal_vbo->SetAttribute(face_shader.face_normal_attribute, GL_FLOAT);
-	uvcoord_vbo->SetAttribute(face_shader.uvcoord_attribute, GL_FLOAT);
+	vertex_vbo->SetAttribute(CEngine::GetFaceShader()->vertex_attribute, GL_FLOAT);
+	normal_vbo->SetAttribute(CEngine::GetFaceShader()->normal_attribute, GL_FLOAT);
+	face_normal_vbo->SetAttribute(CEngine::GetFaceShader()->face_normal_attribute, GL_FLOAT);
+	uvcoord_vbo->SetAttribute(CEngine::GetFaceShader()->uvcoord_attribute, GL_FLOAT);
 }
 
 void CMesh::PutToGL(CVector cam, int both_sides)
@@ -726,10 +726,10 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 
 	RefreshVBO();
 
-	face_shader.SetMode(shader_enabled);
-	face_shader.SetTwoSide(both_sides);
-	face_shader.SetTransformation(CMesh::transformation);
-	face_shader.SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
+	CEngine::GetFaceShader()->SetMode(shader_enabled);
+	CEngine::GetFaceShader()->SetTwoSide(both_sides);
+	CEngine::GetFaceShader()->SetTransformation(CMesh::transformation);
+	CEngine::GetFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

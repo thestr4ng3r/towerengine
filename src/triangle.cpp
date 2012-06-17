@@ -67,28 +67,28 @@ void CTriangle::PutToGL(int wireframe, int both_sides)
 			CTexture::PutDefaultToGL();
 
 		if(both_sides)
-			face_shader.SetTwoSide(1);
+			CEngine::GetFaceShader()->SetTwoSide(1);
 		else
-			face_shader.SetTwoSide(0);
+			CEngine::GetFaceShader()->SetTwoSide(0);
 
 
 		glBegin(GL_TRIANGLES);
-		face_shader.SetTexCoord(tex_coord[0]);
+		CEngine::GetFaceShader()->SetTexCoord(tex_coord[0]);
 		v[0]->PutToGL();
-		face_shader.SetTexCoord(tex_coord[1]);
+		CEngine::GetFaceShader()->SetTexCoord(tex_coord[1]);
 		v[1]->PutToGL();
-		face_shader.SetTexCoord(tex_coord[2]);
+		CEngine::GetFaceShader()->SetTexCoord(tex_coord[2]);
 		v[2]->PutToGL();
 		glEnd();
 
 		if(both_sides)
 		{
 			glBegin(GL_TRIANGLES);
-			face_shader.SetTexCoord(tex_coord[1]);
+			CEngine::GetFaceShader()->SetTexCoord(tex_coord[1]);
 			v[1]->PutToGL();
-			face_shader.SetTexCoord(tex_coord[0]);
+			CEngine::GetFaceShader()->SetTexCoord(tex_coord[0]);
 			v[0]->PutToGL();
-			face_shader.SetTexCoord(tex_coord[2]);
+			CEngine::GetFaceShader()->SetTexCoord(tex_coord[2]);
 			v[2]->PutToGL();
 			glEnd();
 		}
