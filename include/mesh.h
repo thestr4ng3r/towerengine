@@ -1,7 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#define FILE_HEADER_MESH_1_0 "Tower Mesh Version 1.0 by Metallic Entertainment - Mesh\n"
+#define FILE_HEADER_MESH_1_0		"Tower Mesh Version 1.0 by Metallic Entertainment - Mesh\n"
 
 #define TEM_VERSION_0_1				0
 #define TEM_VERSION_0_2				1
@@ -199,36 +199,6 @@ class CMesh
 		CMesh(void);
 		~CMesh(void);
 };
-
-
-class CMeshHandler
-{
-private:
-	CMesh *mesh;
-
-	bool animation_mode;
-	bool loop;
-	CAnimation *animation;
-	float time;
-
-	char *position;
-
-public:
-	CMeshHandler(CMesh *mesh);
-
-	void SetAnimation(const char *animation);
-	void PlayAnimation(float time);
-	bool GetAnimationFinished(void);
-	void SetAnimationLoop(bool l) { loop = l; };
-	void SetAnimationMode(bool a) { animation_mode = a; };
-	void SetAnimationTime(float t) { time = t; };
-	void SetPosition(const char *position);
-	
-	void PutToGL(CVector cam = Vec(0.0, 0.0, 0.0));
-};
-
-
-
 
 #endif
 

@@ -11,6 +11,9 @@ struct CTriangle;
 struct CMaterial;
 struct CVertex;
 struct CEntity;
+class CWorld;
+class CObject;
+class CCamera;
 
 #include "tresources.h"
 
@@ -28,5 +31,9 @@ struct CEntity;
 #include "animation.h"
 #include "entity.h"
 #include "engine.h"
+#include "object.h"
+#include "meshobject.h"
+#include "camera.h"
+#include "world.h"
 
 #endif

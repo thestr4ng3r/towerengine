@@ -27,6 +27,10 @@ OBJ := $(OBJPATH)mesh.o \
        $(OBJPATH)animation.o \
        $(OBJPATH)entity.o \
        $(OBJPATH)engine.o \
+       $(OBJPATH)world.o \
+       $(OBJPATH)camera.o \
+       $(OBJPATH)object.o \
+       $(OBJPATH)meshobject.o \
        $(OBJPATH)resources.o
        
 RESOURCES_SOURCE := $(SRCPATH)/resources.cpp
