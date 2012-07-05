@@ -169,7 +169,7 @@ void main(void)
 	
 	float shadow = 1.0;
 	float sr = 1.5;
-	/*int shadow_enabled = 1;
+	int shadow_enabled = 1;
 	if(ShadowCoordW(vec2(sr, 0.0)).x > 1.0 || ShadowCoordW(vec2(0.0, sr)).y > 1.0 ||
 			ShadowCoordW(vec2(sr, 0.0)).x < 0.0 || ShadowCoordW(vec2(0.0, sr)).y < 0.0)
 		shadow_enabled = 0;
@@ -184,7 +184,7 @@ void main(void)
 			for (x = -sr ; x <=sr ; x+=(sr*2.0 + 1.0)/4.0)
 				shadow += ShadowLookup(vec2(x,y));
 		shadow /= 16.0;
-	}*/
+	}
 	
 	frag_color += max(0.0, dot(light_dir, normal)) * color * LightColor * shadow;
 	

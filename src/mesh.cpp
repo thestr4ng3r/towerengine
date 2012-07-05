@@ -1528,7 +1528,9 @@ int CMesh::SaveToFile(const char *file)
 				xmlNewProp(child, (const xmlChar *)"v", (const xmlChar *)ea->second->string_v.c_str());
 				break;
 			}
+			xmlAddChild(cur, child);
 		}
+		xmlAddChild(root, cur);
 	}
 
 	xmlDocDumpFormatMemory(doc, &buf, &buffer_size, 1);
@@ -1613,7 +1615,7 @@ map<string, CEntity *> CMesh::GetEntitiesInGroup(const char *group)
 	vector<CEntity *>::iterator i;
 
 	for(i=entities.begin(); i!=entities.end(); i++)
-		if((*i)->name.compare(group) == 0)
+		if((*i)->group.compare(group) == 0)
 			r.insert(pair<string, CEntity *>((*i)->name, *i));
 
 	return r;
