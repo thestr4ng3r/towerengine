@@ -38,7 +38,7 @@ IBO::~IBO(void)
 
 bool IBO::SetSize(int size, bool copy)
 {
-	if(size == this->size)
+	if(size == this->size && data != 0)
 		return false;
 
 	GLuint *old = data;
@@ -53,14 +53,14 @@ bool IBO::SetSize(int size, bool copy)
 	}
 	this->size = size;
 
-	//AssignData();
+	AssignData();
 	return true;
 }
 
 void IBO::AssignData(void)
 {
 	Bind();
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * size, data, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * size, data, GL_DYNAMIC_DRAW);
 	UnBind();
 }
 

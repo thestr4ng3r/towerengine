@@ -12,6 +12,7 @@
 #define TEM_CURRENT_VERSION			TEM_VERSION_0_2
 #define TEM_CURRENT_VERSION_STRING	TEM_VERSION_0_2_STRING
 
+
 class CMesh
 {
 	private:
@@ -20,6 +21,10 @@ class CMesh
 		int wireframe;
 		int loop_anim;
 		int anim_finished;
+
+		bool refresh_all_vbos;
+		bool refresh_vertex_vbo;
+		bool refresh_ibos;
 
 		VAO *vao;
 		VBO<float> *vertex_vbo;
@@ -30,9 +35,9 @@ class CMesh
 
 		set<CVertex *> outdated_vertices;
 
-		int mat_data_count;
-		int *mat_indices;		// for vbo painting
-		CMaterial **mat_list; 	// for vbo painting
+		//int mat_data_count;
+		//int *mat_indices;		// for vbo painting
+		//CMaterial **mat_list; 	// for vbo painting
 
 		CMeshPosition *current_position;
 		CAnimation *current_animation;
@@ -55,7 +60,8 @@ class CMesh
 		void InvalidateVertex(CVertex *v);
 		void AssignVertexArrayPositions(void);
 
-		void RefreshVBO(void);
+		void RefreshAllVBOs(void);
+		void RefreshVertexVBO(void);
 		void DeleteVBOData(void);
 
 		CVertex *ParseVertexNode(xmlNodePtr cur);
@@ -188,6 +194,11 @@ class CMesh
 		CVertex *GetVertexByID(int id);
 
 		void SetVertexId(CVertex *v, int id);
+
+		void TriggerAllVBOsRefresh(void)	{ refresh_all_vbos = true; }
+		void TriggerVertexVBORefresh(void)	{ refresh_vertex_vbo = true; }
+		void TriggerIBOsRefresh(void)		{ refresh_ibos = true; }
+		void RefreshIBOs(void);
 
 		void SortTriangles(CVector cam);
 		void SortMaterials(void);

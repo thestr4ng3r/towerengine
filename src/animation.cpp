@@ -175,6 +175,8 @@ void CAnimation::ApplyCurrentFrame(void)
 				av->ApplyMixedPosition(bv, mix);
 				break;
 			}
+
+	mesh->TriggerVertexVBORefresh();
 }
 
 

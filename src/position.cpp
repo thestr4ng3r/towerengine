@@ -167,6 +167,8 @@ void CMeshPosition::ApplyPosition(void)
 	{
 		vp->ApplyPosition();
 	}
+
+	mesh->TriggerVertexVBORefresh();
 }
 
 CMeshPosition *CMeshPosition::Copy(CMesh *m)

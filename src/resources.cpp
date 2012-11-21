@@ -224,7 +224,7 @@ const char *face_shader_frag =
 "}\n"
 "\n"
 "void main(void)\n"
-"{\n"
+"{	\n"
 "	if(!gl_FrontFacing && !TwoSide)\n"
 "		discard;\n"
 "	\n"

@@ -126,7 +126,7 @@ float ShadowLookup(vec2 offset)
 }
 
 void main(void)
-{
+{	
 	if(!gl_FrontFacing && !TwoSide)
 		discard;
 	

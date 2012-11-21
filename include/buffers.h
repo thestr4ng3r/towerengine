@@ -30,6 +30,7 @@ public:
 	~VBO(void);
 
 	void SetAttribute(GLuint index, GLenum type, GLboolean normalize = GL_FALSE, GLsizei stride = 0);
+	void AssignData(void);
 	void Bind(void)					{ glBindBuffer(GL_ARRAY_BUFFER, vbo); };
 	static void UnBind(void)		{ glBindBuffer(GL_ARRAY_BUFFER, 0); };
 	bool SetSize(int size, bool copy = false); // returns true if size has changed and false if not
@@ -91,9 +92,15 @@ template <class T> VBO<T>::~VBO(void)
 template <class T> void VBO<T>::SetAttribute(GLuint index, GLenum type, GLboolean normalize, GLsizei stride)
 {
 	Bind();
-	glBufferData(GL_ARRAY_BUFFER, size * components * sizeof(T), data, GL_STATIC_DRAW);
 	glVertexAttribPointer(index, components, type, normalize, stride, 0);
 	glEnableVertexAttribArray(index);
+	UnBind();
+}
+
+template <class T> void VBO<T>::AssignData(void)
+{
+	Bind();
+	glBufferData(GL_ARRAY_BUFFER, size * components * sizeof(T), data, GL_DYNAMIC_DRAW);
 	UnBind();
 }
 

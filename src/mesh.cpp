@@ -39,8 +39,11 @@ CMesh::CMesh(void)
 {
 	idle_position = 0;
 	vao = 0;
-	mat_indices = 0;
+	//mat_indices = 0;
 	refresh_func = 0;
+	refresh_all_vbos = true;
+	refresh_vertex_vbo = false;
+	refresh_ibos = true;
 	outdated_vertices.clear();
 	vertex_indices.clear();
 	entities.clear();
@@ -93,8 +96,8 @@ void CMesh::Translate(CVector v)
 void CMesh::RotateX(float a)
 {
 	float m[16] = 
-		{ cos(a), -sin(a), 0.0, 0.0,
-		  sin(a), cos(a),  0.0, 0.0,
+		{ (float)cos(a), -(float)sin(a), 0.0, 0.0,
+		  (float)sin(a), (float)cos(a),  0.0, 0.0,
 		  0.0,    0.0,     1.0, 0.0,
 		  0.0,    0.0,     0.0, 1.0 };
 	CombineMatrix4(transformation, m, transformation);
@@ -103,9 +106,9 @@ void CMesh::RotateX(float a)
 void CMesh::RotateY(float a)
 {
 	float m[16] = 
-		{ cos(a), 0.0,  sin(a), 0.0,
+		{ (float)cos(a), 0.0,  (float)sin(a), 0.0,
 		  0.0,    1.0,     0.0, 0.0,
-		  -sin(a),0.0,  cos(a), 0.0,
+		  -(float)sin(a),0.0,  (float)cos(a), 0.0,
 		  0.0,    0.0,     0.0, 1.0 };
 	CombineMatrix4(transformation, m, transformation);
 }
@@ -114,8 +117,8 @@ void CMesh::RotateZ(float a)
 {
 	float m[16] = 
 		{ 1.0,    0.0,     0.0, 0.0,
-		  0.0, cos(a), -sin(a), 0.0,
-		  0.0, sin(a),  cos(a), 0.0,
+		  0.0, (float)cos(a), -(float)sin(a), 0.0,
+		  0.0, (float)sin(a),  (float)cos(a), 0.0,
 		  0.0,    0.0,     0.0, 1.0 };
 	CombineMatrix4(transformation, m, transformation);
 }
@@ -151,6 +154,7 @@ void CMesh::ApplyMatrix(float m[16])
 
 	for(v=vertices.begin(); v!=vertices.end(); v++)
 		(*v)->SetVector(ApplyMatrix4(m, **v));
+	refresh_vertex_vbo = true;
 }
 
 void CMesh::SetXY(CVector x, CVector y)
@@ -196,10 +200,10 @@ void CMesh::Create(void)
 	uvcoord_vbo = new VBO<float>(2, vao);
 	outdated_vertices.clear();
 	data_count = 0;
-	mat_data_count = 0;
-	mat_indices = 0;
-	mat_list = 0;
 	refresh_func = 0;
+	refresh_all_vbos = true;
+	refresh_vertex_vbo = false;
+	refresh_ibos = true;
 	idle_material = CreateMaterial("$NONE", "$NONE", 32.0, "$NONE", "$NONE", 0.0, "$NONE", 0.0, cstr("$NONE"));
 	//VAO::UnBind();
 
@@ -241,6 +245,9 @@ void CMesh::Delete(void)
 
 	DeleteVBOData();
 	outdated_vertices.clear();
+	refresh_all_vbos = true;
+	refresh_vertex_vbo = false;
+	refresh_ibos = true;
 
 	data_count = 0;
 }
@@ -255,14 +262,6 @@ void CMesh::DeleteVBOData(void)
 		delete normal_vbo;
 		delete face_normal_vbo;
 		delete uvcoord_vbo;
-	}
-
-	if(mat_indices)
-	{
-		delete [] mat_indices;
-		delete [] mat_list;
-		mat_indices = 0;
-		mat_data_count = 0;
 	}
 }
 
@@ -337,6 +336,7 @@ CVertex *CMesh::CreateVertex(CVector v)
 {
 	CVertex *o;
 	o = new CVertex(v, this);
+	refresh_all_vbos = false;
 	return o;
 }
 
@@ -345,6 +345,8 @@ CMaterial *CMesh::CreateMaterial(const char *diffuse, const char *specular, floa
 {
     if(!GetState())
         return 0;
+
+	refresh_ibos = true;
 
     return CMaterial::CreateMaterial(diffuse, specular, exponent, normal, aeb, b_factor, height, h_factor, name, this);
 }
@@ -355,6 +357,8 @@ CMaterial *CMesh::CreateMaterialRelative(const char *path, const char *diffuse, 
     if(!GetState())
         return 0;
 
+	refresh_ibos = true;
+
     return CMaterial::CreateMaterialRelative(path, diffuse, specular, exponent, normal, aeb, b_factor, height, h_factor, name, this);
 }
 
@@ -362,6 +366,9 @@ CTriangle *CMesh::CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector 
 {
     if(!GetState())
         return 0;
+
+	refresh_ibos = true;
+
     return CTriangle::CreateTriangle(v1, v2, v3, color, material, t1, t2, t3, this);
 }
 
@@ -384,6 +391,9 @@ CTriangle *CMesh::CreateTriangleAuto(CVector v1, CVector v2, CVector v3, CVector
 		if(!vert[i])
 			vert[i] = CreateVertex(Vec(v[i*3+0], v[i*3+1], v[i*3+2]));
 	}
+
+	refresh_ibos = true;
+
 	return CreateTriangle(vert[0], vert[1], vert[2],
                color,			     // color
                material,                    // material
@@ -457,6 +467,8 @@ void CMesh::AddVertex(CVertex *v)
 		if(*i == v)
 			return;
 	vertices.push_back(v);
+
+	refresh_all_vbos = true;
 }
 
 void CMesh::AddTriangle(CTriangle *t)
@@ -467,6 +479,8 @@ void CMesh::AddTriangle(CTriangle *t)
 		if(*i == t)
 			return;
 	triangles.push_back(t);
+	refresh_all_vbos = true;
+	refresh_ibos = true;
 }
 
 void CMesh::AddMaterial(CMaterial *m)
@@ -477,6 +491,7 @@ void CMesh::AddMaterial(CMaterial *m)
 		if(*i == m)
 			return;
 	materials.push_back(m);
+	refresh_ibos = true;
 }
 
 void CMesh::AddCustomPosition(CCustomPosition *p)
@@ -487,6 +502,7 @@ void CMesh::AddCustomPosition(CCustomPosition *p)
 		if(*i == p)
 			return;
 	custom_positions.push_back(p);
+	//refresh_vbo = true;
 }
 
 void CMesh::AddAnimation(CAnimation *a)
@@ -497,6 +513,7 @@ void CMesh::AddAnimation(CAnimation *a)
 		if(*i == a)
 			return;
 	animations.push_back(a);
+	//refresh_vbo = true;
 }
 
 void CMesh::RemoveVertex(CVertex *v)
@@ -509,6 +526,8 @@ void CMesh::RemoveVertex(CVertex *v)
 			vertices.erase(i);
 			break;
 		}
+	refresh_all_vbos = true;
+	refresh_ibos = true;
 }
 
 void CMesh::RemoveTriangle(CTriangle *t)
@@ -521,6 +540,8 @@ void CMesh::RemoveTriangle(CTriangle *t)
 			triangles.erase(i);
 			break;
 		}
+	refresh_ibos = true;
+	//refresh_vbo = true;
 }
 
 void CMesh::RemoveMaterial(CMaterial *m)
@@ -533,6 +554,8 @@ void CMesh::RemoveMaterial(CMaterial *m)
 			materials.erase(i);
 			break;
 		}
+	refresh_ibos = true;
+	//refresh_vbo = true;
 }
 
 void CMesh::RemoveCustomPosition(CCustomPosition *p)
@@ -545,6 +568,7 @@ void CMesh::RemoveCustomPosition(CCustomPosition *p)
 			custom_positions.erase(i);
 			break;
 		}
+	//refresh_vbo = true;
 }
 
 void CMesh::RemoveAnimation(CAnimation *a)
@@ -557,6 +581,7 @@ void CMesh::RemoveAnimation(CAnimation *a)
 			animations.erase(i);
 			break;
 		}
+	//refresh_vbo = true;
 }
 
 void CMesh::RemoveEntity(CEntity *e)
@@ -600,6 +625,7 @@ void CMesh::SetTriangleMaterials(void)
         if(!(*t)->mat)
         	(*t)->mat = GetIdleMaterial();
     }
+	//refresh_vbo = true;
 }
 
 void CMesh::InvalidateVertex(CVertex *v)
@@ -607,6 +633,7 @@ void CMesh::InvalidateVertex(CVertex *v)
 	if(outdated_vertices.find(v) != outdated_vertices.end())
 		return;
 	outdated_vertices.insert(v);
+	refresh_vertex_vbo = true;
 }
 
 void CMesh::AssignVertexArrayPositions(void)
@@ -616,24 +643,43 @@ void CMesh::AssignVertexArrayPositions(void)
 
 	for(c=0, i=vertices.begin(); i!=vertices.end(); c++, i++)
 		(*i)->index = c;
+
+	refresh_all_vbos = true;
 }
 
-void CMesh::RefreshVBO(void)
+void CMesh::RefreshVertexVBO(void)
+{
+	vector<CVertex *>::iterator v;
+	CVertex *vt;
+	float *vertex_data;
+
+	vertex_vbo->SetSize(data_count);
+	vertex_data = vertex_vbo->GetData();
+
+	for(v=vertices.begin(); v!=vertices.end(); v++)
+	{
+		vt = *v;
+		memcpy(vertex_data + vt->index * 3, vt->v, 3 * sizeof(float));
+	}
+
+	vertex_vbo->AssignData();
+
+	refresh_vertex_vbo = false;
+}
+
+void CMesh::RefreshAllVBOs(void)
 {
 	vector<CTriangle *>::iterator i;
-	vector<CVertex *>::iterator v;
 	vector<CMaterial *>::iterator m;
+	vector<CVertex *>::iterator v;
 	CVertex *vt;
-	CTriangle *t;
-	CMaterial *mt;
-	int c;
-	int j;
 	int d;
-	int m_max;
 	float *vertex_data;
 	float *normal_data;
 	float *face_normal_data;
 	float *uvcoord_data;
+
+	AssignVertexArrayPositions();
 
 	data_count = GetVertexCount();
 	vertex_vbo->SetSize(data_count);
@@ -645,19 +691,6 @@ void CMesh::RefreshVBO(void)
 	normal_data = normal_vbo->GetData();
 	face_normal_data = face_normal_vbo->GetData();
 	uvcoord_data = uvcoord_vbo->GetData();
-
-	m_max = GetMaterialCount();
-	if(mat_data_count != m_max)
-	{
-		mat_data_count = m_max;
-		if(mat_indices)
-		{
-			delete [] mat_indices;
-			delete [] mat_list;
-		}
-		mat_indices = new int[m_max];
-		mat_list = new CMaterial *[m_max];
-	}
 
 	/*while(!outdated_vertices.empty())
 	{
@@ -671,17 +704,35 @@ void CMesh::RefreshVBO(void)
 		memcpy(uvcoord_data + c*2, vt->uv.v, 2 * sizeof(float));
 	}*/
 
-	for(v=vertices.begin(), c=0; v!=vertices.end(); v++, c++)
+	for(v=vertices.begin(); v!=vertices.end(); v++)
 	{
 		vt = *v;
-		vt->index = c;
-		d = c*3;
+		d = vt->index * 3;
 		memcpy(vertex_data + d, vt->v, 3 * sizeof(float));
 		memcpy(normal_data + d, vt->normal.v, 3 * sizeof(float));
 		memcpy(face_normal_data + d, vt->normal.v, 3 * sizeof(float));
-		memcpy(uvcoord_data + c*2, vt->uv.v, 2 * sizeof(float));
+		memcpy(uvcoord_data + vt->index*2, vt->uv.v, 2 * sizeof(float));
 
 	}
+
+	vertex_vbo->AssignData();
+	normal_vbo->AssignData();
+	face_normal_vbo->AssignData();
+	uvcoord_vbo->AssignData();
+
+	refresh_all_vbos = refresh_vertex_vbo = false;
+}
+
+void CMesh::RefreshIBOs(void)
+{
+	vector<CTriangle *>::iterator i;
+	vector<CMaterial *>::iterator m;
+	CTriangle *t;
+	CMaterial *mt;
+	int c;
+	int j;
+
+	SortMaterials();
 
 	for(m=materials.begin(); m!=materials.end(); m++)
 		(*m)->triangle_count = (*m)->triangle_i = 0;
@@ -691,12 +742,10 @@ void CMesh::RefreshVBO(void)
 		(*i)->mat->triangle_count++;
 	}
 
-	vao->Bind();
 	for(m=materials.begin(); m!=materials.end(); m++)
 	{
 		mt = *m;
 		mt->ibo->SetSize(mt->triangle_count * 3);
-		mt->ibo->AssignData();
 		mt->ibo_data = mt->ibo->GetData();
 	}
 
@@ -710,11 +759,10 @@ void CMesh::RefreshVBO(void)
 		mt->triangle_i++;
 	}
 
-	vao->Bind();
-	vertex_vbo->SetAttribute(CEngine::GetFaceShader()->vertex_attribute, GL_FLOAT);
-	normal_vbo->SetAttribute(CEngine::GetFaceShader()->normal_attribute, GL_FLOAT);
-	face_normal_vbo->SetAttribute(CEngine::GetFaceShader()->face_normal_attribute, GL_FLOAT);
-	uvcoord_vbo->SetAttribute(CEngine::GetFaceShader()->uvcoord_attribute, GL_FLOAT);
+	for(m=materials.begin(); m!=materials.end(); m++)
+		(*m)->ibo->AssignData();
+
+	refresh_ibos = false;
 }
 
 void CMesh::PutToGL(CVector cam, int both_sides)
@@ -722,9 +770,19 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 	vector<CMaterial *>::iterator i;
 
 	//Sort(cam);
-	SortMaterials();
 
-	RefreshVBO();
+	if(refresh_all_vbos)
+		RefreshAllVBOs();
+	else if(refresh_vertex_vbo)
+		RefreshVertexVBO();
+
+	vertex_vbo->SetAttribute(CEngine::GetFaceShader()->vertex_attribute, GL_FLOAT);
+	normal_vbo->SetAttribute(CEngine::GetFaceShader()->normal_attribute, GL_FLOAT);
+	face_normal_vbo->SetAttribute(CEngine::GetFaceShader()->face_normal_attribute, GL_FLOAT);
+	uvcoord_vbo->SetAttribute(CEngine::GetFaceShader()->uvcoord_attribute, GL_FLOAT);
+
+	if(refresh_ibos)
+		RefreshIBOs();
 
 	CEngine::GetFaceShader()->SetMode(shader_enabled);
 	CEngine::GetFaceShader()->SetTwoSide(both_sides);
@@ -1020,7 +1078,9 @@ int CMesh::LoadFromFile(const char *file, int no_material)
 	}	
 
 	//CalculateNormalsSolid();
-	AssignVertexArrayPositions();
+
+	refresh_all_vbos = true;
+	refresh_ibos = true;
 
 	return r;
 }
@@ -1098,6 +1158,9 @@ int CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material)
 
 		cur = cur->next;
 	}
+
+	refresh_all_vbos = true;
+	refresh_ibos = true;
 
 	return 1;
 }
@@ -1636,6 +1699,7 @@ CCustomPosition *CMesh::CreatePosition(const char *name)
 {
 	if(GetPositionByName(name))
 		return 0;
+	//refresh_vbo = true;
 
 	return new CCustomPosition(this, name);
 }
@@ -1643,18 +1707,22 @@ CCustomPosition *CMesh::CreatePosition(const char *name)
 void CMesh::ChangePosition(const char *name, const char *idle)
 {
 	CCustomPosition *p;
+	CMeshPosition *old_pos = current_position;
 
 	if(strcmp(name, idle) == 0)
 		current_position = idle_position;
 	else if((p = GetPositionByName(name)) != 0)
 		current_position = p;
 
-	if(current_position)
+	if(current_position && current_position != old_pos)
 		current_position->ApplyPosition();
 }
 
 void CMesh::ChangePosition(CMeshPosition *pos)
 {
+	if(pos == current_position)
+		return;
+
 	current_position = pos;
 
 	if(current_position)
@@ -1804,6 +1872,7 @@ void CMesh::SortTriangles(CVector cam)
 		(*t)->cam_dist = ((*t)->v[0]->cam_dist + (*t)->v[1]->cam_dist + (*t)->v[2]->cam_dist) * (1.0/3.0);*/
 
 	sort(triangles.begin(), triangles.end(), CompareTriangleMaterial);
+	refresh_all_vbos = true;
 }
 
 void CMesh::SortMaterials(void)
