@@ -1,8 +1,7 @@
-#ifndef _TMS_H
-#define _TMS_H
+#ifndef _TOWERENGINE_H
+#define _TOWERENGINE_H
 
 #include "includes.h"
 #include "_towerengine.h"
-
 
 #endif

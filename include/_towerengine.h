@@ -1,5 +1,5 @@
-#ifndef __TMS_H
-#define __TMS_H
+#ifndef __TOWERENGINE_H
+#define __TOWERENGINE_H
 
 class CMeshPosition;
 class CIdlePosition;

@@ -37,7 +37,7 @@ RESOURCES_SOURCE := $(SRCPATH)/resources.cpp
 RESOURCES_HEADER := $(INCLUDEPATH)/tresources.h 
 
 INCLUDE := -I$(INCLUDEPATH) -I$(SRCPATH) -I/usr/include/libxml2
-LIBS := -lIL
+LIBS := -L/usr/lib/x86_64-linux-gnu -lIL -lILU -lGL -lGLU -lxml2
 
 MAKEFLAGS += -swr
 

@@ -793,7 +793,9 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for(i=materials.begin(); i!=materials.end(); i++)
 	{
-		(*i)->PutToGL();
+		if(shader_enabled)
+			(*i)->PutToGL();
+
 		if(this->wireframe)
 			(*i)->ibo->Draw(GL_LINE_STRIP);
 		else
