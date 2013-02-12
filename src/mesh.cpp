@@ -196,6 +196,8 @@ void CMesh::Create(void)
 	vao = new VAO();
 	vertex_vbo = new VBO<float>(3, vao);
 	normal_vbo = new VBO<float>(3, vao);
+	tang_vbo = new VBO<float>(3, vao);
+	bitang_vbo = new VBO<float>(3, vao);
 	face_normal_vbo = new VBO<float>(3, vao);
 	uvcoord_vbo = new VBO<float>(2, vao);
 	outdated_vertices.clear();
@@ -260,6 +262,8 @@ void CMesh::DeleteVBOData(void)
 		vao = 0;
 		delete vertex_vbo;
 		delete normal_vbo;
+		delete tang_vbo;
+		delete bitang_vbo;
 		delete face_normal_vbo;
 		delete uvcoord_vbo;
 	}
@@ -281,6 +285,7 @@ CMesh *CMesh::Copy(void)
 	{
 		vn = new CVertex(r);
 		vn->SetVector(**v);
+		vn->normal = (*v)->normal;
 		SetVertexId(vn, (*v)->id);
 	}
 
@@ -303,15 +308,10 @@ CMesh *CMesh::Copy(void)
 			continue;
 		tn = new CTriangle(r);
 		for(i=0; i<3; i++)
-		{
 			tn->v[i] = r->GetVertexByID((*t)->v[i]->id);
-			tn->tex_coord[i] = (*t)->tex_coord[i];
-		}
-		tn->SetMaterial((*t)->tex_coord[0], (*t)->tex_coord[1], (*t)->tex_coord[2], (*t)->m_name);
+		tn->SetMaterial((*t)->m_name);
+		tn->CalculateTangents();
 		tn->color = (*t)->color;
-		tn->normal[0] = (*t)->normal[0];
-		tn->normal[1] = (*t)->normal[1];
-		tn->normal[2] = (*t)->normal[2];
 	}
 
 	r->SetTriangleMaterials();
@@ -676,6 +676,8 @@ void CMesh::RefreshAllVBOs(void)
 	int d;
 	float *vertex_data;
 	float *normal_data;
+	float *tang_data;
+	float *bitang_data;
 	float *face_normal_data;
 	float *uvcoord_data;
 
@@ -684,11 +686,15 @@ void CMesh::RefreshAllVBOs(void)
 	data_count = GetVertexCount();
 	vertex_vbo->SetSize(data_count);
 	normal_vbo->SetSize(data_count);
+	tang_vbo->SetSize(data_count);
+	bitang_vbo->SetSize(data_count);
 	face_normal_vbo->SetSize(data_count);
 	uvcoord_vbo->SetSize(data_count);
 
 	vertex_data = vertex_vbo->GetData();
 	normal_data = normal_vbo->GetData();
+	tang_data = tang_vbo->GetData();
+	bitang_data = bitang_vbo->GetData();
 	face_normal_data = face_normal_vbo->GetData();
 	uvcoord_data = uvcoord_vbo->GetData();
 
@@ -710,6 +716,8 @@ void CMesh::RefreshAllVBOs(void)
 		d = vt->index * 3;
 		memcpy(vertex_data + d, vt->v, 3 * sizeof(float));
 		memcpy(normal_data + d, vt->normal.v, 3 * sizeof(float));
+		memcpy(tang_data + d, vt->tang.v, 3 * sizeof(float));
+		memcpy(bitang_data + d, vt->bitang.v, 3 * sizeof(float));
 		memcpy(face_normal_data + d, vt->normal.v, 3 * sizeof(float));
 		memcpy(uvcoord_data + vt->index*2, vt->uv.v, 2 * sizeof(float));
 
@@ -717,6 +725,8 @@ void CMesh::RefreshAllVBOs(void)
 
 	vertex_vbo->AssignData();
 	normal_vbo->AssignData();
+	tang_vbo->AssignData();
+	bitang_vbo->AssignData();
 	face_normal_vbo->AssignData();
 	uvcoord_vbo->AssignData();
 
@@ -769,6 +779,8 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 {
 	vector<CMaterial *>::iterator i;
 
+	//CalculateNormalsSolid();
+
 	//Sort(cam);
 
 	if(refresh_all_vbos)
@@ -776,14 +788,35 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 	else if(refresh_vertex_vbo)
 		RefreshVertexVBO();
 
+
+
+	//CEngine::UnbindShader();
+/*	glColor4f(1.0, 1.0, 1.0, 1.0);
+	vector<CTriangle *>::iterator ti;
+	for(ti=triangles.begin(); ti!=triangles.end(); ti++)
+	{
+		glBegin(GL_LINES);
+		glVertex3f(0.0, 0.0, 0.0);
+		glVertex3f(1.0, 1.0, 1.0);
+		for(int j=0; j<3; j++)
+		{
+			(*ti)->v[j]->PutToGL();
+			(*((*ti)->v[j]) + (*ti)->v[j]->normal * 0.1).PutToGL();
+		}
+		glEnd();
+	}*/
+
 	vertex_vbo->SetAttribute(CEngine::GetFaceShader()->vertex_attribute, GL_FLOAT);
 	normal_vbo->SetAttribute(CEngine::GetFaceShader()->normal_attribute, GL_FLOAT);
-	face_normal_vbo->SetAttribute(CEngine::GetFaceShader()->face_normal_attribute, GL_FLOAT);
+	tang_vbo->SetAttribute(CEngine::GetFaceShader()->tang_attribute, GL_FLOAT);
+	bitang_vbo->SetAttribute(CEngine::GetFaceShader()->bitang_attribute, GL_FLOAT);
+	//face_normal_vbo->SetAttribute(CEngine::GetFaceShader()->face_normal_attribute, GL_FLOAT);
 	uvcoord_vbo->SetAttribute(CEngine::GetFaceShader()->uvcoord_attribute, GL_FLOAT);
 
 	if(refresh_ibos)
 		RefreshIBOs();
 
+	//CEngine::GetFaceShader()->BindShader();
 	CEngine::GetFaceShader()->SetMode(shader_enabled);
 	CEngine::GetFaceShader()->SetTwoSide(both_sides);
 	CEngine::GetFaceShader()->SetTransformation(CMesh::transformation);
@@ -1715,9 +1748,11 @@ void CMesh::ChangePosition(const char *name, const char *idle)
 		current_position = idle_position;
 	else if((p = GetPositionByName(name)) != 0)
 		current_position = p;
+	else
+		printf("fail\n");
 
-	if(current_position && current_position != old_pos)
-		current_position->ApplyPosition();
+	//if(current_position && current_position != old_pos)
+	current_position->ApplyPosition();
 }
 
 void CMesh::ChangePosition(CMeshPosition *pos)
@@ -1779,6 +1814,7 @@ void CMesh::ChangeAnimation(CAnimation *a)
 	ResetAnimationFinished();
 	current_animation = a;
 	current_animation->SetTime(0.0);
+	//RefreshAllVBOs();
 }
 
 void CMesh::ChangeAnimation(const char *name)

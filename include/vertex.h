@@ -11,6 +11,7 @@ struct CVertex : public CVector
 	CVector2 uv;
 	bool uv_set;
 	CVector normal;
+	CVector tang, bitang;
 	int normal_count; // only for calculating smooth normals
 
 	int index;

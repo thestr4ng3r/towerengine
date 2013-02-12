@@ -46,9 +46,9 @@ class CFaceShader : public CShader
 	public:
 		static const GLint vertex_attribute = 0;
 		static const GLint normal_attribute = 1;
-		static const GLint face_normal_attribute = 5;
-		static const GLint uvcoord_attribute = 2;
-
+		static const GLint tang_attribute = 2;
+		static const GLint bitang_attribute = 3;
+		static const GLint uvcoord_attribute = 4;
 		void Init(void);
 
 		void SetMode(int e); // disables or enables calculation of the color to speed up e.g. shadow mapping

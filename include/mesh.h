@@ -29,6 +29,8 @@ class CMesh
 		VAO *vao;
 		VBO<float> *vertex_vbo;
 		VBO<float> *normal_vbo;
+		VBO<float> *tang_vbo;
+		VBO<float> *bitang_vbo;
 		VBO<float> *face_normal_vbo;
 		VBO<float> *uvcoord_vbo;
 		int data_count;

@@ -131,10 +131,10 @@ void CMaterial::PutToGL(void)
 	CEngine::GetFaceShader()->SetTexture(diffuse.tex, aeb.tex, normal.tex, height.tex, specular.tex);
 	CEngine::GetFaceShader()->SetDiffuseColor(diffuse.color);
 	CEngine::GetFaceShader()->SetSpecularColor(specular.color);
-	CEngine::GetFaceShader()->SetAmbientColor(diffuse.ambient_color);
 	CEngine::GetFaceShader()->SetSpecular(specular.exponent);
 	CEngine::GetFaceShader()->SetBumpFactor(aeb.bump_factor);
 	CEngine::GetFaceShader()->SetHeightFactor(Vec(1.0, 1.0, 1.0) * height.factor);
+	CEngine::GetFaceShader()->SetAmbientColor(diffuse.ambient_color);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

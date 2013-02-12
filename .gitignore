@@ -9,6 +9,8 @@
 *.a
 *.so
 *.so.*
+*_old.frag
+*_old.vert
 
 # git scripts
 push.sh

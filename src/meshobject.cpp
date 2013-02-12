@@ -17,6 +17,8 @@ CMeshObject::CMeshObject(CMesh *mesh)
 	scale = Vec(1.0, 1.0, 1.0);
 	color = Vec(1.0, 1.0, 1.0);
 	alpha = 1.0;
+	visible = true;
+	time = 0.0;
 }
 
 void CMeshObject::SetAnimation(const char *animation)
@@ -55,6 +57,9 @@ void CMeshObject::SetPose(const char *pose)
 
 void CMeshObject::PutToGL(CVector cam)
 {
+	if(!visible)
+		return;
+
 	CMesh::LoadIdentity();
 	CMesh::Translate(pos);
 	CMesh::Scale(scale);

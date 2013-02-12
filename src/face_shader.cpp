@@ -4,7 +4,8 @@ int shader_enabled = 1;
 
 const GLint CFaceShader::vertex_attribute;
 const GLint CFaceShader::normal_attribute;
-const GLint CFaceShader::face_normal_attribute;
+const GLint CFaceShader::tang_attribute;
+const GLint CFaceShader::bitang_attribute;
 const GLint CFaceShader::uvcoord_attribute;
 
 void CFaceShader::Init(void)
@@ -14,49 +15,46 @@ void CFaceShader::Init(void)
 	CreateVertexShader();
 	CreateFragmentShader();
 	CreateProgram();
-	glBindAttribLocationARB(program, vertex_attribute, "Vertex_a");
-	glBindAttribLocationARB(program, normal_attribute, "Normal_a");
-	glBindAttribLocationARB(program, face_normal_attribute, "FaceNormal_a");
-	glBindAttribLocationARB(program, uvcoord_attribute, "TexCoord_a");
+	glBindAttribLocationARB(program, vertex_attribute, "vertex_attr");
+	glBindAttribLocationARB(program, normal_attribute, "normal_attr");
+	glBindAttribLocationARB(program, tang_attribute, "tang_attr");
+	glBindAttribLocationARB(program, bitang_attribute, "bitang_attr");
+	glBindAttribLocationARB(program, uvcoord_attribute, "uv_attr");
 	LinkProgram();
 
-	two_side_uniform = glGetUniformLocationARB(program, "TwoSide");
+	two_side_uniform = glGetUniformLocationARB(program, "two_side_uni");
 
-	diffuse_color_uniform = glGetUniformLocationARB(program, "DiffuseColor");
-	diffuse_color2_uniform = glGetUniformLocationARB(program, "DiffuseColor2");
-	specular_color_uniform = glGetUniformLocationARB(program, "SpecularColor");
-	ambient_color_uniform = glGetUniformLocationARB(program, "AmbientColor");
+	diffuse_color_uniform = glGetUniformLocationARB(program, "diffuse_color_uni");
+	diffuse_color2_uniform = glGetUniformLocationARB(program, "diffuse_color2_uni");
+	specular_color_uniform = glGetUniformLocationARB(program, "specular_color_uni");
+	ambient_color_uniform = glGetUniformLocationARB(program, "ambient_color_uni");
 
-	light_pos_uniform = glGetUniformLocationARB(program, "LightPos");
-	light_color_uniform = glGetUniformLocationARB(program, "LightColor");
+	light_pos_uniform = glGetUniformLocationARB(program, "light_pos_uni");
+	light_color_uniform = glGetUniformLocationARB(program, "light_color_uni");
 	
-	shadow_map_uniform = glGetUniformLocationARB(program, "ShadowMap");
-	shadow_enabled_uniform = glGetUniformLocationARB(program, "ShadowEnabled");
-	shadow_pixel_uniform = glGetUniformLocationARB(program, "ShadowPixel");
+	shadow_map_uniform = glGetUniformLocationARB(program, "shadow_map_uni");
+	shadow_enabled_uniform = glGetUniformLocationARB(program, "shadow_enabled_uni");
+	shadow_pixel_uniform = glGetUniformLocationARB(program, "shadow_pixel_size_uni");
 
-	specular_size_uniform = glGetUniformLocationARB(program, "SpecularSize");
+	specular_size_uniform = glGetUniformLocationARB(program, "specular_size_uni");
 
-	diffuse_tex_uniform = glGetUniformLocationARB(program, "DiffuseTex");
-	aeb_tex_uniform = glGetUniformLocationARB(program, "AEBTex");
-	normal_tex_uniform = glGetUniformLocationARB(program, "NormalTex");
-	height_tex_uniform = glGetUniformLocationARB(program, "HeightTex");
-	specular_tex_uniform = glGetUniformLocationARB(program, "SpecularTex");
+	diffuse_tex_uniform = glGetUniformLocationARB(program, "diffuse_tex_uni");
+	//aeb_tex_uniform = glGetUniformLocationARB(program, "AEBTex");
+	normal_tex_uniform = glGetUniformLocationARB(program, "normal_tex_uni");
+	height_tex_uniform = glGetUniformLocationARB(program, "height_tex_uni");
+	specular_tex_uniform = glGetUniformLocationARB(program, "specular_tex_uni");
 
-	tex_border_uniform = glGetUniformLocationARB(program, "TexBorder");
-	discard_border_uniform = glGetUniformLocationARB(program, "DiscardBorder");
+	//tex_border_uniform = glGetUniformLocationARB(program, "TexBorder");
+	//discard_border_uniform = glGetUniformLocationARB(program, "DiscardBorder");
 
-	height_factor_uniform = glGetUniformLocationARB(program, "HeightFactor");
-	bump_factor_uniform = glGetUniformLocationARB(program, "BumpFactor");
+	//height_factor_uniform = glGetUniformLocationARB(program, "height_factor_uni");
+	//bump_factor_uniform = glGetUniformLocationARB(program, "BumpFactor");
 
-	fog_color_uniform = glGetUniformLocationARB(program, "FogColor");
-	fog_depth_uniform = glGetUniformLocationARB(program, "FogDepth");
-	fog_dist_uniform = glGetUniformLocationARB(program, "FogDist");
+	transformation_uniform = glGetUniformLocationARB(program, "transformation_uni");
+	shader_mode_uniform = glGetUniformLocationARB(program, "shader_mode_uni");
 
-	transformation_uniform = glGetUniformLocationARB(program, "Transformation");
-	shader_mode_uniform = glGetUniformLocationARB(program, "ShaderMode");
-
-	clip_uniform = glGetUniformLocationARB(program, "Clip");
-	clip_dist_uniform = glGetUniformLocationARB(program, "ClipDist");
+	clip_uniform = glGetUniformLocationARB(program, "clip_vec_uni");
+	clip_dist_uniform = glGetUniformLocationARB(program, "clib_dist_uni");
 
 	ResetUniforms();
 	UseNoShader();
@@ -83,7 +81,7 @@ void CFaceShader::SetDiffuseColor(CVector color)
 
 void CFaceShader::SetDiffuseColor2(CVector color, float alpha)
 {
-	if(diffuse_color_uniform != -1)
+	if(diffuse_color2_uniform != -1)
 		glUniform4fARB(diffuse_color2_uniform, color.x, color.y, color.z, alpha);
 }
 
