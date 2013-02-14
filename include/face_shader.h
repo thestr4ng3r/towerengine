@@ -24,8 +24,12 @@ class CFaceShader : public CShader
 		GLint shadow_enabled_uniform;
 		GLint shadow_pixel_uniform;
 
+		GLint diffuse_tex_enabled_uniform;
+		GLint normal_tex_enabled_uniform;
+		GLint height_tex_enabled_uniform;
+		GLint specular_tex_enabled_uniform;
+
 		GLint diffuse_tex_uniform;
-		GLint aeb_tex_uniform;
 		GLint normal_tex_uniform;
 		GLint height_tex_uniform;
 		GLint specular_tex_uniform;
@@ -59,7 +63,10 @@ class CFaceShader : public CShader
 		void SetAmbientColor(CVector color);
 		void SetLight(CVector pos, CVector color);
 		void SetSpecular(float size);
-		void SetTexture(GLuint diffuse, GLuint aeb, GLuint normal, GLuint height, GLuint specular);
+		void SetDiffuseTexture(bool enabled, GLuint tex = 0);
+		void SetSpecularTexture(bool enabled, GLuint tex = 0);
+		void SetNormalTexture(bool enabled, GLuint tex = 0);
+		void SetHeightTexture(bool enabled, GLuint tex = 0);
 		void SetBorder(int e, CVector2 a, CVector2 b);
 		void SetTexCoord(CVector2 coord);
 		void SetVectors(CVector normal, CVector tangx, CVector tangy, CVector fnormal = Vec(0.0, 0.0, 0.0));

@@ -1,16 +1,16 @@
 #ifndef MESH_H
 #define MESH_H
 
-#define FILE_HEADER_MESH_1_0		"Tower Mesh Version 1.0 by Metallic Entertainment - Mesh\n"
-
-#define TEM_VERSION_0_1				0
-#define TEM_VERSION_0_2				1
+#define TEM_VERSION_0_1				1
+#define TEM_VERSION_0_2				2
+#define TEM_VERSION_0_3				3
 
 #define TEM_VERSION_0_1_STRING		"0.1"
 #define TEM_VERSION_0_2_STRING		"0.2"
+#define TEM_VERSION_0_3_STRING		"0.3"
 
-#define TEM_CURRENT_VERSION			TEM_VERSION_0_2
-#define TEM_CURRENT_VERSION_STRING	TEM_VERSION_0_2_STRING
+#define TEM_CURRENT_VERSION			TEM_VERSION_0_3
+#define TEM_CURRENT_VERSION_STRING	TEM_VERSION_0_3_STRING
 
 
 class CMesh
@@ -106,9 +106,8 @@ class CMesh
 
         int LoadFromFile_lib3ds(const char *file);
 		int MergeWithFile_lib3ds(const char *file);
-		int LoadFromFileHandle_1_0(int h, const char *path, int no_material = 0);
-		int LoadFromFile(const char *file, int no_material = 0);
-		int LoadFromFile_xml(const char *file, const char *path, int no_material);
+		bool LoadFromFile(const char *file, int no_material = 0);
+		bool LoadFromFile_xml(const char *file, const char *path, int no_material);
         //int LoadFromFile_0_0(const char *file) { printf("LoadFromFile_0_0 function was removed.\n"); return 0; };
         int SaveToFile(const char *file);
  	    int SaveToFile_0_1(const char *file);
@@ -119,8 +118,6 @@ class CMesh
 		int GetState(void);
 		void Create(void);
 		void Delete(void);
-
-		CMesh *Copy(void);
 
 		void SetWireframe(int wf)					{ wireframe = wf ? 1 : 0; }
 		int GetWireframe(void)						{ return wireframe; }
@@ -180,10 +177,6 @@ class CMesh
 		CVertex *CreateVertex(CVector v);
 		CTriangle *CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3);
 		CTriangle *CreateTriangleAuto(CVector v1, CVector v2, CVector v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3);
-		CMaterial *CreateMaterial(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb,
-		float b_factor, const char *height, float h_factor, char name[100]);
-		CMaterial *CreateMaterialRelative(const char *path, const char *diffuse, const char *specular, float exponent, const char *normal,
-		const char *aeb, float b_factor, const char *height, float h_factor, char name[100]);
 		CCustomPosition *CreatePosition(const char *name);
 		CEntity *CreateEntity(string name, string group = string());
 
@@ -192,7 +185,7 @@ class CMesh
 		void ChangePosition(CMeshPosition *pos);
 		void CopyPositionFromVertices(void);
 
-		CMaterial *GetMaterialByName(char name[100]);
+		CMaterial *GetMaterialByName(string name);
 		CVertex *GetVertexByID(int id);
 
 		void SetVertexId(CVertex *v, int id);

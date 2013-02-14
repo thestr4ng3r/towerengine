@@ -23,8 +23,11 @@ uniform vec3 specular_color_uni;
 uniform vec3 ambient_color_uni;
 uniform float specular_size_uni;
 
+uniform bool diffuse_tex_enabled_uni;
+uniform bool specular_tex_enabled_uni;
+uniform bool normal_tex_enabled_uni;
+
 uniform sampler2D diffuse_tex_uni;
-//uniform sampler2D aeb_tex_uni;
 uniform sampler2D normal_tex_uni;
 uniform sampler2D specular_tex_uni;
 
@@ -86,9 +89,16 @@ void main(void)
 	vec3 cam_dir = normalize(cam_pos_var - pos_var); // pos to cam normalized
 	mat3 tangent_space = mat3(tang_var, bitang_var, normal_var);
 				
-	vec4 diffuse_tex_color = texture2D(diffuse_tex_uni, uv_var).rgba;
-	vec3 normal_tex_color = texture2D(normal_tex_uni, uv_var).rgb;
-	vec3 specular_tex_color = texture2D(specular_tex_uni, uv_var).rgb;
+	vec4 diffuse_tex_color = vec4(1.0, 1.0, 1.0, 1.0);
+	if(diffuse_tex_enabled_uni)
+		diffuse_tex_color = texture2D(diffuse_tex_uni, uv_var).rgba;
+	
+	vec3 normal_tex_color = vec3(0.5, 0.5, 1.0);
+	if(normal_tex_enabled_uni)
+		normal_tex_color = texture2D(normal_tex_uni, uv_var).rgb;
+	vec3 specular_tex_color = vec3(0.5, 0.5, 0.5);
+	if(specular_tex_enabled_uni)
+		specular_tex_color = texture2D(specular_tex_uni, uv_var).rgb;
 	
 	vec3 normal = tangent_space * (normal_tex_color - vec3(0.5, 0.5, 0.5)) * 2.0; 
 	

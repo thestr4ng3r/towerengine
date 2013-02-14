@@ -30,7 +30,7 @@ CTriangle::~CTriangle()
 
 void CTriangle::SetMaterial(char material[100])
 {
-    mat = mesh->GetMaterialByName(material);
+    mat = mesh->GetMaterialByName(string(material));
     if(!mat)
     	mat = mesh->GetIdleMaterial();
     if(!m_name)

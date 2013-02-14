@@ -16,7 +16,6 @@
 #define READ_MODUS_READ -1
 #define READ_MODUS_VALUES 0
 
-CMaterial *CMaterial::current = 0;
 
 CVector light_dir;
 CVector light_pos;
@@ -206,7 +205,7 @@ void CMesh::Create(void)
 	refresh_all_vbos = true;
 	refresh_vertex_vbo = false;
 	refresh_ibos = true;
-	idle_material = CreateMaterial("$NONE", "$NONE", 32.0, "$NONE", "$NONE", 0.0, "$NONE", 0.0, cstr("$NONE"));
+	idle_material = new CMaterial(this, string());
 	//VAO::UnBind();
 
 	SetWireframe(0);
@@ -270,67 +269,6 @@ void CMesh::DeleteVBOData(void)
 }
 
 
-CMesh *CMesh::Copy(void)
-{
-	CMesh *r;
-	int i;
-
-	r = new CMesh();
-
-	SetIDs();
-
-	vector<CVertex *>::iterator v;
-	CVertex *vn;
-	for(v=vertices.begin(); v!=vertices.end(); v++)
-	{
-		vn = new CVertex(r);
-		vn->SetVector(**v);
-		vn->normal = (*v)->normal;
-		SetVertexId(vn, (*v)->id);
-	}
-
-	vector<CMaterial *>::iterator m;
-	CMaterial *mn;
-	for(m=materials.begin(); m!=materials.end(); m++)
-	{
-		mn = new CMaterial(r);
-		mn->SetValues((*m)->diffuse.filename.c_str(), (*m)->specular.filename.c_str(), (*m)->specular.exponent, (*m)->normal.filename.c_str(), (*m)->aeb.filename.c_str(),
-				(*m)->aeb.bump_factor, (*m)->height.filename.c_str(), (*m)->height.factor);
-		//(*m)->tex->Copy(mn->tex);
-		mn->name = cstr((*m)->name);
-	}
-
-	vector<CTriangle *>::iterator t;
-	CTriangle *tn;
-	for(t=triangles.begin(); t!=triangles.end(); t++)
-	{
-		if(strcmp((*t)->m_name, "$NONE") == 0)
-			continue;
-		tn = new CTriangle(r);
-		for(i=0; i<3; i++)
-			tn->v[i] = r->GetVertexByID((*t)->v[i]->id);
-		tn->SetMaterial((*t)->m_name);
-		tn->CalculateTangents();
-		tn->color = (*t)->color;
-	}
-
-	r->SetTriangleMaterials();
-
-	idle_position->Copy(r);
-
-	vector<CCustomPosition *>::iterator cp;
-	for(cp=custom_positions.begin(); cp!=custom_positions.end(); cp++)
-		(*cp)->Copy(r);
-
-	vector<CAnimation *>::iterator a;
-	for(a=animations.begin(); a!=animations.end(); a++)
-		(*a)->Copy(r);
-
-	return r;
-}
-
-
-
 
 CVertex *CMesh::CreateVertex(CVector v)
 {
@@ -338,28 +276,6 @@ CVertex *CMesh::CreateVertex(CVector v)
 	o = new CVertex(v, this);
 	refresh_all_vbos = false;
 	return o;
-}
-
-CMaterial *CMesh::CreateMaterial(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb,
-			float b_factor, const char *height, float h_factor, char name[100])
-{
-    if(!GetState())
-        return 0;
-
-	refresh_ibos = true;
-
-    return CMaterial::CreateMaterial(diffuse, specular, exponent, normal, aeb, b_factor, height, h_factor, name, this);
-}
-
-CMaterial *CMesh::CreateMaterialRelative(const char *path, const char *diffuse, const char *specular, float exponent, const char *normal,
-			const char *aeb, float b_factor, const char *height, float h_factor, char name[100])
-{
-    if(!GetState())
-        return 0;
-
-	refresh_ibos = true;
-
-    return CMaterial::CreateMaterialRelative(path, diffuse, specular, exponent, normal, aeb, b_factor, height, h_factor, name, this);
 }
 
 CTriangle *CMesh::CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3) // TODO: Optimieren!
@@ -411,16 +327,13 @@ CEntity *CMesh::CreateEntity(string name, string group)
 	return e;
 }
 
-CMaterial *CMesh::GetMaterialByName(char name[100])
+CMaterial *CMesh::GetMaterialByName(string name)
 {
     vector<CMaterial *>::iterator m;
 
-    if(strcmp(name, "$NONE") == 0)
-        return 0;
-
     for(m=materials.begin(); m!=materials.end(); m++)
     {
-        if(strcmp((*m)->name, name) == 0)
+        if((*m)->GetName().compare(name) == 0)
             return *m;
     }
 
@@ -841,254 +754,11 @@ int CMesh::GetState(void)
     return 1;
 }
 
-
-int CMesh::LoadFromFileHandle_1_0(int h, const char *path, int no_material)
-{
-	float v[15];
-	char tx[5][100];
-	char name[100];
-	char modus, read_modus;
-	int ret = 0;
-	int id;
-	int i;
-	int tvert[3];
-	int counter = 0;
-	int vp_number;
-	union
-	{
-		float time;
-		float len;
-	};
-	int *vp_id;
-	char *tex_temp[6];
-	CVector *vec;
-	float *vp_coord;
-	int rel_counter;
-	int vp_count;
-	CCustomPosition *created_p;
-	CAnimation *created_a;
-	CVertex *created_v;
-
-	read_modus = READ_MODUS_READ;
-
-	Create();
-	
-	while(1)
-	{
-	    if(read_modus == READ_MODUS_READ)
-	    {
-	        ret = read(h, &modus, 1);
-	        read_modus = READ_MODUS_VALUES;
-	
-	        counter = 0;
-	    }
-	
-	    if(read_modus == READ_MODUS_VALUES)
-	    {
-	    	switch(modus)
-	    	{
-	    		case FILE_MODUS_MAT: // read material
-	    			if(counter < 5)
-	            		    ret = read(h, &tx[counter], 100);
-	            		else if(counter >= 5 && counter < 8)
-	    				ret = read(h, &v[counter - 5], sizeof(float));
-	            		else if(counter == 8)
-	            		    	ret = read(h, &name, 100);
-	            		else
-	            		    read_modus = READ_MODUS_FINISH;
-	    			break;
-
-
-
-	    		case FILE_MODUS_VERT: // read vertex
-	    			if(counter < 3)
-	    				ret = read(h, &v[counter], sizeof(float));
-	    			else if(counter == 3)
-	    				ret = read(h, &id, sizeof(int));
-	    			else if(counter > 3)
-	    				read_modus = READ_MODUS_FINISH;
-	    			break;
-
-
-
-	    		case FILE_MODUS_TRI: // read triangle
-	                    	if(counter < 3) // Vertices
-	                    		ret = read(h, &tvert[counter], sizeof(int));
-	    	                else if(counter >= 3 && counter < 15) // Other Vectors
-	    				ret = read(h, &v[counter], sizeof(float));
-	    			else if(counter == 15) // Material
-	            	        	ret = read(h, &name, 100);
-	                    	else if(counter > 15)
-	                        		read_modus = READ_MODUS_FINISH;
-	    			break;
-
-
-
-			case FILE_MODUS_POS: // read position
-				if(counter == 0)
-				{
-					ret = read(h, &name, 100);
-				}
-				else if(counter == 1)
-				{
-					ret = read(h, &vp_number, sizeof(int));
-					vp_id = new int[vp_number];
-					vp_coord = new float[vp_number * 3];
-					vp_count = 0;
-				}
-				else if(counter > 1 && counter < (vp_number * 4) + 2)
-				{
-					rel_counter = counter - 2;
-					vp_count = (rel_counter - (rel_counter % 4)) / 4;
-					if(rel_counter % 4 == 0)
-						ret = read(h, &vp_id[vp_count], sizeof(int));
-					else
-						ret = read(h, &vp_coord[vp_count * 3 + (rel_counter % 4) - 1], sizeof(float));
-				}
-				else if(counter >= (vp_number * 4) + 2)
-				{
-					read_modus = READ_MODUS_FINISH;
-				}
-				break;
-
-
-
-			case FILE_MODUS_KEY: // read keyframe
-				if(counter == 0)
-					ret = read(h, &name, 100);
-				else if(counter == 1)
-					ret = read(h, &time, sizeof(float));
-				else if(counter == 2)
-				{
-					ret = read(h, &vp_number, sizeof(int));
-					vp_id = new int[vp_number];
-					vp_coord = new float[vp_number * 3];
-				}
-				else if(counter > 2 && counter < (vp_number * 4) + 3)
-				{
-					rel_counter = counter - 3;
-					vp_count = (rel_counter - (rel_counter % 4)) / 4;
-					if(rel_counter % 4 == 0)
-						ret = read(h, &vp_id[vp_count], sizeof(int));
-					else
-						ret = read(h, &vp_coord[vp_count * 3 + (rel_counter % 4) - 1], sizeof(float));
-				}
-				else if(counter >= (vp_number * 4) + 3)
-					read_modus = READ_MODUS_FINISH;
-
-				break;
-
-
-
-			case FILE_MODUS_ANIM: // read animation
-				if(counter == 0)
-					ret = read(h, &name, 100);
-				else if(counter == 1)
-					ret = read(h, &len, sizeof(float));
-				else if(counter > 1)
-					read_modus = READ_MODUS_FINISH;
-				break;
-	    	}
-	    }
-	
-	    if(modus == FILE_MODUS_END)
-		    break;
-
-	    if(ret < 1)
-	    {
-		    printf("unexpected eof\n");
-		    break;
-	    }
-	
-	    counter++;
-	
-	    if(read_modus == READ_MODUS_FINISH)
-	    {
-	    	switch(modus)
-	    	{
-	    		case FILE_MODUS_MAT:
-				if(no_material)
-					break;
-	    			tex_temp[0] = new char[100];
-	            		tex_temp[1] = new char[100];
-	            		tex_temp[2] = new char[100];
-	            		tex_temp[3] = new char[100];
-				tex_temp[4] = new char[100];
-				tex_temp[5] = new char[100];
-	            		snprintf(tex_temp[0], 100, "%s", tx[0]);
-	            		snprintf(tex_temp[1], 100, "%s", tx[1]);
-	            		snprintf(tex_temp[2], 100, "%s", tx[2]);
-				snprintf(tex_temp[3], 100, "%s", tx[3]);
-				snprintf(tex_temp[4], 100, "%s", tx[4]);
-	            		snprintf(tex_temp[5], 100, "%s", name);
-
-	            		CreateMaterialRelative(path, tex_temp[0], tex_temp[1], v[0], tex_temp[2], tex_temp[3], v[1],
-					       tex_temp[4], v[2], tex_temp[5]);
-	    			break;
-	    		case FILE_MODUS_VERT:
-	    			created_v = CreateVertex(Vec(v[0], v[1], v[2]));
-	    			SetVertexId(created_v, id);
-	    			break;
-	    		case FILE_MODUS_TRI:
-	    			CreateTriangle(GetVertexByID(tvert[0]),   // 1
-	                           		GetVertexByID(tvert[1]),       	// 2
-	                           		GetVertexByID(tvert[2]),       	// 3
-	                           		Vec(v[3], v[4], v[5]),     		// color
-	                           		name,                    		// material
-	                           		Vec(v[6], v[7], v[8]),    		// t1
-	                           		Vec(v[9], v[10], v[11]),    		// t2
-	                           		Vec(v[12], v[13], v[14]));   		// t3
-	                    	break;
-			case FILE_MODUS_POS: // create position
-				created_p = new CCustomPosition(this, name);
-				vec = new CVector[vp_number];
-				for(i=0; i<vp_number; i++)
-				{
-					vec[i].x = vp_coord[i * 3 + 0];
-					vec[i].y = vp_coord[i * 3 + 1];
-					vec[i].z = vp_coord[i * 3 + 2];
-				}
-				created_p->CopyFromData(vp_number, vp_id, vec);
-				break;
-
-			case FILE_MODUS_KEY: // create keyframe
-				created_a = GetAnimationByName(name);
-				if(!created_a)
-					break;
-				vec = new CVector[vp_number];
-				for(i=0; i<vp_number; i++)
-				{
-					vec[i].x = vp_coord[i * 3 + 0];
-					vec[i].y = vp_coord[i * 3 + 1];
-					vec[i].z = vp_coord[i * 3 + 2];
-				}
-				created_a->NewKeyFrameFromData(time, vp_number, vp_id, vec);
-				break;
-
-			case FILE_MODUS_ANIM: // create animation
-				created_a = new CAnimation(this, name, len, 0);
-				break;
-
-	    	}
-	
-	        read_modus = READ_MODUS_READ;
-	        counter = 0;
-	    }
-	}
-
-	close(h);
-	
-	return 1;
-}
-
-
-
-int CMesh::LoadFromFile(const char *file, int no_material)
+bool CMesh::LoadFromFile(const char *file, int no_material)
 {
 	int h;
-	int r;
+	bool r;
 	char *path;
-	char header[strlen(FILE_HEADER_MESH_1_0)];
 	struct stat s;
 	
 	if(stat(file, &s) != 0 && errno == ENOENT)
@@ -1096,23 +766,7 @@ int CMesh::LoadFromFile(const char *file, int no_material)
 	
 	path = PathOfFile(file);
 
-	h = open(file, O_RDONLY);
-	if(h < 0)
-	    return 0;
-
-	read(h, &header, strlen(FILE_HEADER_MESH_1_0));
-
-	if(strcmp(header, FILE_HEADER_MESH_1_0) == 0)
-	{
-		r = LoadFromFileHandle_1_0(h, path, no_material);
-	}
-	else
-	{
-		close(h);
-		r = LoadFromFile_xml(file, path, no_material);
-	}	
-
-	//CalculateNormalsSolid();
+	r = LoadFromFile_xml(file, path, no_material);
 
 	refresh_all_vbos = true;
 	refresh_ibos = true;
@@ -1129,7 +783,7 @@ int TEMVersionFromString(const char *s)
 	return -1;
 }
 
-int CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material)
+bool CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material)
 {
 	xmlDocPtr doc;
 	xmlNodePtr cur;
@@ -1165,7 +819,7 @@ int CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material)
 		else if(file_version != TEM_CURRENT_VERSION)
 		{
 			printf("WARNING: Version \"%s\" of file \"%s\" is outdated. Use \"%s\" instead.\n",
-					version_string, file, TEM_VERSION_0_2_STRING);
+					version_string, file, TEM_CURRENT_VERSION_STRING);
 		}
 	}
 
@@ -1234,54 +888,47 @@ CVertex *CMesh::ParseVertexNode(xmlNodePtr cur)
 CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 {
 	xmlNodePtr child;
-	char *diffuse_file;
-	char *specular_file; float exponent;
-	char *normal_file;
-	char *aeb_file; float bump_factor;
-	char *height_file; float height_factor;
-	char *name;
+	bool diffuse_enabled, specular_enabled, normal_enabled, height_enabled;
+	string diffuse_file;
+	string specular_file; float exponent;
+	string normal_file;
+	string height_file; float height_factor;
+	string name;
 	xmlChar *temp;
 	CMaterial *r;
 
-	name = diffuse_file = specular_file = normal_file = aeb_file = height_file = 0;
+	diffuse_enabled = specular_enabled = normal_enabled = height_enabled = false;
 
-	name = (char *)xmlGetProp(cur, (const xmlChar *)"name");
+	name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
+
 	child = cur->children;
-	diffuse_file = cstr("$NONE");
-	specular_file = cstr("$NONE");
-	normal_file = cstr("$NONE");
-	aeb_file = cstr("$NONE");
-	height_file = cstr("$NONE");
 	while(child)
 	{
 		if(!xmlStrcmp(child->name, (const xmlChar *)"diffuse"))
 		{
 			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
-				diffuse_file = (char *)temp;
+				diffuse_file = string((const char *)temp);
+			diffuse_enabled = diffuse_file.length() > 0;
 		}
 		if(!xmlStrcmp(child->name, (const xmlChar *)"specular"))
 		{
 			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
-				specular_file = (char *)temp;
+				specular_file = string((const char *)temp);
+			specular_enabled = specular_file.length() > 0;
 			if((temp = xmlGetProp(child, (const xmlChar *)"exponent")))
 				exponent = atof((const char *)temp);
 		}
 		if(!xmlStrcmp(child->name, (const xmlChar *)"normal"))
 		{
 			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
-				normal_file = (char *)temp;
-		}
-		if(!xmlStrcmp(child->name, (const xmlChar *)"aeb"))
-		{
-			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
-				aeb_file = (char *)temp;
-			if((temp = xmlGetProp(child, (const xmlChar *)"factor")))
-				bump_factor = atof((const char *)temp);
+				normal_file = string((const char *)temp);
+			normal_enabled = normal_file.length() > 0;
 		}
 		if(!xmlStrcmp(child->name, (const xmlChar *)"height"))
 		{
 			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
-				height_file = (char *)temp;
+				height_file = string((const char *)temp);
+			height_enabled = height_file.length() > 0;
 			if((temp = xmlGetProp(child, (const xmlChar *)"factor")))
 				height_factor = atof((const char *)temp);
 			else
@@ -1290,7 +937,23 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 		child = child->next;
 	}
 
-	r = CreateMaterialRelative(path, diffuse_file, specular_file, exponent, normal_file, aeb_file, bump_factor, height_file, height_factor, name);
+	r = new CMaterial(this, name);
+
+	if(diffuse_file.compare("$NONE") == 0)
+		diffuse_enabled = false;
+	if(specular_file.compare("$NONE") == 0)
+		specular_enabled = false;
+	if(normal_file.compare("$NONE") == 0)
+		normal_enabled = false;
+	if(height_file.compare("$NONE") == 0)
+		height_enabled = false;
+
+	r->SetDiffuse(diffuse_enabled, diffuse_file); // TODO: color, ambient_color
+	r->SetSpecular(specular_enabled, specular_file, Vec(1.0, 1.0, 1.0), exponent); // TODO: specular color
+	r->SetNormal(normal_enabled, normal_file);
+	r->SetHeight(height_enabled, height_file, height_factor);
+	r->Load(string(path));
+
 	return r;
 }
 
@@ -1486,34 +1149,47 @@ int CMesh::SaveToFile(const char *file)
 
 	for(m=materials.begin(); m!=materials.end(); m++)
 	{
-		if(strcmp((*m)->name, "$NONE") == 0)
+		if((*m)->GetName().length() == 0)
 			continue;
 
 		cur = xmlNewNode(0, (const xmlChar *)"material");
-		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)(*m)->name);
+		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)(*m)->GetName().c_str());
 
-		child = xmlNewNode(0, (const xmlChar *)"diffuse");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->diffuse.filename.c_str());
-		xmlAddChild(cur, child);
 
-		child = xmlNewNode(0, (const xmlChar *)"specular");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->specular.filename.c_str());
-		xmlNewProp(child, (const xmlChar *)"exponent", (const xmlChar *)ftoa((*m)->specular.exponent));
-		xmlAddChild(cur, child);
+		CMaterial::Diffuse diffuse = (*m)->GetDiffuse();
+		CMaterial::Specular specular = (*m)->GetSpecular();
+		CMaterial::Normal normal = (*m)->GetNormal();
+		CMaterial::Height height = (*m)->GetHeight();
 
-		child = xmlNewNode(0, (const xmlChar *)"normal");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->normal.filename.c_str());
-		xmlAddChild(cur, child);
+		if(diffuse.enabled)
+		{
+			child = xmlNewNode(0, (const xmlChar *)"diffuse");
+			xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)diffuse.filename.c_str());
+			xmlAddChild(cur, child);
+		}
 
-		child = xmlNewNode(0, (const xmlChar *)"aeb");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->aeb.filename.c_str());
-		xmlNewProp(child, (const xmlChar *)"factor", (const xmlChar *)ftoa((*m)->aeb.bump_factor));
-		xmlAddChild(cur, child);
+		if(specular.enabled)
+		{
+			child = xmlNewNode(0, (const xmlChar *)"specular");
+			xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)specular.filename.c_str());
+			xmlNewProp(child, (const xmlChar *)"exponent", (const xmlChar *)ftoa(specular.exponent));
+			xmlAddChild(cur, child);
+		}
 
-		child = xmlNewNode(0, (const xmlChar *)"height");
-		xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)(*m)->height.filename.c_str());
-		xmlNewProp(child, (const xmlChar *)"factor", (const xmlChar *)ftoa((*m)->height.factor));
-		xmlAddChild(cur, child);
+		if(normal.enabled)
+		{
+			child = xmlNewNode(0, (const xmlChar *)"normal");
+			xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)normal.filename.c_str());
+			xmlAddChild(cur, child);
+		}
+
+		if(height.enabled)
+		{
+			child = xmlNewNode(0, (const xmlChar *)"height");
+			xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)height.filename.c_str());
+			xmlNewProp(child, (const xmlChar *)"factor", (const xmlChar *)ftoa(height.factor));
+			xmlAddChild(cur, child);
+		}
 
 		xmlAddChild(root, cur);
 	}
@@ -1884,18 +1560,18 @@ bool CompareTriangleMaterial(CTriangle *a, CTriangle *b)
 	//if(a->mat == b->mat)
 	//	return CompareDist(a, b);
 	//else
-	if(b->mat->transparent == a->mat->transparent)
+	if(b->mat->GetTransparent() == a->mat->GetTransparent())
 		return a->mat < b->mat;
 	else
-		return b->mat->transparent && !a->mat->transparent;
+		return b->mat->GetTransparent() && !a->mat->GetTransparent();
 }
 
 bool CompareMaterialTransparency(CMaterial *a, CMaterial *b)
 {
-	if(b->transparent == a->transparent)
+	if(b->GetTransparent() == a->GetTransparent())
 		return a < b;
 	else
-		return b->transparent && !a->transparent;
+		return b->GetTransparent() && !a->GetTransparent();
 }
 
 void CMesh::SortTriangles(CVector cam)

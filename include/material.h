@@ -1,77 +1,83 @@
 #ifndef _MATERIAL_H_
 #define _MATERIAL_H_
 
-struct CMaterial
+class CMaterial
 {
-	CMesh *mesh;
-	//CMaterial *chain_next;
+	public:
+		struct Diffuse
+		{
+			bool enabled;
+			string filename;
+			CVector color;
+			CVector ambient_color;
+		};
 
-	//CTexture *tex;
+		struct Specular
+		{
+			bool enabled;
+			string filename;
+			float exponent;
+			CVector color;
+		};
 
-	IBO *ibo;
-	int triangle_count;
-	int triangle_i;
-	GLuint *ibo_data;
+		struct Normal
+		{
+			bool enabled;
+			string filename;
+		};
 
-	char *name;
+		struct Height
+		{
+			bool enabled;
+			string filename;
+			float factor;
+		};
 
-	struct diffuse
-	{
-		bool enabled;
-		string filename;
-		GLuint tex;
-		CVector color;
-		CVector ambient_color;
-	} diffuse;
+	private:
+		CMesh *mesh;
 
-	struct specular
-	{
-		bool enabled;
-		string filename;
-		float exponent;
-		GLuint tex;
-		CVector color;
-	} specular;
+		string name;
 
-	struct normal
-	{
-		bool enabled;
-		string filename;
-		GLuint tex;
-	} normal;
+		Diffuse diffuse;
+		Specular specular;
+		Normal normal;
+		Height height;
 
-	struct aeb
-	{
-		bool enabled;
-		string filename;
-		float bump_factor;
-		GLuint tex;
-	} aeb;
+		GLuint diffuse_tex;
+		GLuint specular_tex;
+		GLuint normal_tex;
+		GLuint height_tex;
 
-	struct height
-	{
-		bool enabled;
-		string filename;
-		float factor;
-		GLuint tex;
-	} height;
+		bool transparent;
 
-	bool transparent;
+	public:
+		IBO *ibo;
+		int triangle_count;
+		int triangle_i;
+		GLuint *ibo_data;
 
-	static CMaterial *current;
+		CMaterial(CMesh *mesh, string name);
+		~CMaterial(void);
 
-	CMaterial(CMesh *mesh);
-	~CMaterial(void);
+		string GetName(void)		{ return name; }
+		CMesh *GetMesh(void)		{ return mesh; }
+		Diffuse GetDiffuse(void)	{ return diffuse; }
+		Specular GetSpecular(void)	{ return specular; }
+		Normal GetNormal(void)		{ return normal; }
+		Height GetHeight(void)		{ return height; }
+		bool GetTransparent(void)	{ return transparent; }
 
-	void SetValues(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb, float b_factor, const char *height, float h_factor);
-	void Load(string path);
+		void SetDiffuse(bool enabled, string filename = string(), CVector color = Vec(1.0, 1.0, 1.0), CVector ambient = Vec(0.5, 0.5, 0.5));
+		void SetSpecular(bool enabled, string filename = string(), CVector color = Vec(1.0, 1.0, 1.0), float exponent = 32.0);
+		void SetNormal(bool enabled, string filename = string());
+		void SetHeight(bool enabled, string filename = string(), float factor = 1.0);
 
-	static CMaterial *CreateMaterial(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb,
-			   float b_factor, const char *height, float h_factor, char name[100], CMesh *mesh = 0);
-	static CMaterial *CreateMaterialRelative(const char *path, const char *diffuse, const char *specular, float exponent, const char *normal,
-			   const char *aeb, float b_factor, const char *height, float h_factor, char name[100], CMesh *mesh = 0);
+		void Load(string path);
 
-	void PutToGL(void);// { if(current != this) tex->PutToGL(); current = this; };
+		static CMaterial *CreateMaterial(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb,
+				   float b_factor, const char *height, float h_factor, char name[100], CMesh *mesh = 0);
+
+		void PutToGL(void);
 };
 
 #endif

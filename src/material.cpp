@@ -1,93 +1,77 @@
 #include "towerengine.h"
 
-CMaterial::CMaterial(CMesh *mesh)
+CMaterial::CMaterial(CMesh *mesh, string name)
 {
     this->mesh = mesh;
-    ibo = 0;
-    if(mesh)
-    {
-    	mesh->AddMaterial(this);
-    	ibo = mesh->CreateIBO();
-    }
+    this->name = name;
+	mesh->AddMaterial(this);
+	ibo = mesh->CreateIBO();
 
-    diffuse.tex = 0;
-	specular.tex = 0;
-	normal.tex = 0;
-	aeb.tex = 0;
-	height.tex = 0;
-	diffuse.filename = string("$NONE");
+	diffuse.enabled = false;
+	diffuse.filename = string();
 	diffuse.color.Set(1.0, 1.0, 1.0);
 	diffuse.ambient_color.Set(0.5, 0.5, 0.5);
-	specular.filename = string("$NONE");
-	specular.color.Set(1.0, 1.0, 1.0);
-	normal.filename = string("$NONE");
-	aeb.filename = string("$NONE");
-	aeb.bump_factor = 0.0;
-	specular.exponent = 64.0;
-	height.filename = string("$NONE");
-	transparent = false;
-	height.factor = 0.0;
+    diffuse_tex = 0;
+    transparent = false;
 
-    //tex = new CTexture;
+	specular.enabled = false;
+	specular.filename = string();
+	specular.color.Set(1.0, 1.0, 1.0);
+	specular.exponent = 64.0;
+	specular_tex = 0;
+
+	normal.enabled = false;
+	normal.filename = string();
+	normal_tex = 0;
+
+	height.enabled = false;
+	height.filename = string();
+	height.factor = 0.0;
+	height_tex = 0;
 }
 
 CMaterial::~CMaterial(void)
 {
-	if(diffuse.tex != 0)
-		glDeleteTextures(1, &diffuse.tex);
-	if(specular.tex != 0)
-		glDeleteTextures(1, &specular.tex);
-	if(normal.tex != 0)
-		glDeleteTextures(1, &normal.tex);
-	if(aeb.tex != 0)
-		glDeleteTextures(1, &aeb.tex);
-	if(height.tex != 0)
-		glDeleteTextures(1, &height.tex);
+	if(diffuse_tex != 0)
+		glDeleteTextures(1, &diffuse_tex);
+	if(specular_tex != 0)
+		glDeleteTextures(1, &specular_tex);
+	if(normal_tex != 0)
+		glDeleteTextures(1, &normal_tex);
+	if(height_tex != 0)
+		glDeleteTextures(1, &height_tex);
 
 	if(mesh)
 		mesh->RemoveMaterial(this);
-
-    //delete tex;
 }
 
-CMaterial *CMaterial::CreateMaterial(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb,
-		       float b_factor, const char *height, float h_factor, char name[100], CMesh *mesh)
+void CMaterial::SetDiffuse(bool enabled, string filename, CVector color, CVector ambient)
 {
-    CMaterial *m;
-
-    m = new CMaterial(mesh);
-    m->name = cstr(name);
-    m->SetValues(diffuse, specular, exponent, normal, aeb, b_factor, height, h_factor);
-    m->Load(".");
-
-    return m;
+	diffuse.enabled = enabled;
+	diffuse.filename = filename;
+	diffuse.color = color;
+	diffuse.ambient_color = ambient;
 }
 
-CMaterial *CMaterial::CreateMaterialRelative(const char *path, const char *diffuse, const char *specular, float exponent, const char *normal,
-		       const char *aeb, float b_factor, const char *height, float h_factor, char name[100], CMesh *mesh)
+void CMaterial::SetSpecular(bool enabled, string filename, CVector color, float exponent)
 {
-    CMaterial *m;
-
-    m = new CMaterial(mesh);
-    m->name = cstr(name);
-    m->SetValues(diffuse, specular, exponent, normal, aeb, b_factor, height, h_factor);
-    m->Load(path);
-
-    return m;
+	specular.enabled = enabled;
+	specular.filename = filename;
+	specular.color = color;
+	specular.exponent = exponent;
 }
 
-
-void CMaterial::SetValues(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb,
-		       float b_factor, const char *height, float h_factor)
+void CMaterial::SetNormal(bool enabled, string filename)
 {
-	this->diffuse.filename = cstr(diffuse);
-	this->specular.filename = cstr(specular);
-	this->normal.filename = cstr(normal);
-	this->aeb.filename = cstr(aeb);
-	this->height.filename = cstr(height);
-	this->aeb.bump_factor = b_factor;
-	this->height.factor = h_factor;
-	this->specular.exponent = exponent;
+	normal.enabled = enabled;
+	normal.filename = filename;
+}
+
+void CMaterial::SetHeight(bool enabled, string filename, float factor)
+{
+	height.enabled = enabled;
+	height.filename = filename;
+	height.factor = factor;
 }
 
 void CMaterial::Load(string path)
@@ -95,44 +79,44 @@ void CMaterial::Load(string path)
 	string file;
 	struct stat s;
 
-	file = path + diffuse.filename;
-	if(diffuse.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
-		diffuse.tex = GLTextureFromColor(Vec(1.0, 1.0, 1.0));
-	else
-		diffuse.tex = LoadGLTexture(file.c_str());
+	if(diffuse.enabled)
+	{
+		file = path + diffuse.filename;
+		if(stat(file.c_str(), &s) == 0)
+			diffuse_tex = LoadGLTexture(file.c_str(), &transparent, 3);
+	}
 
-	file = path + specular.filename;
-	if(specular.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
-		specular.tex = GLTextureFromColor(Vec(0.5, 0.5, 0.5));
-	else
-		specular.tex = LoadGLTexture(file.c_str());
+	if(specular.enabled)
+	{
+		file = path + specular.filename;
+		if(stat(file.c_str(), &s) == 0)
+			specular_tex = LoadGLTexture(file.c_str());
+	}
 
-	file = path + normal.filename;
-	if(normal.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
-		normal.tex = GLTextureFromColor(Vec(0.5, 0.5, 1.0));
-	else
-		normal.tex = LoadGLTexture(file.c_str());
+	if(normal.enabled)
+	{
+		file = path + normal.filename;
+		if(stat(file.c_str(), &s) == 0)
+			normal_tex = LoadGLTexture(file.c_str());
+	}
 
-	file = path + aeb.filename;
-	if(aeb.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
-		aeb.tex = GLTextureFromColor(Vec(1.0, 1.0, 1.0));
-	else
-		aeb.tex = LoadGLTexture(file.c_str(), &transparent, 0);
-
-	file = path + height.filename;
-	if(height.filename.compare("$NONE") == 0 || stat(file.c_str(), &s) != 0)
-		height.tex = GLTextureFromColor(Vec(0.5, 0.5, 0.5));
-	else
-		height.tex = LoadGLTexture(file.c_str());
+	if(height.enabled)
+	{
+		file = path + height.filename;
+		if(stat(file.c_str(), &s) == 0)
+			height_tex = LoadGLTexture(file.c_str());
+	}
 }
 
 void CMaterial::PutToGL(void)
 {
-	CEngine::GetFaceShader()->SetTexture(diffuse.tex, aeb.tex, normal.tex, height.tex, specular.tex);
+	CEngine::GetFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse_tex);
+	CEngine::GetFaceShader()->SetSpecularTexture(specular.enabled, specular_tex);
+	CEngine::GetFaceShader()->SetNormalTexture(normal.enabled, normal_tex);
+	CEngine::GetFaceShader()->SetHeightTexture(height.enabled, height_tex);
 	CEngine::GetFaceShader()->SetDiffuseColor(diffuse.color);
 	CEngine::GetFaceShader()->SetSpecularColor(specular.color);
 	CEngine::GetFaceShader()->SetSpecular(specular.exponent);
-	CEngine::GetFaceShader()->SetBumpFactor(aeb.bump_factor);
 	CEngine::GetFaceShader()->SetHeightFactor(Vec(1.0, 1.0, 1.0) * height.factor);
 	CEngine::GetFaceShader()->SetAmbientColor(diffuse.ambient_color);
 	glEnable(GL_BLEND);

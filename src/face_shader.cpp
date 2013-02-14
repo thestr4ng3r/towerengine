@@ -39,10 +39,14 @@ void CFaceShader::Init(void)
 	specular_size_uniform = glGetUniformLocationARB(program, "specular_size_uni");
 
 	diffuse_tex_uniform = glGetUniformLocationARB(program, "diffuse_tex_uni");
-	//aeb_tex_uniform = glGetUniformLocationARB(program, "AEBTex");
 	normal_tex_uniform = glGetUniformLocationARB(program, "normal_tex_uni");
 	height_tex_uniform = glGetUniformLocationARB(program, "height_tex_uni");
 	specular_tex_uniform = glGetUniformLocationARB(program, "specular_tex_uni");
+
+	diffuse_tex_enabled_uniform = glGetUniformLocationARB(program, "diffuse_tex_enabled_uni");
+	normal_tex_enabled_uniform = glGetUniformLocationARB(program, "normal_tex_enabled_uni");
+	height_tex_enabled_uniform = glGetUniformLocationARB(program, "height_tex_enabled_uni");
+	specular_tex_enabled_uniform = glGetUniformLocationARB(program, "specular_tex_enabled_uni");
 
 	//tex_border_uniform = glGetUniformLocationARB(program, "TexBorder");
 	//discard_border_uniform = glGetUniformLocationARB(program, "DiscardBorder");
@@ -112,24 +116,55 @@ void CFaceShader::SetSpecular(float size)
 
 }
 
-void CFaceShader::SetTexture(GLuint diffuse, GLuint aeb, GLuint normal, GLuint height, GLuint specular)
-{
-	glUniform1iARB(diffuse_tex_uniform, 0);
-	glUniform1iARB(aeb_tex_uniform, 1);
-	glUniform1iARB(normal_tex_uniform, 2);
-	glUniform1iARB(height_tex_uniform, 3);
-	glUniform1iARB(specular_tex_uniform, 4);
 
-	glActiveTextureARB(GL_TEXTURE0_ARB);
-	glBindTexture(GL_TEXTURE_2D, diffuse);
-	glActiveTextureARB(GL_TEXTURE1_ARB);
-	glBindTexture(GL_TEXTURE_2D, aeb);
-	glActiveTexture(GL_TEXTURE2_ARB);
-	glBindTexture(GL_TEXTURE_2D, normal);
-	glActiveTexture(GL_TEXTURE3_ARB);
-	glBindTexture(GL_TEXTURE_2D, height);
-	glActiveTexture(GL_TEXTURE4_ARB);
-	glBindTexture(GL_TEXTURE_2D, specular);
+void CFaceShader::SetDiffuseTexture(bool enabled, GLuint tex)
+{
+	glUniform1iARB(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
+
+	if(enabled)
+	{
+		glUniform1iARB(diffuse_tex_uniform, 0);
+		glActiveTextureARB(GL_TEXTURE0_ARB);
+		glBindTexture(GL_TEXTURE_2D, tex);
+	}
+}
+
+void CFaceShader::SetSpecularTexture(bool enabled, GLuint tex)
+{
+	glUniform1iARB(specular_tex_enabled_uniform, enabled ? 1 : 0);
+
+	if(enabled)
+	{
+		glUniform1iARB(specular_tex_uniform, 4);
+		glActiveTexture(GL_TEXTURE4_ARB);
+		glBindTexture(GL_TEXTURE_2D, tex);
+	}
+
+}
+
+void CFaceShader::SetNormalTexture(bool enabled, GLuint tex)
+{
+	glUniform1iARB(normal_tex_enabled_uniform, enabled ? 1 : 0);
+
+	if(enabled)
+	{
+		glUniform1iARB(normal_tex_uniform, 2);
+		glActiveTexture(GL_TEXTURE2_ARB);
+		glBindTexture(GL_TEXTURE_2D, tex);
+	}
+
+}
+
+void CFaceShader::SetHeightTexture(bool enabled, GLuint tex)
+{
+	glUniform1iARB(height_tex_enabled_uniform, enabled ? 1 : 0);
+
+	if(enabled)
+	{
+		glUniform1iARB(height_tex_uniform, 3);
+		glActiveTexture(GL_TEXTURE3_ARB);
+		glBindTexture(GL_TEXTURE_2D, tex);
+	}
 }
 
 void CFaceShader::SetShadow(int v, GLuint tex, CVector2 pixel)
@@ -216,7 +251,7 @@ void CFaceShader::SetClip(CVector c, float d)
 void CFaceShader::ResetUniforms(void)
 {
 	SetVectors(Vec(0.0, 0.0, 1.0), Vec(1.0, 0.0, 0.0), Vec(0.0, 1.0, 0.0)); 
-	//SetDiffuseColor(Vec(1.0, 1.0, 1.0));
+	SetDiffuseColor(Vec(1.0, 1.0, 1.0));
 	SetSpecularColor(Vec(0.5, 0.5, 0.5));
 	SetAmbientColor(Vec(0.3, 0.3, 0.3));
 	SetLight(Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0));
@@ -225,5 +260,9 @@ void CFaceShader::ResetUniforms(void)
 	SetFog(Vec(1.0, 1.0, 1.0), 0.0, 0.0);
 	SetClip(Vec(0.0, 0.0, 0.0), 0.0);
 	SetShadow(0, 0, Vec(1.0, 1.0));
+	SetDiffuseTexture(false);
+	SetSpecularTexture(false);
+	SetNormalTexture(false);
+	SetHeightTexture(false);
 }
 
