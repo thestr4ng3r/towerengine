@@ -10,7 +10,7 @@ CMaterial::CMaterial(CMesh *mesh, string name)
 	diffuse.enabled = false;
 	diffuse.filename = string();
 	diffuse.color.Set(1.0, 1.0, 1.0);
-	diffuse.ambient_color.Set(0.5, 0.5, 0.5);
+	diffuse.ambient = 1.0;
     diffuse_tex = 0;
     transparent = false;
 
@@ -45,12 +45,12 @@ CMaterial::~CMaterial(void)
 		mesh->RemoveMaterial(this);
 }
 
-void CMaterial::SetDiffuse(bool enabled, string filename, CVector color, CVector ambient)
+void CMaterial::SetDiffuse(bool enabled, string filename, CVector color, float ambient)
 {
 	diffuse.enabled = enabled;
 	diffuse.filename = filename;
 	diffuse.color = color;
-	diffuse.ambient_color = ambient;
+	diffuse.ambient = ambient;
 }
 
 void CMaterial::SetSpecular(bool enabled, string filename, CVector color, float exponent)
@@ -118,7 +118,7 @@ void CMaterial::PutToGL(void)
 	CEngine::GetFaceShader()->SetSpecularColor(specular.color);
 	CEngine::GetFaceShader()->SetSpecular(specular.exponent);
 	CEngine::GetFaceShader()->SetHeightFactor(Vec(1.0, 1.0, 1.0) * height.factor);
-	CEngine::GetFaceShader()->SetAmbientColor(diffuse.ambient_color);
+	CEngine::GetFaceShader()->SetAmbient(diffuse.ambient);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

@@ -20,7 +20,7 @@ uniform vec2 shadow_pixel_size_uni;
 uniform vec3 diffuse_color_uni;
 uniform vec4 diffuse_color2_uni;
 uniform vec3 specular_color_uni;
-uniform vec3 ambient_color_uni;
+uniform float ambient_uni;
 uniform float specular_size_uni;
 
 uniform bool diffuse_tex_enabled_uni;
@@ -33,6 +33,7 @@ uniform sampler2D specular_tex_uni;
 
 uniform vec3 light_pos_uni;
 uniform vec3 light_color_uni;
+uniform vec3 light_ambient_color_uni;
 
 uniform vec3 clip_vec_uni;
 uniform float clip_dist_uni;
@@ -103,7 +104,7 @@ void main(void)
 	vec3 normal = tangent_space * (normal_tex_color - vec3(0.5, 0.5, 0.5)) * 2.0; 
 	
 	float alpha = diffuse_tex_color.a; // alpha
-	vec3 color = ambient_color_uni * diffuse_tex_color.rgb; // ambient
+	vec3 color = light_ambient_color_uni * diffuse_tex_color.rgb * ambient_uni; // ambient
 	
 	float shadow = 1.0;
 	float sr = 1.5;

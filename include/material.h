@@ -9,7 +9,7 @@ class CMaterial
 			bool enabled;
 			string filename;
 			CVector color;
-			CVector ambient_color;
+			float ambient;
 		};
 
 		struct Specular
@@ -67,7 +67,7 @@ class CMaterial
 		Height GetHeight(void)		{ return height; }
 		bool GetTransparent(void)	{ return transparent; }
 
-		void SetDiffuse(bool enabled, string filename = string(), CVector color = Vec(1.0, 1.0, 1.0), CVector ambient = Vec(0.5, 0.5, 0.5));
+		void SetDiffuse(bool enabled, string filename = string(), CVector color = Vec(1.0, 1.0, 1.0), float ambient = 1.0);
 		void SetSpecular(bool enabled, string filename = string(), CVector color = Vec(1.0, 1.0, 1.0), float exponent = 32.0);
 		void SetNormal(bool enabled, string filename = string());
 		void SetHeight(bool enabled, string filename = string(), float factor = 1.0);

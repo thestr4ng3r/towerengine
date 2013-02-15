@@ -14,11 +14,13 @@ class CFaceShader : public CShader
 		GLint diffuse_color_uniform;
 		GLint diffuse_color2_uniform;
 		GLint specular_color_uniform;
-		GLint ambient_color_uniform;
+		GLint ambient_uniform;
 
 		GLint light_pos_uniform;
 		GLint light_color_uniform;
-		GLint specular_size_uniform;
+		GLint light_ambient_color_uniform;
+
+		GLint specular_size_uniform; // TODO: in exponent umbenennen
 
 		GLint shadow_map_uniform;
 		GLint shadow_enabled_uniform;
@@ -60,8 +62,9 @@ class CFaceShader : public CShader
 		void SetDiffuseColor(CVector color);
 		void SetDiffuseColor2(CVector color, float alpha);
 		void SetSpecularColor(CVector color);
-		void SetAmbientColor(CVector color);
+		void SetAmbient(float ambient);
 		void SetLight(CVector pos, CVector color);
+		void SetLightAmbientColor(CVector color);
 		void SetSpecular(float size);
 		void SetDiffuseTexture(bool enabled, GLuint tex = 0);
 		void SetSpecularTexture(bool enabled, GLuint tex = 0);

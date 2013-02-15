@@ -163,7 +163,7 @@ GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, in
 	if (!success)
 	{
 		error = ilGetError();
-		std::cout << "Image load failed - IL reports error: " << error << " - " << iluErrorString(error) << std::endl;
+		printf("Failed to load image \"%s\": \n", filename, iluErrorString(error));
 		return 0;
 	}
 
@@ -178,7 +178,7 @@ GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, in
 	if (!success)
 	{
 		error = ilGetError();
-		std::cout << "Image conversion failed - IL reports error: " << error << " - " << iluErrorString(error) << std::endl;
+		printf("Failed to convert image \"%s\": \n", filename, iluErrorString(error));
 		return 0;
 	}
 

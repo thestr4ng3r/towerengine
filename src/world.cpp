@@ -191,7 +191,7 @@ void CWorld::Render(CVector cam_pos)
 {
 	CEngine::BindFaceShader();
 	CEngine::GetFaceShader()->SetLight(light_pos, light_color);
-	CEngine::GetFaceShader()->SetAmbientColor(ambient_color);
+	CEngine::GetFaceShader()->SetLightAmbientColor(ambient_color);
 	CEngine::GetFaceShader()->SetTwoSide(0);
 	CEngine::GetFaceShader()->SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
 	CEngine::GetFaceShader()->SetShadow(shadow.enabled ? 1 : 0, shadow.tex, Vec(1.0 / (float)shadow.width, 1.0 / (float)shadow.height));

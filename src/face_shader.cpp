@@ -27,10 +27,11 @@ void CFaceShader::Init(void)
 	diffuse_color_uniform = glGetUniformLocationARB(program, "diffuse_color_uni");
 	diffuse_color2_uniform = glGetUniformLocationARB(program, "diffuse_color2_uni");
 	specular_color_uniform = glGetUniformLocationARB(program, "specular_color_uni");
-	ambient_color_uniform = glGetUniformLocationARB(program, "ambient_color_uni");
+	ambient_uniform = glGetUniformLocationARB(program, "ambient_uni");
 
 	light_pos_uniform = glGetUniformLocationARB(program, "light_pos_uni");
 	light_color_uniform = glGetUniformLocationARB(program, "light_color_uni");
+	light_ambient_color_uniform = glGetUniformLocationARB(program, "light_ambient_color_uni");
 	
 	shadow_map_uniform = glGetUniformLocationARB(program, "shadow_map_uni");
 	shadow_enabled_uniform = glGetUniformLocationARB(program, "shadow_enabled_uni");
@@ -95,10 +96,10 @@ void CFaceShader::SetSpecularColor(CVector color)
 		glUniform3fARB(specular_color_uniform, color.x, color.y, color.z);
 }
 
-void CFaceShader::SetAmbientColor(CVector color)
+void CFaceShader::SetAmbient(float ambient)
 {
-	if(ambient_color_uniform != -1)
-		glUniform3fARB(ambient_color_uniform, color.x, color.y, color.z);
+	if(ambient_uniform != -1)
+		glUniform1fARB(ambient_uniform, ambient);
 }
 
 void CFaceShader::SetLight(CVector pos, CVector color)
@@ -107,6 +108,12 @@ void CFaceShader::SetLight(CVector pos, CVector color)
 		glUniform3fARB(light_pos_uniform, pos.x, pos.y, pos.z);
 	if(light_color_uniform != -1)
 		glUniform3fARB(light_color_uniform, color.x, color.y, color.z);
+}
+
+void CFaceShader::SetLightAmbientColor(CVector color)
+{
+	if(light_ambient_color_uniform != -1)
+		glUniform3fARB(light_ambient_color_uniform, color.x, color.y, color.z);
 }
 
 void CFaceShader::SetSpecular(float size)
@@ -253,8 +260,9 @@ void CFaceShader::ResetUniforms(void)
 	SetVectors(Vec(0.0, 0.0, 1.0), Vec(1.0, 0.0, 0.0), Vec(0.0, 1.0, 0.0)); 
 	SetDiffuseColor(Vec(1.0, 1.0, 1.0));
 	SetSpecularColor(Vec(0.5, 0.5, 0.5));
-	SetAmbientColor(Vec(0.3, 0.3, 0.3));
+	SetAmbient(1.0);
 	SetLight(Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0));
+	SetLightAmbientColor(Vec(0.0, 0.0, 0.0));
 	SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
 	SetSpecular(32.0);
 	SetFog(Vec(1.0, 1.0, 1.0), 0.0, 0.0);
