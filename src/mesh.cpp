@@ -776,6 +776,8 @@ bool CMesh::LoadFromFile(const char *file, int no_material)
 
 int TEMVersionFromString(const char *s)
 {
+	if(strcmp(s, TEM_VERSION_0_3_STRING) == 0)
+		return TEM_VERSION_0_3;
 	if(strcmp(s, TEM_VERSION_0_2_STRING) == 0)
 		return TEM_VERSION_0_2;
 	if(strcmp(s, TEM_VERSION_0_1_STRING) == 0)
@@ -889,8 +891,8 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 {
 	xmlNodePtr child;
 	bool diffuse_enabled, specular_enabled, normal_enabled, height_enabled;
-	string diffuse_file;
-	string specular_file; float exponent;
+	string diffuse_file; float ambient; CVector diffuse_color;
+	string specular_file; float exponent; CVector specular_color;
 	string normal_file;
 	string height_file; float height_factor;
 	string name;
@@ -898,6 +900,9 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 	CMaterial *r;
 
 	diffuse_enabled = specular_enabled = normal_enabled = height_enabled = false;
+	ambient = 1.0;
+	diffuse_color = Vec(1.0, 1.0, 1.0);
+	specular_color = Vec(0.0, 0.0, 0.0);
 
 	name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
 
@@ -909,6 +914,14 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
 				diffuse_file = string((const char *)temp);
 			diffuse_enabled = diffuse_file.length() > 0;
+			if((temp = xmlGetProp(child, (const xmlChar *)"ambient")))
+				ambient = atof((const char *)temp);
+			if((temp = xmlGetProp(child, (const xmlChar *)"r")))
+				diffuse_color.r = atof((const char *)temp);
+			if((temp = xmlGetProp(child, (const xmlChar *)"g")))
+				diffuse_color.g = atof((const char *)temp);
+			if((temp = xmlGetProp(child, (const xmlChar *)"b")))
+				diffuse_color.b = atof((const char *)temp);
 		}
 		if(!xmlStrcmp(child->name, (const xmlChar *)"specular"))
 		{
@@ -917,6 +930,12 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 			specular_enabled = specular_file.length() > 0;
 			if((temp = xmlGetProp(child, (const xmlChar *)"exponent")))
 				exponent = atof((const char *)temp);
+			if((temp = xmlGetProp(child, (const xmlChar *)"r")))
+				specular_color.r = atof((const char *)temp);
+			if((temp = xmlGetProp(child, (const xmlChar *)"g")))
+				specular_color.g = atof((const char *)temp);
+			if((temp = xmlGetProp(child, (const xmlChar *)"b")))
+				specular_color.b = atof((const char *)temp);
 		}
 		if(!xmlStrcmp(child->name, (const xmlChar *)"normal"))
 		{
@@ -948,8 +967,8 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 	if(height_file.compare("$NONE") == 0)
 		height_enabled = false;
 
-	r->SetDiffuse(diffuse_enabled, diffuse_file); // TODO: color, ambient_color
-	r->SetSpecular(specular_enabled, specular_file, Vec(1.0, 1.0, 1.0), exponent); // TODO: specular color
+	r->SetDiffuse(diffuse_enabled, diffuse_file, diffuse_color, ambient);
+	r->SetSpecular(specular_enabled, specular_file, specular_color, exponent);
 	r->SetNormal(normal_enabled, normal_file);
 	r->SetHeight(height_enabled, height_file, height_factor);
 	r->Load(string(path));

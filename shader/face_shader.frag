@@ -90,9 +90,10 @@ void main(void)
 	vec3 cam_dir = normalize(cam_pos_var - pos_var); // pos to cam normalized
 	mat3 tangent_space = mat3(tang_var, bitang_var, normal_var);
 				
-	vec4 diffuse_tex_color = vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 diffuse_color = vec4(1.0, 1.0, 1.0, 1.0);
 	if(diffuse_tex_enabled_uni)
-		diffuse_tex_color = texture2D(diffuse_tex_uni, uv_var).rgba;
+		diffuse_color = texture2D(diffuse_tex_uni, uv_var).rgba;
+	diffuse_color *= vec4(diffuse_color_uni.rgb, 1.0);
 	
 	vec3 normal_tex_color = vec3(0.5, 0.5, 1.0);
 	if(normal_tex_enabled_uni)
@@ -103,8 +104,8 @@ void main(void)
 	
 	vec3 normal = tangent_space * (normal_tex_color - vec3(0.5, 0.5, 0.5)) * 2.0; 
 	
-	float alpha = diffuse_tex_color.a; // alpha
-	vec3 color = light_ambient_color_uni * diffuse_tex_color.rgb * ambient_uni; // ambient
+	float alpha = diffuse_color.a; // alpha
+	vec3 color = light_ambient_color_uni * diffuse_color.rgb * ambient_uni; // ambient
 	
 	float shadow = 1.0;
 	float sr = 1.5;
@@ -122,13 +123,13 @@ void main(void)
 	}
 	
 	
-	float light_intensity = dot(normal, light_dir);
-	color += shadow * light_intensity * light_color_uni * diffuse_tex_color.rgb; // diffuse light
+	float light_intensity = max(dot(normal, light_dir), 0.0);
+	color += shadow * light_intensity * light_color_uni * diffuse_color.rgb; // diffuse light
 	
 	//specular
-	vec3 specular_color = specular_tex_color * specular_color_uni * texture2D(specular_tex_uni, uv_var).rgb * light_color_uni;
+	vec3 specular_color = specular_tex_color * specular_color_uni * light_color_uni;
 	float specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0);
-	color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular_size_uni)) * light_intensity;
+	color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular_size_uni));
 		
 	gl_FragColor = vec4(color, alpha) * diffuse_color2_uni;
 }
