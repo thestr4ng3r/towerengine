@@ -1,9 +1,7 @@
 #ifndef __TOWERENGINE_H
 #define __TOWERENGINE_H
 
-class CMeshPosition;
-class CIdlePosition;
-class CCustomPosition;
+class CMeshPose;
 class CAnimation;
 struct CKeyFrame;
 class CMesh;
@@ -27,13 +25,14 @@ class CCamera;
 #include "triangle.h"
 #include "material.h"
 #include "mesh.h"
-#include "position.h"
+#include "pose.h"
 #include "animation.h"
 #include "entity.h"
 #include "engine.h"
 #include "object.h"
 #include "meshobject.h"
 #include "camera.h"
+#include "light.h"
 #include "world.h"
 
 #endif

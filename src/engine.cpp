@@ -5,7 +5,11 @@ CFaceShader *CEngine::face_shader = 0;
 
 void CEngine::Init(void)
 {
+	int max_textures;
+
 	printf("Supported OpenGL version: %s\n", glGetString(GL_VERSION));
+	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_textures);
+	printf("Support of %d texture image units\n", max_textures);
 
 	#ifdef _WIN32
 		glewInit();

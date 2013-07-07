@@ -36,7 +36,7 @@ void CMesh::CalculateNormalsSolid(void)
 
 CMesh::CMesh(void)
 {
-	idle_position = 0;
+	idle_pose = 0;
 	vao = 0;
 	//mat_indices = 0;
 	refresh_func = 0;
@@ -190,7 +190,7 @@ void CMesh::Create(void)
 {
 	Delete();
 
-	current_position = idle_position = new CIdlePosition(this);
+	current_pose = idle_pose = new CMeshPose(this);
 
 	vao = new VAO();
 	vertex_vbo = new VBO<float>(3, vao);
@@ -218,14 +218,16 @@ void CMesh::Delete(void)
 	if(!GetState())
 		return;
 
-	while(!custom_positions.empty())
-		delete custom_positions.back();
+	map<string, CMeshPose *>::iterator cpi;
+	for(cpi=custom_pose.begin(); cpi!=custom_pose.end(); cpi++)
+		delete custom_pose.begin()->second;
+	custom_pose.clear();
 
 	while(!animations.empty())
 		delete animations.back();
 
-	if(idle_position)
-		delete idle_position;
+	if(idle_pose)
+		delete idle_pose;
 	
 	while(!triangles.empty())
 		delete triangles.back();
@@ -407,14 +409,12 @@ void CMesh::AddMaterial(CMaterial *m)
 	refresh_ibos = true;
 }
 
-void CMesh::AddCustomPosition(CCustomPosition *p)
+void CMesh::AddCustomPose(string name, CMeshPose *p)
 {
-	vector<CCustomPosition *>::iterator i;
+	if(custom_pose.find(name) != custom_pose.end())
+		return;
 
-	for(i=custom_positions.begin(); i!=custom_positions.end(); i++)
-		if(*i == p)
-			return;
-	custom_positions.push_back(p);
+	custom_pose.insert(pair<string, CMeshPose *>(name, p));
 	//refresh_vbo = true;
 }
 
@@ -471,17 +471,14 @@ void CMesh::RemoveMaterial(CMaterial *m)
 	//refresh_vbo = true;
 }
 
-void CMesh::RemoveCustomPosition(CCustomPosition *p)
+void CMesh::RemoveCustomPose(string name)
 {
-	vector<CCustomPosition *>::iterator i;
+	map<string, CMeshPose *>::iterator i;
 
-	for(i=custom_positions.begin(); i!=custom_positions.end(); i++)
-		if(*i == p)
-		{
-			custom_positions.erase(i);
-			break;
-		}
-	//refresh_vbo = true;
+	i = custom_pose.find(name);
+
+	if(i != custom_pose.end())
+		custom_pose.erase(i);
 }
 
 void CMesh::RemoveAnimation(CAnimation *a)
@@ -515,7 +512,7 @@ void CMesh::SetIDs(void)
 	vector<CVertex *>::iterator v;
 	vector<CAnimation *>::iterator a;
 	CKeyFrame *f;
-	vector<CCustomPosition *>::iterator p;
+	map<string, CMeshPose *>::iterator p;
 
 	for(v=vertices.begin(), i=0; v!=vertices.end(); v++, i++)
 		SetVertexId((*v), i);
@@ -524,8 +521,8 @@ void CMesh::SetIDs(void)
 		for(f=(*a)->key_first; f; f=f->chain_next, i++)
 			f->id = i;
 
-	for(p=custom_positions.begin(), i=0; p!=custom_positions.end(); p++)
-		(*p)->id = i;
+	for(p=custom_pose.begin(), i=0; p!=custom_pose.end(); p++)
+		p->second->id = i;
 }
 
 void CMesh::SetTriangleMaterials(void)
@@ -692,8 +689,6 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 {
 	vector<CMaterial *>::iterator i;
 
-	//CalculateNormalsSolid();
-
 	//Sort(cam);
 
 	if(refresh_all_vbos)
@@ -756,7 +751,6 @@ int CMesh::GetState(void)
 
 bool CMesh::LoadFromFile(const char *file, int no_material)
 {
-	int h;
 	bool r;
 	char *path;
 	struct stat s;
@@ -837,8 +831,8 @@ bool CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material
 			ParseMaterialNode(cur, path);
 		if(xmlStrcmp(cur->name, (const xmlChar *)"triangle") == 0)
 			ParseTriangleNode(cur);
-		if(xmlStrcmp(cur->name, (const xmlChar *)"position") == 0)
-			ParsePositionNode(cur);
+		if(xmlStrcmp(cur->name, (const xmlChar *)"pose") == 0 || xmlStrcmp(cur->name, (const xmlChar *)"position") == 0)
+			ParsePoseNode(cur);
 		if(xmlStrcmp(cur->name, (const xmlChar *)"animation") == 0)
 			ParseAnimationNode(cur);
 		if(xmlStrcmp(cur->name, (const xmlChar *)"entity") == 0)
@@ -1028,7 +1022,7 @@ CTriangle *CMesh::ParseTriangleNode(xmlNodePtr cur)
 	return r;
 }
 
-CCustomPosition *CMesh::ParsePositionNode(xmlNodePtr cur)
+CMeshPose *CMesh::ParsePoseNode(xmlNodePtr cur)
 {
 	char *name;
 	xmlNodePtr child;
@@ -1036,7 +1030,7 @@ CCustomPosition *CMesh::ParsePositionNode(xmlNodePtr cur)
 	int i;
 	int *vert;
 	CVector *vec;
-	CCustomPosition *r;
+	CMeshPose *r;
 
 	name = (char *)xmlGetProp(cur, (const xmlChar *)"name");
 
@@ -1066,8 +1060,9 @@ CCustomPosition *CMesh::ParsePositionNode(xmlNodePtr cur)
 		i++;
 	}
 
-	r = new CCustomPosition(this, name);
+	r = new CMeshPose(this);
 	r->CopyFromData(count, vert, vec);
+	AddCustomPose(name, r);
 	return r;
 }
 
@@ -1138,7 +1133,9 @@ CKeyFrame *CMesh::ParseKeyFrameNode(xmlNodePtr cur, CAnimation *anim)
 
 int CMesh::SaveToFile(const char *file)
 {
-	xmlDocPtr doc;
+	printf("CMesh::SaveToFile does not do anything at the moment.\n");
+	return 0;
+	/*xmlDocPtr doc;
 	xmlNodePtr root;
 	xmlNodePtr cur;
 	xmlNodePtr child;
@@ -1151,15 +1148,17 @@ int CMesh::SaveToFile(const char *file)
 	vector<CVertex *>::iterator v;
 	CVertex *vt;
 	vector<CTriangle *>::iterator t;
-	vector<CCustomPosition *>::iterator p;
-	CVertexPosition *vp;
+	map<string, CMeshPosition *>::iterator p;
+	map<CVertex *, CVector>::iterator vp;
+	CVertex *pv;
+	CVector pp;
 	vector<CAnimation *>::iterator a;
 	CKeyFrame *k;
 	vector<CEntity *>::iterator e;
 	map<string, CEntityAttribute *>::iterator ea;
 
 	SetIDs();
-	ChangePosition(idle_position);
+	ChangePosition(idle_pose);
 
 	doc = xmlNewDoc((const xmlChar *)"1.0");
 	root = xmlNewNode(0, (const xmlChar *)"tmesh");
@@ -1247,8 +1246,8 @@ int CMesh::SaveToFile(const char *file)
 	for(p=custom_positions.begin(); p!=custom_positions.end(); p++)
 	{
 		cur = xmlNewNode(0, (const xmlChar *)"position");
-		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)(*p)->name);
-		for(vp=(*p)->pos_first; vp; vp=vp->chain_next)
+		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)p->first.c_str());
+		for(vp=p->second->vertices.begin(); vp!=p->second->vertices.end(); vp++)
 		{
 			child = xmlNewNode(0, (const xmlChar *)"vertex");
 			xmlNewProp(child, (const xmlChar *)"id", (const xmlChar *)itoa(vp->v->id));
@@ -1330,7 +1329,7 @@ int CMesh::SaveToFile(const char *file)
 	int r = xmlSaveFormatFile(file, doc, 1);
 	xmlFree(buf);
 	xmlFreeDoc(doc);
-	return r;
+	return r;*/
 }
 
 
@@ -1415,80 +1414,86 @@ map<string, CEntity *> CMesh::GetEntitiesInGroup(const char *group)
 }
 
 
-CCustomPosition *CMesh::GetPositionByName(const char *name)
+CMeshPose *CMesh::GetCustomPoseByName(string name)
 {
-	vector<CCustomPosition *>::iterator p;
+	try
+	{
+		return custom_pose.at(name);
+	}
+	catch(...) {}
 
-	for(p=custom_positions.begin(); p!=custom_positions.end(); p++)
-		if(strcmp(name, (*p)->name) == 0)
-			return *p;
 	return 0;
 }
 
-CCustomPosition *CMesh::CreatePosition(const char *name)
+CMeshPose *CMesh::CreateCustomPose(string name)
 {
-	if(GetPositionByName(name))
+	if(GetCustomPoseByName(name))
 		return 0;
-	//refresh_vbo = true;
 
-	return new CCustomPosition(this, name);
+	CMeshPose *p = new CMeshPose(this);
+	p->CopyFromVertices();
+	custom_pose.insert(pair<string, CMeshPose *>(name, p));
+
+	return p;
 }
 
-void CMesh::ChangePosition(const char *name, const char *idle)
+void CMesh::ChangePose(string name, string idle)
 {
-	CCustomPosition *p;
-	CMeshPosition *old_pos = current_position;
+	CMeshPose *p;
 
-	if(strcmp(name, idle) == 0)
-		current_position = idle_position;
-	else if((p = GetPositionByName(name)) != 0)
-		current_position = p;
+	if(name == idle)
+		current_pose = idle_pose;
+	else if((p = GetCustomPoseByName(name)) != 0)
+		current_pose = p;
 	else
-		printf("fail\n");
-
-	//if(current_position && current_position != old_pos)
-	current_position->ApplyPosition();
-}
-
-void CMesh::ChangePosition(CMeshPosition *pos)
-{
-	if(pos == current_position)
 		return;
 
-	current_position = pos;
-
-	if(current_position)
-		current_position->ApplyPosition();
+	current_pose->ApplyPose();
 }
 
-CMeshPosition *CMesh::GetCurrentPosition(void)
+void CMesh::ChangePose(CMeshPose *pos)
 {
-	return current_position;
+	if(pos == current_pose)
+		return;
+
+	current_pose = pos;
+
+	if(current_pose)
+		current_pose->ApplyPose();
 }
 
-void CMesh::CopyPositionFromVertices(void)
+CMeshPose *CMesh::GetCurrentPose(void)
 {
-	if(current_position)
-		current_position->CopyFromVertices();
+	return current_pose;
+}
+
+void CMesh::CopyPoseFromVertices(void)
+{
+	if(current_pose)
+		current_pose->CopyFromVertices();
 }
 
 
-char *CMesh::GetCurrentPositionName(const char *idle)
+string CMesh::GetCurrentPoseName(string idle) // deprecated
 {
-	char *r;
-	const char *t;
+	string r;
 
-	if(!current_position)
+	if(!current_pose)
 		return 0;
 
-	if(current_position == idle_position)
-		t = idle;
+	if(current_pose == idle_pose)
+		return idle;
 	else
-		t = ((CCustomPosition *)current_position)->name;
+	{
+		map<string, CMeshPose *>::iterator i;
+		for(i=custom_pose.begin(); i!=custom_pose.end(); i++)
+		{
+			if(i->second == current_pose)
+				return i->first;
+		}
+	}
 
-	r = new char[strlen(t) + 1];
-	strcpy(r, t);
-	return r;
+	return string();
 }
 
 

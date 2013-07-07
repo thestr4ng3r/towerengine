@@ -40,7 +40,7 @@ CVertex::~CVertex(void)
 		delete t[i];
 
 	if(mesh)
-        	mesh->RemoveVertex(this);
+        mesh->RemoveVertex(this);
 }
 
 int CVertex::GetTriangles(CTriangle **&t, int *&number, CTriangle *exclude)

@@ -29,8 +29,15 @@ void CFaceShader::Init(void)
 	specular_color_uniform = glGetUniformLocationARB(program, "specular_color_uni");
 	ambient_uniform = glGetUniformLocationARB(program, "ambient_uni");
 
-	light_pos_uniform = glGetUniformLocationARB(program, "light_pos_uni");
-	light_color_uniform = glGetUniformLocationARB(program, "light_color_uni");
+	point_light_count_uniform = glGetUniformLocationARB(program, "point_light_count_uni");
+	point_light_pos_uniform = glGetUniformLocationARB(program, "point_light_pos_uni");
+	point_light_color_uniform = glGetUniformLocationARB(program, "point_light_color_uni");
+	point_light_distance_uniform = glGetUniformLocationARB(program, "point_light_distance_uni");
+
+	directional_light_count_uniform = glGetUniformLocationARB(program, "directional_light_count_uni");
+	directional_light_dir_uniform = glGetUniformLocationARB(program, "directional_light_dir_uni");
+	directional_light_color_uniform = glGetUniformLocationARB(program, "directional_light_color_uni");
+
 	light_ambient_color_uniform = glGetUniformLocationARB(program, "light_ambient_color_uni");
 	
 	shadow_map_uniform = glGetUniformLocationARB(program, "shadow_map_uni");
@@ -102,12 +109,21 @@ void CFaceShader::SetAmbient(float ambient)
 		glUniform1fARB(ambient_uniform, ambient);
 }
 
-void CFaceShader::SetLight(CVector pos, CVector color)
+void CFaceShader::SetPointLights(int count, float *pos, float *color, float *dist)
 {
-	if(light_pos_uniform != -1)
-		glUniform3fARB(light_pos_uniform, pos.x, pos.y, pos.z);
-	if(light_color_uniform != -1)
-		glUniform3fARB(light_color_uniform, color.x, color.y, color.z);
+	count = min(count, MAX_POINT_LIGHTS);
+	glUniform1iARB(point_light_count_uniform, count);
+	glUniform3fvARB(point_light_pos_uniform, count, pos);
+	glUniform3fvARB(point_light_color_uniform, count, color);
+	glUniform1fvARB(point_light_distance_uniform, count, dist);
+}
+
+void CFaceShader::SetDirectionalLights(int count, float *dir, float *color)
+{
+	count = min(count, MAX_POINT_LIGHTS);
+	glUniform1iARB(directional_light_count_uniform, count);
+	glUniform3fvARB(directional_light_dir_uniform, count, dir);
+	glUniform3fvARB(directional_light_color_uniform, count, color);
 }
 
 void CFaceShader::SetLightAmbientColor(CVector color)
@@ -261,7 +277,7 @@ void CFaceShader::ResetUniforms(void)
 	SetDiffuseColor(Vec(1.0, 1.0, 1.0));
 	SetSpecularColor(Vec(0.5, 0.5, 0.5));
 	SetAmbient(1.0);
-	SetLight(Vec(0.0, 0.0, 0.0), Vec(0.0, 0.0, 0.0));
+	SetPointLights(0, 0, 0, 0);
 	SetLightAmbientColor(Vec(0.0, 0.0, 0.0));
 	SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
 	SetSpecular(32.0);

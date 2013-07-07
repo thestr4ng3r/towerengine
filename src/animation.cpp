@@ -117,12 +117,11 @@ CKeyFrame *CAnimation::NewKeyFrameFromData(float time, int c, int *vert, CVector
 void CAnimation::ApplyCurrentFrame(void)
 {
 	CKeyFrame *a, *b; // a = last keyframe; b = next keyframe
-	CVertexPosition *av, *bv;
 	CKeyFrame *f;
 	float a_dist, b_dist;
 	float t_dist;
 	float mix;
-	int one_pos; // if there is one position with the same time as the current time, then this will be one.
+	int one_pos; // if there is one pose with the same time as the current time, then this will be one.
 	
 	a_dist = -INFINITY;
 	b_dist = INFINITY;
@@ -162,19 +161,13 @@ void CAnimation::ApplyCurrentFrame(void)
 
 	if(one_pos)
 	{
-		a->ApplyPosition();
+		a->ApplyPose();
 		return;
 	}
 
 	mix = -a_dist / (b->time - a->time);
 
-	for(av = a->pos_first; av; av = av->chain_next)
-		for(bv = b->pos_first; bv; bv = bv->chain_next)
-			if(av->v == bv->v)
-			{
-				av->ApplyMixedPosition(bv, mix);
-				break;
-			}
+	a->ApplyMixedPose(b, mix);
 
 	mesh->TriggerVertexVBORefresh();
 }
@@ -205,7 +198,7 @@ CAnimation *CAnimation::Copy(CMesh *m)
 
 //------------------------------------------------------------
 
-CKeyFrame::CKeyFrame(CAnimation *anim, float time) : CMeshPosition(anim->mesh)
+CKeyFrame::CKeyFrame(CAnimation *anim, float time) : CMeshPose(anim->mesh)
 {
 	this->anim = anim;
 	chain_next = anim->key_first;
@@ -229,18 +222,12 @@ CKeyFrame::~CKeyFrame(void)
 CKeyFrame *CKeyFrame::Copy(CAnimation *a)
 {
 	CKeyFrame *r;
+	map<CVertex *, CVector>::iterator i;
 
 	r = new CKeyFrame(a, time);
-	
-	CVertexPosition *p;
-	CVertex *v;
-	for(p=pos_first; p; p=p->chain_next)
-	{
-		v = a->mesh->GetVertexByID(p->v->id);
-		if(!v)
-			continue;
-		new CVertexPosition(r, v, p->p);
-	}
+
+	for(i=vertices.begin(); i!=vertices.end(); i++)
+		r->vertices.insert(pair<CVertex *, CVector>(i->first, i->second));
 
 	return r;
 

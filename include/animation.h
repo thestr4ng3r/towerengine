@@ -37,7 +37,7 @@ class CAnimation
 		CAnimation *Copy(CMesh *m);
 };
 
-struct CKeyFrame : CMeshPosition
+struct CKeyFrame : CMeshPose
 {
 	CAnimation *anim;
 	CKeyFrame *chain_next;

@@ -12,7 +12,6 @@
 #define TEM_CURRENT_VERSION			TEM_VERSION_0_3
 #define TEM_CURRENT_VERSION_STRING	TEM_VERSION_0_3_STRING
 
-
 class CMesh
 {
 	private:
@@ -41,15 +40,17 @@ class CMesh
 		//int *mat_indices;		// for vbo painting
 		//CMaterial **mat_list; 	// for vbo painting
 
-		CMeshPosition *current_position;
+		CMeshPose *current_pose;
 		CAnimation *current_animation;
+
+		CMeshPose *idle_pose;
 
 		CMaterial *idle_material;
 
 		vector<CVertex *> vertices;
 		vector<CTriangle *> triangles;
 		vector<CMaterial *> materials;
-		vector<CCustomPosition *> custom_positions;
+		map<string, CMeshPose *> custom_pose;
 		vector<CAnimation *> animations;
 		vector<CEntity *> entities;
 
@@ -69,7 +70,7 @@ class CMesh
 		CVertex *ParseVertexNode(xmlNodePtr cur);
 		CMaterial *ParseMaterialNode(xmlNodePtr cur, const char *path);
 		CTriangle *ParseTriangleNode(xmlNodePtr cur);
-		CCustomPosition *ParsePositionNode(xmlNodePtr cur);
+		CMeshPose *ParsePoseNode(xmlNodePtr cur);
 		CAnimation *ParseAnimationNode(xmlNodePtr cur);
 		CKeyFrame *ParseKeyFrameNode(xmlNodePtr cur, CAnimation *anim);
 		CEntity *ParseEntityNode(xmlNodePtr cur);
@@ -91,9 +92,6 @@ class CMesh
 		static void Color(CVector c, float a = 1.0);
 		void ApplyTransformation(void);
 		void ApplyMatrix(float m[16]);
-
-
-		CIdlePosition *idle_position; // TODO: CMesh::idle_position als private definieren
 
 		#ifdef TMS_USE_LIB_G3D
         static G3DContext *g3d_context;
@@ -125,16 +123,16 @@ class CMesh
 		int GetVertexCount(void)					{ return vertices.size(); }
 		int GetTriangleCount(void)					{ return triangles.size(); }
 		int GetMaterialCount(void)					{ return materials.size(); }
-		int GetCustomPositionCount(void)			{ return custom_positions.size(); }
+		int GetCustomPosesCount(void)				{ return custom_pose.size(); }
 		int GetAnimationCount(void)					{ return animations.size(); }
 		int GetEntityCount(void)						{ return entities.size(); }
 
 		CVertex *GetVertex(int i)					{ return vertices.at(i); }
 		CTriangle *GetTriangle(int i)				{ return triangles.at(i); }
 		CMaterial *GetMaterial(int i)				{ return materials.at(i); }
-		CCustomPosition *GetCustomPosition(int i) 	{ return custom_positions.at(i); }
+		CMeshPose *GetCustomPose(string s) 			{ return custom_pose.at(s); }
 		CAnimation *GetAnimation(int i)				{ return animations.at(i); }
-		CEntity *GetEntity(int i)						{ return entities.at(i); }
+		CEntity *GetEntity(int i)					{ return entities.at(i); }
 
 		CMaterial *GetIdleMaterial(void)			{ return idle_material; }
 
@@ -143,21 +141,22 @@ class CMesh
 		void AddVertex(CVertex *v);
 		void AddTriangle(CTriangle *t);
 		void AddMaterial(CMaterial *m);
-		void AddCustomPosition(CCustomPosition *p);
+		void AddCustomPose(string name, CMeshPose *p);
 		void AddAnimation(CAnimation *a);
 
 		void RemoveVertex(CVertex *v);
 		void RemoveTriangle(CTriangle *t);
 		void RemoveMaterial(CMaterial *m);
-		void RemoveCustomPosition(CCustomPosition *p);
+		void RemoveCustomPose(string name);
 		void RemoveAnimation(CAnimation *a);
 		void RemoveEntity(CEntity *e);
 
 		IBO *CreateIBO(void)						{ return new IBO(vao); }
 
-		CCustomPosition *GetPositionByName(const char *name);
-		CMeshPosition *GetCurrentPosition(void);
-		char *GetCurrentPositionName(const char *idle = "Idle");
+		CMeshPose *GetIdlePose(void)		{ return idle_pose; }
+		CMeshPose *GetCustomPoseByName(string name);
+		CMeshPose *GetCurrentPose(void);
+		string GetCurrentPoseName(string idle = string("Idle"));
 
 		CAnimation *CreateAnimation(const char *name, float len = 1.0);
 		void ChangeAnimation(CAnimation *a);
@@ -177,13 +176,13 @@ class CMesh
 		CVertex *CreateVertex(CVector v);
 		CTriangle *CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3);
 		CTriangle *CreateTriangleAuto(CVector v1, CVector v2, CVector v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3);
-		CCustomPosition *CreatePosition(const char *name);
+		CMeshPose *CreateCustomPose(string name);
 		CEntity *CreateEntity(string name, string group = string());
 
 
-		void ChangePosition(const char *name, const char *idle = "Idle");
-		void ChangePosition(CMeshPosition *pos);
-		void CopyPositionFromVertices(void);
+		void ChangePose(string name, string idle = "Idle");
+		void ChangePose(CMeshPose *pos);
+		void CopyPoseFromVertices(void);
 
 		CMaterial *GetMaterialByName(string name);
 		CVertex *GetVertexByID(int id);

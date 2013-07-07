@@ -33,7 +33,7 @@ public:
 	void SetAnimationLoop(bool l)					{ loop = l; }
 	void SetAnimationMode(bool a)					{ animation_mode = a; }
 	void SetAnimationTime(float t)					{ time = t; }
-	void SetPose(const char *position);
+	void SetPose(const char *pose);
 	void SetPosition(CVector v)						{ pos = v; }
 	void SetXY(CVector x, CVector y)				{ SetXYZ(x, y, Cross(x, y)); }
 	void SetYZ(CVector y, CVector z)				{ SetXYZ(Cross(y, z), y, z); }

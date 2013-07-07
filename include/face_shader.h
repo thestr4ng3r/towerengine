@@ -2,6 +2,9 @@
 #ifndef _FACE_SHADER_H
 #define _FACE_SHADER_H
 
+#define MAX_POINT_LIGHTS 16
+#define MAX_DIRECTIONAL_LIGHTS 16
+
 class CFaceShader : public CShader
 {
 	private:
@@ -16,8 +19,15 @@ class CFaceShader : public CShader
 		GLint specular_color_uniform;
 		GLint ambient_uniform;
 
-		GLint light_pos_uniform;
-		GLint light_color_uniform;
+		GLint point_light_count_uniform;
+		GLint point_light_pos_uniform;
+		GLint point_light_color_uniform;
+		GLint point_light_distance_uniform;
+
+		GLint directional_light_count_uniform;
+		GLint directional_light_dir_uniform;
+		GLint directional_light_color_uniform;
+
 		GLint light_ambient_color_uniform;
 
 		GLint specular_size_uniform; // TODO: in exponent umbenennen
@@ -63,7 +73,8 @@ class CFaceShader : public CShader
 		void SetDiffuseColor2(CVector color, float alpha);
 		void SetSpecularColor(CVector color);
 		void SetAmbient(float ambient);
-		void SetLight(CVector pos, CVector color);
+		void SetPointLights(int count, float *pos, float *color, float *dist);
+		void SetDirectionalLights(int count, float *dir, float *color);
 		void SetLightAmbientColor(CVector color);
 		void SetSpecular(float size);
 		void SetDiffuseTexture(bool enabled, GLuint tex = 0);

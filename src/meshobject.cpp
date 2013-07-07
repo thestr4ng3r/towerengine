@@ -77,9 +77,9 @@ void CMeshObject::PutToGL(CVector cam)
 	else
 	{
 		if(pose)
-			mesh->ChangePosition(pose);
+			mesh->ChangePose(pose);
 		else
-			mesh->ChangePosition("Idle");
+			mesh->ChangePose("Idle");
 	}
 	mesh->PutToGL(cam);
 }

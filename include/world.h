@@ -6,10 +6,10 @@ class CWorld
 {
 private:
 	vector<CObject *> objects;
+	vector<CPointLight *> point_lights;
+	vector<CDirectionalLight *> dir_lights;
 	CMeshObject *world_object;
 
-	CVector light_pos;
-	CVector light_color;
 	CVector ambient_color;
 
 	struct shadow
@@ -40,13 +40,17 @@ public:
 	void InitShadow(int width, int height);
 	void SetShadowEnabled(bool enabled)	{ shadow.enabled = enabled; }
 
-	CVector GetLightPos(void)			{ return light_pos; }
-	CVector GetLightColor(void)		{ return light_color; }
 	CVector GetAmbientColor(void)		{ return ambient_color; }
 
-	void SetLightPos(CVector v)		{ light_pos = v; }
-	void SetLightColor(CVector v)		{ light_color = v; }
-	void SetAmbientColor(CVector v)	{ ambient_color = v; }
+	void SetAmbientColor(CVector v)		{ ambient_color = v; }
+
+	void AddPointLight(CPointLight *light);
+	void RemovePointLight(CPointLight *light);
+	void ClearPointLights(void)			{ point_lights.clear(); }
+
+	void AddDirectionalLight(CDirectionalLight *light);
+	void RemoveDirectionalLight(CDirectionalLight *light);
+	void ClearDirectionalLights(void);
 
 	void RenderShadow(CVector cam_pos);
 	void Render(CVector cam_pos);
