@@ -9,7 +9,12 @@
 *.so.*
 *_old.frag
 *_old.vert
+
+# Eclipse Files
 .cproject
 .project
 .settings/
+.dep/
+
+# Build
 build/
