@@ -16,6 +16,7 @@ void CFaceShader::Init(void)
 	CreateFragmentShader();
 	CreateProgram();
 	glBindAttribLocationARB(program, vertex_attribute, "vertex_attr");
+	glBindAttribLocationARB(program, vertex2_attribute, "vertex2_attr");
 	glBindAttribLocationARB(program, normal_attribute, "normal_attr");
 	glBindAttribLocationARB(program, tang_attribute, "tang_attr");
 	glBindAttribLocationARB(program, bitang_attribute, "bitang_attr");
@@ -23,6 +24,8 @@ void CFaceShader::Init(void)
 	LinkProgram();
 
 	two_side_uniform = glGetUniformLocationARB(program, "two_side_uni");
+
+	vertex_mix_uniform = glGetUniformLocationARB(program, "vertex_mix_uni");
 
 	diffuse_color_uniform = glGetUniformLocationARB(program, "diffuse_color_uni");
 	diffuse_color2_uniform = glGetUniformLocationARB(program, "diffuse_color2_uni");
@@ -271,6 +274,11 @@ void CFaceShader::SetClip(CVector c, float d)
 	glUniform1f(clip_dist_uniform, d);
 }
 
+void CFaceShader::SetVertexMix(float m)
+{
+	glUniform1f(vertex_mix_uniform, m);
+}
+
 void CFaceShader::ResetUniforms(void)
 {
 	SetVectors(Vec(0.0, 0.0, 1.0), Vec(1.0, 0.0, 0.0), Vec(0.0, 1.0, 0.0)); 
@@ -284,6 +292,7 @@ void CFaceShader::ResetUniforms(void)
 	SetFog(Vec(1.0, 1.0, 1.0), 0.0, 0.0);
 	SetClip(Vec(0.0, 0.0, 0.0), 0.0);
 	SetShadow(0, 0, Vec(1.0, 1.0));
+	SetVertexMix(0.0);
 	SetDiffuseTexture(false);
 	SetSpecularTexture(false);
 	SetNormalTexture(false);

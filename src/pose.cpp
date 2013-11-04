@@ -34,13 +34,16 @@ void CVertexPosition::ApplyMixedPosition(CVector o, float mix)
 
 CMeshPose::CMeshPose(CMesh *mesh)
 {
+	id = 0;
 	this->mesh = mesh;
+	vbo = mesh->CreateFloatVBO(3);
 }
 
 CMeshPose::~CMeshPose(void)
 {
 	if(mesh->GetCurrentPose() == this)
 		mesh->ChangePose(mesh->GetIdlePose());
+	delete vbo;
 }
 
 void CMeshPose::CopyFromVertices(void)
@@ -55,6 +58,8 @@ void CMeshPose::CopyFromVertices(void)
 		p = *v;
 		vertices.insert(pair<CVertex *, CVector>(v, p));
 	}
+
+	RefreshVBO();
 }
 
 void CMeshPose::Clear(void)
@@ -79,20 +84,19 @@ void CMeshPose::CopyFromData(int c, int *vert, CVector *vec)
 			continue;
 		vertices.insert(pair<CVertex *, CVector>(v, vec[i]));
 	}
+	RefreshVBO();
 }
 
 
-void CMeshPose::ApplyPose(void)
+void CMeshPose::ApplyPoseToVertices(void)
 {
 	map<CVertex *, CVector>::iterator i;
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
 		i->first->SetVector(i->second);
-
-	mesh->TriggerVertexVBORefresh();
 }
 
-void CMeshPose::ApplyMixedPose(CMeshPose *o, float mix)
+void CMeshPose::ApplyMixedPoseToVertices(CMeshPose *o, float mix)
 {
 	map<CVertex *, CVector>::iterator i, oi;
 
@@ -105,10 +109,36 @@ void CMeshPose::ApplyMixedPose(CMeshPose *o, float mix)
 			i->first->SetVector(i->second * mix + oi->second * (1.0 - mix));
 
 	}
-
-	mesh->TriggerVertexVBORefresh();
 }
 
+
+void CMeshPose::RefreshVBO(void)
+{
+	vector<CVertex *>::iterator v;
+	CVertex *vt;
+	float *p;
+	map<CVertex *, CVector>::iterator vi;
+	float *vertex_data;
+	int i;
+
+	mesh->AssignVertexArrayPositions();
+
+	vbo->SetSize(mesh->GetVertexCount());
+	vertex_data = vbo->GetData();
+
+	for(i=0; i<mesh->GetVertexCount(); i++)
+	{
+		vt = mesh->GetVertex(i);
+		vi = vertices.find(vt);
+		if(vi==vertices.end())
+			p = vt->v;
+		else
+			p = vi->second.v;
+		memcpy(vertex_data + vt->index * 3, p, 3 * sizeof(float));
+	}
+
+	vbo->AssignData();
+}
 
 
 

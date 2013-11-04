@@ -58,7 +58,6 @@ in vec2 uv_var;
 in vec3 cam_pos_var;
 in vec4 shadow_coord_var;
 
-
 out vec4 gl_FragColor;
 
 
@@ -171,7 +170,7 @@ void main(void)
 		specular_intensity = max(dot(normalize(reflect(-directional_light_dir_uni[i], normal)), cam_dir), 0.0) * light_intensity;
 		color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular_size_uni)) * shadow;
 	}
-		
+	
 	gl_FragColor = vec4(color, alpha) * diffuse_color2_uni;
 }
 

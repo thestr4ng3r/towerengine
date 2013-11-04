@@ -28,6 +28,7 @@ CAnimation::~CAnimation(void)
 
 	mesh->RemoveAnimation(this);
 
+
 }
 
 int CAnimation::Play(float t, int loop)
@@ -116,11 +117,20 @@ CKeyFrame *CAnimation::NewKeyFrameFromData(float time, int c, int *vert, CVector
 
 void CAnimation::ApplyCurrentFrame(void)
 {
+	CKeyFrame *a, *b;
+	float mix;
+
+	GetKeyframePair(&a, &b, &mix);
+
+	a->ApplyMixedPoseToVertices(b, mix);
+}
+
+void CAnimation::GetKeyframePair(CKeyFrame **r_a, CKeyFrame **r_b, float *mix)
+{
 	CKeyFrame *a, *b; // a = last keyframe; b = next keyframe
 	CKeyFrame *f;
 	float a_dist, b_dist;
 	float t_dist;
-	float mix;
 	int one_pos; // if there is one pose with the same time as the current time, then this will be one.
 	
 	a_dist = -INFINITY;
@@ -156,22 +166,16 @@ void CAnimation::ApplyCurrentFrame(void)
 		}
 	}
 
-	if((!a || !b) && !one_pos)
-		return;
-
 	if(one_pos)
 	{
-		a->ApplyPose();
-		return;
+		b = 0;
+		*mix = 0.0;
 	}
-
-	mix = -a_dist / (b->time - a->time);
-
-	a->ApplyMixedPose(b, mix);
-
-	mesh->TriggerVertexVBORefresh();
+	else
+		*mix = -a_dist / (b->time - a->time);
+	*r_a = a;
+	*r_b = b;
 }
-
 
 int CAnimation::Count(void)
 {

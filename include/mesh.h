@@ -12,21 +12,22 @@
 #define TEM_CURRENT_VERSION			TEM_VERSION_0_3
 #define TEM_CURRENT_VERSION_STRING	TEM_VERSION_0_3_STRING
 
+template <class T> class VBO;
+
 class CMesh
 {
 	private:
 		int file_version;
 
-		int wireframe;
-		int loop_anim;
-		int anim_finished;
+		bool wireframe;
+		bool loop_anim;
+		bool anim_finished;
+		bool animation_mode;
 
-		bool refresh_all_vbos;
-		bool refresh_vertex_vbo;
+		bool refresh_vbos;
 		bool refresh_ibos;
 
 		VAO *vao;
-		VBO<float> *vertex_vbo;
 		VBO<float> *normal_vbo;
 		VBO<float> *tang_vbo;
 		VBO<float> *bitang_vbo;
@@ -35,10 +36,6 @@ class CMesh
 		int data_count;
 
 		set<CVertex *> outdated_vertices;
-
-		//int mat_data_count;
-		//int *mat_indices;		// for vbo painting
-		//CMaterial **mat_list; 	// for vbo painting
 
 		CMeshPose *current_pose;
 		CAnimation *current_animation;
@@ -60,11 +57,8 @@ class CMesh
 
 		void CallRefresh(void) { if(refresh_func != 0) (*refresh_func)(); }
 
-		void InvalidateVertex(CVertex *v);
-		void AssignVertexArrayPositions(void);
 
 		void RefreshAllVBOs(void);
-		void RefreshVertexVBO(void);
 		void DeleteVBOData(void);
 
 		CVertex *ParseVertexNode(xmlNodePtr cur);
@@ -125,7 +119,7 @@ class CMesh
 		int GetMaterialCount(void)					{ return materials.size(); }
 		int GetCustomPosesCount(void)				{ return custom_pose.size(); }
 		int GetAnimationCount(void)					{ return animations.size(); }
-		int GetEntityCount(void)						{ return entities.size(); }
+		int GetEntityCount(void)					{ return entities.size(); }
 
 		CVertex *GetVertex(int i)					{ return vertices.at(i); }
 		CTriangle *GetTriangle(int i)				{ return triangles.at(i); }
@@ -179,6 +173,8 @@ class CMesh
 		CMeshPose *CreateCustomPose(string name);
 		CEntity *CreateEntity(string name, string group = string());
 
+		VBO<float> *CreateFloatVBO(int components);
+		void AssignVertexArrayPositions(void);
 
 		void ChangePose(string name, string idle = "Idle");
 		void ChangePose(CMeshPose *pos);
@@ -189,8 +185,7 @@ class CMesh
 
 		void SetVertexId(CVertex *v, int id);
 
-		void TriggerAllVBOsRefresh(void)	{ refresh_all_vbos = true; }
-		void TriggerVertexVBORefresh(void)	{ refresh_vertex_vbo = true; }
+		void TriggerAllVBOsRefresh(void)	{ refresh_vbos = true; }
 		void TriggerIBOsRefresh(void)		{ refresh_ibos = true; }
 		void RefreshIBOs(void);
 

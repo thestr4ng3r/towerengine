@@ -27,6 +27,8 @@ class CAnimation
 		CKeyFrame *NewKeyFrame(float time);
 		CKeyFrame *NewKeyFrameFromData(float time, int c, int *vert, CVector *vec);
 
+		void GetKeyframePair(CKeyFrame **a, CKeyFrame **b, float *mix);
+
 		void ApplyCurrentFrame(void);
 
 		float GetLength(void);

@@ -59,12 +59,15 @@ class CFaceShader : public CShader
 		GLint clip_uniform;
 		GLint clip_dist_uniform;
 
+		GLint vertex_mix_uniform;
+
 	public:
 		static const GLint vertex_attribute = 0;
-		static const GLint normal_attribute = 1;
-		static const GLint tang_attribute = 2;
-		static const GLint bitang_attribute = 3;
-		static const GLint uvcoord_attribute = 4;
+		static const GLint vertex2_attribute = 1;
+		static const GLint normal_attribute = 2;
+		static const GLint tang_attribute = 3;
+		static const GLint bitang_attribute = 4;
+		static const GLint uvcoord_attribute = 5;
 		void Init(void);
 
 		void SetMode(int e); // disables or enables calculation of the color to speed up e.g. shadow mapping
@@ -90,6 +93,7 @@ class CFaceShader : public CShader
 		void SetTwoSide(int v);
 		void SetShadow(int enabled, GLuint tex, CVector2 pixel);
 		void SetTransformation(float m[16]);
+		void SetVertexMix(float m = 0.0);
 		void ResetUniforms(void);
 };
 

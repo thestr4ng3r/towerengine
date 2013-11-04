@@ -5,7 +5,9 @@ project(towerengine)
 set(CMAKE_BUILD_TYPE Release)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/oglft)
 FILE(GLOB towerengine_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+FILE(GLOB oglft_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/oglft/*.h")
 
 set(towerengine_SRC 
 	src/animation.cpp 
@@ -27,7 +29,11 @@ set(towerengine_SRC
 	src/vector2.cpp 
 	src/vector.cpp 
 	src/vertex.cpp 
-	src/world.cpp)
+	src/world.cpp
+	src/terrain.cpp
+	src/envmap.cpp
+	src/cube_env_shader.cpp
+	oglft/OGLFT.cpp)
 
 add_definitions(-g -Wall)
 
@@ -42,13 +48,19 @@ include_directories(${OPENGL_INCLUDE_DIR})
 target_link_libraries(towerengine ${OPENGL_LIBRARIES})
 
 find_package(DevIL REQUIRED)
-include_DIRECTORIES(${IL_INCLUDE_DIR})
+include_directories(${IL_INCLUDE_DIR})
 target_link_libraries(towerengine ${IL_LIBRARIES})
 target_link_libraries(towerengine ${ILU_LIBRARIES})
+
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+target_link_libraries(towerengine ${FREETYPE_LIBRARIES})
+
 
 install(TARGETS towerengine DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
 INSTALL(FILES ${towerengine_INCLUDES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/towerengine)
+INSTALL(FILES ${oglft_INCLUDES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/towerengine)
 
 # uninstall target
 configure_file(

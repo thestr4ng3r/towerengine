@@ -40,8 +40,7 @@ CMesh::CMesh(void)
 	vao = 0;
 	//mat_indices = 0;
 	refresh_func = 0;
-	refresh_all_vbos = true;
-	refresh_vertex_vbo = false;
+	refresh_vbos = true;
 	refresh_ibos = true;
 	outdated_vertices.clear();
 	vertex_indices.clear();
@@ -153,7 +152,6 @@ void CMesh::ApplyMatrix(float m[16])
 
 	for(v=vertices.begin(); v!=vertices.end(); v++)
 		(*v)->SetVector(ApplyMatrix4(m, **v));
-	refresh_vertex_vbo = true;
 }
 
 void CMesh::SetXY(CVector x, CVector y)
@@ -190,10 +188,9 @@ void CMesh::Create(void)
 {
 	Delete();
 
-	current_pose = idle_pose = new CMeshPose(this);
-
 	vao = new VAO();
-	vertex_vbo = new VBO<float>(3, vao);
+	current_pose = idle_pose = new CMeshPose(this);
+	//vertex_vbo = new VBO<float>(3, vao);
 	normal_vbo = new VBO<float>(3, vao);
 	tang_vbo = new VBO<float>(3, vao);
 	bitang_vbo = new VBO<float>(3, vao);
@@ -202,8 +199,7 @@ void CMesh::Create(void)
 	outdated_vertices.clear();
 	data_count = 0;
 	refresh_func = 0;
-	refresh_all_vbos = true;
-	refresh_vertex_vbo = false;
+	refresh_vbos = true;
 	refresh_ibos = true;
 	idle_material = new CMaterial(this, string());
 	//VAO::UnBind();
@@ -248,8 +244,7 @@ void CMesh::Delete(void)
 
 	DeleteVBOData();
 	outdated_vertices.clear();
-	refresh_all_vbos = true;
-	refresh_vertex_vbo = false;
+	refresh_vbos = true;
 	refresh_ibos = true;
 
 	data_count = 0;
@@ -261,7 +256,7 @@ void CMesh::DeleteVBOData(void)
 	{
 		delete vao;
 		vao = 0;
-		delete vertex_vbo;
+		//delete vertex_vbo;
 		delete normal_vbo;
 		delete tang_vbo;
 		delete bitang_vbo;
@@ -270,13 +265,17 @@ void CMesh::DeleteVBOData(void)
 	}
 }
 
+VBO<float> *CMesh::CreateFloatVBO(int components)
+{
+	return new VBO<float>(components, vao);
+}
 
 
 CVertex *CMesh::CreateVertex(CVector v)
 {
 	CVertex *o;
 	o = new CVertex(v, this);
-	refresh_all_vbos = false;
+	refresh_vbos = false;
 	return o;
 }
 
@@ -383,7 +382,7 @@ void CMesh::AddVertex(CVertex *v)
 			return;
 	vertices.push_back(v);
 
-	refresh_all_vbos = true;
+	refresh_vbos = true;
 }
 
 void CMesh::AddTriangle(CTriangle *t)
@@ -394,7 +393,7 @@ void CMesh::AddTriangle(CTriangle *t)
 		if(*i == t)
 			return;
 	triangles.push_back(t);
-	refresh_all_vbos = true;
+	refresh_vbos = true;
 	refresh_ibos = true;
 }
 
@@ -439,7 +438,7 @@ void CMesh::RemoveVertex(CVertex *v)
 			vertices.erase(i);
 			break;
 		}
-	refresh_all_vbos = true;
+	refresh_vbos = true;
 	refresh_ibos = true;
 }
 
@@ -538,14 +537,6 @@ void CMesh::SetTriangleMaterials(void)
 	//refresh_vbo = true;
 }
 
-void CMesh::InvalidateVertex(CVertex *v)
-{
-	if(outdated_vertices.find(v) != outdated_vertices.end())
-		return;
-	outdated_vertices.insert(v);
-	refresh_vertex_vbo = true;
-}
-
 void CMesh::AssignVertexArrayPositions(void)
 {
 	vector<CVertex *>::iterator i;
@@ -554,27 +545,7 @@ void CMesh::AssignVertexArrayPositions(void)
 	for(c=0, i=vertices.begin(); i!=vertices.end(); c++, i++)
 		(*i)->index = c;
 
-	refresh_all_vbos = true;
-}
-
-void CMesh::RefreshVertexVBO(void)
-{
-	vector<CVertex *>::iterator v;
-	CVertex *vt;
-	float *vertex_data;
-
-	vertex_vbo->SetSize(data_count);
-	vertex_data = vertex_vbo->GetData();
-
-	for(v=vertices.begin(); v!=vertices.end(); v++)
-	{
-		vt = *v;
-		memcpy(vertex_data + vt->index * 3, vt->v, 3 * sizeof(float));
-	}
-
-	vertex_vbo->AssignData();
-
-	refresh_vertex_vbo = false;
+	refresh_vbos = true;
 }
 
 void CMesh::RefreshAllVBOs(void)
@@ -584,7 +555,6 @@ void CMesh::RefreshAllVBOs(void)
 	vector<CVertex *>::iterator v;
 	CVertex *vt;
 	int d;
-	float *vertex_data;
 	float *normal_data;
 	float *tang_data;
 	float *bitang_data;
@@ -594,37 +564,22 @@ void CMesh::RefreshAllVBOs(void)
 	AssignVertexArrayPositions();
 
 	data_count = GetVertexCount();
-	vertex_vbo->SetSize(data_count);
 	normal_vbo->SetSize(data_count);
 	tang_vbo->SetSize(data_count);
 	bitang_vbo->SetSize(data_count);
 	face_normal_vbo->SetSize(data_count);
 	uvcoord_vbo->SetSize(data_count);
 
-	vertex_data = vertex_vbo->GetData();
 	normal_data = normal_vbo->GetData();
 	tang_data = tang_vbo->GetData();
 	bitang_data = bitang_vbo->GetData();
 	face_normal_data = face_normal_vbo->GetData();
 	uvcoord_data = uvcoord_vbo->GetData();
 
-	/*while(!outdated_vertices.empty())
-	{
-		vt = *outdated_vertices.begin();
-		outdated_vertices.erase(outdated_vertices.begin());
-		c = vt->index;
-		d = c*3;
-		memcpy(vertex_data + d, vt->v, 3 * sizeof(float));
-		memcpy(normal_data + d, vt->normal.v, 3 * sizeof(float));
-		memcpy(face_normal_data + d, vt->normal.v, 3 * sizeof(float));
-		memcpy(uvcoord_data + c*2, vt->uv.v, 2 * sizeof(float));
-	}*/
-
 	for(v=vertices.begin(); v!=vertices.end(); v++)
 	{
 		vt = *v;
 		d = vt->index * 3;
-		memcpy(vertex_data + d, vt->v, 3 * sizeof(float));
 		memcpy(normal_data + d, vt->normal.v, 3 * sizeof(float));
 		memcpy(tang_data + d, vt->tang.v, 3 * sizeof(float));
 		memcpy(bitang_data + d, vt->bitang.v, 3 * sizeof(float));
@@ -633,14 +588,13 @@ void CMesh::RefreshAllVBOs(void)
 
 	}
 
-	vertex_vbo->AssignData();
 	normal_vbo->AssignData();
 	tang_vbo->AssignData();
 	bitang_vbo->AssignData();
 	face_normal_vbo->AssignData();
 	uvcoord_vbo->AssignData();
 
-	refresh_all_vbos = refresh_vertex_vbo = false;
+	refresh_vbos = false;
 }
 
 void CMesh::RefreshIBOs(void)
@@ -688,13 +642,34 @@ void CMesh::RefreshIBOs(void)
 void CMesh::PutToGL(CVector cam, int both_sides)
 {
 	vector<CMaterial *>::iterator i;
+	VBO<float> *vertex_vbo, *vertex2_vbo;
+	CKeyFrame *a, *b;
+	float mix;
+
+	vertex2_vbo = 0;
+	if(animation_mode)
+	{
+		current_animation->GetKeyframePair(&a, &b, &mix);
+		if(!a)
+		{
+			vertex_vbo = current_pose->vbo;
+		}
+		else
+		{
+			vertex_vbo = a->vbo;
+			if(b)
+				vertex2_vbo = b->vbo;
+		}
+	}
+	else
+	{
+		vertex_vbo = current_pose->vbo;
+	}
 
 	//Sort(cam);
 
-	if(refresh_all_vbos)
+	if(refresh_vbos)
 		RefreshAllVBOs();
-	else if(refresh_vertex_vbo)
-		RefreshVertexVBO();
 
 
 
@@ -715,6 +690,14 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 	}*/
 
 	vertex_vbo->SetAttribute(CEngine::GetFaceShader()->vertex_attribute, GL_FLOAT);
+	if(vertex2_vbo)
+	{
+		CEngine::GetFaceShader()->SetVertexMix(mix);
+		vertex2_vbo->SetAttribute(CEngine::GetFaceShader()->vertex2_attribute, GL_FLOAT);
+	}
+	else
+		CEngine::GetFaceShader()->SetVertexMix(0.0);
+
 	normal_vbo->SetAttribute(CEngine::GetFaceShader()->normal_attribute, GL_FLOAT);
 	tang_vbo->SetAttribute(CEngine::GetFaceShader()->tang_attribute, GL_FLOAT);
 	bitang_vbo->SetAttribute(CEngine::GetFaceShader()->bitang_attribute, GL_FLOAT);
@@ -762,7 +745,7 @@ bool CMesh::LoadFromFile(const char *file, int no_material)
 
 	r = LoadFromFile_xml(file, path, no_material);
 
-	refresh_all_vbos = true;
+	refresh_vbos = true;
 	refresh_ibos = true;
 
 	return r;
@@ -844,7 +827,9 @@ bool CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material
 		cur = cur->next;
 	}
 
-	refresh_all_vbos = true;
+	idle_pose->CopyFromVertices();
+
+	refresh_vbos = true;
 	refresh_ibos = true;
 
 	return 1;
@@ -873,7 +858,6 @@ CVertex *CMesh::ParseVertexNode(xmlNodePtr cur)
 	}
 
 	r = new CVertex(p, this);
-	InvalidateVertex(r);
 	SetVertexId(r, id);
 	r->uv_set = file_version >= TEM_VERSION_0_2;
 	r->uv = uv;
@@ -1448,7 +1432,9 @@ void CMesh::ChangePose(string name, string idle)
 	else
 		return;
 
-	current_pose->ApplyPose();
+	animation_mode = false;
+
+	//current_pose->ApplyPose();
 }
 
 void CMesh::ChangePose(CMeshPose *pos)
@@ -1458,8 +1444,10 @@ void CMesh::ChangePose(CMeshPose *pos)
 
 	current_pose = pos;
 
-	if(current_pose)
-		current_pose->ApplyPose();
+	animation_mode = false;
+
+	//if(current_pose)
+	//	current_pose->ApplyPose();
 }
 
 CMeshPose *CMesh::GetCurrentPose(void)
@@ -1514,6 +1502,7 @@ void CMesh::ChangeAnimation(CAnimation *a)
 	ResetAnimationFinished();
 	current_animation = a;
 	current_animation->SetTime(0.0);
+	animation_mode = true;
 	//RefreshAllVBOs();
 }
 
@@ -1610,7 +1599,7 @@ void CMesh::SortTriangles(CVector cam)
 		(*t)->cam_dist = ((*t)->v[0]->cam_dist + (*t)->v[1]->cam_dist + (*t)->v[2]->cam_dist) * (1.0/3.0);*/
 
 	sort(triangles.begin(), triangles.end(), CompareTriangleMaterial);
-	refresh_all_vbos = true;
+	refresh_vbos = true;
 }
 
 void CMesh::SortMaterials(void)

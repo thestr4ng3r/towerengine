@@ -29,8 +29,26 @@ void CMeshObject::SetAnimation(const char *animation)
 	this->animation = a;
 }
 
-void CMeshObject::PlayAnimation(float time)
+void CMeshObject::Fade(float fade_end, float time)
 {
+	this->fade_end = fade_end;
+	fade_speed = (fade_end - alpha) / time;
+}
+
+void CMeshObject::Play(float time)
+{
+	if(fade_speed != 0.0)
+	{
+		alpha += fade_speed * time;
+
+		if((fade_speed > 0.0 && alpha >= fade_end)
+				|| (fade_speed < 0.0 && alpha <= fade_end))
+		{
+			fade_speed = 0.0;
+			alpha = fade_end;
+		}
+	}
+
 	if(!animation_mode || !animation)
 		return;
 
@@ -57,7 +75,7 @@ void CMeshObject::SetPose(const char *pose)
 
 void CMeshObject::PutToGL(CVector cam)
 {
-	if(!visible)
+	if(!visible || alpha <= 0.0)
 		return;
 
 	CMesh::LoadIdentity();
@@ -72,7 +90,6 @@ void CMeshObject::PutToGL(CVector cam)
 		mesh->ChangeAnimation(animation);
 		mesh->SetAnimationLoop(0);
 		animation->SetTime(time);
-		mesh->ApplyAnimation();
 	}
 	else
 	{
