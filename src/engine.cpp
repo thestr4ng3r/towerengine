@@ -2,6 +2,7 @@
 #include "towerengine.h"
 
 CFaceShader *CEngine::face_shader = 0;
+CSkyBoxShader *CEngine::skybox_shader = 0;
 
 void CEngine::Init(void)
 {
@@ -26,6 +27,9 @@ void CEngine::Init(void)
 
 	face_shader = new CFaceShader();
 	face_shader->Init();
+
+	skybox_shader = new CSkyBoxShader();
+	skybox_shader->Init();
 }
 
 void CEngine::Destroy(void)

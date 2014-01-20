@@ -31,8 +31,8 @@ set(towerengine_SRC
 	src/vertex.cpp 
 	src/world.cpp
 	src/terrain.cpp
-	src/envmap.cpp
-	src/cube_env_shader.cpp
+	src/skybox.cpp
+	src/skybox_shader.cpp
 	oglft/OGLFT.cpp)
 
 add_definitions(-g -Wall)

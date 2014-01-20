@@ -5,6 +5,7 @@ class CEngine
 {
 private:
 	static CFaceShader *face_shader;
+	static CSkyBoxShader *skybox_shader;
 
 public:
 	static void Init(void);
@@ -15,6 +16,7 @@ public:
 	static void BindShader(GLhandleARB s);
 
 	static CFaceShader *GetFaceShader(void)		{ return face_shader; }
+	static CSkyBoxShader *GetSkyBoxShader(void)	{ return skybox_shader; }
 };
 
 #endif

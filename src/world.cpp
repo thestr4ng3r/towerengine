@@ -5,6 +5,7 @@ CWorld::CWorld(void)
 {
 	ambient_color = Vec(0.1, 0.1, 0.1);
 	world_object = 0;
+	sky_box = 0;
 	shadow.enabled = false;
 }
 
@@ -265,6 +266,9 @@ void CWorld::Render(CVector cam_pos)
 		memcpy(dir_light_dir + i*3, dir_light->GetDirection().v, 3 * sizeof(float));
 		memcpy(dir_light_color + i*3, dir_light->GetColor().v, 3 * sizeof(float));
 	}
+
+	if(sky_box)
+		sky_box->Paint(cam_pos);
 
 	CEngine::BindFaceShader();
 	CEngine::GetFaceShader()->SetPointLights(point_lights.size(), point_light_pos, point_light_color, point_light_distance);

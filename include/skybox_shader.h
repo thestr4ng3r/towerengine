@@ -1,7 +1,7 @@
 #ifndef _ENVIRONMENT_SHADER_H
 #define _ENVIRONMENT_SHADER_H
 
-class CCubeEnvShader : public CShader
+class CSkyBoxShader : public CShader
 {
 	private:
 		GLint tex_uniform;
@@ -12,7 +12,7 @@ class CCubeEnvShader : public CShader
 		void ResetUniforms(void) {};
 };
 
-extern CCubeEnvShader cube_env_shader;
+extern CSkyBoxShader cube_env_shader;
 
 GLenum CubeTex(int side);
 int CubeSide(GLenum tex);

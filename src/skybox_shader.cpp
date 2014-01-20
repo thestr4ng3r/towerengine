@@ -1,10 +1,10 @@
 #include "towerengine.h"
 
-CCubeEnvShader cube_env_shader;
+CSkyBoxShader cube_env_shader;
 
-void CCubeEnvShader::Init(void)
+void CSkyBoxShader::Init(void)
 {
-	printf("Compiling Environment Shader...\n");
+	printf("Compiling SkyBox Shader...\n");
 
 	SetSource(cube_env_shader_vert, cube_env_shader_frag);
 	CreateVertexShader();
@@ -17,7 +17,7 @@ void CCubeEnvShader::Init(void)
 	UseNoShader();
 }
 
-void CCubeEnvShader::SetCubeMap(GLuint tex)
+void CSkyBoxShader::SetCubeMap(GLuint tex)
 {
 	glUniform1iARB(tex_uniform, 0);
 
@@ -42,7 +42,10 @@ GLuint LoadGLCubeMap(const char *filename[6])
 	{
 		success = ilLoadImage(filename[i]);
 		if(!success)
+		{
+			printf("Failed to load cube map texture %d: %s\n", i, filename[i]);
 			continue;
+		}
 		iluGetImageInfo(&ImageInfo);
 		if (ImageInfo.Origin != IL_ORIGIN_UPPER_LEFT)
 		{
