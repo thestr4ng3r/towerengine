@@ -2,9 +2,6 @@
 #ifndef _FACE_SHADER_H
 #define _FACE_SHADER_H
 
-#define MAX_POINT_LIGHTS 16
-#define MAX_DIRECTIONAL_LIGHTS 16
-
 class CFaceShader : public CShader
 {
 	private:
@@ -23,6 +20,9 @@ class CFaceShader : public CShader
 		GLint point_light_pos_uniform;
 		GLint point_light_color_uniform;
 		GLint point_light_distance_uniform;
+		GLint point_light_shadow_enabled_uniform;
+		GLint point_light_shadow_map_uniform;
+		GLint point_light_shadow_near_clip_uniform;
 
 		GLint directional_light_count_uniform;
 		GLint directional_light_dir_uniform;
@@ -31,10 +31,6 @@ class CFaceShader : public CShader
 		GLint light_ambient_color_uniform;
 
 		GLint specular_size_uniform; // TODO: in exponent umbenennen
-
-		GLint shadow_map_uniform;
-		GLint shadow_enabled_uniform;
-		GLint shadow_pixel_uniform;
 
 		GLint diffuse_tex_enabled_uniform;
 		GLint normal_tex_enabled_uniform;
@@ -68,6 +64,17 @@ class CFaceShader : public CShader
 		static const GLint tang_attribute = 3;
 		static const GLint bitang_attribute = 4;
 		static const GLint uvcoord_attribute = 5;
+
+		static const GLint max_point_lights = 8;
+		static const GLint max_directional_lights = 8;
+
+		static const unsigned int diffuse_tex_unit = 0;
+		static const unsigned int specular_tex_unit = 4;
+		static const unsigned int normal_tex_unit = 2;
+		static const unsigned int height_tex_unit = 3;
+		static const unsigned int point_light_shadow_tex_first_unit = 5;
+		static const unsigned int directional_light_shadow_tex_first_unit = point_light_shadow_tex_first_unit + max_point_lights;
+
 		void Init(void);
 
 		void SetMode(int e); // disables or enables calculation of the color to speed up e.g. shadow mapping
@@ -76,7 +83,7 @@ class CFaceShader : public CShader
 		void SetDiffuseColor2(CVector color, float alpha);
 		void SetSpecularColor(CVector color);
 		void SetAmbient(float ambient);
-		void SetPointLights(int count, float *pos, float *color, float *dist);
+		void SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps, float *shadow_near_clips);
 		void SetDirectionalLights(int count, float *dir, float *color);
 		void SetLightAmbientColor(CVector color);
 		void SetSpecular(float size);
@@ -91,7 +98,6 @@ class CFaceShader : public CShader
 		void SetBumpFactor(float f);
 		void SetFog(CVector color, float depth, float dist);
 		void SetTwoSide(int v);
-		void SetShadow(int enabled, GLuint tex, CVector2 pixel);
 		void SetTransformation(float m[16]);
 		void SetVertexMix(float m = 0.0);
 		void ResetUniforms(void);

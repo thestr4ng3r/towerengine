@@ -13,18 +13,6 @@ private:
 
 	CVector ambient_color;
 
-	struct shadow
-	{
-		bool enabled;
-
-		GLuint tex;
-		GLuint fbo;
-		GLuint rbo;
-
-		int width;
-		int height;
-	} shadow;
-
 	void PutToGL(CVector cam_pos);
 	void SetShadowTextureMatrix(void);
 
@@ -39,8 +27,8 @@ public:
 	void RemoveWorldMesh(void);
 	void Clear(void);
 
-	void InitShadow(int width, int height);
-	void SetShadowEnabled(bool enabled)	{ shadow.enabled = enabled; }
+	//void InitShadow(int width, int height);
+	//void SetShadowEnabled(bool enabled)	{ shadow.enabled = enabled; }
 
 	CVector GetAmbientColor(void)		{ return ambient_color; }
 
@@ -54,7 +42,8 @@ public:
 	void RemoveDirectionalLight(CDirectionalLight *light);
 	void ClearDirectionalLights(void);
 
-	void RenderShadow(CVector cam_pos);
+	void RenderShadow(void);
+	void RenderShadowMaps(void);
 	void Render(CVector cam_pos);
 };
 

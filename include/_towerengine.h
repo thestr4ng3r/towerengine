@@ -12,6 +12,10 @@ struct CEntity;
 class CWorld;
 class CObject;
 class CCamera;
+class CPointLight;
+class CPointLightShadow;
+class CDirectionalLight;
+class CDirectionalLightShadow;
 
 #include "tresources.h"
 
@@ -36,6 +40,7 @@ class CCamera;
 #include "terrain.h"
 #include "camera.h"
 #include "light.h"
+#include "shadow.h"
 #include "world.h"
 
 #endif

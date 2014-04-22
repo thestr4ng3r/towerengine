@@ -25,6 +25,51 @@ void CSkyBoxShader::SetCubeMap(GLuint tex)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 }
 
+GLenum CubeTex(int side)
+{
+	switch(side)
+	{
+		case 0:	return GL_TEXTURE_CUBE_MAP_POSITIVE_X; break;
+		case 1:	return GL_TEXTURE_CUBE_MAP_NEGATIVE_X; break;
+		case 2:	return GL_TEXTURE_CUBE_MAP_POSITIVE_Y; break;
+		case 3:	return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y; break;
+		case 4:	return GL_TEXTURE_CUBE_MAP_POSITIVE_Z; break;
+		case 5:	return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z; break;
+	};
+
+	return 0;
+}
+
+int CubeSide(GLenum tex)
+{
+	switch(tex)
+	{
+		case GL_TEXTURE_CUBE_MAP_POSITIVE_X:	return 0; break;
+		case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:	return 1; break;
+		case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:	return 2; break;
+		case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:	return 3; break;
+		case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:	return 4; break;
+		case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:	return 5; break;
+	};
+
+	return 0;
+}
+
+CVector CubeVecS(int side)
+{
+	switch(side)
+	{
+		case 0:	return Vec(1.0, 0.0, 0.0); break;
+		case 1:	return Vec(-1.0, 0.0, 0.0); break;
+		case 2:	return Vec(0.0, 1.0, 0.0); break;
+		case 3:	return Vec(0.0, -1.0, 0.0); break;
+		case 4:	return Vec(0.0, 0.0, 1.0); break;
+		case 5:	return Vec(0.0, 0.0, -1.0); break;
+	};
+
+	return Vec(0.0, 0.0, 0.0);
+}
+
 GLuint LoadGLCubeMap(const char *filename[6])
 {
 	ILinfo ImageInfo;

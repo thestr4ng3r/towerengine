@@ -1,6 +1,6 @@
 #version 130
 
-uniform mat4 gl_TextureMatrix[gl_MaxTextureCoords];
+//uniform mat4 gl_TextureMatrix[gl_MaxTextureCoords];
 uniform mat4 gl_ModelViewProjectionMatrix;
 uniform mat4 gl_ModelViewMatrix;
 uniform mat4 gl_ModelViewMatrixInverse;
@@ -22,7 +22,7 @@ out vec3 bitang_var;
 out vec2 uv_var;
 
 out vec3 cam_pos_var;
-out vec4 shadow_coord_var;
+//out vec4 shadow_coord_var;
 
 
 void main(void)
@@ -38,7 +38,7 @@ void main(void)
 	uv_var = uv_attr;
 	
 	cam_pos_var = gl_ModelViewMatrixInverse[3].xyz;
-	shadow_coord_var = gl_TextureMatrix[5] * pos;
+	//shadow_coord_var = gl_TextureMatrix[5] * pos;
 	
 	gl_Position = gl_ModelViewProjectionMatrix * pos;
 }

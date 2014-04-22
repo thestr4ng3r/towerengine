@@ -17,6 +17,7 @@ set(towerengine_SRC
 	src/entity.cpp 
 	src/face_shader.cpp 
 	src/light.cpp 
+	src/shadow.cpp
 	src/material.cpp 
 	src/mesh.cpp 
 	src/meshobject.cpp 

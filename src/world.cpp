@@ -6,7 +6,6 @@ CWorld::CWorld(void)
 	ambient_color = Vec(0.1, 0.1, 0.1);
 	world_object = 0;
 	sky_box = 0;
-	shadow.enabled = false;
 }
 
 CWorld::~CWorld(void)
@@ -46,7 +45,7 @@ void CWorld::RemoveObject(CObject *o)
 
 void CWorld::AddPointLight(CPointLight *light)
 {
-	if(point_lights.size() >= MAX_POINT_LIGHTS)
+	if(point_lights.size() >= CFaceShader::max_point_lights)
 		return;
 
 	for(vector<CPointLight *>::iterator i = point_lights.begin(); i != point_lights.end(); i++)
@@ -67,7 +66,7 @@ void CWorld::RemovePointLight(CPointLight *light)
 
 void CWorld::AddDirectionalLight(CDirectionalLight *light)
 {
-	if(dir_lights.size() >= MAX_DIRECTIONAL_LIGHTS)
+	if(dir_lights.size() >= CFaceShader::max_directional_lights)
 		return;
 
 	for(vector<CDirectionalLight *>::iterator i = dir_lights.begin(); i != dir_lights.end(); i++)
@@ -143,64 +142,11 @@ void CWorld::Clear(void)
 	objects.clear();
 }
 
-void CWorld::InitShadow(int width, int height)
+void CWorld::RenderShadow(void)
 {
-	shadow.width = width;
-	shadow.height = height;
-
-	glGenTextures(1, &shadow.tex);
-	glBindTexture(GL_TEXTURE_2D, shadow.tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadow.width, shadow.height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glGenFramebuffersEXT(1, &shadow.fbo);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, shadow.fbo);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, shadow.tex, 0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	shadow.enabled = true;
-}
-
-void CWorld::RenderShadow(CVector cam_pos)
-{
-	if(point_lights.size() == 0)
-		return;
-
-	CVector light_pos = point_lights[0]->GetPos();
-
 	shader_enabled = 0;
-	UseNoShader();
-	glEnable(GL_DEPTH_TEST);
-
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, shadow.fbo);
-	glViewport(0, 0, shadow.width, shadow.height);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-	//glCullFace(GL_FRONT);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(60.0, (double)shadow.width / (double)shadow.height, 1.0, 100.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(light_pos.x, light_pos.y, light_pos.z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); // TODO
-	SetShadowTextureMatrix();
-	Render(cam_pos);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
+	Render(Vec(0.0, 0.0, 0.0));
 	shader_enabled = 1;
-
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	//glCullFace(GL_BACK);
 }
 
 void CWorld::SetShadowTextureMatrix(void)
@@ -237,22 +183,51 @@ void CWorld::SetShadowTextureMatrix(void)
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void CWorld::RenderShadowMaps(void)
+{
+	vector<CPointLight *>::iterator pi;
+
+	for(pi=point_lights.begin(); pi!=point_lights.end(); pi++)
+		(*pi)->RenderShadow(this);
+
+	vector<CDirectionalLight *>::iterator di;
+
+	for(di=dir_lights.begin(); di!=dir_lights.end(); di++)
+		(*di)->RenderShadow(this);
+}
+
 void CWorld::Render(CVector cam_pos)
 {
 	int i;
 	CPointLight *point_light;
-	float *point_light_pos, *point_light_color, *point_light_distance;
+	float *point_light_pos, *point_light_color, *point_light_distance, *point_light_shadow_near_clip;
+	int *point_light_shadow_enabled;
+	GLuint *point_light_shadow_maps;
 
 	point_light_pos = new float[point_lights.size() * 3];
 	point_light_color = new float[point_lights.size() * 3];
 	point_light_distance = new float[point_lights.size()];
+	point_light_shadow_enabled = new int[point_lights.size()];
+	point_light_shadow_maps = new GLuint[point_lights.size()];
+	point_light_shadow_near_clip = new float[point_lights.size()];
 
 	for(i=0; i<(int)point_lights.size(); i++)
 	{
 		point_light = point_lights[i];
-		memcpy(point_light_pos + i*3, point_light->GetPos().v, 3 * sizeof(float));
+		memcpy(point_light_pos + i*3, point_light->GetPosition().v, 3 * sizeof(float));
 		memcpy(point_light_color + i*3, point_light->GetColor().v, 3 * sizeof(float));
 		point_light_distance[i] = point_light->GetDistance();
+		point_light_shadow_enabled[i] = (point_light->GetShadowEnabled() ? 1 : 0);
+		if(point_light->GetShadowEnabled())
+		{
+			point_light_shadow_maps[i] = point_light->GetShadow()->GetShadowMap();
+			point_light_shadow_near_clip[i] = point_light->GetShadow()->GetNearClip();
+		}
+		else
+		{
+			point_light_shadow_maps[i] = 0;
+			point_light_shadow_near_clip[i] = 0.0;
+		}
 	}
 
 	CDirectionalLight *dir_light;
@@ -271,12 +246,17 @@ void CWorld::Render(CVector cam_pos)
 		sky_box->Paint(cam_pos);
 
 	CEngine::BindFaceShader();
-	CEngine::GetFaceShader()->SetPointLights(point_lights.size(), point_light_pos, point_light_color, point_light_distance);
+	CEngine::GetFaceShader()->SetPointLights(	point_lights.size(),
+												point_light_pos,
+												point_light_color,
+												point_light_distance,
+												point_light_shadow_enabled,
+												point_light_shadow_maps,
+												point_light_shadow_near_clip);
 	CEngine::GetFaceShader()->SetDirectionalLights(dir_lights.size(), dir_light_dir, dir_light_color);
 	CEngine::GetFaceShader()->SetLightAmbientColor(ambient_color);
 	CEngine::GetFaceShader()->SetTwoSide(0);
 	CEngine::GetFaceShader()->SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
-	CEngine::GetFaceShader()->SetShadow(shadow.enabled ? 1 : 0, shadow.tex, Vec(1.0 / (float)shadow.width, 1.0 / (float)shadow.height));
 	//CEngine::GetFaceShader()->SetClip(clip.v, clip.d);
 
 	PutToGL(cam_pos);

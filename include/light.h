@@ -10,16 +10,24 @@ class CPointLight
 		CVector color;
 		float distance;
 
+		bool shadow_enabled;
+		CPointLightShadow *shadow;
+
 	public:
 		CPointLight(CVector pos, CVector color, float distance);
 
-		void SetPos(CVector pos)		{ this->pos = pos; }
+		void SetPosition(CVector pos)		{ this->pos = pos; }
 		void SetColor(CVector color)	{ this->color = color; }
 		void SetDistance(float dist)	{ this->distance = dist; }
 
-		CVector GetPos(void)	{ return pos; }
-		CVector GetColor(void)	{ return color; }
-		float GetDistance(void)	{ return distance; }
+		CVector GetPosition(void)			{ return pos; }
+		CVector GetColor(void)				{ return color; }
+		float GetDistance(void)				{ return distance; }
+		bool GetShadowEnabled(void)			{ return shadow_enabled; }
+		CPointLightShadow *GetShadow(void)	{ return shadow; }
+
+		void InitShadow(int size, float near_clip);
+		void RenderShadow(CWorld *world);
 };
 
 class CDirectionalLight
@@ -36,6 +44,8 @@ class CDirectionalLight
 
 		CVector GetDirection(void)	{ return dir; }
 		CVector GetColor(void)		{ return color; }
+
+		void RenderShadow(CWorld *world);
 };
 
 

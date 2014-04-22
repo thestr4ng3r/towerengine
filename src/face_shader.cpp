@@ -36,16 +36,15 @@ void CFaceShader::Init(void)
 	point_light_pos_uniform = glGetUniformLocationARB(program, "point_light_pos_uni");
 	point_light_color_uniform = glGetUniformLocationARB(program, "point_light_color_uni");
 	point_light_distance_uniform = glGetUniformLocationARB(program, "point_light_distance_uni");
+	point_light_shadow_map_uniform = glGetUniformLocationARB(program, "point_light_shadow_map_uni");
+	point_light_shadow_enabled_uniform = glGetUniformLocationARB(program, "point_light_shadow_enabled_uni");
+	point_light_shadow_near_clip_uniform = glGetUniformLocationARB(program, "point_light_shadow_near_clip_uni");
 
 	directional_light_count_uniform = glGetUniformLocationARB(program, "directional_light_count_uni");
 	directional_light_dir_uniform = glGetUniformLocationARB(program, "directional_light_dir_uni");
 	directional_light_color_uniform = glGetUniformLocationARB(program, "directional_light_color_uni");
 
 	light_ambient_color_uniform = glGetUniformLocationARB(program, "light_ambient_color_uni");
-	
-	shadow_map_uniform = glGetUniformLocationARB(program, "shadow_map_uni");
-	shadow_enabled_uniform = glGetUniformLocationARB(program, "shadow_enabled_uni");
-	shadow_pixel_uniform = glGetUniformLocationARB(program, "shadow_pixel_size_uni");
 
 	specular_size_uniform = glGetUniformLocationARB(program, "specular_size_uni");
 
@@ -112,18 +111,33 @@ void CFaceShader::SetAmbient(float ambient)
 		glUniform1fARB(ambient_uniform, ambient);
 }
 
-void CFaceShader::SetPointLights(int count, float *pos, float *color, float *dist)
+void CFaceShader::SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps, float *shadow_near_clips)
 {
-	count = min(count, MAX_POINT_LIGHTS);
+	int i;
+	count = min(count, max_point_lights);
 	glUniform1iARB(point_light_count_uniform, count);
 	glUniform3fvARB(point_light_pos_uniform, count, pos);
 	glUniform3fvARB(point_light_color_uniform, count, color);
 	glUniform1fvARB(point_light_distance_uniform, count, dist);
+
+	glUniform1ivARB(point_light_shadow_enabled_uniform, count, shadow_enabled);
+	int *tex_units = new int[max_point_lights];
+	for(i=0; i<count; i++)
+	{
+		tex_units[i] = point_light_shadow_tex_first_unit + i;
+		glActiveTextureARB(GL_TEXTURE0 + tex_units[i]);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, shadow_maps[i]);
+	}
+	for(i=count; i<max_point_lights; i++)
+		tex_units[i] = point_light_shadow_tex_first_unit + i;
+
+	glUniform1ivARB(point_light_shadow_map_uniform, max_point_lights, tex_units);
+	glUniform1fvARB(point_light_shadow_near_clip_uniform, count, shadow_near_clips);
 }
 
 void CFaceShader::SetDirectionalLights(int count, float *dir, float *color)
 {
-	count = min(count, MAX_POINT_LIGHTS);
+	count = min(count, max_directional_lights);
 	glUniform1iARB(directional_light_count_uniform, count);
 	glUniform3fvARB(directional_light_dir_uniform, count, dir);
 	glUniform3fvARB(directional_light_color_uniform, count, color);
@@ -149,8 +163,8 @@ void CFaceShader::SetDiffuseTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glUniform1iARB(diffuse_tex_uniform, 0);
-		glActiveTextureARB(GL_TEXTURE0_ARB);
+		glUniform1iARB(diffuse_tex_uniform, diffuse_tex_unit);
+		glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
 }
@@ -161,8 +175,8 @@ void CFaceShader::SetSpecularTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glUniform1iARB(specular_tex_uniform, 4);
-		glActiveTexture(GL_TEXTURE4_ARB);
+		glUniform1iARB(specular_tex_uniform, specular_tex_unit);
+		glActiveTexture(GL_TEXTURE0 + specular_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
 
@@ -174,8 +188,8 @@ void CFaceShader::SetNormalTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glUniform1iARB(normal_tex_uniform, 2);
-		glActiveTexture(GL_TEXTURE2_ARB);
+		glUniform1iARB(normal_tex_uniform, normal_tex_unit);
+		glActiveTexture(GL_TEXTURE0 + normal_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
 
@@ -187,23 +201,10 @@ void CFaceShader::SetHeightTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glUniform1iARB(height_tex_uniform, 3);
-		glActiveTexture(GL_TEXTURE3_ARB);
+		glUniform1iARB(height_tex_uniform, height_tex_unit);
+		glActiveTexture(GL_TEXTURE0 + height_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
-}
-
-void CFaceShader::SetShadow(int v, GLuint tex, CVector2 pixel)
-{
-	glUniform1iARB(shadow_map_uniform, 5);
-
-	glActiveTexture(GL_TEXTURE5_ARB);
-	glBindTexture(GL_TEXTURE_2D, tex);
-
-	if(shadow_enabled_uniform != -1)
-		glUniform1i(shadow_enabled_uniform, v ? 1 : 0);
-	if(shadow_pixel_uniform != -1)
-		glUniform2f(shadow_pixel_uniform, pixel.x, pixel.y);
 }
 
 
@@ -285,13 +286,12 @@ void CFaceShader::ResetUniforms(void)
 	SetDiffuseColor(Vec(1.0, 1.0, 1.0));
 	SetSpecularColor(Vec(0.5, 0.5, 0.5));
 	SetAmbient(1.0);
-	SetPointLights(0, 0, 0, 0);
+	SetPointLights(0, 0, 0, 0, 0, 0, 0);
 	SetLightAmbientColor(Vec(0.0, 0.0, 0.0));
 	SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
 	SetSpecular(32.0);
 	SetFog(Vec(1.0, 1.0, 1.0), 0.0, 0.0);
 	SetClip(Vec(0.0, 0.0, 0.0), 0.0);
-	SetShadow(0, 0, Vec(1.0, 1.0));
 	SetVertexMix(0.0);
 	SetDiffuseTexture(false);
 	SetSpecularTexture(false);
