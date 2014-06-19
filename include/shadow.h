@@ -10,18 +10,16 @@ class CPointLightShadow
 
 		GLuint tex;
 		GLuint fbo;
+		GLuint depth_rbo;
 
 		int size;
 
-		float near_clip;
-
 	public:
-		CPointLightShadow(CPointLight *light, int size, float near_clip);
+		CPointLightShadow(CPointLight *light, int size);
 
 		void Render(CWorld *world);
 
 		GLuint GetShadowMap(void)	{ return tex; }
-		float GetNearClip(void)		{ return near_clip; }
 };
 
 class CDirectionalLightShadow

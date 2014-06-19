@@ -6,6 +6,7 @@ class CEngine
 private:
 	static CFaceShader *face_shader;
 	static CSkyBoxShader *skybox_shader;
+	static CPointShadowShader *point_shadow_shader;
 
 public:
 	static void Init(void);
@@ -17,6 +18,7 @@ public:
 
 	static CFaceShader *GetFaceShader(void)		{ return face_shader; }
 	static CSkyBoxShader *GetSkyBoxShader(void)	{ return skybox_shader; }
+	static CPointShadowShader *GetPointShadowShader(void) { return point_shadow_shader; }
 };
 
 #endif

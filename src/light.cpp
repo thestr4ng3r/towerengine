@@ -10,12 +10,12 @@ CPointLight::CPointLight(CVector pos, CVector color, float distance)
 	shadow = 0;
 }
 
-void CPointLight::InitShadow(int size, float near_clip)
+void CPointLight::InitShadow(int size)
 {
 	if(shadow)
 		delete shadow;
 
-	shadow = new CPointLightShadow(this, size, near_clip);
+	shadow = new CPointLightShadow(this, size);
 	shadow_enabled = true;
 }
 

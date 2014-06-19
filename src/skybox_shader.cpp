@@ -1,7 +1,5 @@
 #include "towerengine.h"
 
-CSkyBoxShader cube_env_shader;
-
 void CSkyBoxShader::Init(void)
 {
 	printf("Compiling SkyBox Shader...\n");

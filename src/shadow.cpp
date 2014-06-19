@@ -1,13 +1,12 @@
 
 #include "towerengine.h"
 
-CPointLightShadow::CPointLightShadow(CPointLight *light, int size, float near_clip)
+CPointLightShadow::CPointLightShadow(CPointLight *light, int size)
 {
 	int i;
 
 	this->light = light;
 	this->size = size;
-	this->near_clip = near_clip;
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
@@ -21,14 +20,18 @@ CPointLightShadow::CPointLightShadow(CPointLight *light, int size, float near_cl
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
 
 	for(i=0; i<6; i++)
-		glTexImage2D(CubeTex(i), 0, GL_DEPTH_COMPONENT32, size, size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		glTexImage2D(CubeTex(i), 0, GL_RG32F, size, size, 0, GL_RG, GL_FLOAT, 0);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 	glGenFramebuffersEXT(1, &fbo);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
+	glGenRenderbuffersEXT(1, &depth_rbo);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depth_rbo);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, size, size);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depth_rbo);
+	//glDrawBuffer(GL_NONE);
+	//glReadBuffer(GL_NONE);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
@@ -43,19 +46,24 @@ void CPointLightShadow::Render(CWorld *world)
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glViewport(0, 0, size, size);
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
 	//glCullFace(GL_FRONT);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(90.0, 1.0, near_clip, light->GetDistance());
+	gluPerspective(90.0, 1.0, 0.001, light->GetDistance());
+
+	CEngine::GetPointShadowShader()->BindShader();
+	CEngine::GetPointShadowShader()->SetLightPos(pos);
+	CEngine::GetPointShadowShader()->SetLightDist(light->GetDistance());
 
 	//glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 	for(s=0; s<6; s++)
 	{
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
+		glClearColor(1.0, 1.0, 1.0, 1.0);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -69,8 +77,8 @@ void CPointLightShadow::Render(CWorld *world)
 		gluLookAt(pos.x, pos.y, pos.z, cam_to.x, cam_to.y, cam_to.z, cam_up.x, cam_up.y, cam_up.z);
 		world->RenderShadow();
 	}
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	CEngine::UnbindShader();
 
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	//glCullFace(GL_BACK);
 }

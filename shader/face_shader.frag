@@ -38,7 +38,6 @@ uniform vec3 point_light_color_uni[MAX_POINT_LIGHTS];
 uniform float point_light_distance_uni[MAX_POINT_LIGHTS];
 uniform bool point_light_shadow_enabled_uni[MAX_POINT_LIGHTS];
 uniform samplerCube point_light_shadow_map_uni[MAX_POINT_LIGHTS];
-uniform float point_light_shadow_near_clip_uni[MAX_POINT_LIGHTS];
 
 uniform int directional_light_count_uni;
 uniform vec3 directional_light_dir_uni[MAX_DIRECTIONAL_LIGHTS];
@@ -61,30 +60,21 @@ in vec3 cam_pos_var;
 
 out vec4 gl_FragColor;
 
-float VectorToDepth(vec3 Vec, float n, float f)
-{
-    vec3 AbsVec = abs(Vec);
-    float LocalZcomp = max(AbsVec.x, max(AbsVec.y, AbsVec.z));
-
-    float NormZComp = (f+n) / (f-n) - (2*f*n)/(f-n)/LocalZcomp;
-    return (NormZComp + 1.0) * 0.5;
-}
-
-float PointLightShadowLookup(int i, vec3 dir)
+vec4 PointLightShadowLookup(int i, vec3 dir)
 {
 	switch(i)
 	{
-		case 0: return texture(point_light_shadow_map_uni[0], dir).r;
-		case 1: return texture(point_light_shadow_map_uni[1], dir).r;
-		case 2: return texture(point_light_shadow_map_uni[2], dir).r;
-		case 3: return texture(point_light_shadow_map_uni[3], dir).r;
-		case 4: return texture(point_light_shadow_map_uni[4], dir).r;
-		case 5: return texture(point_light_shadow_map_uni[5], dir).r;
-		case 6: return texture(point_light_shadow_map_uni[6], dir).r;
-		case 7: return texture(point_light_shadow_map_uni[7], dir).r;
+		case 0: return texture(point_light_shadow_map_uni[0], dir);
+		case 1: return texture(point_light_shadow_map_uni[1], dir);
+		case 2: return texture(point_light_shadow_map_uni[2], dir);
+		case 3: return texture(point_light_shadow_map_uni[3], dir);
+		case 4: return texture(point_light_shadow_map_uni[4], dir);
+		case 5: return texture(point_light_shadow_map_uni[5], dir);
+		case 6: return texture(point_light_shadow_map_uni[6], dir);
+		case 7: return texture(point_light_shadow_map_uni[7], dir);
 	}
 	
-	return 1.0;
+	return vec4(1.0);
 }
 
 void main(void)
@@ -132,17 +122,16 @@ void main(void)
 	float specular_intensity;
 	int i;
 	float bias;
-	float shadow_depth, light_depth;
-		
+	float shadow_depth, light_dist_sq;
+			
 	for(i=0; i<point_light_count_uni; i++)
 	{
 		vec3 light_dir = point_light_pos_uni[i] - pos_var; // pos to light
-		float light_dist = light_dir.x * light_dir.x + light_dir.y * light_dir.y + light_dir.z * light_dir.z; // squared distance
-		if(light_dist > point_light_distance_uni[i] * point_light_distance_uni[i])
+		light_dist_sq = light_dir.x * light_dir.x + light_dir.y * light_dir.y + light_dir.z * light_dir.z; // squared distance
+		if(light_dist_sq > point_light_distance_uni[i] * point_light_distance_uni[i])
 			continue;
-		light_dist = sqrt(light_dist); // real distance
+		float light_dist = sqrt(light_dist_sq); // real distance
 		light_dir /= light_dist; // normalized dir
-		
 		
 		if(point_light_shadow_enabled_uni[i])
 		{
@@ -169,13 +158,14 @@ void main(void)
 						shadow_rot_v = vec2(shadow_rot.x + float(x) * sr, shadow_rot.y + float(y) * sr);
 						pcf_dir.y = sin(shadow_rot_v.x);
 						pcf_dir.z = sin(shadow_rot_v.y) * cos(shadow_rot_v.x);
-						pcf_dir.x = cos(shadow_rot_v.y) * cos(shadow_rot_v.x); 
-						shadow_depth = PointLightShadowLookup(i, pcf_dir);
-						//bias = 0.0005 * tan(acos(clamp(dot(normal_var, light_dir), 0.0, 1.0)));
-						//bias = clamp(bias, 0.0, 0.0015);
-						bias = 0.001 + abs(sqrt(float(x * x  + y * y))) * 0.0005 * tan(acos(clamp(dot(normal_var, light_dir), 0.0, 1.0)));
-						light_depth = VectorToDepth(light_dir * (light_dist - bias), point_light_shadow_near_clip_uni[i], point_light_distance_uni[i]);
-						if(shadow_depth + bias >= light_depth)
+						pcf_dir.x = cos(shadow_rot_v.y) * cos(shadow_rot_v.x);
+						 
+						vec4 shadow_v = PointLightShadowLookup(i, pcf_dir);
+						shadow_depth = shadow_v.r * point_light_distance_uni[i];
+						
+						bias = 0.004 + (abs(x) + abs(y)) * 0.01;
+						
+						if(shadow_depth + bias >= light_dist)
 							shadow += 1.0;
 					}
 			shadow /= (samples * 2 + 1) * (samples * 2 + 1);

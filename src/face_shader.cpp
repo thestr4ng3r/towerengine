@@ -38,7 +38,6 @@ void CFaceShader::Init(void)
 	point_light_distance_uniform = glGetUniformLocationARB(program, "point_light_distance_uni");
 	point_light_shadow_map_uniform = glGetUniformLocationARB(program, "point_light_shadow_map_uni");
 	point_light_shadow_enabled_uniform = glGetUniformLocationARB(program, "point_light_shadow_enabled_uni");
-	point_light_shadow_near_clip_uniform = glGetUniformLocationARB(program, "point_light_shadow_near_clip_uni");
 
 	directional_light_count_uniform = glGetUniformLocationARB(program, "directional_light_count_uni");
 	directional_light_dir_uniform = glGetUniformLocationARB(program, "directional_light_dir_uni");
@@ -111,7 +110,7 @@ void CFaceShader::SetAmbient(float ambient)
 		glUniform1fARB(ambient_uniform, ambient);
 }
 
-void CFaceShader::SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps, float *shadow_near_clips)
+void CFaceShader::SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps)
 {
 	int i;
 	count = min(count, max_point_lights);
@@ -132,7 +131,6 @@ void CFaceShader::SetPointLights(int count, float *pos, float *color, float *dis
 		tex_units[i] = point_light_shadow_tex_first_unit + i;
 
 	glUniform1ivARB(point_light_shadow_map_uniform, max_point_lights, tex_units);
-	glUniform1fvARB(point_light_shadow_near_clip_uniform, count, shadow_near_clips);
 }
 
 void CFaceShader::SetDirectionalLights(int count, float *dir, float *color)
@@ -286,7 +284,7 @@ void CFaceShader::ResetUniforms(void)
 	SetDiffuseColor(Vec(1.0, 1.0, 1.0));
 	SetSpecularColor(Vec(0.5, 0.5, 0.5));
 	SetAmbient(1.0);
-	SetPointLights(0, 0, 0, 0, 0, 0, 0);
+	SetPointLights(0, 0, 0, 0, 0, 0);
 	SetLightAmbientColor(Vec(0.0, 0.0, 0.0));
 	SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
 	SetSpecular(32.0);

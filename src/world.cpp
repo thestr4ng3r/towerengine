@@ -145,7 +145,7 @@ void CWorld::Clear(void)
 void CWorld::RenderShadow(void)
 {
 	shader_enabled = 0;
-	Render(Vec(0.0, 0.0, 0.0));
+	PutToGL(Vec(0.0, 0.0, 0.0));
 	shader_enabled = 1;
 }
 
@@ -200,7 +200,7 @@ void CWorld::Render(CVector cam_pos)
 {
 	int i;
 	CPointLight *point_light;
-	float *point_light_pos, *point_light_color, *point_light_distance, *point_light_shadow_near_clip;
+	float *point_light_pos, *point_light_color, *point_light_distance;
 	int *point_light_shadow_enabled;
 	GLuint *point_light_shadow_maps;
 
@@ -209,7 +209,6 @@ void CWorld::Render(CVector cam_pos)
 	point_light_distance = new float[point_lights.size()];
 	point_light_shadow_enabled = new int[point_lights.size()];
 	point_light_shadow_maps = new GLuint[point_lights.size()];
-	point_light_shadow_near_clip = new float[point_lights.size()];
 
 	for(i=0; i<(int)point_lights.size(); i++)
 	{
@@ -218,16 +217,7 @@ void CWorld::Render(CVector cam_pos)
 		memcpy(point_light_color + i*3, point_light->GetColor().v, 3 * sizeof(float));
 		point_light_distance[i] = point_light->GetDistance();
 		point_light_shadow_enabled[i] = (point_light->GetShadowEnabled() ? 1 : 0);
-		if(point_light->GetShadowEnabled())
-		{
-			point_light_shadow_maps[i] = point_light->GetShadow()->GetShadowMap();
-			point_light_shadow_near_clip[i] = point_light->GetShadow()->GetNearClip();
-		}
-		else
-		{
-			point_light_shadow_maps[i] = 0;
-			point_light_shadow_near_clip[i] = 0.0;
-		}
+		point_light_shadow_maps[i] = point_light->GetShadowEnabled() ? point_light->GetShadow()->GetShadowMap() : 0;
 	}
 
 	CDirectionalLight *dir_light;
@@ -251,8 +241,7 @@ void CWorld::Render(CVector cam_pos)
 												point_light_color,
 												point_light_distance,
 												point_light_shadow_enabled,
-												point_light_shadow_maps,
-												point_light_shadow_near_clip);
+												point_light_shadow_maps);
 	CEngine::GetFaceShader()->SetDirectionalLights(dir_lights.size(), dir_light_dir, dir_light_color);
 	CEngine::GetFaceShader()->SetLightAmbientColor(ambient_color);
 	CEngine::GetFaceShader()->SetTwoSide(0);

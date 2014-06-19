@@ -22,7 +22,6 @@ class CFaceShader : public CShader
 		GLint point_light_distance_uniform;
 		GLint point_light_shadow_enabled_uniform;
 		GLint point_light_shadow_map_uniform;
-		GLint point_light_shadow_near_clip_uniform;
 
 		GLint directional_light_count_uniform;
 		GLint directional_light_dir_uniform;
@@ -83,7 +82,7 @@ class CFaceShader : public CShader
 		void SetDiffuseColor2(CVector color, float alpha);
 		void SetSpecularColor(CVector color);
 		void SetAmbient(float ambient);
-		void SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps, float *shadow_near_clips);
+		void SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps);
 		void SetDirectionalLights(int count, float *dir, float *color);
 		void SetLightAmbientColor(CVector color);
 		void SetSpecular(float size);

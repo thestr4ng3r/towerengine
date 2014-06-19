@@ -3,6 +3,7 @@
 
 CFaceShader *CEngine::face_shader = 0;
 CSkyBoxShader *CEngine::skybox_shader = 0;
+CPointShadowShader *CEngine::point_shadow_shader = 0;
 
 void CEngine::Init(void)
 {
@@ -30,11 +31,16 @@ void CEngine::Init(void)
 
 	skybox_shader = new CSkyBoxShader();
 	skybox_shader->Init();
+
+	point_shadow_shader = new CPointShadowShader();
+	point_shadow_shader->Init();
 }
 
 void CEngine::Destroy(void)
 {
 	delete face_shader;
+	delete skybox_shader;
+	delete point_shadow_shader;
 }
 
 

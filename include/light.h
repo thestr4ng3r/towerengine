@@ -26,7 +26,7 @@ class CPointLight
 		bool GetShadowEnabled(void)			{ return shadow_enabled; }
 		CPointLightShadow *GetShadow(void)	{ return shadow; }
 
-		void InitShadow(int size, float near_clip);
+		void InitShadow(int size);
 		void RenderShadow(CWorld *world);
 };
 

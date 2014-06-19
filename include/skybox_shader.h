@@ -12,8 +12,6 @@ class CSkyBoxShader : public CShader
 		void ResetUniforms(void) {};
 };
 
-extern CSkyBoxShader cube_env_shader;
-
 GLenum CubeTex(int side);
 int CubeSide(GLenum tex);
 CVector CubeVecS(int side);
