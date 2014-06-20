@@ -134,43 +134,27 @@ void main(void)
 		light_dir /= light_dist; // normalized dir
 		
 		if(point_light_shadow_enabled_uni[i])
-		{
-			int x, y;
-			vec3 shadow_dir = -light_dir;
-			vec2 shadow_dir_xz = normalize(shadow_dir.xz);
-			vec2 shadow_rot;
-			vec2 shadow_rot_v;
-			float sr = 0.002;
-			vec3 pcf_dir;
+		{ 
+			vec2 moments = PointLightShadowLookup(i, -light_dir).rg;
 			
-			shadow_rot.x = asin(shadow_dir.y);
-			shadow_rot.y = asin(shadow_dir_xz.y);
-			if(shadow_dir.x < 0.0)
-				shadow_rot.y = M_PI - shadow_rot.y;
+			float light_depth = light_dist / point_light_distance_uni[i];
+						
+			// Surface is fully lit. as the current fragment is before the light occluder
+			if(light_depth <= moments.x)
+				shadow = 1.0;
+			else
+			{
+				// The fragment is either in shadow or penumbra. We now use chebyshev's upperBound to check
+				// How likely this pixel is to be lit (p_max)
+				float variance = moments.y - (moments.x*moments.x);
+				variance = max(variance,0.00002);
+			
+				float d = light_depth - moments.x;
+				float p_max = variance / (variance + d*d);
 				
-			shadow = 0.0;
-			
-			int samples = 2;
-			
-			for (y=-samples; y<=samples; y++)
-					for (x=-samples; x<=samples; x++)
-					{
-						shadow_rot_v = vec2(shadow_rot.x + float(x) * sr, shadow_rot.y + float(y) * sr);
-						pcf_dir.y = sin(shadow_rot_v.x);
-						pcf_dir.z = sin(shadow_rot_v.y) * cos(shadow_rot_v.x);
-						pcf_dir.x = cos(shadow_rot_v.y) * cos(shadow_rot_v.x);
-						 
-						vec4 shadow_v = PointLightShadowLookup(i, pcf_dir);
-						shadow_depth = shadow_v.r * point_light_distance_uni[i];
-						
-						bias = 0.004 + (abs(x) + abs(y)) * 0.01;
-						
-						if(shadow_depth + bias >= light_dist)
-							shadow += 1.0;
-					}
-			shadow /= (samples * 2 + 1) * (samples * 2 + 1);
+				shadow = p_max;
+			}
 		}
-	
 	
 		light_intensity = max(dot(normal, light_dir), 0.0) *  (1.0 - light_dist / point_light_distance_uni[i]);
 		color += shadow * light_intensity * point_light_color_uni[i] * diffuse_color.rgb; // diffuse light

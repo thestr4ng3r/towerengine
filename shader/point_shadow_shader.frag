@@ -15,7 +15,17 @@ void main(void)
 	if(d > light_dist * light_dist)
 		discard;
 		
-	gl_FragColor = vec4(sqrt(d) / light_dist, 0.0, 0.0, 1.0);
+	d = sqrt(d) / light_dist;
+
+	float moment1 = d;
+	float moment2 = d * d;
+
+	// Adjusting moments (this is sort of bias per pixel) using partial derivative
+	float dx = dFdx(d);
+	float dy = dFdy(d);
+	moment2 += 0.25*(dx*dx+dy*dy) ;
+	
+	gl_FragColor = vec4(moment1,moment2, 0.0, 1.0);
 }
 
 
