@@ -10,12 +10,12 @@ CPointLight::CPointLight(CVector pos, CVector color, float distance)
 	shadow = 0;
 }
 
-void CPointLight::InitShadow(int size)
+void CPointLight::InitShadow(int size, bool blur_enabled, float blur_size)
 {
 	if(shadow)
 		delete shadow;
 
-	shadow = new CPointLightShadow(this, size);
+	shadow = new CPointLightShadow(this, size, blur_enabled, blur_size);
 	shadow_enabled = true;
 }
 

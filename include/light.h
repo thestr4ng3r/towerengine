@@ -26,7 +26,7 @@ class CPointLight
 		bool GetShadowEnabled(void)			{ return shadow_enabled; }
 		CPointLightShadow *GetShadow(void)	{ return shadow; }
 
-		void InitShadow(int size);
+		void InitShadow(int size, bool blur_enabled = false, float blur_size = 0.05);
 		void RenderShadow(CWorld *world);
 };
 

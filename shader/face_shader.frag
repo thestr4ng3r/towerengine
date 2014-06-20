@@ -60,6 +60,16 @@ in vec3 cam_pos_var;
 
 out vec4 gl_FragColor;
 
+float linstep(float min, float max, float v)
+{
+	return clamp((v - min) / (max - min), 0.0, 1.0);
+}
+
+float ReduceLightBleeding(float p_max, float amount)
+{
+	return linstep(amount, 1.0, p_max);
+}
+
 vec4 PointLightShadowLookup(int i, vec3 dir)
 {
 	switch(i)
@@ -152,7 +162,7 @@ void main(void)
 				float d = light_depth - moments.x;
 				float p_max = variance / (variance + d*d);
 				
-				shadow = p_max;
+				shadow = ReduceLightBleeding(p_max, 0.2);
 			}
 		}
 	

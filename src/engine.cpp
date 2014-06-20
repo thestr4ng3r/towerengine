@@ -4,6 +4,7 @@
 CFaceShader *CEngine::face_shader = 0;
 CSkyBoxShader *CEngine::skybox_shader = 0;
 CPointShadowShader *CEngine::point_shadow_shader = 0;
+CPointShadowBlurShader *CEngine::point_shadow_blur_shader = 0;
 
 void CEngine::Init(void)
 {
@@ -34,6 +35,9 @@ void CEngine::Init(void)
 
 	point_shadow_shader = new CPointShadowShader();
 	point_shadow_shader->Init();
+
+	point_shadow_blur_shader = new CPointShadowBlurShader();
+	point_shadow_blur_shader->Init();
 }
 
 void CEngine::Destroy(void)

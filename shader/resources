@@ -4,3 +4,5 @@ cube_env_shader_vert: shader/skybox_shader.vert
 cube_env_shader_frag: shader/skybox_shader.frag
 point_shadow_shader_vert: shader/point_shadow_shader.vert
 point_shadow_shader_frag: shader/point_shadow_shader.frag
+point_shadow_blur_shader_vert: shader/point_shadow_blur_shader.vert
+point_shadow_blur_shader_frag: shader/point_shadow_blur_shader.frag

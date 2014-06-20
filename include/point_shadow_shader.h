@@ -12,9 +12,18 @@ class CPointShadowShader : public CShader
 		void Init(void);
 		void SetLightPos(CVector v);
 		void SetLightDist(float d);
-		void ResetUniforms(void) {};
 };
 
-extern CPointShadowShader cube_env_shader;
+class CPointShadowBlurShader : public CShader
+{
+	private:
+		GLint tex_uniform;
+		GLint blur_dir_uniform;
+
+	public:
+		void Init(void);
+		void SetTexture(GLuint tex);
+		void SetBlurDir(CVector v);
+};
 
 #endif

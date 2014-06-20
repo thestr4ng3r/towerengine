@@ -12,5 +12,7 @@ extern const char *cube_env_shader_vert;
 extern const char *cube_env_shader_frag;
 extern const char *point_shadow_shader_vert;
 extern const char *point_shadow_shader_frag;
+extern const char *point_shadow_blur_shader_vert;
+extern const char *point_shadow_blur_shader_frag;
 
 #endif
