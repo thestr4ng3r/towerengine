@@ -29,13 +29,9 @@ void CShader::LinkProgram(void)
 
 void CShader::BindShader(void)
 {
-	UseNoShader();
-
 	glUseProgramObjectARB(program);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	ResetUniforms();
 }
 
 

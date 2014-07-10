@@ -80,7 +80,7 @@ void CFaceShader::SetMode(int e)
 		glUniform1i(shader_mode_uniform, e);
 }
 
-void CFaceShader::SetTransformation(float m[16])
+void CFaceShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
 		glUniformMatrix4fvARB(transformation_uniform, 1, GL_FALSE, m);

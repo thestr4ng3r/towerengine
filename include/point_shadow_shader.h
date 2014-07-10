@@ -8,10 +8,13 @@ class CPointShadowShader : public CShader
 		GLint light_pos_uniform;
 		GLint light_dist_uniform;
 
+		GLint transformation_uniform;
+
 	public:
 		void Init(void);
 		void SetLightPos(CVector v);
 		void SetLightDist(float d);
+		void SetTransformation(const float m[16]);
 };
 
 class CPointShadowBlurShader : public CShader

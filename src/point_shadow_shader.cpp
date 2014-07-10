@@ -17,6 +17,7 @@ void CPointShadowShader::Init(void)
 
 	light_pos_uniform = glGetUniformLocationARB(program, "light_pos");
 	light_dist_uniform = glGetUniformLocationARB(program, "light_dist");
+	transformation_uniform = glGetUniformLocationARB(program, "transformation_uni");
 
 	UseNoShader();
 }
@@ -30,6 +31,17 @@ void CPointShadowShader::SetLightDist(float d)
 {
 	glUniform1f(light_dist_uniform, d);
 }
+
+void CPointShadowShader::SetTransformation(const float m[16])
+{
+	if(transformation_uniform != -1)
+		glUniformMatrix4fvARB(transformation_uniform, 1, GL_FALSE, m);
+}
+
+
+
+
+
 
 void CPointShadowBlurShader::Init(void)
 {

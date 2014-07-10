@@ -31,7 +31,9 @@ set(towerengine_SRC
 	src/vector.cpp 
 	src/vertex.cpp 
 	src/world.cpp
+	src/heightmap.cpp
 	src/terrain.cpp
+	src/terrainobject.cpp
 	src/skybox.cpp
 	src/skybox_shader.cpp
 	src/point_shadow_shader.cpp

@@ -79,8 +79,8 @@ void CMeshObject::PutToGL(CVector cam)
 		return;
 
 	CMesh::LoadIdentity();
-	CMesh::Translate(pos);
 	CMesh::Scale(scale);
+	CMesh::Translate(pos);
 	CMesh::Rotate(rot);
 	CMesh::SetXYZ(x, y, z);
 	CMesh::Color(color, alpha);

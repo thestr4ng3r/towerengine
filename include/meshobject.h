@@ -46,6 +46,7 @@ public:
 	void SetScale(CVector v)						{ scale = v; }
 	void SetColor(CVector c)						{ color = c; }
 	void SetAlpha(float a)							{ alpha = a; }
+	void SetColor(CVector c, float a)				{ SetColor(c); SetAlpha(a); }
 	void SetVisible(bool visible)					{ this->visible = visible; }
 	void Fade(float fade_end, float time);
 

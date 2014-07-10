@@ -24,6 +24,12 @@ CVector ambient_color;
 CVector light_attenuation;
 
 
+const float CMesh::identity_matrix[16] = { 1.0, 0.0, 0.0, 0.0,
+										  0.0, 1.0, 0.0, 0.0,
+										  0.0, 0.0, 1.0, 0.0,
+										  0.0, 0.0, 0.0, 1.0 };
+
+
 
 
 void CMesh::CalculateNormalsSolid(void)
@@ -63,12 +69,7 @@ float CMesh::color[4] = { 1.0, 1.0, 1.0, 1.0 };
 
 void CMesh::LoadIdentity(void)
 {
-	static const float m[16] =
-		{ 1.0, 0.0, 0.0, 0.0,
-		  0.0, 1.0, 0.0, 0.0,
-		  0.0, 0.0, 1.0, 0.0,
-		  0.0, 0.0, 0.0, 1.0 };
-	memcpy(transformation, m, 16 * sizeof(float));
+	memcpy(transformation, identity_matrix, 16 * sizeof(float));
 	Color(Vec(1.0, 1.0, 1.0), 1.0);
 }
 
@@ -672,8 +673,6 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 		RefreshAllVBOs();
 
 
-
-	//CEngine::UnbindShader();
 /*	glColor4f(1.0, 1.0, 1.0, 1.0);
 	vector<CTriangle *>::iterator ti;
 	for(ti=triangles.begin(); ti!=triangles.end(); ti++)
@@ -711,6 +710,7 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 	CEngine::GetFaceShader()->SetMode(shader_enabled);
 	CEngine::GetFaceShader()->SetTwoSide(both_sides);
 	CEngine::GetFaceShader()->SetTransformation(CMesh::transformation);
+	CEngine::GetPointShadowShader()->SetTransformation(CMesh::transformation); // TODO
 	CEngine::GetFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
 	glEnable(GL_BLEND);

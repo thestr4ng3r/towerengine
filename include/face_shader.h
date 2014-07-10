@@ -97,7 +97,7 @@ class CFaceShader : public CShader
 		void SetBumpFactor(float f);
 		void SetFog(CVector color, float depth, float dist);
 		void SetTwoSide(int v);
-		void SetTransformation(float m[16]);
+		void SetTransformation(const float m[16]);
 		void SetVertexMix(float m = 0.0);
 		void ResetUniforms(void);
 };

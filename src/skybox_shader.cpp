@@ -87,6 +87,7 @@ GLuint LoadGLCubeMap(const char *filename[6])
 		if(!success)
 		{
 			printf("Failed to load cube map texture %d: %s\n", i, filename[i]);
+			printf("%s\n", iluErrorString(ilGetError()));
 			continue;
 		}
 		iluGetImageInfo(&ImageInfo);
