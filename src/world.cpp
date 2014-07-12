@@ -93,6 +93,7 @@ void CWorld::SetWorldMesh(CMesh *m, bool load_light)
 	map<string, CEntityAttribute *>::iterator ai;
 	CEntity *light_entity;
 	CVector light_pos, light_color;
+	CPointLight *point_light;
 
 	RemoveWorldMesh();
 	AddObject(world_object = new CMeshObject(m));
@@ -116,7 +117,10 @@ void CWorld::SetWorldMesh(CMesh *m, bool load_light)
 				if(ai->second->type == CEntityAttribute::VECTOR)
 					light_color = ai->second->vec_v;
 
-			AddPointLight(new CPointLight(light_pos, light_color, 300.0));
+			point_light = new CPointLight(light_pos, light_color, 300.0);
+			AddPointLight(point_light);
+			point_light->InitShadow(512, true, 0.00001);
+
 
 			if((ai = light_entity->attributes.find(string("ambient"))) != light_entity->attributes.end())
 				if(ai->second->type == CEntityAttribute::VECTOR)
@@ -144,9 +148,7 @@ void CWorld::Clear(void)
 
 void CWorld::RenderShadow(void)
 {
-	shader_enabled = 0;
 	PutToGL(Vec(0.0, 0.0, 0.0));
-	shader_enabled = 1;
 }
 
 void CWorld::SetShadowTextureMatrix(void)
@@ -235,17 +237,18 @@ void CWorld::Render(CVector cam_pos)
 	if(sky_box)
 		sky_box->Paint(cam_pos);
 
-	CEngine::BindFaceShader();
-	CEngine::GetFaceShader()->SetPointLights(	point_lights.size(),
-												point_light_pos,
-												point_light_color,
-												point_light_distance,
-												point_light_shadow_enabled,
-												point_light_shadow_maps);
-	CEngine::GetFaceShader()->SetDirectionalLights(dir_lights.size(), dir_light_dir, dir_light_color);
-	CEngine::GetFaceShader()->SetLightAmbientColor(ambient_color);
-	CEngine::GetFaceShader()->SetTwoSide(0);
-	CEngine::GetFaceShader()->SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
+	CEngine::SetCurrentFaceShader(CEngine::GetDefaultFaceShader());
+	CEngine::BindCurrentFaceShader();
+	CEngine::GetCurrentFaceShader()->SetPointLights(	point_lights.size(),
+														point_light_pos,
+														point_light_color,
+														point_light_distance,
+														point_light_shadow_enabled,
+														point_light_shadow_maps);
+	CEngine::GetCurrentFaceShader()->SetDirectionalLights(dir_lights.size(), dir_light_dir, dir_light_color);
+	CEngine::GetCurrentFaceShader()->SetLightAmbientColor(ambient_color);
+	CEngine::GetCurrentFaceShader()->SetTwoSide(0);
+	CEngine::GetCurrentFaceShader()->SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
 	//CEngine::GetFaceShader()->SetClip(clip.v, clip.d);
 
 	PutToGL(cam_pos);

@@ -688,37 +688,34 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 		glEnd();
 	}*/
 
-	vertex_vbo->SetAttribute(CEngine::GetFaceShader()->vertex_attribute, GL_FLOAT);
+	vertex_vbo->SetAttribute(CFaceShader::vertex_attribute, GL_FLOAT);
 	if(vertex2_vbo)
 	{
-		CEngine::GetFaceShader()->SetVertexMix(mix);
-		vertex2_vbo->SetAttribute(CEngine::GetFaceShader()->vertex2_attribute, GL_FLOAT);
+		CEngine::GetCurrentFaceShader()->SetVertexMix(mix);
+		vertex2_vbo->SetAttribute(CFaceShader::vertex2_attribute, GL_FLOAT);
 	}
 	else
-		CEngine::GetFaceShader()->SetVertexMix(0.0);
+		CEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
 
-	normal_vbo->SetAttribute(CEngine::GetFaceShader()->normal_attribute, GL_FLOAT);
-	tang_vbo->SetAttribute(CEngine::GetFaceShader()->tang_attribute, GL_FLOAT);
-	bitang_vbo->SetAttribute(CEngine::GetFaceShader()->bitang_attribute, GL_FLOAT);
+	normal_vbo->SetAttribute(CFaceShader::normal_attribute, GL_FLOAT);
+	tang_vbo->SetAttribute(CFaceShader::tang_attribute, GL_FLOAT);
+	bitang_vbo->SetAttribute(CFaceShader::bitang_attribute, GL_FLOAT);
 	//face_normal_vbo->SetAttribute(CEngine::GetFaceShader()->face_normal_attribute, GL_FLOAT);
-	uvcoord_vbo->SetAttribute(CEngine::GetFaceShader()->uvcoord_attribute, GL_FLOAT);
+	uvcoord_vbo->SetAttribute(CFaceShader::uvcoord_attribute, GL_FLOAT);
 
 	if(refresh_ibos)
 		RefreshIBOs();
 
 	//CEngine::GetFaceShader()->BindShader();
-	CEngine::GetFaceShader()->SetMode(shader_enabled);
-	CEngine::GetFaceShader()->SetTwoSide(both_sides);
-	CEngine::GetFaceShader()->SetTransformation(CMesh::transformation);
-	CEngine::GetPointShadowShader()->SetTransformation(CMesh::transformation); // TODO
-	CEngine::GetFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
+	CEngine::GetCurrentFaceShader()->SetTwoSide(both_sides);
+	CEngine::GetCurrentFaceShader()->SetTransformation(CMesh::transformation);
+	CEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for(i=materials.begin(); i!=materials.end(); i++)
 	{
-		if(shader_enabled)
-			(*i)->PutToGL();
+		(*i)->PutToGL();
 
 		if(this->wireframe)
 			(*i)->ibo->Draw(GL_LINE_STRIP);

@@ -27,13 +27,17 @@ void CShader::LinkProgram(void)
 	LinkShaderProgram(program);
 }
 
-void CShader::BindShader(void)
+void CShader::Bind(void)
 {
 	glUseProgramObjectARB(program);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+void CShader::Unbind(void)
+{
+	glUseProgramObjectARB(0);
+}
 
 void PrintGLInfoLog(const char *log_title, GLhandleARB handle)
 {

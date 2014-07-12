@@ -1,10 +1,11 @@
 
 #include "towerengine.h"
 
-CFaceShader *CEngine::face_shader = 0;
+CDefaultFaceShader *CEngine::default_face_shader = 0;
 CSkyBoxShader *CEngine::skybox_shader = 0;
 CPointShadowShader *CEngine::point_shadow_shader = 0;
 CPointShadowBlurShader *CEngine::point_shadow_blur_shader = 0;
+CFaceShader *CEngine::current_face_shader = 0;
 
 void CEngine::Init(void)
 {
@@ -27,8 +28,9 @@ void CEngine::Init(void)
 	ilInit();
 	iluInit();
 
-	face_shader = new CFaceShader();
-	face_shader->Init();
+	default_face_shader = new CDefaultFaceShader();
+	default_face_shader->Init();
+	SetCurrentFaceShader(default_face_shader);
 
 	skybox_shader = new CSkyBoxShader();
 	skybox_shader->Init();
@@ -42,25 +44,9 @@ void CEngine::Init(void)
 
 void CEngine::Destroy(void)
 {
-	delete face_shader;
+	delete default_face_shader;
 	delete skybox_shader;
 	delete point_shadow_shader;
+	delete point_shadow_blur_shader;
 }
 
-
-void CEngine::BindFaceShader(void)
-{
-	face_shader->BindShader();
-}
-
-
-void CEngine::BindShader(GLhandleARB s)
-{
-	glUseProgramObjectARB(s);
-}
-
-
-void CEngine::UnbindShader(void)
-{
-	glUseProgramObjectARB(0);
-}

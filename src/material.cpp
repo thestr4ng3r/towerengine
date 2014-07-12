@@ -110,15 +110,15 @@ void CMaterial::Load(string path)
 
 void CMaterial::PutToGL(void)
 {
-	CEngine::GetFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse_tex);
-	CEngine::GetFaceShader()->SetSpecularTexture(specular.enabled, specular_tex);
-	CEngine::GetFaceShader()->SetNormalTexture(normal.enabled, normal_tex);
-	CEngine::GetFaceShader()->SetHeightTexture(height.enabled, height_tex);
-	CEngine::GetFaceShader()->SetDiffuseColor(diffuse.color);
-	CEngine::GetFaceShader()->SetSpecularColor(specular.color);
-	CEngine::GetFaceShader()->SetSpecular(specular.exponent);
-	CEngine::GetFaceShader()->SetHeightFactor(Vec(1.0, 1.0, 1.0) * height.factor);
-	CEngine::GetFaceShader()->SetAmbient(diffuse.ambient);
+	CEngine::GetCurrentFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse_tex);
+	CEngine::GetCurrentFaceShader()->SetSpecularTexture(specular.enabled, specular_tex);
+	CEngine::GetCurrentFaceShader()->SetNormalTexture(normal.enabled, normal_tex);
+	CEngine::GetCurrentFaceShader()->SetHeightTexture(height.enabled, height_tex);
+	CEngine::GetCurrentFaceShader()->SetDiffuseColor(diffuse.color);
+	CEngine::GetCurrentFaceShader()->SetSpecularColor(specular.color);
+	CEngine::GetCurrentFaceShader()->SetSpecular(specular.exponent);
+	CEngine::GetCurrentFaceShader()->SetHeightFactor(Vec(1.0, 1.0, 1.0) * height.factor);
+	CEngine::GetCurrentFaceShader()->SetAmbient(diffuse.ambient);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

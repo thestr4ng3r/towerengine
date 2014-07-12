@@ -14,8 +14,6 @@
 #define MAX_POINT_LIGHTS 8
 #define MAX_DIRECTIONAL_LIGHTS 8
 
-uniform bool shader_mode_uni;
-
 uniform bool two_side_uni;
 
 uniform vec3 diffuse_color_uni;
@@ -97,12 +95,6 @@ void main(void)
 		vec3 clip = pos_var - clip_vec_uni * clip_dist_uni;
 		if(dot(clip, clip_vec_uni) >= 0.0)
 			discard;
-	}
-	
-	if(!shader_mode_uni) // shader mode
-	{
-		gl_FragColor = vec4(1.0);
-		return;
 	}
 	
 

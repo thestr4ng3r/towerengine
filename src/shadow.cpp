@@ -71,7 +71,8 @@ void CPointLightShadow::Render(CWorld *world)
 	glLoadIdentity();
 	gluPerspective(90.0, 1.0, 0.001, light->GetDistance());
 
-	CEngine::GetPointShadowShader()->BindShader();
+	CEngine::SetCurrentFaceShader(CEngine::GetPointShadowShader());
+	CEngine::BindCurrentFaceShader();
 	CEngine::GetPointShadowShader()->SetLightPos(pos);
 	CEngine::GetPointShadowShader()->SetLightDist(light->GetDistance());
 
@@ -94,7 +95,7 @@ void CPointLightShadow::Render(CWorld *world)
 		gluLookAt(pos.x, pos.y, pos.z, cam_to.x, cam_to.y, cam_to.z, v_vec.x, v_vec.y, v_vec.z);
 		world->RenderShadow();
 	}
-	CEngine::UnbindShader();
+	CShader::Unbind();
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
 
@@ -111,7 +112,7 @@ void CPointLightShadow::Render(CWorld *world)
 	glLoadIdentity();
 	gluPerspective(90.0, 1.0, 0.001, 5.0);
 
-	CEngine::GetPointShadowBlurShader()->BindShader();
+	CEngine::GetPointShadowBlurShader()->Bind();
 	CEngine::GetPointShadowBlurShader()->SetTexture(tex);
 
 	for(s=0; s<6; s++)
@@ -132,7 +133,7 @@ void CPointLightShadow::Render(CWorld *world)
 
 		h_vec = Cross(cam_dir, v_vec);
 
-		CEngine::GetPointShadowBlurShader()->SetBlurDir(v_vec * 0.003);
+		CEngine::GetPointShadowBlurShader()->SetBlurDir(v_vec * blur_size);
 
 		glBegin(GL_QUADS);
 		glVertex3fv((cam_dir + h_vec + v_vec).v);
@@ -142,7 +143,7 @@ void CPointLightShadow::Render(CWorld *world)
 		glEnd();
 
 	}
-	CEngine::UnbindShader();
+	CShader::Unbind();
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -154,7 +155,7 @@ void CPointLightShadow::Render(CWorld *world)
 	glLoadIdentity();
 	gluPerspective(90.0, 1.0, 0.001, 5.0);
 
-	CEngine::GetPointShadowBlurShader()->BindShader();
+	CEngine::GetPointShadowBlurShader()->Bind();
 	CEngine::GetPointShadowBlurShader()->SetTexture(blur_tex);
 
 	for(s=0; s<6; s++)
@@ -175,7 +176,7 @@ void CPointLightShadow::Render(CWorld *world)
 
 		h_vec = Cross(cam_dir, v_vec);
 
-		CEngine::GetPointShadowBlurShader()->SetBlurDir(h_vec * 0.003);
+		CEngine::GetPointShadowBlurShader()->SetBlurDir(h_vec * blur_size);
 
 		glBegin(GL_QUADS);
 		glVertex3fv((cam_dir + h_vec + v_vec).v);
@@ -185,7 +186,7 @@ void CPointLightShadow::Render(CWorld *world)
 		glEnd();
 
 	}
-	CEngine::UnbindShader();
+	CShader::Unbind();
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }

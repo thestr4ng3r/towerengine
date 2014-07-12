@@ -20,7 +20,7 @@ class CPointLightShadow
 		int size;
 
 	public:
-		CPointLightShadow(CPointLight *light, int size, bool blur_enabled = false, float blur_size = 0.05);
+		CPointLightShadow(CPointLight *light, int size, bool blur_enabled = false, float blur_size = 0.003);
 
 		void Render(CWorld *world);
 

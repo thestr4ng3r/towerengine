@@ -21,7 +21,9 @@ class CShader : protected CShaderProgram
 		void LinkProgram(void);
 	
 	public:
-		void BindShader(void);
+		void Bind(void);
+		static void Unbind(void);
+
 		virtual void ResetUniforms(void) {};
 
 		virtual ~CShader(void) {};

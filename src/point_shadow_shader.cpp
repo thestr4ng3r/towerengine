@@ -18,6 +18,7 @@ void CPointShadowShader::Init(void)
 	light_pos_uniform = glGetUniformLocationARB(program, "light_pos");
 	light_dist_uniform = glGetUniformLocationARB(program, "light_dist");
 	transformation_uniform = glGetUniformLocationARB(program, "transformation_uni");
+	vertex_mix_uniform = glGetUniformLocationARB(program, "vertex_mix_uni");
 
 	UseNoShader();
 }
@@ -36,6 +37,11 @@ void CPointShadowShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
 		glUniformMatrix4fvARB(transformation_uniform, 1, GL_FALSE, m);
+}
+
+void CPointShadowShader::SetVertexMix(float m)
+{
+	glUniform1f(vertex_mix_uniform, m);
 }
 
 

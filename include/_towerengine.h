@@ -25,6 +25,7 @@ class CDirectionalLightShadow;
 #include "buffers.h"
 #include "shader.h"
 #include "face_shader.h"
+#include "default_face_shader.h"
 #include "skybox_shader.h"
 #include "point_shadow_shader.h"
 #include "skybox.h"

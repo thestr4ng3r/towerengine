@@ -5,7 +5,7 @@ void CSkyBox::Paint(CVector pos, float size)
 {
 	glDisable(GL_DEPTH_TEST);
 
-	CEngine::GetSkyBoxShader()->BindShader();
+	CEngine::GetSkyBoxShader()->Bind();
 	CEngine::GetSkyBoxShader()->SetCubeMap(cube_map);
 
 	glPushMatrix();

@@ -1,5 +1,5 @@
-face_shader_vert: shader/face_shader.vert
-face_shader_frag: shader/face_shader.frag
+default_face_shader_vert: shader/default_face_shader.vert
+default_face_shader_frag: shader/default_face_shader.frag
 cube_env_shader_vert: shader/skybox_shader.vert
 cube_env_shader_frag: shader/skybox_shader.frag
 point_shadow_shader_vert: shader/point_shadow_shader.vert

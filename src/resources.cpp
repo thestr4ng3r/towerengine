@@ -5,7 +5,7 @@
 
 #include "tresources.h"
 
-const char *face_shader_vert = 
+const char *default_face_shader_vert = 
 "#version 130\n"
 "\n"
 "//uniform mat4 gl_TextureMatrix[gl_MaxTextureCoords];\n"
@@ -51,7 +51,7 @@ const char *face_shader_vert =
 "	gl_Position = gl_ModelViewProjectionMatrix * pos;\n"
 "}";
 
-const char *face_shader_frag = 
+const char *default_face_shader_frag = 
 "#version 130\n"
 "\n"
 "// -------------------------------------\n"
@@ -67,8 +67,6 @@ const char *face_shader_frag =
 "\n"
 "#define MAX_POINT_LIGHTS 8\n"
 "#define MAX_DIRECTIONAL_LIGHTS 8\n"
-"\n"
-"uniform bool shader_mode_uni;\n"
 "\n"
 "uniform bool two_side_uni;\n"
 "\n"
@@ -151,12 +149,6 @@ const char *face_shader_frag =
 "		vec3 clip = pos_var - clip_vec_uni * clip_dist_uni;\n"
 "		if(dot(clip, clip_vec_uni) >= 0.0)\n"
 "			discard;\n"
-"	}\n"
-"	\n"
-"	if(!shader_mode_uni) // shader mode\n"
-"	{\n"
-"		gl_FragColor = vec4(1.0);\n"
-"		return;\n"
 "	}\n"
 "	\n"
 "\n"
@@ -291,7 +283,7 @@ const char *point_shadow_shader_vert =
 "in vec3 vertex_attr;\n"
 "in vec3 vertex2_attr; // vertex of next keyframe\n"
 "\n"
-"//uniform float vertex_mix_uni;\n"
+"uniform float vertex_mix_uni;\n"
 "uniform mat4 transformation_uni;\n"
 "\n"
 "out vec3 pos_var;\n"
@@ -299,8 +291,8 @@ const char *point_shadow_shader_vert =
 "void main(void)\n"
 "{\n"
 "	vec3 vertex_pos = vertex_attr;\n"
-"	//if(vertex_mix_uni > 0.0)\n"
-"	//	vertex_pos = vertex_pos * (1.0 - vertex_mix_uni) + vertex2_attr * vertex_mix_uni;\n"
+"	if(vertex_mix_uni > 0.0)\n"
+"		vertex_pos = vertex_pos * (1.0 - vertex_mix_uni) + vertex2_attr * vertex_mix_uni;\n"
 "	vec4 pos = vec4(vertex_pos, 1.0) * transformation_uni;\n"
 "	pos_var = pos.xyz;\n"
 "	\n"

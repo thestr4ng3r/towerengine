@@ -146,36 +146,32 @@ CTerrain::CTerrain(CHeightMap *height_map, float size, float height, CTerrainMat
 
 void CTerrain::Paint(void)
 {
-	vertex_vbo->SetAttribute(CEngine::GetFaceShader()->vertex_attribute, GL_FLOAT);
-	normal_vbo->SetAttribute(CEngine::GetFaceShader()->normal_attribute, GL_FLOAT);
-	tang_vbo->SetAttribute(CEngine::GetFaceShader()->tang_attribute, GL_FLOAT);
-	bitang_vbo->SetAttribute(CEngine::GetFaceShader()->bitang_attribute, GL_FLOAT);
-	uvcoord_vbo->SetAttribute(CEngine::GetFaceShader()->uvcoord_attribute, GL_FLOAT);
-	CEngine::GetFaceShader()->SetVertexMix(0.0);
+	vertex_vbo->SetAttribute(CFaceShader::vertex_attribute, GL_FLOAT);
+	normal_vbo->SetAttribute(CFaceShader::normal_attribute, GL_FLOAT);
+	tang_vbo->SetAttribute(CFaceShader::tang_attribute, GL_FLOAT);
+	bitang_vbo->SetAttribute(CFaceShader::bitang_attribute, GL_FLOAT);
+	uvcoord_vbo->SetAttribute(CFaceShader::uvcoord_attribute, GL_FLOAT);
+	CEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
 
-	CEngine::GetFaceShader()->SetMode(shader_enabled);
-	CEngine::GetFaceShader()->SetTwoSide(0);
-	CEngine::GetFaceShader()->SetTransformation(CMesh::identity_matrix);
+	CEngine::GetCurrentFaceShader()->SetTwoSide(0);
+	CEngine::GetCurrentFaceShader()->SetTransformation(CMesh::identity_matrix);
 	CEngine::GetPointShadowShader()->SetTransformation(CMesh::identity_matrix);
 
-	if(shader_enabled)
-	{
-		CEngine::GetFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
+	CEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
 
-		if(material)
-			material->PutToGL();
-		else
-		{
-			CEngine::GetFaceShader()->SetDiffuseTexture(true, height_map->GetHeightTex());
-			CEngine::GetFaceShader()->SetSpecularTexture(false);
-			CEngine::GetFaceShader()->SetNormalTexture(false);
-			CEngine::GetFaceShader()->SetHeightTexture(false);
-			CEngine::GetFaceShader()->SetDiffuseColor(Vec(1.0, 1.0, 1.0));
-			CEngine::GetFaceShader()->SetSpecularColor(Vec(0.0, 0.0, 0.0));
-			CEngine::GetFaceShader()->SetSpecular(0.0);
-			CEngine::GetFaceShader()->SetHeightFactor(Vec(0.0, 0.0, 0.0));
-			CEngine::GetFaceShader()->SetAmbient(0.3);
-		}
+	if(material)
+		material->PutToGL();
+	else
+	{
+		CEngine::GetCurrentFaceShader()->SetDiffuseTexture(true, height_map->GetHeightTex());
+		CEngine::GetCurrentFaceShader()->SetSpecularTexture(false);
+		CEngine::GetCurrentFaceShader()->SetNormalTexture(false);
+		CEngine::GetCurrentFaceShader()->SetHeightTexture(false);
+		CEngine::GetCurrentFaceShader()->SetDiffuseColor(Vec(1.0, 1.0, 1.0));
+		CEngine::GetCurrentFaceShader()->SetSpecularColor(Vec(0.0, 0.0, 0.0));
+		CEngine::GetCurrentFaceShader()->SetSpecular(0.0);
+		CEngine::GetCurrentFaceShader()->SetHeightFactor(Vec(0.0, 0.0, 0.0));
+		CEngine::GetCurrentFaceShader()->SetAmbient(0.3);
 	}
 
 	ibo->Draw(GL_TRIANGLES);
@@ -288,15 +284,15 @@ void CTerrainMaterial::Load(string path)
 
 void CTerrainMaterial::PutToGL(void)
 {
-	CEngine::GetFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse_tex);
-	CEngine::GetFaceShader()->SetSpecularTexture(specular.enabled, specular_tex);
-	CEngine::GetFaceShader()->SetNormalTexture(normal.enabled, normal_tex);
-	CEngine::GetFaceShader()->SetHeightTexture(height.enabled, height_tex);
-	CEngine::GetFaceShader()->SetDiffuseColor(diffuse.color);
-	CEngine::GetFaceShader()->SetSpecularColor(specular.color);
-	CEngine::GetFaceShader()->SetSpecular(specular.exponent);
-	CEngine::GetFaceShader()->SetHeightFactor(Vec(1.0, 1.0, 1.0) * height.factor);
-	CEngine::GetFaceShader()->SetAmbient(diffuse.ambient);
+	CEngine::GetCurrentFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse_tex);
+	CEngine::GetCurrentFaceShader()->SetSpecularTexture(specular.enabled, specular_tex);
+	CEngine::GetCurrentFaceShader()->SetNormalTexture(normal.enabled, normal_tex);
+	CEngine::GetCurrentFaceShader()->SetHeightTexture(height.enabled, height_tex);
+	CEngine::GetCurrentFaceShader()->SetDiffuseColor(diffuse.color);
+	CEngine::GetCurrentFaceShader()->SetSpecularColor(specular.color);
+	CEngine::GetCurrentFaceShader()->SetSpecular(specular.exponent);
+	CEngine::GetCurrentFaceShader()->SetHeightFactor(Vec(1.0, 1.0, 1.0) * height.factor);
+	CEngine::GetCurrentFaceShader()->SetAmbient(diffuse.ambient);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
