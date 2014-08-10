@@ -24,11 +24,6 @@ CVector ambient_color;
 CVector light_attenuation;
 
 
-const float CMesh::identity_matrix[16] = { 1.0, 0.0, 0.0, 0.0,
-										  0.0, 1.0, 0.0, 0.0,
-										  0.0, 0.0, 1.0, 0.0,
-										  0.0, 0.0, 0.0, 1.0 };
-
 
 
 
@@ -69,7 +64,7 @@ float CMesh::color[4] = { 1.0, 1.0, 1.0, 1.0 };
 
 void CMesh::LoadIdentity(void)
 {
-	memcpy(transformation, identity_matrix, 16 * sizeof(float));
+	memcpy(transformation, CEngine::identity_matrix4, 16 * sizeof(float));
 	Color(Vec(1.0, 1.0, 1.0), 1.0);
 }
 
@@ -878,6 +873,8 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 	ambient = 1.0;
 	diffuse_color = Vec(1.0, 1.0, 1.0);
 	specular_color = Vec(0.0, 0.0, 0.0);
+	height_factor = 1.0;
+	exponent = 8.0;
 
 	name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
 

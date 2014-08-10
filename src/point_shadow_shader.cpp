@@ -1,8 +1,6 @@
 
 #include "towerengine.h"
 
-CPointShadowShader cube_env_shader;
-
 void CPointShadowShader::Init(void)
 {
 	printf("Compiling Point Shadow Shader...\n");
@@ -15,8 +13,8 @@ void CPointShadowShader::Init(void)
 	glBindAttribLocationARB(program, CFaceShader::vertex2_attribute, "vertex2_attr");
 	LinkProgram();
 
-	light_pos_uniform = glGetUniformLocationARB(program, "light_pos");
-	light_dist_uniform = glGetUniformLocationARB(program, "light_dist");
+	light_pos_uniform = glGetUniformLocationARB(program, "light_pos_uni");
+	light_dist_uniform = glGetUniformLocationARB(program, "light_dist_uni");
 	transformation_uniform = glGetUniformLocationARB(program, "transformation_uni");
 	vertex_mix_uniform = glGetUniformLocationARB(program, "vertex_mix_uni");
 

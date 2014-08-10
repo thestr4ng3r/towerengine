@@ -10,6 +10,7 @@ private:
 	vector<CDirectionalLight *> dir_lights;
 	CMeshObject *world_object;
 	CSkyBox *sky_box;
+	CCamera *camera;
 
 	CVector ambient_color;
 
@@ -27,10 +28,8 @@ public:
 	void RemoveWorldMesh(void);
 	void Clear(void);
 
-	//void InitShadow(int width, int height);
-	//void SetShadowEnabled(bool enabled)	{ shadow.enabled = enabled; }
-
 	CVector GetAmbientColor(void)		{ return ambient_color; }
+	CCamera *GetCamera(void)			{ return camera; }
 
 	void SetAmbientColor(CVector v)		{ ambient_color = v; }
 
@@ -44,7 +43,7 @@ public:
 
 	void RenderShadow(void);
 	void RenderShadowMaps(void);
-	void Render(CVector cam_pos);
+	void Render(int screen_width, int screen_height);
 };
 
 

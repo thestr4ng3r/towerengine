@@ -154,8 +154,8 @@ void CTerrain::Paint(void)
 	CEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
 
 	CEngine::GetCurrentFaceShader()->SetTwoSide(0);
-	CEngine::GetCurrentFaceShader()->SetTransformation(CMesh::identity_matrix);
-	CEngine::GetPointShadowShader()->SetTransformation(CMesh::identity_matrix);
+	CEngine::GetCurrentFaceShader()->SetTransformation(CEngine::identity_matrix4);
+	//CEngine::GetPointShadowShader()->SetTransformation(CEngine::identity_matrix);
 
 	CEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
 

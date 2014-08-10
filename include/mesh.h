@@ -70,7 +70,6 @@ class CMesh
 		CEntity *ParseEntityNode(xmlNodePtr cur);
 
 	public:
-		static const float identity_matrix[16];
 		static float transformation[16];
 		static float color[4];
 		static void LoadIdentity(void);

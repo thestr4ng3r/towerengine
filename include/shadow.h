@@ -24,18 +24,38 @@ class CPointLightShadow
 
 		void Render(CWorld *world);
 
-		GLuint GetShadowMap(void)	{ return tex; }
+		GLuint GetShadowMap(void)			{ return tex; }
 
 		void SetBlurEnabled(bool enabled)	{ blur_enabled = enabled; }
 		void SetBlurSize(float size)		{ blur_size = size; }
 
-		bool GetBlurEnabled(void)	{ return blur_enabled; }
-		float GetBlurSize(void)		{ return blur_size; }
+		bool GetBlurEnabled(void)			{ return blur_enabled; }
+		float GetBlurSize(void)				{ return blur_size; }
 };
 
 class CDirectionalLightShadow
 {
+	private:
+		CDirectionalLight *light;
 
+		GLuint tex;
+		GLuint fbo;
+		GLuint depth_rbo;
+
+		int size;
+
+		float near_clip, far_clip; // TODO: Set Function, dynamic setting
+		float *tex_matrix;
+
+	public:
+		CDirectionalLightShadow(CDirectionalLight *light, int size);
+
+		void Render(CWorld *world);
+
+		GLuint GetShadowMap(void)		{ return tex; }
+		float *GetTextureMatrix(void)	{ return tex_matrix; }
+		float GetNearClip(void)			{ return near_clip; }
+		float GetFarClip(void)			{ return far_clip; }
 };
 
 

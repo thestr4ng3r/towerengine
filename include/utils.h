@@ -14,4 +14,6 @@ void InverseMatrix4(float m[16], float *ret);
 CVector ApplyMatrix4(float m[16], CVector v);
 void PrintMatrix4(float m[16]);
 
+#define degtorad(x) (x * M_PI / 180.0)
+
 #endif

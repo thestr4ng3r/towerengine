@@ -289,7 +289,7 @@ CVector Mix(const CVector v1, const CVector v2, float mix)
 
 CVector Mix(const CVector v[], const float a[], int count, float mix)
 {
-	int area;
+	int area = 0;
 	int i;
 
 	float d;

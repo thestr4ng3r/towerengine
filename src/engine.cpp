@@ -5,7 +5,13 @@ CDefaultFaceShader *CEngine::default_face_shader = 0;
 CSkyBoxShader *CEngine::skybox_shader = 0;
 CPointShadowShader *CEngine::point_shadow_shader = 0;
 CPointShadowBlurShader *CEngine::point_shadow_blur_shader = 0;
+CDirectionalShadowShader *CEngine::directional_shadow_shader = 0;
 CFaceShader *CEngine::current_face_shader = 0;
+
+const float CEngine::identity_matrix4[16] = { 1.0, 0.0, 0.0, 0.0,
+										  0.0, 1.0, 0.0, 0.0,
+										  0.0, 0.0, 1.0, 0.0,
+										  0.0, 0.0, 0.0, 1.0 };
 
 void CEngine::Init(void)
 {
@@ -40,6 +46,9 @@ void CEngine::Init(void)
 
 	point_shadow_blur_shader = new CPointShadowBlurShader();
 	point_shadow_blur_shader->Init();
+
+	directional_shadow_shader = new CDirectionalShadowShader();
+	directional_shadow_shader->Init();
 }
 
 void CEngine::Destroy(void)
@@ -48,5 +57,6 @@ void CEngine::Destroy(void)
 	delete skybox_shader;
 	delete point_shadow_shader;
 	delete point_shadow_blur_shader;
+	delete directional_shadow_shader;
 }
 

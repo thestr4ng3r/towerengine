@@ -14,5 +14,7 @@ extern const char *point_shadow_shader_vert;
 extern const char *point_shadow_shader_frag;
 extern const char *point_shadow_blur_shader_vert;
 extern const char *point_shadow_blur_shader_frag;
+extern const char *directional_shadow_shader_vert;
+extern const char *directional_shadow_shader_frag;
 
 #endif

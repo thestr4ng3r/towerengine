@@ -36,6 +36,9 @@ class CDirectionalLight
 		CVector dir;
 		CVector color;
 
+		bool shadow_enabled;
+		CDirectionalLightShadow *shadow;
+
 	public:
 		CDirectionalLight(CVector dir, CVector color);
 
@@ -44,7 +47,10 @@ class CDirectionalLight
 
 		CVector GetDirection(void)	{ return dir; }
 		CVector GetColor(void)		{ return color; }
+		bool GetShadowEnabled(void)			{ return shadow_enabled; }
+		CDirectionalLightShadow *GetShadow(void)	{ return shadow; }
 
+		void InitShadow(int size);
 		void RenderShadow(CWorld *world);
 };
 

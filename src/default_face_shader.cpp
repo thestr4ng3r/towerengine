@@ -35,6 +35,10 @@ void CDefaultFaceShader::Init(void)
 	directional_light_count_uniform = glGetUniformLocationARB(program, "directional_light_count_uni");
 	directional_light_dir_uniform = glGetUniformLocationARB(program, "directional_light_dir_uni");
 	directional_light_color_uniform = glGetUniformLocationARB(program, "directional_light_color_uni");
+	directional_light_shadow_enabled_uniform = glGetUniformLocationARB(program, "directional_light_shadow_enabled_uni");
+	directional_light_shadow_clip_uniform = glGetUniformLocationARB(program, "directional_light_shadow_clip_uni");
+	directional_light_shadow_tex_matrix_uniform = glGetUniformLocationARB(program, "directional_light_shadow_tex_matrix_uni");
+	directional_light_shadow_map_uniform = glGetUniformLocationARB(program, "directional_light_shadow_map_uni");
 
 	light_ambient_color_uniform = glGetUniformLocationARB(program, "light_ambient_color_uni");
 
@@ -112,12 +116,29 @@ void CDefaultFaceShader::SetPointLights(int count, float *pos, float *color, flo
 	glUniform1ivARB(point_light_shadow_map_uniform, max_point_lights, tex_units);
 }
 
-void CDefaultFaceShader::SetDirectionalLights(int count, float *dir, float *color)
+void CDefaultFaceShader::SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_martix)
 {
+	int i;
+
 	count = min(count, max_directional_lights);
 	glUniform1iARB(directional_light_count_uniform, count);
 	glUniform3fvARB(directional_light_dir_uniform, count, dir);
 	glUniform3fvARB(directional_light_color_uniform, count, color);
+	glUniform1ivARB(directional_light_shadow_enabled_uniform, count, shadow_enabled);
+	glUniform2fvARB(directional_light_shadow_clip_uniform, count, shadow_clip);
+	glUniformMatrix4fvARB(directional_light_shadow_tex_matrix_uniform, count, GL_FALSE, shadow_tex_martix);
+
+	int *tex_units = new int[max_directional_lights];
+	for(i=0; i<count; i++)
+	{
+		tex_units[i] = directional_light_shadow_tex_first_unit + i;
+		glActiveTextureARB(GL_TEXTURE0 + tex_units[i]);
+		glBindTexture(GL_TEXTURE_2D, shadow_maps[i]);
+	}
+	for(i=count; i<max_directional_lights; i++)
+		tex_units[i] = directional_light_shadow_tex_first_unit + i;
+
+	glUniform1ivARB(directional_light_shadow_map_uniform, max_directional_lights, tex_units);
 }
 
 void CDefaultFaceShader::SetLightAmbientColor(CVector color)

@@ -38,6 +38,7 @@ set(towerengine_SRC
 	src/skybox.cpp
 	src/skybox_shader.cpp
 	src/point_shadow_shader.cpp
+	src/directional_shadow_shader.cpp
 	oglft/OGLFT.cpp)
 
 add_definitions(-g -Wall)

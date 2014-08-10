@@ -4,30 +4,35 @@
 
 class CCamera
 {
-public:
-	virtual ~CCamera(void) {};
-
-	virtual CVector GetPosition(void) = 0;
-	virtual void SetGLMatrix(void) = 0;
-};
-
-class CDirCamera : public CCamera
-{
 private:
 	CVector pos;
 	CVector dir;
-	CVector top;
+	CVector up;
+	float angle;
+	float aspect;
+	float near_clip, far_clip;
 
 public:
-	CDirCamera(void);
+	CCamera(void);
 
 	CVector GetPosition(void)		{ return pos; }
+	CVector GetDirection(void)		{ return dir; }
+	CVector GetUp(void)				{ return up; }
+	float GetAngle(void)			{ return angle; }
+	float GetAspect(void)			{ return aspect; }
+	float GetNearClip(void)			{ return near_clip; }
+	float GetFarClip(void)			{ return far_clip; }
+	CVector *GetRelativeFrustumCorners(float near, float far);
+	CVector *GetRelativeFrustumCorners(void) { return GetRelativeFrustumCorners(near_clip, far_clip); }
 
-	void SetPosition(CVector p)	{ pos = p; }
-	void SetDirection(CVector d)	{ dir = d; dir.Normalize(); }
-	void SetTop(CVector t)			{ top = t; top.Normalize(); }
-
-	void SetGLMatrix(void);
+	void SetPosition(CVector p)		{ pos = p; }
+	void SetDirection(CVector d)	{ dir = d; }
+	void SetUp(CVector t)			{ up = t; }
+	void SetAngle(float a)			{ angle = a; }
+	void SetAspect(float a)			{ aspect = a; }
+	void SetClip(float n, float f)	{ near_clip = n; far_clip = f; }
+	void SetNearClip(float n)		{ near_clip = n; }
+	void SetFarClip(float f)		{ far_clip = f; }
 };
 
 #endif
