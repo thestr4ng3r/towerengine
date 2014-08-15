@@ -28,6 +28,8 @@ class CDefaultFaceShader : public CFaceShader
 		GLint directional_light_shadow_enabled_uniform;
 		GLint directional_light_shadow_clip_uniform;
 		GLint directional_light_shadow_tex_matrix_uniform;
+		GLint directional_light_shadow_splits_count_uniform;
+		GLint directional_light_shadow_splits_z_uniform;
 		GLint directional_light_shadow_map_uniform;
 
 		GLint light_ambient_color_uniform;
@@ -68,7 +70,7 @@ class CDefaultFaceShader : public CFaceShader
 		void SetSpecularColor(CVector color);
 		void SetAmbient(float ambient);
 		void SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps);
-		void SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_martix);
+		void SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z);
 		void SetLightAmbientColor(CVector color);
 		void SetSpecular(float size);
 		void SetDiffuseTexture(bool enabled, GLuint tex = 0);

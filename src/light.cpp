@@ -40,12 +40,12 @@ CDirectionalLight::CDirectionalLight(CVector dir, CVector color)
 	shadow_enabled = false;
 }
 
-void CDirectionalLight::InitShadow(int size)
+void CDirectionalLight::InitShadow(int size, int splits)
 {
 	if(shadow)
 		delete shadow;
 
-	shadow = new CDirectionalLightShadow(this, size);
+	shadow = new CDirectionalLightShadow(this, size, splits);
 	shadow_enabled = true;
 }
 

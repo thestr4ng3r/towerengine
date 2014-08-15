@@ -50,7 +50,7 @@ class CDirectionalLight
 		bool GetShadowEnabled(void)			{ return shadow_enabled; }
 		CDirectionalLightShadow *GetShadow(void)	{ return shadow; }
 
-		void InitShadow(int size);
+		void InitShadow(int size, int splits = 4);
 		void RenderShadow(CWorld *world);
 };
 

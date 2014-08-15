@@ -227,8 +227,10 @@ void CWorld::Render(int screen_width, int screen_height)
 		point_light_shadow_maps[i] = point_light->GetShadowEnabled() ? point_light->GetShadow()->GetShadowMap() : 0;
 	}
 
+	int s;
 	CDirectionalLight *dir_light;
 	float *dir_light_dir, *dir_light_color, *dir_light_shadow_clip, *dir_light_shadow_tex_matrix;
+	float *dir_light_shadow_splits_count, *dir_light_shadow_splits_z;
 	int *dir_light_shadow_enabled;
 	GLuint *dir_light_shadow_maps;
 
@@ -236,7 +238,9 @@ void CWorld::Render(int screen_width, int screen_height)
 	dir_light_color = new float[dir_lights.size() * 3];
 	dir_light_shadow_enabled = new int[dir_lights.size()];
 	dir_light_shadow_clip = new float[dir_lights.size() * 2];
-	dir_light_shadow_tex_matrix = new float[dir_lights.size() * 16];
+	dir_light_shadow_tex_matrix = new float[dir_lights.size() * 16 * CFaceShader::max_directional_light_splits];
+	dir_light_shadow_splits_count = new float[dir_lights.size()];
+	dir_light_shadow_splits_z = new float[dir_lights.size() * (CFaceShader::max_directional_light_splits+1)];
 	dir_light_shadow_maps = new GLuint[dir_lights.size()];
 
 	for(i=0; i<(int)dir_lights.size(); i++)
@@ -249,8 +253,15 @@ void CWorld::Render(int screen_width, int screen_height)
 			dir_light_shadow_enabled[i] = 1;
 			dir_light_shadow_clip[i*2 + 0] = dir_light->GetShadow()->GetNearClip();
 			dir_light_shadow_clip[i*2 + 1] = dir_light->GetShadow()->GetFarClip();
-			memcpy(dir_light_shadow_tex_matrix + i*16, dir_light->GetShadow()->GetTextureMatrix(), sizeof(float) * 16);
 			dir_light_shadow_maps[i] = dir_light->GetShadow()->GetShadowMap();
+			dir_light_shadow_splits_count[i] = dir_light->GetShadow()->GetSplitsCount();
+			for(s=0; s<dir_light->GetShadow()->GetSplitsCount(); s++)
+			{
+				memcpy(dir_light_shadow_tex_matrix + i*16*CFaceShader::max_directional_light_splits + 16*s,
+						dir_light->GetShadow()->GetTextureMatrix()[s], sizeof(float) * 16);
+			}
+			memcpy(dir_light_shadow_splits_z + i*(CFaceShader::max_directional_light_splits+1),
+					dir_light->GetShadow()->GetSplitsZ(), sizeof(float) * (dir_light->GetShadow()->GetSplitsCount()+1));
 		}
 		else
 		{
@@ -291,7 +302,7 @@ void CWorld::Render(int screen_width, int screen_height)
 														point_light_distance,
 														point_light_shadow_enabled,
 														point_light_shadow_maps);
-	CEngine::GetCurrentFaceShader()->SetDirectionalLights(dir_lights.size(), dir_light_dir, dir_light_color, dir_light_shadow_enabled, dir_light_shadow_maps, dir_light_shadow_clip, dir_light_shadow_tex_matrix);
+	CEngine::GetCurrentFaceShader()->SetDirectionalLights(dir_lights.size(), dir_light_dir, dir_light_color, dir_light_shadow_enabled, dir_light_shadow_maps, dir_light_shadow_clip, dir_light_shadow_tex_matrix, dir_light_shadow_splits_count, dir_light_shadow_splits_z);
 	CEngine::GetCurrentFaceShader()->SetLightAmbientColor(ambient_color);
 	CEngine::GetCurrentFaceShader()->SetTwoSide(0);
 	CEngine::GetCurrentFaceShader()->SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));

@@ -15,6 +15,7 @@ class CFaceShader : public CShader
 
 		static const GLint max_point_lights = 8;
 		static const GLint max_directional_lights = 8;
+		static const GLint max_directional_light_splits = 8;
 
 		static const unsigned int diffuse_tex_unit = 0;
 		static const unsigned int specular_tex_unit = 4;
@@ -29,7 +30,7 @@ class CFaceShader : public CShader
 		virtual void SetSpecularColor(CVector color) {};
 		virtual void SetAmbient(float ambient) {};
 		virtual void SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps) {};
-		virtual void SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_martix) {};
+		virtual void SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_martix, float *shadow_splits_count, float *shadow_splits_z) {};
 		virtual void SetLightAmbientColor(CVector color) {};
 		virtual void SetSpecular(float size) {};
 		virtual void SetDiffuseTexture(bool enabled, GLuint tex = 0) {};
