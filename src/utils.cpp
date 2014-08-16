@@ -39,10 +39,6 @@ void SetColor(GLenum which, float r, float g, float b)
 
 void PaintAxes(void)
 {
-	glPointSize(8.0);
-
-	UseNoShader();
-
 	glDisable(GL_LIGHTING);
 
 	glLineWidth(3);

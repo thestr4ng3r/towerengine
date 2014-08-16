@@ -3,8 +3,6 @@
 
 void CPointShadowShader::Init(void)
 {
-	printf("Compiling Point Shadow Shader...\n");
-
 	SetSource(point_shadow_shader_vert, point_shadow_shader_frag);
 	CreateVertexShader();
 	CreateFragmentShader();
@@ -13,12 +11,12 @@ void CPointShadowShader::Init(void)
 	glBindAttribLocationARB(program, CFaceShader::vertex2_attribute, "vertex2_attr");
 	LinkProgram();
 
-	light_pos_uniform = glGetUniformLocationARB(program, "light_pos_uni");
-	light_dist_uniform = glGetUniformLocationARB(program, "light_dist_uni");
-	transformation_uniform = glGetUniformLocationARB(program, "transformation_uni");
-	vertex_mix_uniform = glGetUniformLocationARB(program, "vertex_mix_uni");
+	light_pos_uniform = GetUniformLocation("light_pos_uni");
+	light_dist_uniform = GetUniformLocation("light_dist_uni");
+	transformation_uniform = GetUniformLocation("transformation_uni");
+	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
 
-	UseNoShader();
+	Unbind();
 }
 
 void CPointShadowShader::SetLightPos(CVector v)
@@ -49,17 +47,16 @@ void CPointShadowShader::SetVertexMix(float m)
 
 void CPointShadowBlurShader::Init(void)
 {
-	printf("Compiling Point Shadow Blur Shader...\n");
 	SetSource(point_shadow_blur_shader_vert, point_shadow_blur_shader_frag);
 	CreateVertexShader();
 	CreateFragmentShader();
 	CreateProgram();
 	LinkProgram();
 
-	tex_uniform = glGetUniformLocationARB(program, "tex_uni");
-	blur_dir_uniform = glGetUniformLocationARB(program, "blur_dir_uni");
+	tex_uniform = GetUniformLocation("tex_uni");
+	blur_dir_uniform = GetUniformLocation("blur_dir_uni");
 
-	UseNoShader();
+	Unbind();
 }
 
 void CPointShadowBlurShader::SetTexture(GLuint tex)

@@ -9,6 +9,7 @@ private:
 	static CPointShadowShader *point_shadow_shader;
 	static CPointShadowBlurShader *point_shadow_blur_shader;
 	static CDirectionalShadowShader *directional_shadow_shader;
+	static CDirectionalShadowBlurShader *directional_shadow_blur_shader;
 
 	static CFaceShader *current_face_shader;
 
@@ -18,11 +19,12 @@ public:
 	static void Init(void);
 	static void Destroy(void);
 
-	static CDefaultFaceShader *GetDefaultFaceShader(void)				{ return default_face_shader; }
-	static CSkyBoxShader *GetSkyBoxShader(void)							{ return skybox_shader; }
-	static CPointShadowShader *GetPointShadowShader(void)				{ return point_shadow_shader; }
-	static CPointShadowBlurShader *GetPointShadowBlurShader(void)		{ return point_shadow_blur_shader; }
-	static CDirectionalShadowShader *GetDirectionalShadowShader(void)	{ return directional_shadow_shader; }
+	static CDefaultFaceShader *GetDefaultFaceShader(void)						{ return default_face_shader; }
+	static CSkyBoxShader *GetSkyBoxShader(void)									{ return skybox_shader; }
+	static CPointShadowShader *GetPointShadowShader(void)						{ return point_shadow_shader; }
+	static CPointShadowBlurShader *GetPointShadowBlurShader(void)				{ return point_shadow_blur_shader; }
+	static CDirectionalShadowShader *GetDirectionalShadowShader(void)			{ return directional_shadow_shader; }
+	static CDirectionalShadowBlurShader *GetDirectionalShadowBlurShader(void)	{ return directional_shadow_blur_shader; }
 
 	static CFaceShader *GetCurrentFaceShader(void)		{ return current_face_shader; }
 	static void SetCurrentFaceShader(CFaceShader *s)	{ current_face_shader = s; }

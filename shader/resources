@@ -8,3 +8,5 @@ point_shadow_blur_shader_vert: shader/point_shadow_blur_shader.vert
 point_shadow_blur_shader_frag: shader/point_shadow_blur_shader.frag
 directional_shadow_shader_vert: shader/directional_shadow_shader.vert
 directional_shadow_shader_frag: shader/directional_shadow_shader.frag
+directional_shadow_blur_shader_vert: shader/directional_shadow_blur_shader.vert
+directional_shadow_blur_shader_frag: shader/directional_shadow_blur_shader.frag

@@ -3,7 +3,6 @@
 
 void CDefaultFaceShader::Init(void)
 {
-	printf("Compiling Face Shader...\n");
 	SetSource(default_face_shader_vert, default_face_shader_frag);
 	CreateVertexShader();
 	CreateFragmentShader();
@@ -16,53 +15,53 @@ void CDefaultFaceShader::Init(void)
 	glBindAttribLocationARB(program, uvcoord_attribute, "uv_attr");
 	LinkProgram();
 
-	two_side_uniform = glGetUniformLocationARB(program, "two_side_uni");
+	two_side_uniform = GetUniformLocation("two_side_uni");
 
-	vertex_mix_uniform = glGetUniformLocationARB(program, "vertex_mix_uni");
+	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
 
-	diffuse_color_uniform = glGetUniformLocationARB(program, "diffuse_color_uni");
-	diffuse_color2_uniform = glGetUniformLocationARB(program, "diffuse_color2_uni");
-	specular_color_uniform = glGetUniformLocationARB(program, "specular_color_uni");
-	ambient_uniform = glGetUniformLocationARB(program, "ambient_uni");
+	diffuse_color_uniform = GetUniformLocation("diffuse_color_uni");
+	diffuse_color2_uniform = GetUniformLocation("diffuse_color2_uni");
+	specular_color_uniform = GetUniformLocation("specular_color_uni");
+	ambient_uniform = GetUniformLocation("ambient_uni");
 
-	point_light_count_uniform = glGetUniformLocationARB(program, "point_light_count_uni");
-	point_light_pos_uniform = glGetUniformLocationARB(program, "point_light_pos_uni");
-	point_light_color_uniform = glGetUniformLocationARB(program, "point_light_color_uni");
-	point_light_distance_uniform = glGetUniformLocationARB(program, "point_light_distance_uni");
-	point_light_shadow_map_uniform = glGetUniformLocationARB(program, "point_light_shadow_map_uni");
-	point_light_shadow_enabled_uniform = glGetUniformLocationARB(program, "point_light_shadow_enabled_uni");
+	point_light_count_uniform = GetUniformLocation("point_light_count_uni");
+	point_light_pos_uniform = GetUniformLocation("point_light_pos_uni");
+	point_light_color_uniform = GetUniformLocation("point_light_color_uni");
+	point_light_distance_uniform = GetUniformLocation("point_light_distance_uni");
+	point_light_shadow_map_uniform = GetUniformLocation("point_light_shadow_map_uni");
+	point_light_shadow_enabled_uniform = GetUniformLocation("point_light_shadow_enabled_uni");
 
-	directional_light_count_uniform = glGetUniformLocationARB(program, "directional_light_count_uni");
-	directional_light_dir_uniform = glGetUniformLocationARB(program, "directional_light_dir_uni");
-	directional_light_color_uniform = glGetUniformLocationARB(program, "directional_light_color_uni");
-	directional_light_shadow_enabled_uniform = glGetUniformLocationARB(program, "directional_light_shadow_enabled_uni");
-	directional_light_shadow_clip_uniform = glGetUniformLocationARB(program, "directional_light_shadow_clip_uni");
-	directional_light_shadow_tex_matrix_uniform = glGetUniformLocationARB(program, "directional_light_shadow_tex_matrix_uni");
-	directional_light_shadow_splits_count_uniform = glGetUniformLocationARB(program, "directional_light_shadow_splits_count_uni");
-	directional_light_shadow_splits_z_uniform = glGetUniformLocationARB(program, "directional_light_shadow_splits_z_uni");
-	directional_light_shadow_map_uniform = glGetUniformLocationARB(program, "directional_light_shadow_map_uni");
+	directional_light_count_uniform = GetUniformLocation("directional_light_count_uni");
+	directional_light_dir_uniform = GetUniformLocation("directional_light_dir_uni");
+	directional_light_color_uniform = GetUniformLocation("directional_light_color_uni");
+	directional_light_shadow_enabled_uniform = GetUniformLocation("directional_light_shadow_enabled_uni");
+	directional_light_shadow_clip_uniform = GetUniformLocation("directional_light_shadow_clip_uni");
+	directional_light_shadow_tex_matrix_uniform = GetUniformLocation("directional_light_shadow_tex_matrix_uni");
+	directional_light_shadow_splits_count_uniform = GetUniformLocation("directional_light_shadow_splits_count_uni");
+	directional_light_shadow_splits_z_uniform = GetUniformLocation("directional_light_shadow_splits_z_uni");
+	directional_light_shadow_map_uniform = GetUniformLocation("directional_light_shadow_map_uni");
 
-	light_ambient_color_uniform = glGetUniformLocationARB(program, "light_ambient_color_uni");
+	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
 
-	specular_size_uniform = glGetUniformLocationARB(program, "specular_size_uni");
+	specular_size_uniform = GetUniformLocation("specular_size_uni");
 
-	diffuse_tex_uniform = glGetUniformLocationARB(program, "diffuse_tex_uni");
-	normal_tex_uniform = glGetUniformLocationARB(program, "normal_tex_uni");
-	height_tex_uniform = glGetUniformLocationARB(program, "height_tex_uni");
-	specular_tex_uniform = glGetUniformLocationARB(program, "specular_tex_uni");
+	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
+	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
+	height_tex_uniform = GetUniformLocation("height_tex_uni");
+	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
 
-	diffuse_tex_enabled_uniform = glGetUniformLocationARB(program, "diffuse_tex_enabled_uni");
-	normal_tex_enabled_uniform = glGetUniformLocationARB(program, "normal_tex_enabled_uni");
-	height_tex_enabled_uniform = glGetUniformLocationARB(program, "height_tex_enabled_uni");
-	specular_tex_enabled_uniform = glGetUniformLocationARB(program, "specular_tex_enabled_uni");
+	diffuse_tex_enabled_uniform = GetUniformLocation("diffuse_tex_enabled_uni");
+	normal_tex_enabled_uniform = GetUniformLocation("normal_tex_enabled_uni");
+	height_tex_enabled_uniform = GetUniformLocation("height_tex_enabled_uni");
+	specular_tex_enabled_uniform = GetUniformLocation("specular_tex_enabled_uni");
 
-	transformation_uniform = glGetUniformLocationARB(program, "transformation_uni");
+	transformation_uniform = GetUniformLocation("transformation_uni");
 
-	clip_uniform = glGetUniformLocationARB(program, "clip_vec_uni");
-	clip_dist_uniform = glGetUniformLocationARB(program, "clib_dist_uni");
+	clip_uniform = GetUniformLocation("clip_vec_uni");
+	clip_dist_uniform = GetUniformLocation("clib_dist_uni");
 
 	ResetUniforms();
-	UseNoShader();
+	Unbind();
 }
 
 void CDefaultFaceShader::SetTransformation(const float m[16])

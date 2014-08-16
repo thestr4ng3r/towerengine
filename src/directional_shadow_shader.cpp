@@ -3,8 +3,6 @@
 
 void CDirectionalShadowShader::Init(void)
 {
-	printf("Compiling Directional Shadow Shader...\n");
-
 	SetSource(directional_shadow_shader_vert, directional_shadow_shader_frag);
 	CreateVertexShader();
 	CreateFragmentShader();
@@ -13,13 +11,13 @@ void CDirectionalShadowShader::Init(void)
 	glBindAttribLocationARB(program, CFaceShader::vertex2_attribute, "vertex2_attr");
 	LinkProgram();
 
-	light_dir_uniform = glGetUniformLocationARB(program, "light_dir_uni");
-	clip_uniform = glGetUniformLocationARB(program, "clip_uni");
-	transformation_uniform = glGetUniformLocationARB(program, "transformation_uni");
-	vertex_mix_uniform = glGetUniformLocationARB(program, "vertex_mix_uni");
-	cam_pos_uniform = glGetUniformLocationARB(program, "cam_pos_uni");
+	light_dir_uniform = GetUniformLocation("light_dir_uni");
+	clip_uniform = GetUniformLocation("clip_uni");
+	transformation_uniform = GetUniformLocation("transformation_uni");
+	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
+	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
-	UseNoShader();
+	Unbind();
 }
 
 void CDirectionalShadowShader::SetLightDir(CVector v)
@@ -46,4 +44,37 @@ void CDirectionalShadowShader::SetClip(float near, float far)
 void CDirectionalShadowShader::SetCamPos(CVector v)
 {
 	glUniform3f(cam_pos_uniform, v.x, v.y, v.z);
+}
+
+
+
+
+
+void CDirectionalShadowBlurShader::Init(void)
+{
+	InitShader(directional_shadow_blur_shader_vert, directional_shadow_blur_shader_frag, "Directional Shadow Shader");
+
+	tex_uniform = GetUniformLocation("tex_uni");
+	tex_layer_uniform = GetUniformLocation("tex_layer_uni");
+	blur_dir_uniform = GetUniformLocation("blur_dir_uni");
+
+	Unbind();
+}
+
+void CDirectionalShadowBlurShader::SetTexture(GLuint tex)
+{
+	glUniform1i(tex_uniform, 0);
+	glActiveTextureARB(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
+}
+
+void CDirectionalShadowBlurShader::SetTextureLayer(int layer)
+{
+	glUniform1f(tex_layer_uniform, (float)layer);
+}
+
+
+void CDirectionalShadowBlurShader::SetBlurDir(CVector2 v)
+{
+	glUniform2f(blur_dir_uniform, v.x, v.y);
 }

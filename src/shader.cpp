@@ -9,12 +9,12 @@ void CShader::SetSource(const char *vertex, const char *fragment)
 
 void CShader::CreateVertexShader(void)
 {
-	vertex_shader = CreateShader(GL_VERTEX_SHADER_ARB, vertex_src);
+	vertex_shader = CreateShader(GL_VERTEX_SHADER_ARB, vertex_src, name);
 }
 
 void CShader::CreateFragmentShader(void)
 {
-	fragment_shader = CreateShader(GL_FRAGMENT_SHADER_ARB, fragment_src);
+	fragment_shader = CreateShader(GL_FRAGMENT_SHADER_ARB, fragment_src, name);
 }
 
 void CShader::CreateProgram(void)
@@ -25,6 +25,22 @@ void CShader::CreateProgram(void)
 void CShader::LinkProgram(void)
 {
 	LinkShaderProgram(program);
+}
+
+void CShader::InitShader(const char *vert_src, const char *frag_src, const char *shader_name)
+{
+	name = shader_name;
+
+	SetSource(vert_src, frag_src);
+	CreateVertexShader();
+	CreateFragmentShader();
+	CreateProgram();
+	LinkProgram();
+}
+
+GLint CShader::GetUniformLocation(const char *uniform)
+{
+	return glGetUniformLocation(program, uniform);
 }
 
 void CShader::Bind(void)
@@ -39,7 +55,7 @@ void CShader::Unbind(void)
 	glUseProgramObjectARB(0);
 }
 
-void PrintGLInfoLog(const char *log_title, GLhandleARB handle)
+void PrintGLInfoLog(const char *log_title, GLhandleARB handle, const char *shader_name = 0)
 {
 	GLchar *string;
 	GLint size;
@@ -50,14 +66,17 @@ void PrintGLInfoLog(const char *log_title, GLhandleARB handle)
 	{
 		string = new GLchar [size];
 		glGetInfoLogARB(handle, size, &size, string);
-		printf("%s Info log:\n", log_title);
+		printf("%s info log", log_title);
+		if(shader_name != 0)
+			 printf("for %s:\n", shader_name);
+		printf(":\n");
 		printf("-----------\n%s\n-----------\n", string);
 		delete [] string;
 	}
 }
 
 
-GLhandleARB CreateShader(GLenum type, const char *src)
+GLhandleARB CreateShader(GLenum type, const char *src, const char *name)
 {
 	GLhandleARB s;
 	GLint len;
@@ -74,7 +93,7 @@ GLhandleARB CreateShader(GLenum type, const char *src)
 	glShaderSourceARB(s, 1, &src, &len);
 
 	glCompileShaderARB(s);
-	PrintGLInfoLog("Compile", s);
+	PrintGLInfoLog("Compile", s, name);
 
 	return s;
 }
@@ -93,12 +112,7 @@ GLhandleARB CreateShaderProgram(GLhandleARB vertex_shader, GLhandleARB fragment_
 void LinkShaderProgram(GLhandleARB program)
 {
 	glLinkProgramARB(program);
-	PrintGLInfoLog("Link", program);
-}
-
-void UseNoShader(void)
-{
-	glUseProgramObjectARB(0);
+	//PrintGLInfoLog("Link", program);
 }
 
 GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, int alpha_channel) // from http://r3dux.org/2010/11/single-call-opengl-texture-loader-in-devil/

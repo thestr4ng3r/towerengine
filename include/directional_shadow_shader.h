@@ -22,4 +22,18 @@ class CDirectionalShadowShader : public CFaceShader
 		void SetCamPos(CVector v);
 };
 
+class CDirectionalShadowBlurShader : public CShader
+{
+	private:
+		GLint tex_uniform;
+		GLint tex_layer_uniform;
+		GLint blur_dir_uniform;
+
+	public:
+		void Init(void);
+		void SetTexture(GLuint tex);
+		void SetTextureLayer(int layer);
+		void SetBlurDir(CVector2 v);
+};
+
 #endif

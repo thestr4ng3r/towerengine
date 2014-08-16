@@ -13,12 +13,18 @@ struct CShaderProgram
 
 class CShader : protected CShaderProgram
 {
+	private:
+		const char *name;
+
 	protected:
 		void SetSource(const char *vertex, const char *fragment);
 		void CreateVertexShader(void);
 		void CreateFragmentShader(void);
 		void CreateProgram(void);
 		void LinkProgram(void);
+
+		void InitShader(const char *vert_src, const char *frag_src, const char *shader_name = 0);
+		GLint GetUniformLocation(const char *uniform);
 	
 	public:
 		void Bind(void);
@@ -31,10 +37,9 @@ class CShader : protected CShaderProgram
 
 
 void PrintGLInfoLog(const char *log_title, GLhandleARB handle);
-GLhandleARB CreateShader(GLenum type, const char *src);
+GLhandleARB CreateShader(GLenum type, const char *src, const char *name);
 GLhandleARB CreateShaderProgram(GLhandleARB vertex_shader, GLhandleARB fragment_shader);
 void LinkShaderProgram(GLhandleARB program);
-void UseNoShader(void);
 
 GLuint LoadGLTexture(const char *filename, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 inline GLuint LoadGLTexture(const char *filename, bool *transparent, int alpha_channel = 3)

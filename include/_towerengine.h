@@ -44,8 +44,10 @@ class CDirectionalLightShadow;
 #include "terrain.h"
 #include "terrainobject.h"
 #include "camera.h"
-#include "light.h"
-#include "shadow.h"
+#include "point_light.h"
+#include "directional_light.h"
+#include "point_light_shadow.h"
+#include "directional_light_shadow.h"
 #include "world.h"
 
 #endif

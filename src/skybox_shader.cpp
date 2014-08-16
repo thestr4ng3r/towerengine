@@ -2,17 +2,15 @@
 
 void CSkyBoxShader::Init(void)
 {
-	printf("Compiling SkyBox Shader...\n");
-
 	SetSource(cube_env_shader_vert, cube_env_shader_frag);
 	CreateVertexShader();
 	CreateFragmentShader();
 	CreateProgram();
 	LinkProgram();
 
-	tex_uniform = glGetUniformLocationARB(program, "Texture");
+	tex_uniform = GetUniformLocation("Texture");
 
-	UseNoShader();
+	Unbind();
 }
 
 void CSkyBoxShader::SetCubeMap(GLuint tex)
