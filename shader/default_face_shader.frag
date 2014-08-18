@@ -182,8 +182,7 @@ void main(void)
 											
 				float light_dot = (dot(pos_var - cam_pos_var, -directional_light_dir_uni[i]) + directional_light_shadow_clip_uni[i].x) /
 									(directional_light_shadow_clip_uni[i].y - directional_light_shadow_clip_uni[i].x);
-										
-				// Surface is fully lit. as the current fragment is before the light occluder
+
 				if(light_dot <= moments.x)
 					shadow = 1.0;
 				else
@@ -193,7 +192,7 @@ void main(void)
 				    float d = light_dot - moments.x;
 				    float p_max = linstep(0.5, 1.0, variance / (variance + d*d));
 				    
-				    shadow = clamp(max(p, p_max), 0.0, 1.0);
+				   	shadow = clamp(max(p, p_max), 0.0, 1.0);
 				}	
 			}
 			else

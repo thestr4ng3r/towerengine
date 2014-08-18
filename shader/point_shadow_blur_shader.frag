@@ -10,7 +10,7 @@ in vec3 pos_var;
 
 void main()
 {
-	vec3 coord = normalize(pos_var);
+	vec3 coord = pos_var;//normalize(pos_var);
 	vec2 color = vec2(0.0, 0.0);
 	
 	color += texture(tex_uni, coord - blur_dir_uni * 5.0).rg * 0.01;

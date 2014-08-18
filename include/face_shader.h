@@ -20,7 +20,7 @@ class CFaceShader : public CShader
 		static const unsigned int diffuse_tex_unit = 0;
 		static const unsigned int specular_tex_unit = 4;
 		static const unsigned int normal_tex_unit = 2;
-		static const unsigned int height_tex_unit = 3;
+		//static const unsigned int height_tex_unit = 3;
 		static const unsigned int point_light_shadow_tex_first_unit = 5;
 		static const unsigned int directional_light_shadow_tex_first_unit = point_light_shadow_tex_first_unit + max_point_lights;
 
@@ -36,13 +36,10 @@ class CFaceShader : public CShader
 		virtual void SetDiffuseTexture(bool enabled, GLuint tex = 0) {};
 		virtual void SetSpecularTexture(bool enabled, GLuint tex = 0) {};
 		virtual void SetNormalTexture(bool enabled, GLuint tex = 0) {};
-		virtual void SetHeightTexture(bool enabled, GLuint tex = 0) {};
-		virtual void SetBorder(int e, CVector2 a, CVector2 b) {};
+		//virtual void SetHeightTexture(bool enabled, GLuint tex = 0) {};
 		virtual void SetTexCoord(CVector2 coord) {};
 		virtual void SetVectors(CVector normal, CVector tangx, CVector tangy, CVector fnormal = Vec(0.0, 0.0, 0.0)) {};
-		virtual void SetHeightFactor(CVector factor) {};
-		virtual void SetBumpFactor(float f) {};
-		virtual void SetFog(CVector color, float depth, float dist) {};
+		//virtual void SetHeightFactor(CVector factor) {};
 		virtual void SetTwoSide(int v) {};
 		virtual void SetTransformation(const float m[16]) {};
 		virtual void SetVertexMix(float m = 0.0) {};

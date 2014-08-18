@@ -47,12 +47,12 @@ void CDefaultFaceShader::Init(void)
 
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
-	height_tex_uniform = GetUniformLocation("height_tex_uni");
+	//height_tex_uniform = GetUniformLocation("height_tex_uni");
 	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
 
 	diffuse_tex_enabled_uniform = GetUniformLocation("diffuse_tex_enabled_uni");
 	normal_tex_enabled_uniform = GetUniformLocation("normal_tex_enabled_uni");
-	height_tex_enabled_uniform = GetUniformLocation("height_tex_enabled_uni");
+	//height_tex_enabled_uniform = GetUniformLocation("height_tex_enabled_uni");
 	specular_tex_enabled_uniform = GetUniformLocation("specular_tex_enabled_uni");
 
 	transformation_uniform = GetUniformLocation("transformation_uni");
@@ -60,6 +60,7 @@ void CDefaultFaceShader::Init(void)
 	clip_uniform = GetUniformLocation("clip_vec_uni");
 	clip_dist_uniform = GetUniformLocation("clib_dist_uni");
 
+	Bind();
 	ResetUniforms();
 	Unbind();
 }
@@ -196,7 +197,7 @@ void CDefaultFaceShader::SetNormalTexture(bool enabled, GLuint tex)
 
 }
 
-void CDefaultFaceShader::SetHeightTexture(bool enabled, GLuint tex)
+/*void CDefaultFaceShader::SetHeightTexture(bool enabled, GLuint tex)
 {
 	glUniform1iARB(height_tex_enabled_uniform, enabled ? 1 : 0);
 
@@ -206,7 +207,7 @@ void CDefaultFaceShader::SetHeightTexture(bool enabled, GLuint tex)
 		glActiveTexture(GL_TEXTURE0 + height_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
-}
+}*/
 
 
 void CDefaultFaceShader::SetTexCoord(CVector2 coord)
@@ -214,20 +215,6 @@ void CDefaultFaceShader::SetTexCoord(CVector2 coord)
 	glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, coord.v);
 }
 
-void CDefaultFaceShader::SetBorder(int e, CVector2 a, CVector2 b)
-{
-	CVector small, big;
-
-	small.x = a.x < b.x ? a.x : b.x;
-	small.y = a.y < b.y ? a.y : b.y;
-	big.x = a.x > b.x ? a.x : b.x;
-	big.y = a.y > b.y ? a.y : b.y;
-
-	if(tex_border_uniform != -1)
-		glUniform4f(tex_border_uniform, small.x, small.y, big.x, big.y);
-	if(discard_border_uniform != -1)
-		glUniform1i(discard_border_uniform, e ? 1 : 0);
-}
 
 void CDefaultFaceShader::SetVectors(CVector normal, CVector tangx, CVector tangy, CVector fnormal)
 {
@@ -242,32 +229,17 @@ void CDefaultFaceShader::SetVectors(CVector normal, CVector tangx, CVector tangy
 		normal.AttrToGL(normal_attribute);
 }
 
-void CDefaultFaceShader::SetHeightFactor(CVector factor)
+/*void CDefaultFaceShader::SetHeightFactor(CVector factor)
 {
 	if(height_factor_uniform != -1)
 		glUniform3f(height_factor_uniform, factor.x, factor.y, factor.z);
-}
+}*/
 
-void CDefaultFaceShader::SetBumpFactor(float f)
-{
-	if(bump_factor_uniform != -1)
-		glUniform1f(bump_factor_uniform, f);
-}
 
 void CDefaultFaceShader::SetTwoSide(int v)
 {
 	if(two_side_uniform != -1)
 		glUniform1i(two_side_uniform, v ? 1 : 0);
-}
-
-void CDefaultFaceShader::SetFog(CVector color, float depth, float dist)
-{
-	if(fog_color_uniform != -1)
-		glUniform3f(fog_color_uniform, color.x, color.y, color.z);
-	if(fog_depth_uniform != -1)
-		glUniform1f(fog_depth_uniform, depth);
-	if(fog_dist_uniform != -1)
-		glUniform1f(fog_dist_uniform, dist);
 }
 
 void CDefaultFaceShader::SetClip(CVector c, float d)
@@ -289,13 +261,11 @@ void CDefaultFaceShader::ResetUniforms(void)
 	SetAmbient(1.0);
 	SetPointLights(0, 0, 0, 0, 0, 0);
 	SetLightAmbientColor(Vec(0.0, 0.0, 0.0));
-	SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
 	SetSpecular(32.0);
-	SetFog(Vec(1.0, 1.0, 1.0), 0.0, 0.0);
 	SetClip(Vec(0.0, 0.0, 0.0), 0.0);
 	SetVertexMix(0.0);
 	SetDiffuseTexture(false);
 	SetSpecularTexture(false);
 	SetNormalTexture(false);
-	SetHeightTexture(false);
+	//SetHeightTexture(false);
 }

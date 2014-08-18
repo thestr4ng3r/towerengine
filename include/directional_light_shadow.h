@@ -24,6 +24,7 @@ class CDirectionalLightShadow
 		float blur_size;
 		GLuint blur_tex;
 		GLuint blur_fbo;
+		GLenum *blur_draw_buffers;
 
 	public:
 		CDirectionalLightShadow(CDirectionalLight *light, int size, int splits, bool blur_enabled = false, float blur_size = 0.003);

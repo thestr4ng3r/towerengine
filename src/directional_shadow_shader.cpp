@@ -55,8 +55,9 @@ void CDirectionalShadowBlurShader::Init(void)
 	InitShader(directional_shadow_blur_shader_vert, directional_shadow_blur_shader_frag, "Directional Shadow Shader");
 
 	tex_uniform = GetUniformLocation("tex_uni");
-	tex_layer_uniform = GetUniformLocation("tex_layer_uni");
+	tex_layers_count_uniform = GetUniformLocation("tex_layers_count_uni");
 	blur_dir_uniform = GetUniformLocation("blur_dir_uni");
+	blur_factors_uniform = GetUniformLocation("blur_factors_uni");
 
 	Unbind();
 }
@@ -68,9 +69,10 @@ void CDirectionalShadowBlurShader::SetTexture(GLuint tex)
 	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
 }
 
-void CDirectionalShadowBlurShader::SetTextureLayer(int layer)
+void CDirectionalShadowBlurShader::SetTextureLayers(int count, float *blur_factors)
 {
-	glUniform1f(tex_layer_uniform, (float)layer);
+	glUniform1i(tex_layers_count_uniform, count);
+	glUniform1fv(blur_factors_uniform, count, blur_factors);
 }
 
 

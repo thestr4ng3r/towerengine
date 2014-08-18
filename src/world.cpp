@@ -305,7 +305,6 @@ void CWorld::Render(int screen_width, int screen_height)
 	CEngine::GetCurrentFaceShader()->SetDirectionalLights(dir_lights.size(), dir_light_dir, dir_light_color, dir_light_shadow_enabled, dir_light_shadow_maps, dir_light_shadow_clip, dir_light_shadow_tex_matrix, dir_light_shadow_splits_count, dir_light_shadow_splits_z);
 	CEngine::GetCurrentFaceShader()->SetLightAmbientColor(ambient_color);
 	CEngine::GetCurrentFaceShader()->SetTwoSide(0);
-	CEngine::GetCurrentFaceShader()->SetBorder(0, Vec(0.0, 0.0), Vec(0.0, 0.0));
 	//CEngine::GetFaceShader()->SetClip(clip.v, clip.d);
 
 	PutToGL(cam_pos);

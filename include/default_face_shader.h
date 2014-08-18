@@ -38,23 +38,16 @@ class CDefaultFaceShader : public CFaceShader
 
 		GLint diffuse_tex_enabled_uniform;
 		GLint normal_tex_enabled_uniform;
-		GLint height_tex_enabled_uniform;
+		//GLint height_tex_enabled_uniform;
 		GLint specular_tex_enabled_uniform;
 
 		GLint diffuse_tex_uniform;
 		GLint normal_tex_uniform;
-		GLint height_tex_uniform;
+		//GLint height_tex_uniform;
 		GLint specular_tex_uniform;
 
-		GLint tex_border_uniform;
-		GLint discard_border_uniform;
-
-		GLint height_factor_uniform;
-		GLint bump_factor_uniform;
-
-		GLint fog_color_uniform;
-		GLint fog_depth_uniform;
-		GLint fog_dist_uniform;
+		//GLint height_factor_uniform;
+		//GLint bump_factor_uniform;
 
 		GLint clip_uniform;
 		GLint clip_dist_uniform;
@@ -77,12 +70,10 @@ class CDefaultFaceShader : public CFaceShader
 		void SetSpecularTexture(bool enabled, GLuint tex = 0);
 		void SetNormalTexture(bool enabled, GLuint tex = 0);
 		void SetHeightTexture(bool enabled, GLuint tex = 0);
-		void SetBorder(int e, CVector2 a, CVector2 b);
 		void SetTexCoord(CVector2 coord);
 		void SetVectors(CVector normal, CVector tangx, CVector tangy, CVector fnormal = Vec(0.0, 0.0, 0.0));
-		void SetHeightFactor(CVector factor);
+		//void SetHeightFactor(CVector factor);
 		void SetBumpFactor(float f);
-		void SetFog(CVector color, float depth, float dist);
 		void SetTwoSide(int v);
 		void SetTransformation(const float m[16]);
 		void SetVertexMix(float m = 0.0);
