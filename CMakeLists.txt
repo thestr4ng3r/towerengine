@@ -15,6 +15,8 @@ set(towerengine_SRC
 	src/camera.cpp 
 	src/engine.cpp 
 	src/entity.cpp 
+	src/boundingbox.cpp
+	src/transformationmatrix.cpp
 	src/face_shader.cpp 
 	src/default_face_shader.cpp
 	src/point_light.cpp 
@@ -33,6 +35,7 @@ set(towerengine_SRC
 	src/vector2.cpp 
 	src/vector.cpp 
 	src/vertex.cpp 
+	src/renderspace.cpp
 	src/world.cpp
 	src/heightmap.cpp
 	src/terrain.cpp

@@ -12,10 +12,16 @@ private:
 	CSkyBox *sky_box;
 	CCamera *camera;
 
+	CRenderSpace *camera_render_space;
+	set<CPointLight *> camera_render_point_lights;
+	set<CDirectionalLight *> camera_render_dir_lights;
+
 	CVector ambient_color;
 
-	void PutToGL(CVector cam_pos);
+	//void PaintObjects(void);
+	void FillRenderSpaces(void);
 	void SetShadowTextureMatrix(void);
+	void RenderShadowMaps(void);
 
 public:
 	CWorld(void);
@@ -41,8 +47,6 @@ public:
 	void RemoveDirectionalLight(CDirectionalLight *light);
 	void ClearDirectionalLights(void);
 
-	void RenderShadow(void);
-	void RenderShadowMaps(void);
 	void Render(int screen_width, int screen_height);
 };
 

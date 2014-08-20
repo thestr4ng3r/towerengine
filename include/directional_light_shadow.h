@@ -7,6 +7,8 @@ class CDirectionalLightShadow
 	private:
 		CDirectionalLight *light;
 
+		CRenderSpace *render_space;
+
 		GLuint tex;
 		GLuint fbo;
 		GLuint depth_rbo;
@@ -31,12 +33,13 @@ class CDirectionalLightShadow
 
 		void Render(CWorld *world);
 
-		GLuint GetShadowMap(void)		{ return tex; }
-		float **GetTextureMatrix(void)	{ return tex_matrix; }
-		float GetNearClip(void)			{ return near_clip; }
-		float GetFarClip(void)			{ return far_clip; }
-		int GetSplitsCount(void)		{ return splits; }
-		float *GetSplitsZ(void)			{ return splits_z; }
+		GLuint GetShadowMap(void)			{ return tex; }
+		float **GetTextureMatrix(void)		{ return tex_matrix; }
+		float GetNearClip(void)				{ return near_clip; }
+		float GetFarClip(void)				{ return far_clip; }
+		int GetSplitsCount(void)			{ return splits; }
+		float *GetSplitsZ(void)				{ return splits_z; }
+		CRenderSpace *GetRenderSpace(void)	{ return render_space; }
 };
 
 

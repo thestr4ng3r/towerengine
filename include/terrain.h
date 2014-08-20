@@ -26,9 +26,12 @@ class CTerrain
 	public:
 		CTerrain(CHeightMap *height_map, float size = 10.0, float height = 1.0, CTerrainMaterial *material = 0);
 
+		CBoundingBox GetBoundingBox(void);
+
 		void SetMaterial(CTerrainMaterial *material) { this->material = material; }
 
 		void Paint(void);
+
 };
 
 class CTerrainMaterial

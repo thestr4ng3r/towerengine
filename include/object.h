@@ -7,7 +7,8 @@ class CObject
 public:
 	virtual ~CObject(void) {}
 
-	virtual void PutToGL(CVector cam = Vec(0.0, 0.0, 0.0)) = 0;
+	virtual void PutToGL(void) = 0;
+	virtual CBoundingBox GetBoundingBox(void) = 0;
 };
 
 

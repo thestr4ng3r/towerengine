@@ -24,6 +24,8 @@ private:
 	CVector color;
 	float alpha;
 
+	CTransformationMatrix *transformation;
+
 	float fade_end;
 	float fade_speed;
 
@@ -50,7 +52,8 @@ public:
 	void SetVisible(bool visible)					{ this->visible = visible; }
 	void Fade(float fade_end, float time);
 
-	void PutToGL(CVector cam = Vec(0.0, 0.0, 0.0));
+	void PutToGL(void);
+	CBoundingBox GetBoundingBox(void);
 };
 
 #endif

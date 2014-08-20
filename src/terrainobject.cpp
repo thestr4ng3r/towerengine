@@ -5,7 +5,12 @@ CTerrainObject::CTerrainObject(CTerrain *terrain)
 	this->terrain = terrain;
 }
 
-void CTerrainObject::PutToGL(CVector cam)
+void CTerrainObject::PutToGL(void)
 {
 	terrain->Paint();
+}
+
+CBoundingBox CTerrainObject::GetBoundingBox(void)
+{
+	return terrain->GetBoundingBox();
 }

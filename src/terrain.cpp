@@ -177,7 +177,11 @@ void CTerrain::Paint(void)
 	ibo->Draw(GL_TRIANGLES);
 }
 
-
+CBoundingBox CTerrain::GetBoundingBox(void)
+{
+	return CBoundingBox(	Vec(-size / 2.0, height, -size / 2.0),
+							Vec(size / 2.0, 0.0, size / 2.0));
+}
 
 
 

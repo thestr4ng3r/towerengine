@@ -22,6 +22,8 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	}
 	splits_z[splits] = 0.0;
 
+	render_space = new CRenderSpace();
+
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -54,7 +56,7 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RG32F, size, size, splits, 0, GL_RG, GL_FLOAT, 0);
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
 	glGenFramebuffersEXT(1, &blur_fbo);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, blur_fbo);
@@ -116,7 +118,7 @@ void CDirectionalLightShadow::Render(CWorld *world)
 
 		c_log = cam_near * pow(cam_far / cam_near, (float)(s+1) / (float)splits);
 		c_uni = cam_near + (cam_far - cam_near) * ((float)(s+1) / (float)splits);
-		splits_z[s+1] = (c_log + c_uni) * 0.5;
+		splits_z[s+1] = c_log * 0.65 + c_uni * 0.35;
 
 		//splits_z[s+1] = world->GetCamera()->GetNearClip() +
 		//		(world->GetCamera()->GetFarClip() - world->GetCamera()->GetNearClip()) * pow(2, -(splits - (s+1)));
@@ -166,15 +168,25 @@ void CDirectionalLightShadow::Render(CWorld *world)
 		glClearColor(1.0, 1.0, 1.0, 1.0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-		world->RenderShadow();
+		render_space->Render();
 	}
-
 
 	CShader::Unbind();
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
+
+
 	if(!blur_enabled)
 		return;
+
+	/*GLfloat blur_vert[] = {	-1.0, 1.0,
+							-1.0, -1.0,
+							1.0, -1.0,
+							1.0, 1.0, };
+	GLfloat blur_tex_coord[] = {	0.0, 1.0,
+									0.0, 0.0,
+									1.0, 0.0,
+									1.0, 1.0, };*/
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -199,8 +211,6 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	for(s=0; s<splits; s++)
 		glFramebufferTextureLayerEXT(GL_FRAMEBUFFER_EXT, blur_draw_buffers[s], blur_tex, 0, s);
 
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0, 1.0);
 	glVertex2f(-1.0, 1.0);
@@ -219,8 +229,6 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	for(s=0; s<splits; s++)
 		glFramebufferTextureLayerEXT(GL_FRAMEBUFFER_EXT, blur_draw_buffers[s], tex, 0, s);
 
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0, 1.0);
 	glVertex2f(-1.0, 1.0);
@@ -231,6 +239,11 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	glTexCoord2f(1.0, 1.0);
 	glVertex2f(1.0, 1.0);
 	glEnd();
+
+//	glEnableClientState(GL_VERTEX_ARRAY);
+	//glVertexPointer(2, GL_FLOAT, 0, blur_vert);
+	//glTexCoordPointer(2, GL_FLOAT, 0, blur_tex_coord);
+	//glDrawArrays(GL_QUADS, 0, 4);
 
 	CShader::Unbind();
 

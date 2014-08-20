@@ -15,6 +15,7 @@ CMeshObject::CMeshObject(CMesh *mesh)
 	y = Vec(0.0, 1.0, 0.0);
 	z = Vec(0.0, 0.0, 1.0);
 	scale = Vec(1.0, 1.0, 1.0);
+	transformation = new CTransformationMatrix();
 	color = Vec(1.0, 1.0, 1.0);
 	alpha = 1.0;
 	visible = true;
@@ -73,16 +74,39 @@ void CMeshObject::SetPose(const char *pose)
 	this->pose = cstr(pose);
 }
 
-void CMeshObject::PutToGL(CVector cam)
+CBoundingBox CMeshObject::GetBoundingBox(void)
+{
+	CBoundingBox b;
+	CVector *p = mesh->GetBoundingBox().GetCornerPoints();
+	float *mat;
+
+	transformation->LoadIdentity();
+	transformation->Translate(pos);
+	transformation->Rotate(rot);
+	transformation->SetXYZ(x, y, z);
+	transformation->Scale(scale);
+
+	mat = transformation->GetMatrix();
+
+	for(int i=0; i<8; i++)
+		b.AddPoint(ApplyMatrix4(mat, p[i]));
+
+	return b;
+}
+
+void CMeshObject::PutToGL(void)
 {
 	if(!visible || alpha <= 0.0)
 		return;
 
-	CMesh::LoadIdentity();
-	CMesh::Scale(scale);
-	CMesh::Translate(pos);
-	CMesh::Rotate(rot);
-	CMesh::SetXYZ(x, y, z);
+	transformation->LoadIdentity();
+	transformation->Translate(pos);
+	transformation->Rotate(rot);
+	transformation->SetXYZ(x, y, z);
+	transformation->Scale(scale);
+
+	CEngine::GetCurrentFaceShader()->SetTransformation(transformation->GetMatrix());
+
 	CMesh::Color(color, alpha);
 
 	if(animation_mode && animation)
@@ -98,5 +122,5 @@ void CMeshObject::PutToGL(CVector cam)
 		else
 			mesh->ChangePose("Idle");
 	}
-	mesh->PutToGL(cam);
+	mesh->PutToGL();
 }

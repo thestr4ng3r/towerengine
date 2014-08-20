@@ -43,3 +43,103 @@ CVector *CCamera::GetRelativeFrustumCorners(float near, float far)
 
 	return c;
 }
+
+
+void CCamera::CalculateFrustumPlanes(void)
+{
+	CVector *points = frustum_planes_points;
+	CVector *normals = frustum_planes_normals;
+
+	CVector hvec = Cross(dir, up);
+	CVector vvec = Cross(hvec, dir);
+	hvec.Normalize();
+	vvec.Normalize();
+
+	float tang = tan(degtorad(angle) * 0.5);
+	float nh = near_clip * tang;
+	float nw = nh * aspect;
+
+	CVector aux;
+
+	points[0] = pos + dir * near_clip;
+	normals[0] = dir;
+
+	points[1] = pos + dir * far_clip;
+	normals[1] = -dir;
+
+	aux = (points[0] + vvec*nh) - pos;
+	aux.Normalize();
+	normals[2] = Cross(aux, hvec);
+	points[2] = points[0] + vvec*nh;
+
+	aux = (points[0] - vvec*nh) - pos;
+	aux.Normalize();
+	normals[3] = Cross(hvec, aux);
+	points[3] = points[0] - vvec*nh;
+
+	aux = (points[0] - hvec*nw) - pos;
+	aux.Normalize();
+	normals[4] = Cross(aux, vvec);
+	points[4] = points[0] - hvec*nw;
+
+	aux = (points[0] + hvec*nw) - pos;
+	aux.Normalize();
+	normals[5] = Cross(vvec, aux);
+	points[5] = points[0] + hvec*nw;
+}
+
+bool CCamera::TestPointCulling(CVector point)
+{
+	for(int i=0; i<6; i++)
+	{
+		if(Dot(point - frustum_planes_points[i], frustum_planes_normals[i]) < 0.0)
+			return true;
+	}
+	return false;
+}
+
+bool CCamera::TestSphereCulling(CVector center, float radius)
+{
+	for(int i=0; i<6; i++)
+	{
+		if(Dot(center - frustum_planes_points[i], frustum_planes_normals[i]) < -radius)
+			return true;
+	}
+	return false;
+}
+
+bool CCamera::TestBoundingBoxCulling(CBoundingBox b)
+{
+	CVector p, n;
+	CVector normal;
+
+	for(int i=0; i<6; i++)
+	{
+		normal = frustum_planes_normals[i];
+
+		p = b.GetMin();
+		if(normal.x >= 0)
+			p.x = b.GetMax().x;
+		if(normal.y >=0)
+			p.y = b.GetMax().y;
+		if(normal.z >= 0)
+			p.z = b.GetMax().z;
+
+		n = b.GetMax();
+		if(normal.x >= 0)
+			n.x = b.GetMin().x;
+		if(normal.y >=0)
+			n.y = b.GetMin().y;
+		if(normal.z >= 0)
+			n.z = b.GetMin().z;
+
+		if((Dot(n - frustum_planes_points[i], normal) < 0.0) && (Dot(p - frustum_planes_points[i], normal) < 0.0))
+			return true;
+	}
+
+	return false;
+}
+
+
+
+

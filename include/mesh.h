@@ -35,6 +35,8 @@ class CMesh
 		VBO<float> *uvcoord_vbo;
 		int data_count;
 
+		CBoundingBox bounding_box;
+
 		set<CVertex *> outdated_vertices;
 
 		CMeshPose *current_pose;
@@ -70,21 +72,10 @@ class CMesh
 		CEntity *ParseEntityNode(xmlNodePtr cur);
 
 	public:
-		static float transformation[16];
 		static float color[4];
-		static void LoadIdentity(void);
-		static void Translate(CVector v);
-		static void RotateX(float a);
-		static void RotateY(float a);
-		static void RotateZ(float a);
-		static void SetXY(CVector x, CVector y);
-		static void SetYZ(CVector y, CVector z);
-		static void SetXZ(CVector x, CVector z);
-		static void SetXYZ(CVector x, CVector y, CVector z);
-		static void Rotate(CVector v);
-		static void Scale(CVector v);
+
 		static void Color(CVector c, float a = 1.0);
-		void ApplyTransformation(void);
+
 		void ApplyMatrix(float m[16]);
 
 		#ifdef TMS_USE_LIB_G3D
@@ -106,7 +97,7 @@ class CMesh
 		int SaveToFile_old(const char *file);
 		//void SetOrientation(CVector o);
 		//CVector ApplyOrientation(CVector v) { return Orientation(v, orient_x, orient_y, orient_z); };
-		void PutToGL(CVector cam = Vec(0.0, 0.0, 0.0), int both_sides = 0);
+		void PutToGL(int both_sides = 0);
 		int GetState(void);
 		void Create(void);
 		void Delete(void);
@@ -131,6 +122,8 @@ class CMesh
 		CMaterial *GetIdleMaterial(void)			{ return idle_material; }
 
 		map<string, CEntity *> GetEntitiesInGroup(const char *group = "");
+
+		CBoundingBox GetBoundingBox(void)			{ return bounding_box; }
 
 		void AddVertex(CVertex *v);
 		void AddTriangle(CTriangle *t);
@@ -166,6 +159,8 @@ class CMesh
 
         void SetTriangleMaterials(void);
 		void CalculateNormalsSolid(void);
+
+		void GenerateBoundingBox(void);
 
 		CVertex *CreateVertex(CVector v);
 		CTriangle *CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3);

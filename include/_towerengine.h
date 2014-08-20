@@ -21,6 +21,8 @@ class CDirectionalLightShadow;
 
 #include "vector2.h"
 #include "vector.h"
+#include "boundingbox.h"
+#include "transformationmatrix.h"
 #include "utils.h"
 #include "buffers.h"
 #include "shader.h"
@@ -46,6 +48,7 @@ class CDirectionalLightShadow;
 #include "camera.h"
 #include "point_light.h"
 #include "directional_light.h"
+#include "renderspace.h"
 #include "point_light_shadow.h"
 #include "directional_light_shadow.h"
 #include "world.h"

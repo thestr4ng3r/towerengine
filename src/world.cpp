@@ -7,6 +7,7 @@ CWorld::CWorld(void)
 	world_object = 0;
 	sky_box = 0;
 	camera = new CCamera();
+	camera_render_space = new CRenderSpace();
 }
 
 CWorld::~CWorld(void)
@@ -147,11 +148,6 @@ void CWorld::Clear(void)
 	objects.clear();
 }
 
-void CWorld::RenderShadow(void)
-{
-	PutToGL(Vec(0.0, 0.0, 0.0));
-}
-
 void CWorld::SetShadowTextureMatrix(void)
 {
 	static double modelView[16];
@@ -188,20 +184,94 @@ void CWorld::SetShadowTextureMatrix(void)
 
 void CWorld::RenderShadowMaps(void)
 {
+	set<CPointLight *>::iterator pi;
+
+	for(pi=camera_render_point_lights.begin(); pi!=camera_render_point_lights.end(); pi++)
+		(*pi)->RenderShadow(this);
+
+	set<CDirectionalLight *>::iterator di;
+
+	for(di=camera_render_dir_lights.begin(); di!=camera_render_dir_lights.end(); di++)
+		(*di)->RenderShadow(this);
+}
+
+void CWorld::FillRenderSpaces(void)
+{
+	CBoundingBox b;
+	CVector minv, maxv;
+	CVector light_pos;
+	float light_dist;
+	vector<CObject *>::iterator i;
+
+	camera->CalculateFrustumPlanes();
+
+	camera_render_space->ClearObjects();
+	camera_render_point_lights.clear();
+	camera_render_dir_lights.clear();
+
+	for(i=objects.begin(); i!=objects.end(); i++)
+	{
+		if(camera->TestBoundingBoxCulling((*i)->GetBoundingBox()))
+			continue;
+		camera_render_space->objects.insert((*i));
+	}
+
 	vector<CPointLight *>::iterator pi;
 
 	for(pi=point_lights.begin(); pi!=point_lights.end(); pi++)
-		(*pi)->RenderShadow(this);
+	{
+		if(!(*pi)->GetShadowEnabled())
+			continue;
+
+		light_pos = (*pi)->GetPosition();
+		light_dist = (*pi)->GetDistance();
+
+		if(camera->TestSphereCulling(light_pos, light_dist))
+			continue;
+
+		camera_render_point_lights.insert(*pi);
+
+		for(i=objects.begin(); i!=objects.end(); i++)
+		{
+			b = (*i)->GetBoundingBox();
+			minv = b.GetMin(); maxv = b.GetMax();
+
+			if(minv.x > light_pos.x + light_dist)
+				continue;
+			if(minv.y > light_pos.y + light_dist)
+				continue;
+			if(minv.z > light_pos.z + light_dist)
+				continue;
+			if(maxv.x < light_pos.x - light_dist)
+				continue;
+			if(maxv.y < light_pos.y - light_dist)
+				continue;
+			if(maxv.z < light_pos.z - light_dist)
+				continue;
+
+			(*pi)->GetShadow()->GetRenderSpace()->objects.insert((*i));
+		}
+	}
 
 	vector<CDirectionalLight *>::iterator di;
 
 	for(di=dir_lights.begin(); di!=dir_lights.end(); di++)
-		(*di)->RenderShadow(this);
+	{
+		if(!(*di)->GetShadowEnabled())
+			continue;
+
+		camera_render_dir_lights.insert(*di);
+
+		for(i=objects.begin(); i!=objects.end(); i++)
+			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i));
+	}
 }
 
 void CWorld::Render(int screen_width, int screen_height)
 {
 	camera->SetAspect((float)screen_width / (float)screen_height);
+
+	FillRenderSpaces();
 
 	RenderShadowMaps();
 
@@ -210,16 +280,17 @@ void CWorld::Render(int screen_width, int screen_height)
 	float *point_light_pos, *point_light_color, *point_light_distance;
 	int *point_light_shadow_enabled;
 	GLuint *point_light_shadow_maps;
+	set<CPointLight *>::iterator pi;
 
-	point_light_pos = new float[point_lights.size() * 3];
-	point_light_color = new float[point_lights.size() * 3];
-	point_light_distance = new float[point_lights.size()];
-	point_light_shadow_enabled = new int[point_lights.size()];
-	point_light_shadow_maps = new GLuint[point_lights.size()];
+	point_light_pos = new float[camera_render_point_lights.size() * 3];
+	point_light_color = new float[camera_render_point_lights.size() * 3];
+	point_light_distance = new float[camera_render_point_lights.size()];
+	point_light_shadow_enabled = new int[camera_render_point_lights.size()];
+	point_light_shadow_maps = new GLuint[camera_render_point_lights.size()];
 
-	for(i=0; i<(int)point_lights.size(); i++)
+	for(pi=camera_render_point_lights.begin(), i=0; pi!=camera_render_point_lights.end(); pi++, i++)
 	{
-		point_light = point_lights[i];
+		point_light = *pi;
 		memcpy(point_light_pos + i*3, point_light->GetPosition().v, 3 * sizeof(float));
 		memcpy(point_light_color + i*3, point_light->GetColor().v, 3 * sizeof(float));
 		point_light_distance[i] = point_light->GetDistance();
@@ -233,19 +304,20 @@ void CWorld::Render(int screen_width, int screen_height)
 	float *dir_light_shadow_splits_count, *dir_light_shadow_splits_z;
 	int *dir_light_shadow_enabled;
 	GLuint *dir_light_shadow_maps;
+	set<CDirectionalLight *>::iterator di;
 
-	dir_light_dir = new float[dir_lights.size() * 3];
-	dir_light_color = new float[dir_lights.size() * 3];
-	dir_light_shadow_enabled = new int[dir_lights.size()];
-	dir_light_shadow_clip = new float[dir_lights.size() * 2];
-	dir_light_shadow_tex_matrix = new float[dir_lights.size() * 16 * CFaceShader::max_directional_light_splits];
-	dir_light_shadow_splits_count = new float[dir_lights.size()];
-	dir_light_shadow_splits_z = new float[dir_lights.size() * (CFaceShader::max_directional_light_splits+1)];
-	dir_light_shadow_maps = new GLuint[dir_lights.size()];
+	dir_light_dir = new float[camera_render_dir_lights.size() * 3];
+	dir_light_color = new float[camera_render_dir_lights.size() * 3];
+	dir_light_shadow_enabled = new int[camera_render_dir_lights.size()];
+	dir_light_shadow_clip = new float[camera_render_dir_lights.size() * 2];
+	dir_light_shadow_tex_matrix = new float[camera_render_dir_lights.size() * 16 * CFaceShader::max_directional_light_splits];
+	dir_light_shadow_splits_count = new float[camera_render_dir_lights.size()];
+	dir_light_shadow_splits_z = new float[camera_render_dir_lights.size() * (CFaceShader::max_directional_light_splits+1)];
+	dir_light_shadow_maps = new GLuint[camera_render_dir_lights.size()];
 
-	for(i=0; i<(int)dir_lights.size(); i++)
+	for(di=camera_render_dir_lights.begin(), i=0; di!=camera_render_dir_lights.end(); di++, i++)
 	{
-		dir_light = dir_lights[i];
+		dir_light = *di;
 		memcpy(dir_light_dir + i*3, dir_light->GetDirection().v, 3 * sizeof(float));
 		memcpy(dir_light_color + i*3, dir_light->GetColor().v, 3 * sizeof(float));
 		if(dir_light->GetShadowEnabled())
@@ -290,36 +362,126 @@ void CWorld::Render(int screen_width, int screen_height)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 
-
 	if(sky_box)
 		sky_box->Paint(cam_pos);
 
 	CEngine::SetCurrentFaceShader(CEngine::GetDefaultFaceShader());
 	CEngine::BindCurrentFaceShader();
-	CEngine::GetCurrentFaceShader()->SetPointLights(	point_lights.size(),
+	CEngine::GetCurrentFaceShader()->SetPointLights(	camera_render_point_lights.size(),
 														point_light_pos,
 														point_light_color,
 														point_light_distance,
 														point_light_shadow_enabled,
 														point_light_shadow_maps);
-	CEngine::GetCurrentFaceShader()->SetDirectionalLights(dir_lights.size(), dir_light_dir, dir_light_color, dir_light_shadow_enabled, dir_light_shadow_maps, dir_light_shadow_clip, dir_light_shadow_tex_matrix, dir_light_shadow_splits_count, dir_light_shadow_splits_z);
+	CEngine::GetCurrentFaceShader()->SetDirectionalLights(	camera_render_dir_lights.size(),
+															dir_light_dir,
+															dir_light_color,
+															dir_light_shadow_enabled,
+															dir_light_shadow_maps,
+															dir_light_shadow_clip,
+															dir_light_shadow_tex_matrix,
+															dir_light_shadow_splits_count,
+															dir_light_shadow_splits_z);
 	CEngine::GetCurrentFaceShader()->SetLightAmbientColor(ambient_color);
 	CEngine::GetCurrentFaceShader()->SetTwoSide(0);
 	//CEngine::GetFaceShader()->SetClip(clip.v, clip.d);
 
-	PutToGL(cam_pos);
+	camera_render_space->Render();
+
+	CShader::Unbind();
+	glColor4f(0.0, 0.0, 1.0, 1.0);
+	glLineWidth(2.0);
+
+	/*  // Paint Bounding Boxes
+
+	vector<CObject *>::iterator o;
+	CBoundingBox b;
+	CVector minv, maxv;
+
+	for(o=objects.begin(); o!=objects.end(); o++) // TODO: Sort objects of CWorld by z-distance before painting
+	{
+		b = (*o)->GetBoundingBox();
+		minv = b.GetMin();
+		maxv = b.GetMax();
+
+		glBegin(GL_LINE_LOOP); // top
+		glVertex3f(minv.x, maxv.y, minv.z);
+		glVertex3f(minv.x, maxv.y, maxv.z);
+		glVertex3f(maxv.x, maxv.y, maxv.z);
+		glVertex3f(maxv.x, maxv.y, minv.z);
+		glEnd();
+
+		glBegin(GL_LINE_LOOP); // bottom
+		glVertex3f(minv.x, minv.y, minv.z);
+		glVertex3f(minv.x, minv.y, maxv.z);
+		glVertex3f(maxv.x, minv.y, maxv.z);
+		glVertex3f(maxv.x, minv.y, minv.z);
+		glEnd();
+
+		glBegin(GL_LINES); //connections
+		glVertex3f(minv.x, maxv.y, minv.z);
+		glVertex3f(minv.x, minv.y, minv.z);
+
+		glVertex3f(minv.x, maxv.y, maxv.z);
+		glVertex3f(minv.x, minv.y, maxv.z);
+
+		glVertex3f(maxv.x, maxv.y, maxv.z);
+		glVertex3f(maxv.x, minv.y, maxv.z);
+
+		glVertex3f(maxv.x, maxv.y, minv.z);
+		glVertex3f(maxv.x, minv.y, minv.z);
+		glEnd();
+	}*/
 
 	delete[] point_light_pos;
 	delete[] point_light_color;
 	delete[] point_light_distance;
 }
 
-void CWorld::PutToGL(CVector cam_pos)
+/*void CWorld::PaintObjects(void) // TODO: Sort objects of CWorld by z-distance before painting
 {
 	vector<CObject *>::iterator i;
+	CBoundingBox b;
+	CVector minv, maxv;
+	CVector light_pos;
+	float light_dist;
 
-	for(i=objects.begin(); i!=objects.end(); i++) // TODO: Sort objects of CWorld by z-distance before painting
+	switch(camera_mode)
 	{
-		(*i)->PutToGL(cam_pos);
+		case POINT_LIGHT:
+			light_pos = point_light_camera->GetPosition();
+			light_dist = point_light_camera->GetDistance();
+
+			for(i=objects.begin(); i!=objects.end(); i++)
+			{
+				b = (*i)->GetBoundingBox();
+				minv = b.GetMin(); maxv = b.GetMax();
+
+				if(minv.x > light_pos.x + light_dist)
+					continue;
+				if(minv.y > light_pos.y + light_dist)
+					continue;
+				if(minv.z > light_pos.z + light_dist)
+					continue;
+				if(maxv.x < light_pos.x - light_dist)
+					continue;
+				if(maxv.y < light_pos.y - light_dist)
+					continue;
+				if(maxv.z < light_pos.z - light_dist)
+					continue;
+
+				(*i)->PutToGL(cam_pos);
+			}
+			break;
+
+		default:
+			for(i=objects.begin(); i!=objects.end(); i++)
+				(*i)->PutToGL(cam_pos);
+			break;
 	}
-}
+}*/
+
+
+
+
+

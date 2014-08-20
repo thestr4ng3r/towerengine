@@ -34,11 +34,11 @@ void CMesh::CalculateNormalsSolid(void)
 		(*i)->CalculateNormalSolid();
 }
 
-
 CMesh::CMesh(void)
 {
 	idle_pose = 0;
 	vao = 0;
+	bounding_box = CBoundingBox();
 	//mat_indices = 0;
 	refresh_func = 0;
 	refresh_vbos = true;
@@ -54,19 +54,8 @@ CMesh::~CMesh(void)
 	Delete();
 }
 
-float CMesh::transformation[16] = 
-		{ 1.0, 0.0, 0.0, 0.0,
-		  0.0, 1.0, 0.0, 0.0,
-		  0.0, 0.0, 1.0, 0.0,
-		  0.0, 0.0, 0.0, 1.0 };
-
 float CMesh::color[4] = { 1.0, 1.0, 1.0, 1.0 };
 
-void CMesh::LoadIdentity(void)
-{
-	memcpy(transformation, CEngine::identity_matrix4, 16 * sizeof(float));
-	Color(Vec(1.0, 1.0, 1.0), 1.0);
-}
 
 void CMesh::Color(CVector c, float a)
 {
@@ -76,71 +65,6 @@ void CMesh::Color(CVector c, float a)
 	color[3] = a;
 }
 
-void CMesh::Translate(CVector v)
-{
-	float m[16] =
-		{ 1.0, 0.0, 0.0, v.x,
-		  0.0, 1.0, 0.0, v.y,
-		  0.0, 0.0, 1.0, v.z,
-		  0.0, 0.0, 0.0, 1.0 };
-
-	CombineMatrix4(transformation, m, transformation);
-}
-
-void CMesh::RotateX(float a)
-{
-	float m[16] = 
-		{ (float)cos(a), -(float)sin(a), 0.0, 0.0,
-		  (float)sin(a), (float)cos(a),  0.0, 0.0,
-		  0.0,    0.0,     1.0, 0.0,
-		  0.0,    0.0,     0.0, 1.0 };
-	CombineMatrix4(transformation, m, transformation);
-}
-
-void CMesh::RotateY(float a)
-{
-	float m[16] = 
-		{ (float)cos(a), 0.0,  (float)sin(a), 0.0,
-		  0.0,    1.0,     0.0, 0.0,
-		  -(float)sin(a),0.0,  (float)cos(a), 0.0,
-		  0.0,    0.0,     0.0, 1.0 };
-	CombineMatrix4(transformation, m, transformation);
-}
-
-void CMesh::RotateZ(float a)
-{
-	float m[16] = 
-		{ 1.0,    0.0,     0.0, 0.0,
-		  0.0, (float)cos(a), -(float)sin(a), 0.0,
-		  0.0, (float)sin(a),  (float)cos(a), 0.0,
-		  0.0,    0.0,     0.0, 1.0 };
-	CombineMatrix4(transformation, m, transformation);
-}
-
-void CMesh::Rotate(CVector v)
-{
-	RotateX(v.x);
-	RotateY(v.y);
-	RotateZ(v.z);
-}
-
-void CMesh::Scale(CVector v)
-{
-	transformation[0] *= v.x;
-	transformation[1] *= v.x;
-	transformation[3] *= v.x;
-	transformation[5] *= v.y;
-	transformation[6] *= v.y;
-	transformation[7] *= v.y;
-	transformation[9] *= v.z;
-	transformation[10] *= v.z;
-	transformation[11] *= v.z;
-}
-
-void CMesh::ApplyTransformation(void)
-{
-	ApplyMatrix(transformation);
-}
 
 void CMesh::ApplyMatrix(float m[16])
 {
@@ -148,35 +72,6 @@ void CMesh::ApplyMatrix(float m[16])
 
 	for(v=vertices.begin(); v!=vertices.end(); v++)
 		(*v)->SetVector(ApplyMatrix4(m, **v));
-}
-
-void CMesh::SetXY(CVector x, CVector y)
-{
-	CVector z = Cross(x, y);
-	SetXYZ(x, y, z);
-}
-
-void CMesh::SetYZ(CVector y, CVector z)
-{
-	CVector x = Cross(y, z);
-	SetXYZ(x, y, z);
-}
-
-void CMesh::SetXZ(CVector x, CVector z)
-{
-	CVector y = Cross(x, z);
-	SetXYZ(x, y, z);
-}
-
-void CMesh::SetXYZ(CVector x, CVector y, CVector z)
-{
-	float m[16] =
-			{ x.x, y.x, z.x, 0.0,
-			  x.y, y.y, z.y, 0.0,
-			  x.z, y.z, z.z, 0.0,
-			  0.0, 0.0, 0.0, 1.0 };
-
-	CombineMatrix4(transformation, m, transformation);
 }
 
 
@@ -544,6 +439,15 @@ void CMesh::AssignVertexArrayPositions(void)
 	refresh_vbos = true;
 }
 
+void CMesh::GenerateBoundingBox(void)
+{
+	vector<CVertex *>::iterator i;
+	bounding_box = CBoundingBox();
+
+	for(i=vertices.begin(); i!=vertices.end(); i++)
+		bounding_box.AddPoint(**i);
+}
+
 void CMesh::RefreshAllVBOs(void)
 {
 	vector<CTriangle *>::iterator i;
@@ -635,7 +539,7 @@ void CMesh::RefreshIBOs(void)
 	refresh_ibos = false;
 }
 
-void CMesh::PutToGL(CVector cam, int both_sides)
+void CMesh::PutToGL(int both_sides)
 {
 	vector<CMaterial *>::iterator i;
 	VBO<float> *vertex_vbo, *vertex2_vbo;
@@ -703,7 +607,6 @@ void CMesh::PutToGL(CVector cam, int both_sides)
 
 	//CEngine::GetFaceShader()->BindShader();
 	CEngine::GetCurrentFaceShader()->SetTwoSide(both_sides);
-	CEngine::GetCurrentFaceShader()->SetTransformation(CMesh::transformation);
 	CEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
 	glEnable(GL_BLEND);
@@ -819,7 +722,10 @@ bool CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material
 		cur = cur->next;
 	}
 
+
 	idle_pose->CopyFromVertices();
+
+	GenerateBoundingBox();
 
 	refresh_vbos = true;
 	refresh_ibos = true;

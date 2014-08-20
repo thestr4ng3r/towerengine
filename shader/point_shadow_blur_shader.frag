@@ -1,29 +1,25 @@
 #version 130
 
-out vec4 gl_FragColor;
+out vec4 tex_out[6];
 
 uniform samplerCube tex_uni;
 
-uniform vec3 blur_dir_uni;
-
-in vec3 pos_var;
+in vec3 coords_var[6];
+in vec3 blur_dir_var[6];
 
 void main()
 {
-	vec3 coord = pos_var;//normalize(pos_var);
-	vec2 color = vec2(0.0, 0.0);
-	
-	color += texture(tex_uni, coord - blur_dir_uni * 5.0).rg * 0.01;
-	color += texture(tex_uni, coord - blur_dir_uni * 4.0).rg * 0.05;
-	color += texture(tex_uni, coord - blur_dir_uni * 3.0).rg * 0.09;
-	color += texture(tex_uni, coord - blur_dir_uni * 2.0).rg * 0.12;
-	color += texture(tex_uni, coord - blur_dir_uni).rg * 0.15;
-	color += texture(tex_uni, coord).rg * 0.16;
-	color += texture(tex_uni, coord + blur_dir_uni).rg * 0.15;
-	color += texture(tex_uni, coord + blur_dir_uni * 2.0).rg * 0.12;
-	color += texture(tex_uni, coord + blur_dir_uni * 3.0).rg * 0.09;
-	color += texture(tex_uni, coord + blur_dir_uni * 4.0).rg * 0.05;
-	color += texture(tex_uni, coord + blur_dir_uni * 5.0).rg * 0.01;
-	
-	gl_FragColor = vec4(color, 0.0, 1.0);
+	vec2 color;
+
+	for(int s=0; s<6; s++)
+	{
+		color = vec2(0.0, 0.0);
+		color += texture(tex_uni, coords_var[s] - blur_dir_var[s] * 2.0).rg * 0.06;
+		color += texture(tex_uni, coords_var[s] - blur_dir_var[s]).rg * 0.24;
+		color += texture(tex_uni, coords_var[s]).rg * 0.4;
+		color += texture(tex_uni, coords_var[s] + blur_dir_var[s]).rg * 0.24;
+		color += texture(tex_uni, coords_var[s] + blur_dir_var[s] * 2.0).rg * 0.06;
+		
+		tex_out[s] = vec4(color, 0.0, 1.0);
+	}
 }
