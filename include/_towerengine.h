@@ -51,6 +51,7 @@ class CDirectionalLightShadow;
 #include "renderspace.h"
 #include "point_light_shadow.h"
 #include "directional_light_shadow.h"
+#include "character_controller.h"
 #include "world.h"
 
 #endif

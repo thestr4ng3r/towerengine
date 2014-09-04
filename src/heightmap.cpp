@@ -4,9 +4,7 @@ CHeightMap::CHeightMap(int size)
 {
 	this->size = size;
 	height_tex = 0;
-	data = new float *[size];
-	for(int i=0; i<size; i++)
-		data[i] = new float[size];
+	data = new float [size*size];
 }
 
 bool CHeightMap::Load(const char *file)
@@ -38,7 +36,7 @@ bool CHeightMap::Load(const char *file)
 
 	for(x=0; x<size; x++)
 		for(y=0; y<size; y++)
-			data[x][y] = (float)image_data[y*size*3 + x*3] / 255.0;
+			data[y*size + x] = (float)image_data[y*size*3 + x*3] / 255.0;
 
 
 	glGenTextures(1, &height_tex);

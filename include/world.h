@@ -18,6 +18,15 @@ private:
 
 	CVector ambient_color;
 
+	struct physics
+	{
+		btBroadphaseInterface *broadphase;
+		btDefaultCollisionConfiguration *collision_configuration;
+		btCollisionDispatcher *collision_dispatcher;
+		btSequentialImpulseConstraintSolver *solver;
+		btDiscreteDynamicsWorld *dynamics_world;
+	} physics;
+
 	//void PaintObjects(void);
 	void FillRenderSpaces(void);
 	void SetShadowTextureMatrix(void);
@@ -36,6 +45,8 @@ public:
 
 	CVector GetAmbientColor(void)		{ return ambient_color; }
 	CCamera *GetCamera(void)			{ return camera; }
+	btDiscreteDynamicsWorld *GetDynamicsWorld(void) { return physics.dynamics_world; }
+	btBroadphaseInterface *GetBroadphase(void)		{ return physics.broadphase; }
 
 	void SetAmbientColor(CVector v)		{ ambient_color = v; }
 
@@ -47,6 +58,7 @@ public:
 	void RemoveDirectionalLight(CDirectionalLight *light);
 	void ClearDirectionalLights(void);
 
+	void Step(float time);
 	void Render(int screen_width, int screen_height);
 };
 

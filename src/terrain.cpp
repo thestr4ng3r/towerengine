@@ -50,8 +50,8 @@ CTerrain::CTerrain(CHeightMap *height_map, float size, float height, CTerrainMat
 			bitang_data[d + 2] = 1.0;
 
 			d = y * map_size * 2 + x * 2;
-			uvcoord_data[d + 0] = ((float)x / (float)map_size) * 20.0;
-			uvcoord_data[d + 1] = ((float)y / (float)map_size) * 20.0;
+			uvcoord_data[d + 0] = ((float)x / (float)map_size) * 50.0;
+			uvcoord_data[d + 1] = ((float)y / (float)map_size) * 50.0;
 		}
 	}
 
@@ -138,10 +138,24 @@ CTerrain::CTerrain(CHeightMap *height_map, float size, float height, CTerrainMat
 		}
 	}
 
-
 	normal_vbo->AssignData();
 
 	ibo->AssignData();
+
+
+	physics_vertices = new float[map_size * map_size * 3];
+	memcpy(physics_vertices, vertex_data, map_size * map_size * 3 * sizeof(float));
+	physics_triangles = new int[(map_size - 1) * (map_size - 1) * 6];
+
+	for(int i=0; i<(map_size - 1) * (map_size - 1) * 6; i++)
+		physics_triangles[i] = (int)ibo_data[i];
+
+	btTriangleIndexVertexArray *va = new btTriangleIndexVertexArray((map_size - 1) * (map_size - 1) * 2, physics_triangles, 0,
+			map_size * map_size, physics_vertices, 0);
+
+	collision_shape = new btStaticPlaneShape(btVector3(0.0, 1.0, 0.0), 0.0);//new btBvhTriangleMeshShape(va, false);
+
+
 }
 
 void CTerrain::Paint(void)

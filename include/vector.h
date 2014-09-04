@@ -47,23 +47,24 @@ struct CVector
 	CVector &operator+=(const CVector o)	{x += o.x; y += o.y; z += o.z; return *this;};
 	CVector &operator-=(const CVector o)	{x -= o.x; y -= o.y; z -= o.z; return *this;};
 	CVector &operator*=(const CVector o)	{x *= o.x; y *= o.y; z *= o.z; return *this;};
-	CVector &operator*=(float f)		{x *= f; y *= f; z *= f; return *this;};
-	CVector &operator/=(float f)		{x /= f; y /= f; z /= f; return *this;};
+	CVector &operator*=(float f)			{x *= f; y *= f; z *= f; return *this;};
+	CVector &operator/=(float f)			{x /= f; y /= f; z /= f; return *this;};
 	#ifdef TMS_USE_LIB_3DS
         CVector &operator=(Lib3dsVector o)      {x = o[0]; y = o[1]; z = o[2]; return *this;};
 	#endif
-        /*#ifdef TMS_USE_LIB_3DS
-        CVector &operator=(G3DVector o[3])      {x = o[0]; y = o[1]; z = o[2]; return *this;};
-        #endif*/
+
+	CVector &operator=(const btVector3 a)	{ x = a.x(); y = a.y(); z = a.z(); return *this; }
 };
 
 CVector Vec(float x, float y, float z);
+CVector Vec(btVector3 v);
 #ifdef TMS_USE_LIB_3DS
 CVector Vec3ds(Lib3dsVector v);
 #endif
 #ifdef TMS_USE_LIB_G3D
 CVector VecG3D(G3DVector v[3]);
 #endif
+inline btVector3 BtVec(CVector a)		{ return btVector3(a.x, a.y, a.z); }
 CVector NullVec(void);
 CVector operator+(const CVector &a, const CVector &b);
 CVector operator-(const CVector &a, const CVector &b);
@@ -71,6 +72,7 @@ CVector operator*(const CVector &a, float scalar);
 CVector operator*(float scalar, const CVector &a);
 CVector operator*(const CVector &a, const CVector &b);
 int operator==(const CVector a, const CVector b);
+
 double Dot(const CVector &a, const CVector &b);
 CVector Cross(const CVector &a, const CVector &b);
 CVector Vec(const CVector2 &v, float y);

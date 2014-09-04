@@ -38,6 +38,8 @@ CMesh::CMesh(void)
 {
 	idle_pose = 0;
 	vao = 0;
+	physics.mesh = 0;
+	physics.shape = 0;
 	bounding_box = CBoundingBox();
 	//mat_indices = 0;
 	refresh_func = 0;
@@ -137,6 +139,18 @@ void CMesh::Delete(void)
 	outdated_vertices.clear();
 	refresh_vbos = true;
 	refresh_ibos = true;
+
+	if(physics.mesh)
+	{
+		delete physics.mesh;
+		physics.mesh = 0;
+	}
+
+	if(physics.shape)
+	{
+		delete physics.shape;
+		physics.shape = 0;
+	}
 
 	data_count = 0;
 }
@@ -448,6 +462,25 @@ void CMesh::GenerateBoundingBox(void)
 		bounding_box.AddPoint(**i);
 }
 
+btBvhTriangleMeshShape *CMesh::GeneratePhysicsMeshShape(void)
+{
+	vector<CTriangle *>::iterator i;
+
+	if(physics.mesh)
+		delete physics.mesh;
+
+	physics.mesh = new btTriangleMesh();
+
+	for(i=triangles.begin(); i!=triangles.end(); i++)
+		physics.mesh->addTriangle(BtVec(*((*i)->v[0])), BtVec(*((*i)->v[1])), BtVec(*((*i)->v[2])));
+
+	if(physics.shape)
+		delete physics.shape;
+
+	return physics.shape = new btBvhTriangleMeshShape(physics.mesh, false);
+}
+
+
 void CMesh::RefreshAllVBOs(void)
 {
 	vector<CTriangle *>::iterator i;
@@ -726,6 +759,7 @@ bool CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material
 	idle_pose->CopyFromVertices();
 
 	GenerateBoundingBox();
+	GeneratePhysicsMeshShape();
 
 	refresh_vbos = true;
 	refresh_ibos = true;

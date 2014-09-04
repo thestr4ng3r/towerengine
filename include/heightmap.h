@@ -5,7 +5,7 @@ class CHeightMap
 {
 	private:
 		int size;
-		float **data;
+		float *data;
 
 		GLuint height_tex;
 
@@ -14,9 +14,10 @@ class CHeightMap
 
 		bool Load(const char *file);
 
-		GLuint GetHeightTex(void)	{ return height_tex; }
-		float GetValue(int x, int y) { return data[min(max(x, 0), size)][min(max(y, 0), size)]; }
-		int GetSize(void) { return size; }
+		GLuint GetHeightTex(void)		{ return height_tex; }
+		float GetValue(int x, int y) 	{ return data[min(max(y, 0), size) * size + min(max(x, 0), size)]; }
+		float *GetData(void)			{ return data; };
+		int GetSize(void) 				{ return size; }
 };
 
 #endif

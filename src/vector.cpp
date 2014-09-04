@@ -132,6 +132,11 @@ CVector Vec(float x, float y, float z)
 	return v;
 }
 
+CVector Vec(btVector3 v)
+{
+	return Vec(v.x(), v.y(), v.z());
+}
+
 /*#ifdef TMS_USE_LIB_3DS
 CVector Vec3ds(Lib3dsVector v)
 {

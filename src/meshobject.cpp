@@ -20,6 +20,9 @@ CMeshObject::CMeshObject(CMesh *mesh)
 	alpha = 1.0;
 	visible = true;
 	time = 0.0;
+	motion_state = new btDefaultMotionState(btTransform(btQuaternion(0.0, 0.0, 0.0, 1), btVector3(0.0, 0.0, 0.0)));
+	rigid_body = new btRigidBody(0.0, motion_state, mesh->GetPhysicsMeshShape(), btVector3(0.0, 0.0, 0.0));
+	rigid_body->setRestitution(0.0);
 }
 
 void CMeshObject::SetAnimation(const char *animation)
@@ -87,6 +90,9 @@ CBoundingBox CMeshObject::GetBoundingBox(void)
 	transformation->Scale(scale);
 
 	mat = transformation->GetMatrix();
+
+	btTransform trans(btMatrix3x3(mat[0], mat[1], mat[2], mat[4], mat[5], mat[6], mat[8], mat[9], mat[10]), btVector3(mat[3], mat[7], mat[11]));
+	rigid_body->setWorldTransform(trans);
 
 	for(int i=0; i<8; i++)
 		b.AddPoint(ApplyMatrix4(mat, p[i]));

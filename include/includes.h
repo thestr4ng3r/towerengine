@@ -49,4 +49,8 @@ using namespace std;
 #include <libxml/tree.h>
 
 
+#include <btBulletDynamicsCommon.h>
+#include <btBulletCollisionCommon.h>
+#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+
 #endif

@@ -23,12 +23,18 @@ class CTerrain
 		VBO<float> *bitang_vbo;
 		VBO<float> *uvcoord_vbo;
 
+		int *physics_triangles;
+		float *physics_vertices;
+		btCollisionShape *collision_shape;
+
 	public:
 		CTerrain(CHeightMap *height_map, float size = 10.0, float height = 1.0, CTerrainMaterial *material = 0);
 
 		CBoundingBox GetBoundingBox(void);
 
 		void SetMaterial(CTerrainMaterial *material) { this->material = material; }
+
+		btCollisionShape *GetCollisionShape(void)	{ return collision_shape; }
 
 		void Paint(void);
 

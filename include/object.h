@@ -4,11 +4,17 @@
 
 class CObject
 {
-public:
-	virtual ~CObject(void) {}
+	protected:
+		btRigidBody *rigid_body;
+		btDefaultMotionState *motion_state;
 
-	virtual void PutToGL(void) = 0;
-	virtual CBoundingBox GetBoundingBox(void) = 0;
+	public:
+		virtual ~CObject(void) {}
+
+		virtual void PutToGL(void) = 0;
+		virtual CBoundingBox GetBoundingBox(void) = 0;
+
+		btRigidBody *GetRigidBody(void)		{ return rigid_body; }
 };
 
 

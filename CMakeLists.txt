@@ -44,6 +44,7 @@ set(towerengine_SRC
 	src/skybox_shader.cpp
 	src/point_shadow_shader.cpp
 	src/directional_shadow_shader.cpp
+	src/character_controller.cpp
 	oglft/OGLFT.cpp)
 
 add_definitions(-g -Wall)
@@ -67,6 +68,9 @@ find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 target_link_libraries(towerengine ${FREETYPE_LIBRARIES})
 
+find_package(Bullet REQUIRED)
+include_directories(${BULLET_INCLUDE_DIRS})
+target_link_libraries(towerengine ${BULLET_LIBRARIES})
 
 install(TARGETS towerengine DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 

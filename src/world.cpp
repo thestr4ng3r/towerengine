@@ -1,6 +1,9 @@
 
 #include "towerengine.h"
 
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "BulletDynamics/Character/btKinematicCharacterController.h"
+
 CWorld::CWorld(void)
 {
 	ambient_color = Vec(0.1, 0.1, 0.1);
@@ -8,12 +11,29 @@ CWorld::CWorld(void)
 	sky_box = 0;
 	camera = new CCamera();
 	camera_render_space = new CRenderSpace();
+
+	physics.broadphase = new btDbvtBroadphase();
+	physics.collision_configuration = new btDefaultCollisionConfiguration();
+	physics.collision_dispatcher = new btCollisionDispatcher(physics.collision_configuration);
+	physics.solver = new btSequentialImpulseConstraintSolver();
+	physics.dynamics_world = new btDiscreteDynamicsWorld(physics.collision_dispatcher, physics.broadphase, physics.solver, physics.collision_configuration);
+	physics.dynamics_world->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
+
+
+	// Test shit...
+	physics.dynamics_world->setGravity(btVector3(0.0, -100.0, 0.0));
 }
 
 CWorld::~CWorld(void)
 {
 	if(world_object)
 		delete world_object;
+
+	delete physics.broadphase;
+	delete physics.collision_configuration;
+	delete physics.collision_dispatcher;
+	delete physics.solver;
+	delete physics.dynamics_world;
 }
 
 void CWorld::AddObject(CObject *o)
@@ -25,6 +45,8 @@ void CWorld::AddObject(CObject *o)
 			return;
 
 	objects.push_back(o);
+
+	physics.dynamics_world->addRigidBody(o->GetRigidBody());
 }
 
 void CWorld::RemoveObject(CObject *o)
@@ -266,6 +288,13 @@ void CWorld::FillRenderSpaces(void)
 			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i));
 	}
 }
+
+
+void CWorld::Step(float time)
+{
+	physics.dynamics_world->stepSimulation(time, 10);
+}
+
 
 void CWorld::Render(int screen_width, int screen_height)
 {
