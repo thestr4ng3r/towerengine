@@ -150,10 +150,10 @@ CTerrain::CTerrain(CHeightMap *height_map, float size, float height, CTerrainMat
 	for(int i=0; i<(map_size - 1) * (map_size - 1) * 6; i++)
 		physics_triangles[i] = (int)ibo_data[i];
 
-	btTriangleIndexVertexArray *va = new btTriangleIndexVertexArray((map_size - 1) * (map_size - 1) * 2, physics_triangles, 0,
-			map_size * map_size, physics_vertices, 0);
+	btTriangleIndexVertexArray *va = new btTriangleIndexVertexArray((map_size - 1) * (map_size - 1) * 2, physics_triangles, sizeof(int) * 3,
+			map_size * map_size, physics_vertices, sizeof(float) * 3);
 
-	collision_shape = new btStaticPlaneShape(btVector3(0.0, 1.0, 0.0), 0.0);//new btBvhTriangleMeshShape(va, false);
+	collision_shape = new btBvhTriangleMeshShape(va, false);
 
 
 }

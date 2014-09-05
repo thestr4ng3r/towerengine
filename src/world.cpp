@@ -18,10 +18,6 @@ CWorld::CWorld(void)
 	physics.solver = new btSequentialImpulseConstraintSolver();
 	physics.dynamics_world = new btDiscreteDynamicsWorld(physics.collision_dispatcher, physics.broadphase, physics.solver, physics.collision_configuration);
 	physics.dynamics_world->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
-
-
-	// Test shit...
-	physics.dynamics_world->setGravity(btVector3(0.0, -100.0, 0.0));
 }
 
 CWorld::~CWorld(void)
