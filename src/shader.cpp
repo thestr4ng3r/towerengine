@@ -115,15 +115,12 @@ void LinkShaderProgram(GLhandleARB program)
 	//PrintGLInfoLog("Link", program);
 }
 
-GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, int alpha_channel) // from http://r3dux.org/2010/11/single-call-opengl-texture-loader-in-devil/
+GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, int alpha_channel)
 {
 	ILuint imageID;
-	GLuint textureID;
 	ILboolean success;
 	ILenum error;
-	ILubyte *data;
-	ILint width, height;
-	int i;
+	GLuint r_tex;
 
 	ilGenImages(1, &imageID);
 	ilBindImage(imageID);
@@ -136,7 +133,56 @@ GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, in
 		return 0;
 	}
 
+	r_tex = LoadGLTextureIL(imageID, w, h, transparent, alpha_channel);
+
+	ilDeleteImages(1, &imageID);
+
+	return r_tex;
+}
+
+GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int *w, int *h, bool *transparent, int alpha_channel)
+{
+	ILuint imageID;
+	ILboolean success;
+	ILenum error;
+	GLuint r_tex;
+
+	ILenum file_type = IL_TYPE_UNKNOWN;
+
+	if(ext)
+		file_type = ilTypeFromExt((string("f.") + string(ext)).c_str());
+
+	if(file_type == IL_TYPE_UNKNOWN)
+		file_type = ilDetermineTypeL(data, size);
+
+	ilGenImages(1, &imageID);
+	ilBindImage(imageID);
+	success = ilLoadL(file_type, data, size);
+
+	if (!success)
+	{
+		error = ilGetError();
+		printf("Failed to load image: %s\n", iluErrorString(error));
+		return 0;
+	}
+
+	r_tex = LoadGLTextureIL(imageID, w, h, transparent, alpha_channel);
+
+	ilDeleteImages(1, &imageID);
+
+	return r_tex;
+}
+
+GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int alpha_channel) // from http://r3dux.org/2010/11/single-call-opengl-texture-loader-in-devil/
+{
+	GLuint textureID;
+	ILboolean success;
 	ILinfo ImageInfo;
+	ILint width, height;
+	ILubyte *data;
+	ILenum error;
+	int i;
+
 	iluGetImageInfo(&ImageInfo);
 	if (ImageInfo.Origin == IL_ORIGIN_UPPER_LEFT)
 	{
@@ -147,7 +193,7 @@ GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, in
 	if (!success)
 	{
 		error = ilGetError();
-		printf("Failed to convert image \"%s\": %s\n", filename, iluErrorString(error));
+		printf("Failed to convert image: %s\n", iluErrorString(error));
 		return 0;
 	}
 
@@ -193,7 +239,6 @@ GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, in
 				 GL_UNSIGNED_BYTE,				// Image data type
 				 data);							// The actual image data itself
 
-	ilDeleteImages(1, &imageID);
 
 	return textureID;
 }

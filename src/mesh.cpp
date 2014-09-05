@@ -797,23 +797,34 @@ CVertex *CMesh::ParseVertexNode(xmlNodePtr cur)
 	return r;
 }
 
+#define TEXTURE_DISABLED 0
+#define TEXTURE_FILE 1
+#define TEXTURE_DATA 2
+
 CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 {
 	xmlNodePtr child;
-	bool diffuse_enabled, specular_enabled, normal_enabled, height_enabled;
+	int diffuse_mode, specular_mode, normal_mode;
 	string diffuse_file; float ambient; CVector diffuse_color;
 	string specular_file; float exponent; CVector specular_color;
 	string normal_file;
-	string height_file; float height_factor;
+
+	unsigned char *diffuse_data, *specular_data, *normal_data;
+	size_t diffuse_size, specular_size, normal_size;
+	char *diffuse_ext, *specular_ext, *normal_ext;
+	char *base64_temp;
+
 	string name;
 	xmlChar *temp;
 	CMaterial *r;
 
-	diffuse_enabled = specular_enabled = normal_enabled = height_enabled = false;
+	diffuse_mode = specular_mode = normal_mode = TEXTURE_DISABLED;
+	diffuse_ext = specular_ext = normal_ext = 0;
+	diffuse_size = specular_size = normal_size = 0;
+	diffuse_data = specular_data = normal_data = 0;
 	ambient = 1.0;
 	diffuse_color = Vec(1.0, 1.0, 1.0);
 	specular_color = Vec(0.0, 0.0, 0.0);
-	height_factor = 1.0;
 	exponent = 8.0;
 
 	name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
@@ -824,8 +835,20 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 		if(!xmlStrcmp(child->name, (const xmlChar *)"diffuse"))
 		{
 			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
+			{
 				diffuse_file = string((const char *)temp);
-			diffuse_enabled = diffuse_file.length() > 0;
+				diffuse_mode = TEXTURE_FILE;
+			}
+			else if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			{
+				Base64Decode(base64_temp, &diffuse_data, &diffuse_size);
+				if((temp = xmlGetProp(child, (const xmlChar *)"image-extension")))
+					diffuse_ext = (char *)temp;
+				else
+					diffuse_ext = 0;
+				diffuse_mode = TEXTURE_DATA;
+			}
+
 			if((temp = xmlGetProp(child, (const xmlChar *)"ambient")))
 				ambient = atof((const char *)temp);
 			if((temp = xmlGetProp(child, (const xmlChar *)"r")))
@@ -838,8 +861,19 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 		if(!xmlStrcmp(child->name, (const xmlChar *)"specular"))
 		{
 			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
+			{
 				specular_file = string((const char *)temp);
-			specular_enabled = specular_file.length() > 0;
+				specular_mode = TEXTURE_FILE;
+			}
+			else if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			{
+				Base64Decode(base64_temp, &specular_data, &specular_size);
+				if((temp = xmlGetProp(child, (const xmlChar *)"image-extension")))
+					specular_ext = (char *)temp;
+				else
+					specular_ext = 0;
+				specular_mode = TEXTURE_DATA;
+			}
 			if((temp = xmlGetProp(child, (const xmlChar *)"exponent")))
 				exponent = atof((const char *)temp);
 			if((temp = xmlGetProp(child, (const xmlChar *)"r")))
@@ -852,18 +886,20 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 		if(!xmlStrcmp(child->name, (const xmlChar *)"normal"))
 		{
 			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
+			{
 				normal_file = string((const char *)temp);
-			normal_enabled = normal_file.length() > 0;
-		}
-		if(!xmlStrcmp(child->name, (const xmlChar *)"height"))
-		{
-			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
-				height_file = string((const char *)temp);
-			height_enabled = height_file.length() > 0;
-			if((temp = xmlGetProp(child, (const xmlChar *)"factor")))
-				height_factor = atof((const char *)temp);
-			else
-				height_factor = 1.0;
+				normal_mode = TEXTURE_FILE;
+			}
+			else if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			{
+				Base64Decode(base64_temp, &normal_data, &normal_size);
+				if((temp = xmlGetProp(child, (const xmlChar *)"image-extension")))
+					normal_ext = (char *)temp;
+				else
+					normal_ext = 0;
+				normal_mode = TEXTURE_DATA;
+			}
+
 		}
 		child = child->next;
 	}
@@ -871,19 +907,30 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 	r = new CMaterial(this, name);
 
 	if(diffuse_file.compare("$NONE") == 0)
-		diffuse_enabled = false;
+		diffuse_mode = TEXTURE_DISABLED;
 	if(specular_file.compare("$NONE") == 0)
-		specular_enabled = false;
+		specular_mode = TEXTURE_DISABLED;
 	if(normal_file.compare("$NONE") == 0)
-		normal_enabled = false;
-	if(height_file.compare("$NONE") == 0)
-		height_enabled = false;
+		normal_mode = TEXTURE_DISABLED;
 
-	r->SetDiffuse(diffuse_enabled, diffuse_file, diffuse_color, ambient);
-	r->SetSpecular(specular_enabled, specular_file, specular_color, exponent);
-	r->SetNormal(normal_enabled, normal_file);
-	r->SetHeight(height_enabled, height_file, height_factor);
-	r->Load(string(path));
+	r->SetDiffuse(diffuse_color, ambient);
+	r->SetSpecular(specular_color, exponent);
+
+
+	if(diffuse_mode == TEXTURE_FILE)
+		r->LoadDiffuseTextureURL(string(path) + diffuse_file);
+	else if(diffuse_mode == TEXTURE_DATA)
+		r->LoadDiffuseTextureBinary(diffuse_ext, diffuse_data, diffuse_size);
+
+	if(specular_mode == TEXTURE_FILE)
+		r->LoadSpecularTextureURL(string(path) + specular_file);
+	else if(specular_mode == TEXTURE_DATA)
+		r->LoadSpecularTextureBinary(specular_ext, specular_data, specular_size);
+
+	if(normal_mode == TEXTURE_FILE)
+		r->LoadNormalTextureURL(string(path) + normal_file);
+	else if(normal_mode == TEXTURE_DATA)
+		r->LoadNormalTextureBinary(normal_ext, normal_data, normal_size);
 
 	return r;
 }

@@ -42,8 +42,14 @@ GLhandleARB CreateShaderProgram(GLhandleARB vertex_shader, GLhandleARB fragment_
 void LinkShaderProgram(GLhandleARB program);
 
 GLuint LoadGLTexture(const char *filename, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
+GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
+GLuint LoadGLTextureIL(ILuint image, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
+
 inline GLuint LoadGLTexture(const char *filename, bool *transparent, int alpha_channel = 3)
-						{ return LoadGLTexture(filename, 0, 0, transparent, alpha_channel); }
+		{ return LoadGLTexture(filename, 0, 0, transparent, alpha_channel); }
+inline GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, bool *transparent, int alpha_channel = 3)
+		{ return LoadGLTextureBinary(ext, data, size, 0, 0, transparent, alpha_channel); }
+
 GLuint GLTextureFromColor(const CVector &color);
 
 #endif

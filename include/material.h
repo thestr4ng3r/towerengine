@@ -7,46 +7,28 @@ class CMaterial
 		struct Diffuse
 		{
 			bool enabled;
-			string filename;
+			GLuint tex;
 			CVector color;
 			float ambient;
-		};
+		} diffuse;
 
 		struct Specular
 		{
 			bool enabled;
-			string filename;
+			GLuint tex;
 			float exponent;
 			CVector color;
-		};
+		} specular;
 
 		struct Normal
 		{
 			bool enabled;
-			string filename;
-		};
+			GLuint tex;
+		} normal;
 
-		struct Height
-		{
-			bool enabled;
-			string filename;
-			float factor;
-		};
-
-	private:
 		CMesh *mesh;
 
 		string name;
-
-		Diffuse diffuse;
-		Specular specular;
-		Normal normal;
-		Height height;
-
-		GLuint diffuse_tex;
-		GLuint specular_tex;
-		GLuint normal_tex;
-		GLuint height_tex;
 
 		bool transparent;
 
@@ -61,21 +43,18 @@ class CMaterial
 
 		string GetName(void)		{ return name; }
 		CMesh *GetMesh(void)		{ return mesh; }
-		Diffuse GetDiffuse(void)	{ return diffuse; }
-		Specular GetSpecular(void)	{ return specular; }
-		Normal GetNormal(void)		{ return normal; }
-		Height GetHeight(void)		{ return height; }
 		bool GetTransparent(void)	{ return transparent; }
 
-		void SetDiffuse(bool enabled, string filename = string(), CVector color = Vec(1.0, 1.0, 1.0), float ambient = 1.0);
-		void SetSpecular(bool enabled, string filename = string(), CVector color = Vec(1.0, 1.0, 1.0), float exponent = 32.0);
-		void SetNormal(bool enabled, string filename = string());
-		void SetHeight(bool enabled, string filename = string(), float factor = 1.0);
+		void SetDiffuse(CVector color, float ambient);
+		void SetSpecular(CVector color, float exponent);
 
-		void Load(string path);
+		void LoadDiffuseTextureURL(string file);
+		void LoadSpecularTextureURL(string file);
+		void LoadNormalTextureURL(string file);
 
-		static CMaterial *CreateMaterial(const char *diffuse, const char *specular, float exponent, const char *normal, const char *aeb,
-				   float b_factor, const char *height, float h_factor, char name[100], CMesh *mesh = 0);
+		void LoadDiffuseTextureBinary(const char *extension, const void *data, unsigned int size);
+		void LoadSpecularTextureBinary(const char *extension, const void *data, unsigned int size);
+		void LoadNormalTextureBinary(const char *extension, const void *data, unsigned int size);
 
 		void PutToGL(void);
 };

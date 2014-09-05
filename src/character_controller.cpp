@@ -3,46 +3,38 @@
 
 
 
-class btKinematicClosestNotMeConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
+class CCharacterControllerCollisionCallback : public btCollisionWorld::ClosestConvexResultCallback
 {
-public:
-	btKinematicClosestNotMeConvexResultCallback (btCollisionObject* me, const btVector3& up, btScalar minSlopeDot)
-	: btCollisionWorld::ClosestConvexResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
-	, m_me(me)
-	, m_up(up)
-	, m_minSlopeDot(minSlopeDot)
-	{
-	}
-
-	virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult,bool normalInWorldSpace)
-	{
-		if (convexResult.m_hitCollisionObject == m_me)
-			return btScalar(1.0);
-
-		if (!convexResult.m_hitCollisionObject->hasContactResponse())
-			return btScalar(1.0);
-
-		btVector3 hitNormalWorld;
-		if (normalInWorldSpace)
+	public:
+		CCharacterControllerCollisionCallback (btCollisionObject* me)
+				: btCollisionWorld::ClosestConvexResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
 		{
-			hitNormalWorld = convexResult.m_hitNormalLocal;
-		} else
-		{
-			///need to transform normal into worldspace
-			hitNormalWorld = convexResult.m_hitCollisionObject->getWorldTransform().getBasis()*convexResult.m_hitNormalLocal;
+			this->me = me;
 		}
 
-		//btScalar dotUp = m_up.dot(hitNormalWorld);
-		//if (dotUp < m_minSlopeDot) {
-		//	return btScalar(1.0);
-		//}
+		virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult &convexResult, bool normalInWorldSpace)
+		{
+			if(convexResult.m_hitCollisionObject == me)
+				return btScalar(1.0);
 
-		return ClosestConvexResultCallback::addSingleResult (convexResult, normalInWorldSpace);
-	}
-protected:
-	btCollisionObject* m_me;
-	const btVector3 m_up;
-	btScalar m_minSlopeDot;
+			if(!convexResult.m_hitCollisionObject->hasContactResponse())
+				return btScalar(1.0);
+
+			btVector3 hitNormalWorld;
+			if (normalInWorldSpace)
+			{
+				hitNormalWorld = convexResult.m_hitNormalLocal;
+			}
+			else
+			{
+				///need to transform normal into worldspace
+				hitNormalWorld = convexResult.m_hitCollisionObject->getWorldTransform().getBasis()*convexResult.m_hitNormalLocal;
+			}
+
+			return ClosestConvexResultCallback::addSingleResult(convexResult, normalInWorldSpace);
+		}
+	protected:
+		btCollisionObject* me;
 };
 
 
@@ -80,7 +72,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 	vertical_velocity -= 9.81 * time;
 	end.setOrigin(start.getOrigin() + btVector3(0.0, vertical_velocity * time, 0.0));
 
-	btKinematicClosestNotMeConvexResultCallback callback_vert = btKinematicClosestNotMeConvexResultCallback(body, btVector3(0.0, 1.0, 0.0), 0.7071);
+	CCharacterControllerCollisionCallback callback_vert = CCharacterControllerCollisionCallback(body);
 
 	world->convexSweepTest(shape, start, end, callback_vert, 0.005);
 
@@ -108,7 +100,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 			slide_vec *= slide_vec.dot(btVector3(0.0, -1.0, 0.0)) * (-rest_v_velocity);
 
 			end.setOrigin(pos + slide_vec);
-			btKinematicClosestNotMeConvexResultCallback callback_vert_slide = btKinematicClosestNotMeConvexResultCallback(body, btVector3(0.0, 1.0, 0.0), 0.7071);
+			CCharacterControllerCollisionCallback callback_vert_slide = CCharacterControllerCollisionCallback(body);
 			world->convexSweepTest(shape, start, end, callback_vert_slide, 0.005);
 
 			if(callback_vert_slide.hasHit())
@@ -128,7 +120,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 
 	end.setOrigin(target_pos);
 
-	btKinematicClosestNotMeConvexResultCallback callback = btKinematicClosestNotMeConvexResultCallback(body, btVector3(0.0, 1.0, 0.0), 0.7071);
+	CCharacterControllerCollisionCallback callback = CCharacterControllerCollisionCallback(body);
 
 	world->convexSweepTest(shape, start, end, callback);
 
@@ -159,7 +151,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 
 	// go up
 
-	btKinematicClosestNotMeConvexResultCallback callback_up = btKinematicClosestNotMeConvexResultCallback(body, btVector3(0.0, 1.0, 0.0), 0.7071);
+	CCharacterControllerCollisionCallback callback_up = CCharacterControllerCollisionCallback(body);
 	world->convexSweepTest(shape, start, end, callback_up, 0.001);
 
 	if(callback_up.hasHit())
@@ -177,7 +169,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 
 	// go forward
 
-	btKinematicClosestNotMeConvexResultCallback callback_f = btKinematicClosestNotMeConvexResultCallback(body, btVector3(0.0, 1.0, 0.0), 0.7071);
+	CCharacterControllerCollisionCallback callback_f = CCharacterControllerCollisionCallback(body);
 	world->convexSweepTest(shape, start, end, callback_f);
 
 	forward_step = rest_walk_dir.length();
@@ -197,13 +189,13 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 
 	if(forward_step < 0.0001)
 	{
-		body->setLinearVelocity(body->getLinearVelocity() + BtVec(velocity * time) * 60.0);
+		body->setLinearVelocity(BtVec(velocity * time) * 60.0);
 		return;
 	}
 
 	// go down again
 
-	btKinematicClosestNotMeConvexResultCallback callback_down = btKinematicClosestNotMeConvexResultCallback(body, btVector3(0.0, 1.0, 0.0), 0.7071);
+	CCharacterControllerCollisionCallback callback_down = CCharacterControllerCollisionCallback(body);
 	world->convexSweepTest(shape, start, end, callback_down);
 
 	if(callback_down.hasHit())
@@ -211,7 +203,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 		if(callback_down.m_closestHitFraction * real_step < forward_step) // too steep
 		{
 			//pos = target_pos + callback.m_hitNormalWorld * callback.m_hitNormalWorld.dot(first_collision_pos - target_pos);
-			body->setLinearVelocity(body->getLinearVelocity() + BtVec(velocity * time) * 60.0);
+			body->setLinearVelocity(BtVec(velocity * time) * 60.0);
 		}
 		else
 		{
