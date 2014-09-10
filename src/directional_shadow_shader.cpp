@@ -54,6 +54,9 @@ void CDirectionalShadowBlurShader::Init(void)
 {
 	InitShader(directional_shadow_blur_shader_vert, directional_shadow_blur_shader_frag, "Directional Shadow Shader");
 
+	glBindAttribLocationARB(program, vertex_attribute, "vertex_attr");
+	glBindAttribLocationARB(program, uv_coord_attribute, "uv_coord_attr");
+
 	tex_uniform = GetUniformLocation("tex_uni");
 	tex_layers_count_uniform = GetUniformLocation("tex_layers_count_uni");
 	blur_dir_uniform = GetUniformLocation("blur_dir_uni");

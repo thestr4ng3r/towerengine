@@ -41,6 +41,9 @@ CPointLightShadow::CPointLightShadow(CPointLight *light, int size, bool blur_ena
 	this->blur_enabled = blur_enabled;
 	this->blur_size = blur_size;
 
+	if(!blur_enabled)
+		return;
+
 	glGenTextures(1, &blur_tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, blur_tex);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -58,6 +61,20 @@ CPointLightShadow::CPointLightShadow(CPointLight *light, int size, bool blur_ena
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, blur_fbo);
 	glDrawBuffers(6, blur_draw_buffers);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	blur_vao = new VAO();
+
+	blur_vertex_vbo = new VBO<float>(2, blur_vao, 4);
+	static const float blur_vertices[] = {	-1.0, 1.0,
+											-1.0, -1.0,
+											1.0, -1.0,
+											1.0, 1.0 };
+	memcpy(blur_vertex_vbo->GetData(), blur_vertices, sizeof(float) * 8);
+	blur_vertex_vbo->AssignData();
+
+	blur_vao->Bind();
+	blur_vertex_vbo->SetAttribute(CPointShadowBlurShader::vertex_attribute, GL_FLOAT);
+	blur_vao->UnBind();
 }
 
 void CPointLightShadow::Render(CWorld *world)
@@ -131,12 +148,7 @@ void CPointLightShadow::Render(CWorld *world)
 
 	CEngine::GetPointShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0, 0.0) * blur_size);
 
-	glBegin(GL_QUADS);
-	glVertex3f(-1.0, 1.0, -1.0);
-	glVertex3f(-1.0, -1.0, -1.0);
-	glVertex3f(1.0, -1.0, -1.0);
-	glVertex3f(1.0, 1.0, -1.0);
-	glEnd();
+	blur_vao->Draw(GL_QUADS, 0, 4);
 
 
 	CEngine::GetPointShadowBlurShader()->SetTexture(blur_tex);
@@ -148,12 +160,7 @@ void CPointLightShadow::Render(CWorld *world)
 
 	CEngine::GetPointShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0, 0.0) * blur_size);
 
-	glBegin(GL_QUADS);
-	glVertex3f(-1.0, 1.0, -1.0);
-	glVertex3f(-1.0, -1.0, -1.0);
-	glVertex3f(1.0, -1.0, -1.0);
-	glVertex3f(1.0, 1.0, -1.0);
-	glEnd();
+	blur_vao->Draw(GL_QUADS, 0, 4);
 
 	CShader::Unbind();
 

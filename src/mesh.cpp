@@ -632,7 +632,6 @@ void CMesh::PutToGL(int both_sides)
 	normal_vbo->SetAttribute(CFaceShader::normal_attribute, GL_FLOAT);
 	tang_vbo->SetAttribute(CFaceShader::tang_attribute, GL_FLOAT);
 	bitang_vbo->SetAttribute(CFaceShader::bitang_attribute, GL_FLOAT);
-	//face_normal_vbo->SetAttribute(CEngine::GetFaceShader()->face_normal_attribute, GL_FLOAT);
 	uvcoord_vbo->SetAttribute(CFaceShader::uvcoord_attribute, GL_FLOAT);
 
 	if(refresh_ibos)

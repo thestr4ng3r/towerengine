@@ -47,6 +47,9 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	this->blur_enabled = blur_enabled;
 	this->blur_size = blur_size;
 
+	if(!blur_enabled)
+		return;
+
 	glGenTextures(1, &blur_tex);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, blur_tex);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -55,8 +58,9 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RG32F, size, size, splits, 0, GL_RG, GL_FLOAT, 0);
-
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+	printf("dir tex: %d, blur: %d\n", (int)tex, (int)blur_tex);
 
 	glGenFramebuffersEXT(1, &blur_fbo);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, blur_fbo);
@@ -68,6 +72,28 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	glDrawBuffers(splits, blur_draw_buffers);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
+	blur_vao = new VAO();
+
+	blur_vertex_vbo = new VBO<float>(2, blur_vao, 4);
+	static const float blur_vertices[] = {	-1.0, 1.0,
+											-1.0, -1.0,
+											1.0, -1.0,
+											1.0, 1.0 };
+	memcpy(blur_vertex_vbo->GetData(), blur_vertices, sizeof(float) * 8);
+	blur_vertex_vbo->AssignData();
+
+	blur_uv_vbo = new VBO<float>(2, blur_vao, 4);
+	static const float blur_uv_coords[] = {	0.0, 1.0,
+											0.0, 0.0,
+											1.0, 0.0,
+											1.0, 1.0 };
+	memcpy(blur_uv_vbo->GetData(), blur_uv_coords, sizeof(float) * 8);
+	blur_uv_vbo->AssignData();
+
+	blur_vao->Bind();
+	blur_vertex_vbo->SetAttribute(CDirectionalShadowBlurShader::vertex_attribute, GL_FLOAT);
+	blur_uv_vbo->SetAttribute(CDirectionalShadowBlurShader::uv_coord_attribute, GL_FLOAT);
+	blur_vao->UnBind();
 }
 
 void CDirectionalLightShadow::Render(CWorld *world)
@@ -174,19 +200,8 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	CShader::Unbind();
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-
-
 	if(!blur_enabled)
 		return;
-
-	/*GLfloat blur_vert[] = {	-1.0, 1.0,
-							-1.0, -1.0,
-							1.0, -1.0,
-							1.0, 1.0, };
-	GLfloat blur_tex_coord[] = {	0.0, 1.0,
-									0.0, 0.0,
-									1.0, 0.0,
-									1.0, 1.0, };*/
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -211,16 +226,7 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	for(s=0; s<splits; s++)
 		glFramebufferTextureLayerEXT(GL_FRAMEBUFFER_EXT, blur_draw_buffers[s], blur_tex, 0, s);
 
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0, 1.0);
-	glVertex2f(-1.0, 1.0);
-	glTexCoord2f(0.0, 0.0);
-	glVertex2f(-1.0, -1.0);
-	glTexCoord2f(1.0, 0.0);
-	glVertex2f(1.0, -1.0);
-	glTexCoord2f(1.0, 1.0);
-	glVertex2f(1.0, 1.0);
-	glEnd();
+	blur_vao->Draw(GL_QUADS, 0, 4);
 
 	CEngine::GetDirectionalShadowBlurShader()->SetTexture(blur_tex);
 	CEngine::GetDirectionalShadowBlurShader()->SetTextureLayers(splits, v_blur);
@@ -229,21 +235,8 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	for(s=0; s<splits; s++)
 		glFramebufferTextureLayerEXT(GL_FRAMEBUFFER_EXT, blur_draw_buffers[s], tex, 0, s);
 
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0, 1.0);
-	glVertex2f(-1.0, 1.0);
-	glTexCoord2f(0.0, 0.0);
-	glVertex2f(-1.0, -1.0);
-	glTexCoord2f(1.0, 0.0);
-	glVertex2f(1.0, -1.0);
-	glTexCoord2f(1.0, 1.0);
-	glVertex2f(1.0, 1.0);
-	glEnd();
 
-//	glEnableClientState(GL_VERTEX_ARRAY);
-	//glVertexPointer(2, GL_FLOAT, 0, blur_vert);
-	//glTexCoordPointer(2, GL_FLOAT, 0, blur_tex_coord);
-	//glDrawArrays(GL_QUADS, 0, 4);
+	blur_vao->Draw(GL_QUADS, 0, 4);
 
 	CShader::Unbind();
 

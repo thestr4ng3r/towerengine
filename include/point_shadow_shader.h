@@ -27,6 +27,8 @@ class CPointShadowBlurShader : public CShader
 		GLint blur_dir_uniform;
 
 	public:
+		static const GLint vertex_attribute = 0;
+
 		void Init(void);
 		void SetTexture(GLuint tex);
 		void SetBlurDir(CVector v);

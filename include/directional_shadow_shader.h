@@ -31,6 +31,9 @@ class CDirectionalShadowBlurShader : public CShader
 		GLint blur_dir_uniform;
 
 	public:
+		static const GLint vertex_attribute = 0;
+		static const GLint uv_coord_attribute = 1;
+
 		void Init(void);
 		void SetTexture(GLuint tex);
 		void SetTextureLayers(int layers, float *blur_factors);

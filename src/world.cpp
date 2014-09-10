@@ -166,40 +166,6 @@ void CWorld::Clear(void)
 	objects.clear();
 }
 
-void CWorld::SetShadowTextureMatrix(void)
-{
-	static double modelView[16];
-	static double projection[16];
-
-	// This is matrix transform every coordinate x,y,z
-	// x = x* 0.5 + 0.5
-	// y = y* 0.5 + 0.5
-	// z = z* 0.5 + 0.5
-	// Moving from unit cube [-1,1] to [0,1]
-	const GLdouble bias[16] = {
-		0.5, 0.0, 0.0, 0.0,
-		0.0, 0.5, 0.0, 0.0,
-		0.0, 0.0, 0.5, 0.0,
-		0.5, 0.5, 0.5, 1.0};
-
-	// Grab modelview and transformation matrices
-	glGetDoublev(GL_MODELVIEW_MATRIX, modelView);
-	glGetDoublev(GL_PROJECTION_MATRIX, projection);
-
-	glMatrixMode(GL_TEXTURE);
-	glActiveTextureARB(GL_TEXTURE5);
-
-	glLoadIdentity();
-	glLoadMatrixd(bias);
-
-	// concatating all matrices into one.
-	glMultMatrixd (projection);
-	glMultMatrixd (modelView);
-
-	// Go back to normal matrix mode
-	glMatrixMode(GL_MODELVIEW);
-}
-
 void CWorld::RenderShadowMaps(void)
 {
 	set<CPointLight *>::iterator pi;

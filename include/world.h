@@ -29,7 +29,6 @@ private:
 
 	//void PaintObjects(void);
 	void FillRenderSpaces(void);
-	void SetShadowTextureMatrix(void);
 	void RenderShadowMaps(void);
 
 public:

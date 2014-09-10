@@ -20,6 +20,9 @@ class CPointLightShadow
 		GLuint blur_fbo;
 		static const GLenum blur_draw_buffers[6];
 
+		VAO *blur_vao;
+		VBO<float> *blur_vertex_vbo;
+
 		int size;
 
 		bool culled;

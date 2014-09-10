@@ -53,6 +53,8 @@ void CPointShadowBlurShader::Init(void)
 	CreateProgram();
 	LinkProgram();
 
+	glBindAttribLocationARB(program, vertex_attribute, "vertex_attr");
+
 	tex_uniform = GetUniformLocation("tex_uni");
 	blur_dir_uniform = GetUniformLocation("blur_dir_uni");
 

@@ -28,6 +28,10 @@ class CDirectionalLightShadow
 		GLuint blur_fbo;
 		GLenum *blur_draw_buffers;
 
+		VAO *blur_vao;
+		VBO<float> *blur_vertex_vbo;
+		VBO<float> *blur_uv_vbo;
+
 	public:
 		CDirectionalLightShadow(CDirectionalLight *light, int size, int splits, bool blur_enabled = false, float blur_size = 0.003);
 
