@@ -38,8 +38,7 @@ CMesh::CMesh(void)
 {
 	idle_pose = 0;
 	vao = 0;
-	physics.mesh = 0;
-	physics.shape = 0;
+	physics_triangle_mesh = 0;
 	bounding_box = CBoundingBox();
 	//mat_indices = 0;
 	refresh_func = 0;
@@ -140,17 +139,12 @@ void CMesh::Delete(void)
 	refresh_vbos = true;
 	refresh_ibos = true;
 
-	if(physics.mesh)
+	if(physics_triangle_mesh)
 	{
-		delete physics.mesh;
-		physics.mesh = 0;
+		delete physics_triangle_mesh;
+		physics_triangle_mesh = 0;
 	}
 
-	if(physics.shape)
-	{
-		delete physics.shape;
-		physics.shape = 0;
-	}
 
 	data_count = 0;
 }
@@ -462,22 +456,19 @@ void CMesh::GenerateBoundingBox(void)
 		bounding_box.AddPoint(**i);
 }
 
-btBvhTriangleMeshShape *CMesh::GeneratePhysicsMeshShape(void)
+btTriangleMesh *CMesh::GeneratePhysicsMesh(void)
 {
 	vector<CTriangle *>::iterator i;
 
-	if(physics.mesh)
-		delete physics.mesh;
+	if(physics_triangle_mesh)
+		delete physics_triangle_mesh;
 
-	physics.mesh = new btTriangleMesh();
+	physics_triangle_mesh = new btTriangleMesh();
 
 	for(i=triangles.begin(); i!=triangles.end(); i++)
-		physics.mesh->addTriangle(BtVec(*((*i)->v[0])), BtVec(*((*i)->v[1])), BtVec(*((*i)->v[2])));
+		physics_triangle_mesh->addTriangle(BtVec(*((*i)->v[0])), BtVec(*((*i)->v[1])), BtVec(*((*i)->v[2])));
 
-	if(physics.shape)
-		delete physics.shape;
-
-	return physics.shape = new btBvhTriangleMeshShape(physics.mesh, false);
+	return physics_triangle_mesh;
 }
 
 
@@ -758,7 +749,7 @@ bool CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material
 	idle_pose->CopyFromVertices();
 
 	GenerateBoundingBox();
-	GeneratePhysicsMeshShape();
+	GeneratePhysicsMesh();
 
 	refresh_vbos = true;
 	refresh_ibos = true;

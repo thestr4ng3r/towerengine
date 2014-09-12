@@ -154,7 +154,7 @@ void main(void)
 	
 		//specular
 		specular_color = specular_tex_color * specular_color_uni * point_light_color_uni[i];
-		specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0) * light_intensity;
+		specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0);// * light_intensity;
 		color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular_size_uni)) * shadow;
 	}
 	
@@ -206,7 +206,7 @@ void main(void)
 	
 		//specular
 		specular_color = specular_tex_color * specular_color_uni * directional_light_color_uni[i];
-		specular_intensity = max(dot(normalize(reflect(-directional_light_dir_uni[i], normal)), cam_dir), 0.0) * light_intensity;
+		specular_intensity = max(dot(normalize(reflect(-directional_light_dir_uni[i], normal)), cam_dir), 0.0);// * light_intensity;
 		color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular_size_uni)) * shadow;
 	}
 	

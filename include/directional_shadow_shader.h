@@ -30,6 +30,8 @@ class CDirectionalShadowBlurShader : public CShader
 		GLint blur_factors_uniform;
 		GLint blur_dir_uniform;
 
+		GLint blur_mode_uniform;
+
 	public:
 		static const GLint vertex_attribute = 0;
 		static const GLint uv_coord_attribute = 1;

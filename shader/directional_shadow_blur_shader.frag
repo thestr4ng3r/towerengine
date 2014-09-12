@@ -24,11 +24,23 @@ void main()
 		color = vec2(0.0, 0.0);
 		blur_dir = blur_dir_uni * blur_factors_uni[s];
 		
+		#ifdef GAUSSIAN_BLUR	
+		
 		color += texture(tex_uni, vec3(uv_coord_var - blur_dir * 2.0, layer)).rg * 0.06;
 		color += texture(tex_uni, vec3(uv_coord_var - blur_dir, layer)).rg * 0.24;
 		color += texture(tex_uni, vec3(uv_coord_var, layer)).rg * 0.4;
 		color += texture(tex_uni, vec3(uv_coord_var + blur_dir, layer)).rg * 0.24;
 		color += texture(tex_uni, vec3(uv_coord_var + blur_dir * 2.0, layer)).rg * 0.06;
+		
+		#else
+		
+		color += texture(tex_uni, vec3(uv_coord_var - blur_dir * 2.0, layer)).rg * 0.2;
+		color += texture(tex_uni, vec3(uv_coord_var - blur_dir, layer)).rg * 0.2;
+		color += texture(tex_uni, vec3(uv_coord_var, layer)).rg * 0.2;
+		color += texture(tex_uni, vec3(uv_coord_var + blur_dir, layer)).rg * 0.2;
+		color += texture(tex_uni, vec3(uv_coord_var + blur_dir * 2.0, layer)).rg * 0.2;
+		
+		#endif
 				
 		tex_out[s] = vec4(color, 0.0, 1.0);
 	}

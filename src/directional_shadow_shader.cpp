@@ -52,7 +52,7 @@ void CDirectionalShadowShader::SetCamPos(CVector v)
 
 void CDirectionalShadowBlurShader::Init(void)
 {
-	InitShader(directional_shadow_blur_shader_vert, directional_shadow_blur_shader_frag, "Directional Shadow Shader");
+	InitShader(directional_shadow_blur_shader_vert, directional_shadow_blur_shader_frag, "Directional Shadow Blur Shader");
 
 	glBindAttribLocationARB(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocationARB(program, uv_coord_attribute, "uv_coord_attr");
@@ -83,3 +83,4 @@ void CDirectionalShadowBlurShader::SetBlurDir(CVector2 v)
 {
 	glUniform2f(blur_dir_uniform, v.x, v.y);
 }
+

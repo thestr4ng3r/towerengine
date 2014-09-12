@@ -56,12 +56,7 @@ class CMesh
 		map<int, CVertex *> vertex_indices;
 
 
-		struct physics
-		{
-			btTriangleMesh *mesh;
-			btBvhTriangleMeshShape *shape;
-		} physics;
-
+		btTriangleMesh *physics_triangle_mesh;
 
 		void (*refresh_func)(void);
 
@@ -170,8 +165,8 @@ class CMesh
 
 		void GenerateBoundingBox(void);
 
-		btBvhTriangleMeshShape *GeneratePhysicsMeshShape(void);
-		btBvhTriangleMeshShape *GetPhysicsMeshShape(void)	{ return physics.shape; }
+		btTriangleMesh *GeneratePhysicsMesh(void);
+		btTriangleMesh *GetPhysicsMesh(void)		{ return physics_triangle_mesh; }
 
 		CVertex *CreateVertex(CVector v);
 		CTriangle *CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3);

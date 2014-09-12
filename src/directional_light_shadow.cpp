@@ -60,8 +60,6 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RG32F, size, size, splits, 0, GL_RG, GL_FLOAT, 0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-	printf("dir tex: %d, blur: %d\n", (int)tex, (int)blur_tex);
-
 	glGenFramebuffersEXT(1, &blur_fbo);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, blur_fbo);
 
@@ -144,7 +142,7 @@ void CDirectionalLightShadow::Render(CWorld *world)
 
 		c_log = cam_near * pow(cam_far / cam_near, (float)(s+1) / (float)splits);
 		c_uni = cam_near + (cam_far - cam_near) * ((float)(s+1) / (float)splits);
-		splits_z[s+1] = c_log * 0.65 + c_uni * 0.35;
+		splits_z[s+1] = c_log * 0.7 + c_uni * 0.3;
 
 		//splits_z[s+1] = world->GetCamera()->GetNearClip() +
 		//		(world->GetCamera()->GetFarClip() - world->GetCamera()->GetNearClip()) * pow(2, -(splits - (s+1)));

@@ -88,11 +88,17 @@ void CTransformationMatrix::SetXZ(CVector x, CVector z)
 
 void CTransformationMatrix::SetXYZ(CVector x, CVector y, CVector z)
 {
-	float m[16] =
+	/*float m[16] =
 			{ x.x, y.x, z.x, 0.0,
 			  x.y, y.y, z.y, 0.0,
 			  x.z, y.z, z.z, 0.0,
-			  0.0, 0.0, 0.0, 1.0 };
+			  0.0, 0.0, 0.0, 1.0 };*/
+
+	float m[16] =
+				{ x.x, x.y, x.z, 0.0,
+				  y.x, y.y, y.z, 0.0,
+				  z.x, z.y, z.z, 0.0,
+				  0.0, 0.0, 0.0, 1.0 };
 
 	CombineMatrix4(matrix, m, matrix);
 }

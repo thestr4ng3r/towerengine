@@ -6,7 +6,7 @@ class CObject
 {
 	protected:
 		btRigidBody *rigid_body;
-		btDefaultMotionState *motion_state;
+		btMotionState *motion_state;
 
 	public:
 		virtual ~CObject(void) {}
