@@ -167,9 +167,7 @@ void CTerrain::Paint(void)
 	uvcoord_vbo->SetAttribute(CFaceShader::uvcoord_attribute, GL_FLOAT);
 	CEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
 
-	CEngine::GetCurrentFaceShader()->SetTwoSide(0);
 	CEngine::GetCurrentFaceShader()->SetTransformation(CEngine::identity_matrix4);
-	//CEngine::GetPointShadowShader()->SetTransformation(CEngine::identity_matrix);
 
 	CEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
 

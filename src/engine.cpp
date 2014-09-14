@@ -1,7 +1,8 @@
 
 #include "towerengine.h"
 
-CDefaultFaceShader *CEngine::default_face_shader = 0;
+CGeometryPassShader *CEngine::geometry_pass_shader = 0;
+CLightPassShader *CEngine::light_pass_shader = 0;
 CSkyBoxShader *CEngine::skybox_shader = 0;
 CPointShadowShader *CEngine::point_shadow_shader = 0;
 CPointShadowBlurShader *CEngine::point_shadow_blur_shader = 0;
@@ -35,9 +36,12 @@ void CEngine::Init(void)
 	ilInit();
 	iluInit();
 
-	default_face_shader = new CDefaultFaceShader();
-	default_face_shader->Init();
-	SetCurrentFaceShader(default_face_shader);
+	geometry_pass_shader = new CGeometryPassShader();
+	geometry_pass_shader->Init();
+	SetCurrentFaceShader(geometry_pass_shader);
+
+	light_pass_shader = new CLightPassShader();
+	light_pass_shader->Init();
 
 	skybox_shader = new CSkyBoxShader();
 	skybox_shader->Init();
@@ -57,7 +61,7 @@ void CEngine::Init(void)
 
 void CEngine::Destroy(void)
 {
-	delete default_face_shader;
+	delete geometry_pass_shader;
 	delete skybox_shader;
 	delete point_shadow_shader;
 	delete point_shadow_blur_shader;

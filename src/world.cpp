@@ -4,13 +4,17 @@
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletDynamics/Character/btKinematicCharacterController.h"
 
-CWorld::CWorld(void)
+CWorld::CWorld(int screen_width, int screen_height)
 {
+	this->screen_width = screen_width;
+	this->screen_height = screen_height;
 	ambient_color = Vec(0.1, 0.1, 0.1);
 	world_object = 0;
 	sky_box = 0;
 	camera = new CCamera();
 	camera_render_space = new CRenderSpace();
+
+	gbuffer = new CGBuffer(screen_width, screen_height);
 
 	physics.broadphase = new btDbvtBroadphase();
 	physics.collision_configuration = new btDefaultCollisionConfiguration();
@@ -65,7 +69,7 @@ void CWorld::RemoveObject(CObject *o)
 
 void CWorld::AddPointLight(CPointLight *light)
 {
-	if(point_lights.size() >= CFaceShader::max_point_lights)
+	if(point_lights.size() >= CLightPassShader::max_point_lights)
 		return;
 
 	for(vector<CPointLight *>::iterator i = point_lights.begin(); i != point_lights.end(); i++)
@@ -86,7 +90,7 @@ void CWorld::RemovePointLight(CPointLight *light)
 
 void CWorld::AddDirectionalLight(CDirectionalLight *light)
 {
-	if(dir_lights.size() >= CFaceShader::max_directional_lights)
+	if(dir_lights.size() >= CLightPassShader::max_directional_lights)
 		return;
 
 	for(vector<CDirectionalLight *>::iterator i = dir_lights.begin(); i != dir_lights.end(); i++)
@@ -258,7 +262,7 @@ void CWorld::Step(float time)
 }
 
 
-void CWorld::Render(int screen_width, int screen_height)
+void CWorld::Render(void)
 {
 	camera->SetAspect((float)screen_width / (float)screen_height);
 
@@ -301,9 +305,9 @@ void CWorld::Render(int screen_width, int screen_height)
 	dir_light_color = new float[camera_render_dir_lights.size() * 3];
 	dir_light_shadow_enabled = new int[camera_render_dir_lights.size()];
 	dir_light_shadow_clip = new float[camera_render_dir_lights.size() * 2];
-	dir_light_shadow_tex_matrix = new float[camera_render_dir_lights.size() * 16 * CFaceShader::max_directional_light_splits];
+	dir_light_shadow_tex_matrix = new float[camera_render_dir_lights.size() * 16 * CLightPassShader::max_directional_light_splits];
 	dir_light_shadow_splits_count = new float[camera_render_dir_lights.size()];
-	dir_light_shadow_splits_z = new float[camera_render_dir_lights.size() * (CFaceShader::max_directional_light_splits+1)];
+	dir_light_shadow_splits_z = new float[camera_render_dir_lights.size() * (CLightPassShader::max_directional_light_splits+1)];
 	dir_light_shadow_maps = new GLuint[camera_render_dir_lights.size()];
 
 	for(di=camera_render_dir_lights.begin(), i=0; di!=camera_render_dir_lights.end(); di++, i++)
@@ -320,10 +324,10 @@ void CWorld::Render(int screen_width, int screen_height)
 			dir_light_shadow_splits_count[i] = dir_light->GetShadow()->GetSplitsCount();
 			for(s=0; s<dir_light->GetShadow()->GetSplitsCount(); s++)
 			{
-				memcpy(dir_light_shadow_tex_matrix + i*16*CFaceShader::max_directional_light_splits + 16*s,
+				memcpy(dir_light_shadow_tex_matrix + i*16*CLightPassShader::max_directional_light_splits + 16*s,
 						dir_light->GetShadow()->GetTextureMatrix()[s], sizeof(float) * 16);
 			}
-			memcpy(dir_light_shadow_splits_z + i*(CFaceShader::max_directional_light_splits+1),
+			memcpy(dir_light_shadow_splits_z + i*(CLightPassShader::max_directional_light_splits+1),
 					dir_light->GetShadow()->GetSplitsZ(), sizeof(float) * (dir_light->GetShadow()->GetSplitsCount()+1));
 		}
 		else
@@ -336,35 +340,39 @@ void CWorld::Render(int screen_width, int screen_height)
 		}
 	}
 
+	GeometryPass();
+
+
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, screen_width, screen_height);
 
+	camera->SetModelviewProjectionMatrix();
+
+	if(sky_box)
+		sky_box->Paint(camera->GetPosition());
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(camera->GetAngle(), camera->GetAspect(), camera->GetNearClip(), camera->GetFarClip());
+	//gluPerspective(camera->GetAngle(), camera->GetAspect(), camera->GetNearClip(), camera->GetFarClip());
+	glOrtho(0.0, 1.0, 0.0, 1.0, 0.1, 2.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	CVector cam_to = camera->GetPosition() + camera->GetDirection();
-	CVector cam_pos = camera->GetPosition();
-	gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, cam_to.x, cam_to.y, cam_to.z, 0.0, 1.0, 0.0); //pos x, y, z, to x, y, z
+	gluLookAt(0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0); //pos x, y, z, to x, y, z
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
 
-	if(sky_box)
-		sky_box->Paint(cam_pos);
-
-	CEngine::SetCurrentFaceShader(CEngine::GetDefaultFaceShader());
-	CEngine::BindCurrentFaceShader();
-	CEngine::GetCurrentFaceShader()->SetPointLights(	camera_render_point_lights.size(),
+	CEngine::GetLightPassShader()->Bind();
+	CEngine::GetLightPassShader()->SetGBuffer(gbuffer);
+	CEngine::GetLightPassShader()->SetPointLights(	camera_render_point_lights.size(),
 														point_light_pos,
 														point_light_color,
 														point_light_distance,
 														point_light_shadow_enabled,
 														point_light_shadow_maps);
-	CEngine::GetCurrentFaceShader()->SetDirectionalLights(	camera_render_dir_lights.size(),
+	CEngine::GetLightPassShader()->SetDirectionalLights(	camera_render_dir_lights.size(),
 															dir_light_dir,
 															dir_light_color,
 															dir_light_shadow_enabled,
@@ -373,60 +381,45 @@ void CWorld::Render(int screen_width, int screen_height)
 															dir_light_shadow_tex_matrix,
 															dir_light_shadow_splits_count,
 															dir_light_shadow_splits_z);
-	CEngine::GetCurrentFaceShader()->SetLightAmbientColor(ambient_color);
-	CEngine::GetCurrentFaceShader()->SetTwoSide(0);
-	//CEngine::GetFaceShader()->SetClip(clip.v, clip.d);
+	CEngine::GetLightPassShader()->SetLightAmbientColor(ambient_color);
+	CEngine::GetLightPassShader()->SetCameraPosition(camera->GetPosition());
 
-	camera_render_space->Render();
+
+	glBegin(GL_QUADS);
+	glVertex2f(0.0, 1.0);
+	glVertex2f(0.0, 0.0);
+	glVertex2f(1.0, 0.0);
+	glVertex2f(1.0, 1.0);
+	glEnd();
 
 	CShader::Unbind();
-	glColor4f(0.0, 0.0, 1.0, 1.0);
-	glLineWidth(2.0);
-
-	/*  // Paint Bounding Boxes
-
-	vector<CObject *>::iterator o;
-	CBoundingBox b;
-	CVector minv, maxv;
-
-	for(o=objects.begin(); o!=objects.end(); o++) // TODO: Sort objects of CWorld by z-distance before painting
-	{
-		b = (*o)->GetBoundingBox();
-		minv = b.GetMin();
-		maxv = b.GetMax();
-
-		glBegin(GL_LINE_LOOP); // top
-		glVertex3f(minv.x, maxv.y, minv.z);
-		glVertex3f(minv.x, maxv.y, maxv.z);
-		glVertex3f(maxv.x, maxv.y, maxv.z);
-		glVertex3f(maxv.x, maxv.y, minv.z);
-		glEnd();
-
-		glBegin(GL_LINE_LOOP); // bottom
-		glVertex3f(minv.x, minv.y, minv.z);
-		glVertex3f(minv.x, minv.y, maxv.z);
-		glVertex3f(maxv.x, minv.y, maxv.z);
-		glVertex3f(maxv.x, minv.y, minv.z);
-		glEnd();
-
-		glBegin(GL_LINES); //connections
-		glVertex3f(minv.x, maxv.y, minv.z);
-		glVertex3f(minv.x, minv.y, minv.z);
-
-		glVertex3f(minv.x, maxv.y, maxv.z);
-		glVertex3f(minv.x, minv.y, maxv.z);
-
-		glVertex3f(maxv.x, maxv.y, maxv.z);
-		glVertex3f(maxv.x, minv.y, maxv.z);
-
-		glVertex3f(maxv.x, maxv.y, minv.z);
-		glVertex3f(maxv.x, minv.y, minv.z);
-		glEnd();
-	}*/
 
 	delete[] point_light_pos;
 	delete[] point_light_color;
 	delete[] point_light_distance;
+}
+
+
+void CWorld::GeometryPass(void)
+{
+	gbuffer->BindForDrawing();
+
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, screen_width, screen_height);
+
+	camera->SetModelviewProjectionMatrix();
+
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+
+	CEngine::SetCurrentFaceShader(CEngine::GetGeometryPassShader());
+	CEngine::BindCurrentFaceShader();
+
+	camera_render_space->Render();
+
+	CShader::Unbind();
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 /*void CWorld::PaintObjects(void) // TODO: Sort objects of CWorld by z-distance before painting

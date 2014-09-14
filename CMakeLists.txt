@@ -18,7 +18,8 @@ set(towerengine_SRC
 	src/boundingbox.cpp
 	src/transformationmatrix.cpp
 	src/face_shader.cpp 
-	src/default_face_shader.cpp
+	src/geometry_pass_shader.cpp
+	src/light_pass_shader.cpp
 	src/point_light.cpp 
 	src/directional_light.cpp 
 	src/point_light_shadow.cpp
@@ -36,6 +37,7 @@ set(towerengine_SRC
 	src/vector.cpp 
 	src/vertex.cpp 
 	src/renderspace.cpp
+	src/gbuffer.cpp
 	src/world.cpp
 	src/heightmap.cpp
 	src/terrain.cpp

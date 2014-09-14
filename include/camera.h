@@ -44,6 +44,8 @@ class CCamera
 		void SetClip(float n, float f)	{ near_clip = n; far_clip = f; }
 		void SetNearClip(float n)		{ near_clip = n; }
 		void SetFarClip(float f)		{ far_clip = f; }
+
+		void SetModelviewProjectionMatrix(void);
 };
 
 #endif

@@ -15,7 +15,7 @@ void main(void)
 	if(dist > light_dist_uni * light_dist_uni)
 		discard;
 	
-	dist = sqrt(dist) / light_dist_uni;
+	dist = sqrt(dist);
 	
 	gl_FragColor = vec4(dist, dist*dist, 0.0, 1.0);
 }

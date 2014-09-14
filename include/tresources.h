@@ -6,8 +6,10 @@
 #ifndef _INCLUDE_TRESOURCES_H
 #define _INCLUDE_TRESOURCES_H
 
-extern const char *default_face_shader_vert;
-extern const char *default_face_shader_frag;
+extern const char *geometry_pass_shader_vert;
+extern const char *geometry_pass_shader_frag;
+extern const char *light_pass_shader_vert;
+extern const char *light_pass_shader_frag;
 extern const char *cube_env_shader_vert;
 extern const char *cube_env_shader_frag;
 extern const char *point_shadow_shader_vert;

@@ -35,12 +35,11 @@ void CShader::InitShader(const char *vert_src, const char *frag_src, const char 
 	CreateVertexShader();
 	CreateFragmentShader();
 	CreateProgram();
-	LinkProgram();
 }
 
 GLint CShader::GetUniformLocation(const char *uniform)
 {
-	return glGetUniformLocation(program, uniform);
+	return glGetUniformLocationARB(program, uniform);
 }
 
 void CShader::Bind(void)

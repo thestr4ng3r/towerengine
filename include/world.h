@@ -12,6 +12,9 @@ private:
 	CSkyBox *sky_box;
 	CCamera *camera;
 
+	CGBuffer *gbuffer;
+	int screen_width, screen_height;
+
 	CRenderSpace *camera_render_space;
 	set<CPointLight *> camera_render_point_lights;
 	set<CDirectionalLight *> camera_render_dir_lights;
@@ -31,8 +34,10 @@ private:
 	void FillRenderSpaces(void);
 	void RenderShadowMaps(void);
 
+	void GeometryPass(void);
+
 public:
-	CWorld(void);
+	CWorld(int width, int height);
 	~CWorld(void);
 
 	void AddObject(CObject *o);
@@ -58,7 +63,7 @@ public:
 	void ClearDirectionalLights(void);
 
 	void Step(float time);
-	void Render(int screen_width, int screen_height);
+	void Render(void);
 };
 
 

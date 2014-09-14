@@ -100,7 +100,7 @@ class CMesh
 		int SaveToFile_old(const char *file);
 		//void SetOrientation(CVector o);
 		//CVector ApplyOrientation(CVector v) { return Orientation(v, orient_x, orient_y, orient_z); };
-		void PutToGL(int both_sides = 0);
+		void PutToGL(void);
 		int GetState(void);
 		void Create(void);
 		void Delete(void);

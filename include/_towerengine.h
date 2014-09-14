@@ -27,7 +27,9 @@ class CDirectionalLightShadow;
 #include "buffers.h"
 #include "shader.h"
 #include "face_shader.h"
-#include "default_face_shader.h"
+#include "geometry_pass_shader.h"
+#include "gbuffer.h"
+#include "light_pass_shader.h"
 #include "skybox_shader.h"
 #include "point_shadow_shader.h"
 #include "directional_shadow_shader.h"
@@ -52,7 +54,6 @@ class CDirectionalLightShadow;
 #include "point_light_shadow.h"
 #include "directional_light_shadow.h"
 #include "character_controller.h"
-#include "gbuffer.h"
 #include "world.h"
 
 #endif

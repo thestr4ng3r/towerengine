@@ -140,6 +140,18 @@ bool CCamera::TestBoundingBoxCulling(CBoundingBox b)
 	return false;
 }
 
+void CCamera::SetModelviewProjectionMatrix(void)
+{
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(angle, aspect, near_clip, far_clip);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	CVector to = pos + dir;
+	gluLookAt(pos.x, pos.y, pos.z, to.x, to.y, to.z, 0.0, 1.0, 0.0);
+}
+
 
 
 

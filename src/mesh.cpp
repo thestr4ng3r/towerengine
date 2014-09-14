@@ -563,7 +563,7 @@ void CMesh::RefreshIBOs(void)
 	refresh_ibos = false;
 }
 
-void CMesh::PutToGL(int both_sides)
+void CMesh::PutToGL(void)
 {
 	vector<CMaterial *>::iterator i;
 	VBO<float> *vertex_vbo, *vertex2_vbo;
@@ -629,7 +629,6 @@ void CMesh::PutToGL(int both_sides)
 		RefreshIBOs();
 
 	//CEngine::GetFaceShader()->BindShader();
-	CEngine::GetCurrentFaceShader()->SetTwoSide(both_sides);
 	CEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
 	glEnable(GL_BLEND);

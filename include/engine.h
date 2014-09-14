@@ -4,7 +4,8 @@
 class CEngine
 {
 private:
-	static CDefaultFaceShader *default_face_shader;
+	static CGeometryPassShader *geometry_pass_shader;
+	static CLightPassShader *light_pass_shader;
 	static CSkyBoxShader *skybox_shader;
 	static CPointShadowShader *point_shadow_shader;
 	static CPointShadowBlurShader *point_shadow_blur_shader;
@@ -19,7 +20,8 @@ public:
 	static void Init(void);
 	static void Destroy(void);
 
-	static CDefaultFaceShader *GetDefaultFaceShader(void)						{ return default_face_shader; }
+	static CGeometryPassShader *GetGeometryPassShader(void)						{ return geometry_pass_shader; }
+	static CLightPassShader *GetLightPassShader(void)							{ return light_pass_shader; }
 	static CSkyBoxShader *GetSkyBoxShader(void)									{ return skybox_shader; }
 	static CPointShadowShader *GetPointShadowShader(void)						{ return point_shadow_shader; }
 	static CPointShadowBlurShader *GetPointShadowBlurShader(void)				{ return point_shadow_blur_shader; }
