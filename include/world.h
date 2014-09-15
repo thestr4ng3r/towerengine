@@ -19,6 +19,22 @@ private:
 	set<CPointLight *> camera_render_point_lights;
 	set<CDirectionalLight *> camera_render_dir_lights;
 
+	struct render
+	{
+		GLuint fbo;
+		GLuint tex;
+		GLuint depth_rbo;
+
+		float *point_light_pos, *point_light_color, *point_light_distance;
+		int *point_light_shadow_enabled;
+		GLuint *point_light_shadow_maps;
+
+		float *dir_light_dir, *dir_light_color, *dir_light_shadow_clip, *dir_light_shadow_tex_matrix;
+		float *dir_light_shadow_splits_count, *dir_light_shadow_splits_z;
+		int *dir_light_shadow_enabled;
+		GLuint *dir_light_shadow_maps;
+	} render;
+
 	CVector ambient_color;
 
 	struct physics
@@ -35,6 +51,7 @@ private:
 	void RenderShadowMaps(void);
 
 	void GeometryPass(void);
+	void LightPass(void);
 
 public:
 	CWorld(int width, int height);

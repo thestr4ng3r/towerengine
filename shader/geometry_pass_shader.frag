@@ -50,7 +50,6 @@ void main(void)
 	}
 	
 
-	mat3 tangent_space = mat3(tang_var, bitang_var, normal_var);
 				
 	vec4 diffuse_color = vec4(1.0, 1.0, 1.0, 1.0);
 	
@@ -58,9 +57,13 @@ void main(void)
 		diffuse_color = texture2D(diffuse_tex_uni, uv_var).rgba;
 	diffuse_color *= vec4(diffuse_color_uni.rgb, 1.0) * diffuse_color2_uni;
 	
-	vec3 normal_tex_color = vec3(0.5, 0.5, 1.0);
 	if(normal_tex_enabled_uni)
-		normal_tex_color = texture2D(normal_tex_uni, uv_var).rgb;
+	{
+		vec3 normal_tex_color = texture2D(normal_tex_uni, uv_var).rgb;
+		normal_out = vec4(mat3(tang_var, bitang_var, normal_var) * ((normal_tex_color - vec3(0.5, 0.5, 0.5)) * 2.0), 1.0);
+	}
+	else
+		normal_out = vec4(normal_var, 1.0);
 			
 	vec3 specular_color = specular_color_uni;
 	if(specular_tex_enabled_uni)
@@ -68,7 +71,6 @@ void main(void)
 	
 	position_out = vec4(pos_var, 1.0);
 	diffuse_out = diffuse_color;
-	normal_out = vec4(tangent_space * ((normal_tex_color - vec3(0.5, 0.5, 0.5)) * 2.0), 1.0);
 	specular_out = vec4(specular_color, 1.0);
 	specular_exponent_out = vec4(specular_size_uni, 0.0, 0.0, 1.0);
 }

@@ -32,6 +32,7 @@ class CGBuffer
 		void BindForReading(void);
 
 		GLuint GetTexture(GBUFFER_TEXTURE_TYPE type)	{ return tex[type]; }
+		GLuint GetDepthTexture(void)					{ return depth_tex; }
 };
 
 

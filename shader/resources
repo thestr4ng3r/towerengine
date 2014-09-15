@@ -12,3 +12,5 @@ directional_shadow_shader_vert: shader/directional_shadow_shader.vert
 directional_shadow_shader_frag: shader/directional_shadow_shader.frag
 directional_shadow_blur_shader_vert: shader/directional_shadow_blur_shader.vert
 directional_shadow_blur_shader_frag: shader/directional_shadow_blur_shader.frag
+post_process_shader_vert: shader/post_process_shader.vert
+post_process_shader_frag: shader/post_process_shader.frag

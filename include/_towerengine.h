@@ -33,6 +33,7 @@ class CDirectionalLightShadow;
 #include "skybox_shader.h"
 #include "point_shadow_shader.h"
 #include "directional_shadow_shader.h"
+#include "post_process_shader.h"
 #include "skybox.h"
 #include "vertex.h"
 #include "triangle.h"

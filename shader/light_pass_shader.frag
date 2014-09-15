@@ -133,7 +133,7 @@ void main(void)
 			{
 				vec2 moments = DirectionalLightShadowLookup(i, vec3(coord, float(layer))).rg;
 											
-				float light_dot = dot(position.xyz - cam_pos_uni, -directional_light_dir_uni[i]); // / (directional_light_shadow_clip_uni[i].y - directional_light_shadow_clip_uni[i].x);
+				float light_dot = dot(position.xyz - cam_pos_uni, -directional_light_dir_uni[i]) / (directional_light_shadow_clip_uni[i].y - directional_light_shadow_clip_uni[i].x);
 
 				if(light_dot <= moments.x)
 					shadow = 1.0;

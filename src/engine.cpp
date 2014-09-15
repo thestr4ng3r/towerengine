@@ -9,6 +9,7 @@ CPointShadowBlurShader *CEngine::point_shadow_blur_shader = 0;
 CDirectionalShadowShader *CEngine::directional_shadow_shader = 0;
 CDirectionalShadowBlurShader *CEngine::directional_shadow_blur_shader = 0;
 CFaceShader *CEngine::current_face_shader = 0;
+CPostProcessShader *CEngine::post_process_shader = 0;
 
 const float CEngine::identity_matrix4[16] = { 1.0, 0.0, 0.0, 0.0,
 										  0.0, 1.0, 0.0, 0.0,
@@ -57,6 +58,9 @@ void CEngine::Init(void)
 
 	directional_shadow_blur_shader = new CDirectionalShadowBlurShader();
 	directional_shadow_blur_shader->Init();
+
+	post_process_shader = new CPostProcessShader();
+	post_process_shader->Init();
 }
 
 void CEngine::Destroy(void)

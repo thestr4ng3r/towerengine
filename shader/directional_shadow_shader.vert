@@ -21,7 +21,7 @@ void main(void)
 		vertex_pos = vertex_pos * (1.0 - vertex_mix_uni) + vertex2_attr * vertex_mix_uni;
 	vec4 pos = vec4(vertex_pos, 1.0) * transformation_uni;
 	
-	moment1_var = dot(pos.xyz - cam_pos_uni, light_dir_uni);
+	moment1_var = dot(pos.xyz - cam_pos_uni, light_dir_uni) / (clip_uni.y - clip_uni.x);
 	
 	gl_Position = gl_ModelViewProjectionMatrix * pos;
 }
