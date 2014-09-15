@@ -13,13 +13,13 @@ void CPostProcessShader::Init(void)
 
 void CPostProcessShader::SetTextures(GLuint color, GLuint depth, int width, int height)
 {
-	glUniform1iARB(color_tex_uniform, 0);
+	glUniform1i(color_tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, color);
 
-	glUniform1iARB(depth_tex_uniform, 1);
+	glUniform1i(depth_tex_uniform, 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depth);
 
-	glUniform2fARB(tex_pixel_uniform, 1.0 / (float)width, 1.0 / (float)height);
+	glUniform2f(tex_pixel_uniform, 1.0 / (float)width, 1.0 / (float)height);
 }

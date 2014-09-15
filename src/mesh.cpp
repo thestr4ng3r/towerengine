@@ -93,7 +93,7 @@ void CMesh::Create(void)
 	refresh_func = 0;
 	refresh_vbos = true;
 	refresh_ibos = true;
-	idle_material = new CMaterial(this, string());
+	idle_material = new CMeshMaterial(this, string());
 	//VAO::UnBind();
 
 	SetWireframe(0);
@@ -227,9 +227,9 @@ CEntity *CMesh::CreateEntity(string name, string group)
 	return e;
 }
 
-CMaterial *CMesh::GetMaterialByName(string name)
+CMeshMaterial *CMesh::GetMaterialByName(string name)
 {
-    vector<CMaterial *>::iterator m;
+    vector<CMeshMaterial *>::iterator m;
 
     for(m=materials.begin(); m!=materials.end(); m++)
     {
@@ -296,9 +296,9 @@ void CMesh::AddTriangle(CTriangle *t)
 	refresh_ibos = true;
 }
 
-void CMesh::AddMaterial(CMaterial *m)
+void CMesh::AddMaterial(CMeshMaterial *m)
 {
-	vector<CMaterial *>::iterator i;
+	vector<CMeshMaterial *>::iterator i;
 
 	for(i=materials.begin(); i!=materials.end(); i++)
 		if(*i == m)
@@ -355,9 +355,9 @@ void CMesh::RemoveTriangle(CTriangle *t)
 	//refresh_vbo = true;
 }
 
-void CMesh::RemoveMaterial(CMaterial *m)
+void CMesh::RemoveMaterial(CMeshMaterial *m)
 {
-	vector<CMaterial *>::iterator i;
+	vector<CMeshMaterial *>::iterator i;
 
 	for(i=materials.begin(); i!=materials.end(); i++)
 		if(*i == m)
@@ -475,7 +475,7 @@ btTriangleMesh *CMesh::GeneratePhysicsMesh(void)
 void CMesh::RefreshAllVBOs(void)
 {
 	vector<CTriangle *>::iterator i;
-	vector<CMaterial *>::iterator m;
+	vector<CMeshMaterial *>::iterator m;
 	vector<CVertex *>::iterator v;
 	CVertex *vt;
 	int d;
@@ -524,9 +524,9 @@ void CMesh::RefreshAllVBOs(void)
 void CMesh::RefreshIBOs(void)
 {
 	vector<CTriangle *>::iterator i;
-	vector<CMaterial *>::iterator m;
+	vector<CMeshMaterial *>::iterator m;
 	CTriangle *t;
-	CMaterial *mt;
+	CMeshMaterial *mt;
 	int c;
 	int j;
 
@@ -565,7 +565,7 @@ void CMesh::RefreshIBOs(void)
 
 void CMesh::PutToGL(void)
 {
-	vector<CMaterial *>::iterator i;
+	vector<CMeshMaterial *>::iterator i;
 	VBO<float> *vertex_vbo, *vertex2_vbo;
 	CKeyFrame *a, *b;
 	float mix;
@@ -790,31 +790,32 @@ CVertex *CMesh::ParseVertexNode(xmlNodePtr cur)
 #define TEXTURE_FILE 1
 #define TEXTURE_DATA 2
 
-CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
+CMeshMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 {
 	xmlNodePtr child;
-	int diffuse_mode, specular_mode, normal_mode;
-	string diffuse_file; float ambient; CVector diffuse_color;
+	int diffuse_mode, specular_mode, normal_mode, bump_mode;
+	string diffuse_file; CVector diffuse_color;
 	string specular_file; float exponent; CVector specular_color;
 	string normal_file;
+	string bump_file; float bump_depth;
 
-	unsigned char *diffuse_data, *specular_data, *normal_data;
-	size_t diffuse_size, specular_size, normal_size;
-	char *diffuse_ext, *specular_ext, *normal_ext;
+	unsigned char *diffuse_data, *specular_data, *normal_data, *bump_data;
+	size_t diffuse_size, specular_size, normal_size, bump_size;
+	char *diffuse_ext, *specular_ext, *normal_ext, *bump_ext;
 	char *base64_temp;
 
 	string name;
 	xmlChar *temp;
-	CMaterial *r;
+	CMeshMaterial *r;
 
-	diffuse_mode = specular_mode = normal_mode = TEXTURE_DISABLED;
-	diffuse_ext = specular_ext = normal_ext = 0;
-	diffuse_size = specular_size = normal_size = 0;
-	diffuse_data = specular_data = normal_data = 0;
-	ambient = 1.0;
+	diffuse_mode = specular_mode = normal_mode = bump_mode = TEXTURE_DISABLED;
+	diffuse_ext = specular_ext = normal_ext = bump_ext = 0;
+	diffuse_size = specular_size = normal_size = bump_size = 0;
+	diffuse_data = specular_data = normal_data = bump_data = 0;
 	diffuse_color = Vec(1.0, 1.0, 1.0);
 	specular_color = Vec(0.0, 0.0, 0.0);
 	exponent = 8.0;
+	bump_depth = 0.0;
 
 	name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
 
@@ -838,8 +839,6 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 				diffuse_mode = TEXTURE_DATA;
 			}
 
-			if((temp = xmlGetProp(child, (const xmlChar *)"ambient")))
-				ambient = atof((const char *)temp);
 			if((temp = xmlGetProp(child, (const xmlChar *)"r")))
 				diffuse_color.r = atof((const char *)temp);
 			if((temp = xmlGetProp(child, (const xmlChar *)"g")))
@@ -890,20 +889,35 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 			}
 
 		}
+		if(!xmlStrcmp(child->name, (const xmlChar *)"bump"))
+		{
+			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
+			{
+				bump_file = string((const char *)temp);
+				bump_mode = TEXTURE_FILE;
+			}
+			else if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			{
+				Base64Decode(base64_temp, &bump_data, &bump_size);
+				if((temp = xmlGetProp(child, (const xmlChar *)"image-extension")))
+					bump_ext = (char *)temp;
+				else
+					bump_ext = 0;
+				bump_mode = TEXTURE_DATA;
+			}
+			if((temp = xmlGetProp(child, (const xmlChar *)"depth")))
+				bump_depth = atof((const char *)temp);
+		}
+
 		child = child->next;
 	}
 
-	r = new CMaterial(this, name);
+	r = new CMeshMaterial(this, name);
 
-	if(diffuse_file.compare("$NONE") == 0)
-		diffuse_mode = TEXTURE_DISABLED;
-	if(specular_file.compare("$NONE") == 0)
-		specular_mode = TEXTURE_DISABLED;
-	if(normal_file.compare("$NONE") == 0)
-		normal_mode = TEXTURE_DISABLED;
 
-	r->SetDiffuse(diffuse_color, ambient);
+	r->SetDiffuse(diffuse_color);
 	r->SetSpecular(specular_color, exponent);
+	r->SetBump(bump_depth);
 
 
 	if(diffuse_mode == TEXTURE_FILE)
@@ -920,6 +934,11 @@ CMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 		r->LoadNormalTextureURL(string(path) + normal_file);
 	else if(normal_mode == TEXTURE_DATA)
 		r->LoadNormalTextureBinary(normal_ext, normal_data, normal_size);
+
+	if(bump_mode == TEXTURE_FILE)
+		r->LoadBumpTextureURL(string(path) + bump_file);
+	else if(bump_mode == TEXTURE_DATA)
+		r->LoadBumpTextureBinary(bump_ext, bump_data, bump_size);
 
 	return r;
 }
@@ -1098,7 +1117,7 @@ int CMesh::SaveToFile(const char *file)
 	int buffer_size;
 	int i;
 	
-	vector<CMaterial *>::iterator m;
+	vector<CMeshMaterial *>::iterator m;
 	vector<CVertex *>::iterator v;
 	CVertex *vt;
 	vector<CTriangle *>::iterator t;
@@ -1128,10 +1147,10 @@ int CMesh::SaveToFile(const char *file)
 		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)(*m)->GetName().c_str());
 
 
-		CMaterial::Diffuse diffuse = (*m)->GetDiffuse();
-		CMaterial::Specular specular = (*m)->GetSpecular();
-		CMaterial::Normal normal = (*m)->GetNormal();
-		CMaterial::Height height = (*m)->GetHeight();
+		CMeshMaterial::Diffuse diffuse = (*m)->GetDiffuse();
+		CMeshMaterial::Specular specular = (*m)->GetSpecular();
+		CMeshMaterial::Normal normal = (*m)->GetNormal();
+		CMeshMaterial::Height height = (*m)->GetHeight();
 
 		if(diffuse.enabled)
 		{
@@ -1549,7 +1568,7 @@ bool CompareTriangleMaterial(CTriangle *a, CTriangle *b)
 		return b->mat->GetTransparent() && !a->mat->GetTransparent();
 }
 
-bool CompareMaterialTransparency(CMaterial *a, CMaterial *b)
+bool CompareMaterialTransparency(CMeshMaterial *a, CMeshMaterial *b)
 {
 	if(b->GetTransparent() == a->GetTransparent())
 		return a < b;

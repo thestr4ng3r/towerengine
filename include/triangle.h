@@ -9,7 +9,7 @@ struct CTriangle
 	CVector normal[3];
 	CVector fnormal;
 	CVector tang, bitang;
-	CMaterial *mat;
+	CMeshMaterial *mat;
 	CVector color;
 	char *m_name;
 

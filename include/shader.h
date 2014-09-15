@@ -6,9 +6,9 @@ struct CShaderProgram
 	const char *vertex_src;
 	const char *fragment_src;
 
-	GLhandleARB vertex_shader;
-	GLhandleARB fragment_shader;
-	GLhandleARB program;
+	GLuint vertex_shader;
+	GLuint fragment_shader;
+	GLuint program;
 };
 
 class CShader : protected CShaderProgram
@@ -36,10 +36,10 @@ class CShader : protected CShaderProgram
 };
 
 
-void PrintGLInfoLog(const char *log_title, GLhandleARB handle);
-GLhandleARB CreateShader(GLenum type, const char *src, const char *name);
-GLhandleARB CreateShaderProgram(GLhandleARB vertex_shader, GLhandleARB fragment_shader);
-void LinkShaderProgram(GLhandleARB program);
+void PrintGLInfoLog(const char *log_title, GLuint handle);
+GLuint CreateShader(GLenum type, const char *src, const char *name);
+GLuint CreateShaderProgram(GLuint vertex_shader, GLuint fragment_shader);
+void LinkShaderProgram(GLuint program);
 
 GLuint LoadGLTexture(const char *filename, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);

@@ -75,7 +75,7 @@ template <class T> VBO<T>::VBO(int components, VAO *vao, int size)
 	data = 0;
 
 	vao->Bind();
-	glGenBuffersARB(1, &vbo);
+	glGenBuffers(1, &vbo);
 	VAO::UnBind();
 	this->vao = vao;
 

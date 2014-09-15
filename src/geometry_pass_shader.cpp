@@ -8,12 +8,12 @@ void CGeometryPassShader::Init(void)
 	CreateFragmentShader();
 	CreateProgram();
 
-	glBindAttribLocationARB(program, vertex_attribute, "vertex_attr");
-	glBindAttribLocationARB(program, vertex2_attribute, "vertex2_attr");
-	glBindAttribLocationARB(program, normal_attribute, "normal_attr");
-	glBindAttribLocationARB(program, tang_attribute, "tang_attr");
-	glBindAttribLocationARB(program, bitang_attribute, "bitang_attr");
-	glBindAttribLocationARB(program, uvcoord_attribute, "uv_attr");
+	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
+	glBindAttribLocation(program, vertex2_attribute, "vertex2_attr");
+	glBindAttribLocation(program, normal_attribute, "normal_attr");
+	glBindAttribLocation(program, tang_attribute, "tang_attr");
+	glBindAttribLocation(program, bitang_attribute, "bitang_attr");
+	glBindAttribLocation(program, uvcoord_attribute, "uv_attr");
 
 	LinkProgram();
 
@@ -23,19 +23,19 @@ void CGeometryPassShader::Init(void)
 	diffuse_color2_uniform = GetUniformLocation("diffuse_color2_uni");
 	specular_color_uniform = GetUniformLocation("specular_color_uni");
 
-
-
 	specular_size_uniform = GetUniformLocation("specular_size_uni");
+
+	bump_depth_uniform = GetUniformLocation("bump_depth_uni");
 
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
-	//height_tex_uniform = GetUniformLocation("height_tex_uni");
 	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
+	bump_tex_uniform = GetUniformLocation("bump_tex_uni");
 
 	diffuse_tex_enabled_uniform = GetUniformLocation("diffuse_tex_enabled_uni");
 	normal_tex_enabled_uniform = GetUniformLocation("normal_tex_enabled_uni");
-	//height_tex_enabled_uniform = GetUniformLocation("height_tex_enabled_uni");
 	specular_tex_enabled_uniform = GetUniformLocation("specular_tex_enabled_uni");
+	bump_tex_enabled_uniform = GetUniformLocation("bump_tex_enabled_uni");
 
 	transformation_uniform = GetUniformLocation("transformation_uni");
 
@@ -50,25 +50,25 @@ void CGeometryPassShader::Init(void)
 void CGeometryPassShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
-		glUniformMatrix4fvARB(transformation_uniform, 1, GL_FALSE, m);
+		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
 void CGeometryPassShader::SetDiffuseColor(CVector color)
 {
 	if(diffuse_color_uniform != -1)
-		glUniform3fARB(diffuse_color_uniform, color.x, color.y, color.z);
+		glUniform3f(diffuse_color_uniform, color.x, color.y, color.z);
 }
 
 void CGeometryPassShader::SetDiffuseColor2(CVector color, float alpha)
 {
 	if(diffuse_color2_uniform != -1)
-		glUniform4fARB(diffuse_color2_uniform, color.x, color.y, color.z, alpha);
+		glUniform4f(diffuse_color2_uniform, color.x, color.y, color.z, alpha);
 }
 
 void CGeometryPassShader::SetSpecularColor(CVector color)
 {
 	if(specular_color_uniform != -1)
-		glUniform3fARB(specular_color_uniform, color.x, color.y, color.z);
+		glUniform3f(specular_color_uniform, color.x, color.y, color.z);
 }
 
 
@@ -82,11 +82,11 @@ void CGeometryPassShader::SetSpecular(float size)
 
 void CGeometryPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
 {
-	glUniform1iARB(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
+	glUniform1i(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
 
 	if(enabled)
 	{
-		glUniform1iARB(diffuse_tex_uniform, diffuse_tex_unit);
+		glUniform1i(diffuse_tex_uniform, diffuse_tex_unit);
 		glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
@@ -94,11 +94,11 @@ void CGeometryPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
 
 void CGeometryPassShader::SetSpecularTexture(bool enabled, GLuint tex)
 {
-	glUniform1iARB(specular_tex_enabled_uniform, enabled ? 1 : 0);
+	glUniform1i(specular_tex_enabled_uniform, enabled ? 1 : 0);
 
 	if(enabled)
 	{
-		glUniform1iARB(specular_tex_uniform, specular_tex_unit);
+		glUniform1i(specular_tex_uniform, specular_tex_unit);
 		glActiveTexture(GL_TEXTURE0 + specular_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
@@ -107,33 +107,38 @@ void CGeometryPassShader::SetSpecularTexture(bool enabled, GLuint tex)
 
 void CGeometryPassShader::SetNormalTexture(bool enabled, GLuint tex)
 {
-	glUniform1iARB(normal_tex_enabled_uniform, enabled ? 1 : 0);
+	glUniform1i(normal_tex_enabled_uniform, enabled ? 1 : 0);
 
 	if(enabled)
 	{
-		glUniform1iARB(normal_tex_uniform, normal_tex_unit);
+		glUniform1i(normal_tex_uniform, normal_tex_unit);
 		glActiveTexture(GL_TEXTURE0 + normal_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
 
 }
 
-/*void CDefaultFaceShader::SetHeightTexture(bool enabled, GLuint tex)
+void CGeometryPassShader::SetBumpDepth(float depth)
 {
-	glUniform1iARB(height_tex_enabled_uniform, enabled ? 1 : 0);
+	glUniform1f(bump_depth_uniform, depth);
+}
+
+void CGeometryPassShader::SetBumpTexture(bool enabled, GLuint tex)
+{
+	glUniform1i(bump_tex_enabled_uniform, enabled ? 1 : 0);
 
 	if(enabled)
 	{
-		glUniform1iARB(height_tex_uniform, height_tex_unit);
-		glActiveTexture(GL_TEXTURE0 + height_tex_unit);
+		glUniform1i(bump_tex_uniform, bump_tex_unit);
+		glActiveTexture(GL_TEXTURE0 + bump_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
-}*/
+}
 
 
 void CGeometryPassShader::SetTexCoord(CVector2 coord)
 {
-	glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, coord.v);
+	glMultiTexCoord2fv(GL_TEXTURE0, coord.v);
 }
 
 

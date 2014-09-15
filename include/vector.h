@@ -36,9 +36,9 @@ struct CVector
 	void Normalize(void)		{ float l; l = 1.0 / Len(); x *= l; y *= l; z *= l; };
 	void PutToGL(void) const	{ glVertex3fv(v); };
 	void NormalToGL(void) const	{ glNormal3fv(v); };
-	void TexcoordToGL(void) const	{ glMultiTexCoord3fvARB(GL_TEXTURE0_ARB, v); };
-	void TangXToGL(void) const	{ glMultiTexCoord3fvARB(GL_TEXTURE1_ARB, v); };
-	void TangYToGL(void) const	{ glMultiTexCoord3fvARB(GL_TEXTURE2_ARB, v); };
+	void TexcoordToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE0, v); };
+	void TangXToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE1, v); };
+	void TangYToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE2, v); };
 	void AttrToGL(int which) const             { glVertexAttrib3fv(which, v); };
 	void SetFromPlane(const CVector2 &p, const CVector &n, float d);
 	CVector operator -(void) const	{CVector r; r.x = -x, r.y = -y, r.z = -z; return r; };

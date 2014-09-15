@@ -7,8 +7,8 @@ void CPointShadowShader::Init(void)
 	CreateVertexShader();
 	CreateFragmentShader();
 	CreateProgram();
-	glBindAttribLocationARB(program, CFaceShader::vertex_attribute, "vertex_attr");
-	glBindAttribLocationARB(program, CFaceShader::vertex2_attribute, "vertex2_attr");
+	glBindAttribLocation(program, CFaceShader::vertex_attribute, "vertex_attr");
+	glBindAttribLocation(program, CFaceShader::vertex2_attribute, "vertex2_attr");
 	LinkProgram();
 
 	light_pos_uniform = GetUniformLocation("light_pos_uni");
@@ -32,7 +32,7 @@ void CPointShadowShader::SetLightDist(float d)
 void CPointShadowShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
-		glUniformMatrix4fvARB(transformation_uniform, 1, GL_FALSE, m);
+		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
 void CPointShadowShader::SetVertexMix(float m)
@@ -53,7 +53,7 @@ void CPointShadowBlurShader::Init(void)
 	CreateProgram();
 	LinkProgram();
 
-	glBindAttribLocationARB(program, vertex_attribute, "vertex_attr");
+	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 
 	tex_uniform = GetUniformLocation("tex_uni");
 	blur_dir_uniform = GetUniformLocation("blur_dir_uni");
@@ -64,7 +64,7 @@ void CPointShadowBlurShader::Init(void)
 void CPointShadowBlurShader::SetTexture(GLuint tex)
 {
 	glUniform1i(tex_uniform, 0);
-	glActiveTextureARB(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 }
 

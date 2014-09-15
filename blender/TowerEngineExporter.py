@@ -55,7 +55,8 @@ class TowerEngineExporter(bpy.types.Operator, ExportHelper):
 				continue
 				
 		for material in materials.values():
-			diffuse_tex = specular_tex = normal_tex = None
+			diffuse_tex = specular_tex = normal_tex = bump_tex = None
+			bump_factor = 0.0
 			
 			for tex_slot in material.texture_slots:
 				if tex_slot == None:
@@ -70,8 +71,11 @@ class TowerEngineExporter(bpy.types.Operator, ExportHelper):
 					specular_tex = texture
 				if tex_slot.use_map_normal:
 					normal_tex = texture
+				if tex_slot.use_map_displacement:
+					bump_tex = texture
+					bump_factor = tex_slot.displacement_factor
 					
-			if self.include_tex_prop == False and (diffuse_tex != None or specular_tex != None or normal_tex != None):
+			if self.include_tex_prop == False and (diffuse_tex != None or specular_tex != None or normal_tex != None or bump_tex != None):
 				tex_path = os.path.join(path, os.path.basename(self.filepath) + "_tex", material.name)
 				try:
 					os.makedirs(tex_path)
@@ -114,7 +118,7 @@ class TowerEngineExporter(bpy.types.Operator, ExportHelper):
 				if specular_tex != None:
 					file_extension = specular_tex.image.filepath.split(".")[-1]
 					if self.include_tex_prop == False:
-						tex_file = os.path.join(tex_path, "specular." + specular_tex.image.filepath.split(".")[-1])
+						tex_file = os.path.join(tex_path, "specular." + file_extension)
 						try:
 							shutil.copy(bpy.path.abspath(specular_tex.image.filepath), tex_file)
 						except OSError as e:
@@ -140,7 +144,7 @@ class TowerEngineExporter(bpy.types.Operator, ExportHelper):
 				file_extension = normal_tex.image.filepath.split(".")[-1]
 				node2 = doc.createElement("normal")
 				if self.include_tex_prop == False:
-					tex_file = os.path.join(tex_path, "normal." + normal_tex.image.filepath.split(".")[-1])
+					tex_file = os.path.join(tex_path, "normal." + file_extension)
 					try:
 						shutil.copy(bpy.path.abspath(normal_tex.image.filepath), tex_file)
 					except OSError as e:
@@ -157,6 +161,29 @@ class TowerEngineExporter(bpy.types.Operator, ExportHelper):
 					node2.setAttribute("image-extension", file_extension)
 
 
+				node.appendChild(node2)
+				
+			if bump_tex != None:
+				file_extension = bump_tex.image.filepath.split(".")[-1]
+				node2 = doc.createElement("bump")
+				if self.include_tex_prop == False:
+					tex_file = os.path.join(tex_path, "bump." + file_extension)
+					try:
+						shutil.copy(bpy.path.abspath(bump_tex.image.filepath), tex_file)
+					except OSError as e:
+						print(str(e))
+					except IOError as e:
+						print(str(e))
+					node2.setAttribute("file", os.path.relpath(tex_file, path))
+				else:
+					with open(bpy.path.abspath(bump_tex.image.filepath), "rb") as image_file:
+						image_data = image_file.read()
+						image_base64 = base64.b64encode(image_data)
+						image_text = doc.createTextNode(image_base64.decode("utf-8"))
+						node2.appendChild(image_text)
+					node2.setAttribute("image-extension", file_extension)
+					
+				node2.setAttribute("depth", str(bump_factor))
 				node.appendChild(node2)
 
 			root.appendChild(node)

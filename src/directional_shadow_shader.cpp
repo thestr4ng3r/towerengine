@@ -7,8 +7,8 @@ void CDirectionalShadowShader::Init(void)
 	CreateVertexShader();
 	CreateFragmentShader();
 	CreateProgram();
-	glBindAttribLocationARB(program, CFaceShader::vertex_attribute, "vertex_attr");
-	glBindAttribLocationARB(program, CFaceShader::vertex2_attribute, "vertex2_attr");
+	glBindAttribLocation(program, CFaceShader::vertex_attribute, "vertex_attr");
+	glBindAttribLocation(program, CFaceShader::vertex2_attribute, "vertex2_attr");
 	LinkProgram();
 
 	light_dir_uniform = GetUniformLocation("light_dir_uni");
@@ -28,7 +28,7 @@ void CDirectionalShadowShader::SetLightDir(CVector v)
 void CDirectionalShadowShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
-		glUniformMatrix4fvARB(transformation_uniform, 1, GL_FALSE, m);
+		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
 void CDirectionalShadowShader::SetVertexMix(float m)
@@ -54,8 +54,8 @@ void CDirectionalShadowBlurShader::Init(void)
 {
 	InitShader(directional_shadow_blur_shader_vert, directional_shadow_blur_shader_frag, "Directional Shadow Blur Shader");
 
-	glBindAttribLocationARB(program, vertex_attribute, "vertex_attr");
-	glBindAttribLocationARB(program, uv_coord_attribute, "uv_coord_attr");
+	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
+	glBindAttribLocation(program, uv_coord_attribute, "uv_coord_attr");
 
 	LinkProgram();
 
@@ -70,7 +70,7 @@ void CDirectionalShadowBlurShader::Init(void)
 void CDirectionalShadowBlurShader::SetTexture(GLuint tex)
 {
 	glUniform1i(tex_uniform, 0);
-	glActiveTextureARB(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
 }
 

@@ -21,6 +21,8 @@ out vec3 tang_var;
 out vec3 bitang_var;
 out vec2 uv_var;
 
+out vec3 cam_dir_var;
+
 
 void main(void)
 {
@@ -33,6 +35,7 @@ void main(void)
 	tang_var = normalize(tang_attr * mat3(transformation_uni));
 	bitang_var = normalize(bitang_attr * mat3(transformation_uni));
 	uv_var = uv_attr;
+	cam_dir_var = gl_ModelViewMatrixInverse[3].xyz - pos.xyz;
 	
 	gl_Position = gl_ModelViewProjectionMatrix * pos;
 }

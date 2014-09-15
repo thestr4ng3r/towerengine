@@ -15,9 +15,9 @@ void CSkyBoxShader::Init(void)
 
 void CSkyBoxShader::SetCubeMap(GLuint tex)
 {
-	glUniform1iARB(tex_uniform, 0);
+	glUniform1i(tex_uniform, 0);
 
-	glActiveTextureARB(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 }
 
@@ -132,7 +132,7 @@ GLuint CreateCubeTexture(GLenum type, int width, int height)
 	GLuint tex;
 
 	glGenTextures(1, &tex);
-	glActiveTextureARB(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(type, tex);
 	glTexParameterf(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

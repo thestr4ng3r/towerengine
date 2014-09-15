@@ -1,19 +1,9 @@
 #include "towerengine.h"
 
-CMaterial::CMaterial(CMesh *mesh, string name)
+CMaterial::CMaterial(void)
 {
-	ibo_data = 0;
-	triangle_count = 0;
-	triangle_i = 0;
-
-    this->mesh = mesh;
-    this->name = name;
-	mesh->AddMaterial(this);
-	ibo = mesh->CreateIBO();
-
 	diffuse.enabled = false;
 	diffuse.color.Set(1.0, 1.0, 1.0);
-	diffuse.ambient = 1.0;
     diffuse.tex = 0;
     transparent = false;
 
@@ -24,6 +14,10 @@ CMaterial::CMaterial(CMesh *mesh, string name)
 
 	normal.enabled = false;
 	normal.tex = 0;
+
+	bump.enabled = false;
+	bump.tex = 0;
+	bump.depth = 0;
 }
 
 CMaterial::~CMaterial(void)
@@ -34,15 +28,11 @@ CMaterial::~CMaterial(void)
 		glDeleteTextures(1, &specular.tex);
 	if(normal.tex != 0)
 		glDeleteTextures(1, &normal.tex);
-
-	if(mesh)
-		mesh->RemoveMaterial(this);
 }
 
-void CMaterial::SetDiffuse(CVector color, float ambient)
+void CMaterial::SetDiffuse(CVector color)
 {
 	diffuse.color = color;
-	diffuse.ambient = ambient;
 }
 
 void CMaterial::SetSpecular(CVector color, float exponent)
@@ -51,6 +41,10 @@ void CMaterial::SetSpecular(CVector color, float exponent)
 	specular.exponent = exponent;
 }
 
+void CMaterial::SetBump(float depth)
+{
+	bump.depth = depth;
+}
 
 void CMaterial::LoadDiffuseTextureURL(string file)
 {
@@ -82,6 +76,16 @@ void CMaterial::LoadNormalTextureURL(string file)
 	}
 }
 
+void CMaterial::LoadBumpTextureURL(string file)
+{
+	struct stat s;
+	if(stat(file.c_str(), &s) == 0)
+	{
+		bump.enabled = true;
+		bump.tex = LoadGLTexture(file.c_str());
+	}
+}
+
 void CMaterial::LoadDiffuseTextureBinary(const char *extension, const void *data, unsigned int size)
 {
 	diffuse.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
@@ -100,15 +104,20 @@ void CMaterial::LoadNormalTextureBinary(const char *extension, const void *data,
 	normal.enabled = normal.tex ? 1 : 0;
 }
 
+void CMaterial::LoadBumpTextureBinary(const char *extension, const void *data, unsigned int size)
+{
+	bump.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
+	bump.enabled = bump.tex ? 1 : 0;
+}
+
 void CMaterial::PutToGL(void)
 {
 	CEngine::GetCurrentFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse.tex);
 	CEngine::GetCurrentFaceShader()->SetSpecularTexture(specular.enabled, specular.tex);
 	CEngine::GetCurrentFaceShader()->SetNormalTexture(normal.enabled, normal.tex);
+	CEngine::GetCurrentFaceShader()->SetBumpTexture(bump.enabled, bump.tex);
 	CEngine::GetCurrentFaceShader()->SetDiffuseColor(diffuse.color);
 	CEngine::GetCurrentFaceShader()->SetSpecularColor(specular.color);
 	CEngine::GetCurrentFaceShader()->SetSpecular(specular.exponent);
-	CEngine::GetCurrentFaceShader()->SetAmbient(diffuse.ambient);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	CEngine::GetCurrentFaceShader()->SetBumpDepth(bump.depth);
 }

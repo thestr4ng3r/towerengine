@@ -9,12 +9,12 @@ void CShader::SetSource(const char *vertex, const char *fragment)
 
 void CShader::CreateVertexShader(void)
 {
-	vertex_shader = CreateShader(GL_VERTEX_SHADER_ARB, vertex_src, name);
+	vertex_shader = CreateShader(GL_VERTEX_SHADER, vertex_src, name);
 }
 
 void CShader::CreateFragmentShader(void)
 {
-	fragment_shader = CreateShader(GL_FRAGMENT_SHADER_ARB, fragment_src, name);
+	fragment_shader = CreateShader(GL_FRAGMENT_SHADER, fragment_src, name);
 }
 
 void CShader::CreateProgram(void)
@@ -39,32 +39,32 @@ void CShader::InitShader(const char *vert_src, const char *frag_src, const char 
 
 GLint CShader::GetUniformLocation(const char *uniform)
 {
-	return glGetUniformLocationARB(program, uniform);
+	return glGetUniformLocation(program, uniform);
 }
 
 void CShader::Bind(void)
 {
-	glUseProgramObjectARB(program);
+	glUseProgram(program);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void CShader::Unbind(void)
 {
-	glUseProgramObjectARB(0);
+	glUseProgram(0);
 }
 
-void PrintGLInfoLog(const char *log_title, GLhandleARB handle, const char *shader_name = 0)
+void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_name = 0)
 {
 	GLchar *string;
 	GLint size;
 
 	size = 0;
-	glGetObjectParameterivARB(handle, GL_OBJECT_INFO_LOG_LENGTH_ARB, &size);
+	glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &size);
 	if(size > 1)
 	{
 		string = new GLchar [size];
-		glGetInfoLogARB(handle, size, &size, string);
+		glGetProgramInfoLog(handle, size, &size, string);
 		printf("%s info log", log_title);
 		if(shader_name != 0)
 			 printf("for %s:\n", shader_name);
@@ -75,12 +75,12 @@ void PrintGLInfoLog(const char *log_title, GLhandleARB handle, const char *shade
 }
 
 
-GLhandleARB CreateShader(GLenum type, const char *src, const char *name)
+GLuint CreateShader(GLenum type, const char *src, const char *name)
 {
-	GLhandleARB s;
+	GLuint s;
 	GLint len;
 	
-	s = glCreateShaderObjectARB(type);
+	s = glCreateShader(type);
 	if(!s)
 	{
 		printf("Could not create shader!\n");
@@ -89,28 +89,28 @@ GLhandleARB CreateShader(GLenum type, const char *src, const char *name)
 
 
 	len = strlen(src);
-	glShaderSourceARB(s, 1, &src, &len);
+	glShaderSource(s, 1, &src, &len);
 
-	glCompileShaderARB(s);
+	glCompileShader(s);
 	PrintGLInfoLog("Compile", s, name);
 
 	return s;
 }
 
-GLhandleARB CreateShaderProgram(GLhandleARB vertex_shader, GLhandleARB fragment_shader)
+GLuint CreateShaderProgram(GLuint vertex_shader, GLuint fragment_shader)
 {
-	GLhandleARB p;
+	GLuint p;
 
-	p = glCreateProgramObjectARB();
-	glAttachObjectARB(p, vertex_shader);
-	glAttachObjectARB(p, fragment_shader);
+	p = glCreateProgram();
+	glAttachShader(p, vertex_shader);
+	glAttachShader(p, fragment_shader);
 
 	return p;
 }
 
-void LinkShaderProgram(GLhandleARB program)
+void LinkShaderProgram(GLuint program)
 {
-	glLinkProgramARB(program);
+	glLinkProgram(program);
 	//PrintGLInfoLog("Link", program);
 }
 

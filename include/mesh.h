@@ -44,11 +44,11 @@ class CMesh
 
 		CMeshPose *idle_pose;
 
-		CMaterial *idle_material;
+		CMeshMaterial *idle_material;
 
 		vector<CVertex *> vertices;
 		vector<CTriangle *> triangles;
-		vector<CMaterial *> materials;
+		vector<CMeshMaterial *> materials;
 		map<string, CMeshPose *> custom_pose;
 		vector<CAnimation *> animations;
 		vector<CEntity *> entities;
@@ -67,7 +67,7 @@ class CMesh
 		void DeleteVBOData(void);
 
 		CVertex *ParseVertexNode(xmlNodePtr cur);
-		CMaterial *ParseMaterialNode(xmlNodePtr cur, const char *path);
+		CMeshMaterial *ParseMaterialNode(xmlNodePtr cur, const char *path);
 		CTriangle *ParseTriangleNode(xmlNodePtr cur);
 		CMeshPose *ParsePoseNode(xmlNodePtr cur);
 		CAnimation *ParseAnimationNode(xmlNodePtr cur);
@@ -117,12 +117,12 @@ class CMesh
 
 		CVertex *GetVertex(int i)					{ return vertices.at(i); }
 		CTriangle *GetTriangle(int i)				{ return triangles.at(i); }
-		CMaterial *GetMaterial(int i)				{ return materials.at(i); }
+		CMeshMaterial *GetMaterial(int i)				{ return materials.at(i); }
 		CMeshPose *GetCustomPose(string s) 			{ return custom_pose.at(s); }
 		CAnimation *GetAnimation(int i)				{ return animations.at(i); }
 		CEntity *GetEntity(int i)					{ return entities.at(i); }
 
-		CMaterial *GetIdleMaterial(void)			{ return idle_material; }
+		CMeshMaterial *GetIdleMaterial(void)			{ return idle_material; }
 
 		map<string, CEntity *> GetEntitiesInGroup(const char *group = "");
 
@@ -130,13 +130,13 @@ class CMesh
 
 		void AddVertex(CVertex *v);
 		void AddTriangle(CTriangle *t);
-		void AddMaterial(CMaterial *m);
+		void AddMaterial(CMeshMaterial *m);
 		void AddCustomPose(string name, CMeshPose *p);
 		void AddAnimation(CAnimation *a);
 
 		void RemoveVertex(CVertex *v);
 		void RemoveTriangle(CTriangle *t);
-		void RemoveMaterial(CMaterial *m);
+		void RemoveMaterial(CMeshMaterial *m);
 		void RemoveCustomPose(string name);
 		void RemoveAnimation(CAnimation *a);
 		void RemoveEntity(CEntity *e);
@@ -181,7 +181,7 @@ class CMesh
 		void ChangePose(CMeshPose *pos);
 		void CopyPoseFromVertices(void);
 
-		CMaterial *GetMaterialByName(string name);
+		CMeshMaterial *GetMaterialByName(string name);
 		CVertex *GetVertexByID(int id);
 
 		void SetVertexId(CVertex *v, int id);

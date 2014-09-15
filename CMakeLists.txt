@@ -48,6 +48,7 @@ set(towerengine_SRC
 	src/directional_shadow_shader.cpp
 	src/character_controller.cpp
 	src/post_process_shader.cpp
+	src/mesh_material.cpp
 	oglft/OGLFT.cpp)
 
 add_definitions(-g -Wall)

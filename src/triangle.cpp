@@ -87,18 +87,23 @@ void CTriangle::CalculateNormalSolid(void)
 
 void CTriangle::CalculateTangents(void)
 {
-	CVector2 uv_edge1 = v[1]->uv - v[0]->uv;
-	CVector2 uv_edge2 = v[2]->uv - v[0]->uv;
 	CVector edge1 = *v[1] - *v[0];
 	CVector edge2 = *v[2] - *v[0];
+	CVector2 uv_edge1 = v[1]->uv - v[0]->uv;
+	CVector2 uv_edge2 = v[2]->uv - v[0]->uv;
 
-	float b = uv_edge1.y * uv_edge2.x - uv_edge1.x * uv_edge2.y;
+	float r = uv_edge1.x * uv_edge2.y - uv_edge2.x * uv_edge1.y;
 
-	if(b != 0.0f)
+	if(r != 0.0)
 	{
-		float m = 1.0 / b;
-		tang = (edge1 * -uv_edge2.y + edge2 * uv_edge1.y) * m;
-		bitang = (edge1 * -uv_edge2.x + edge2 * uv_edge1.x) * m;
+		r = 1.0 / r;
+
+		tang = Vec(	uv_edge2.y * edge1.x - uv_edge1.y * edge2.x,
+					uv_edge2.y * edge1.y - uv_edge1.y * edge2.y,
+					uv_edge2.y * edge1.z - uv_edge1.y * edge2.z) * r;
+		bitang = Vec(	uv_edge1.x * edge2.x - uv_edge2.x * edge1.x,
+						uv_edge1.x * edge2.y - uv_edge2.x * edge1.y,
+						uv_edge1.x * edge2.z - uv_edge2.x * edge1.z) * r;
 	}
 	else
 	{

@@ -14,13 +14,17 @@ class CGeometryPassShader : public CFaceShader
 
 		GLint specular_size_uniform; // TODO: in exponent umbenennen
 
+		GLint bump_depth_uniform;
+
 		GLint diffuse_tex_enabled_uniform;
 		GLint normal_tex_enabled_uniform;
 		GLint specular_tex_enabled_uniform;
+		GLint bump_tex_enabled_uniform;
 
 		GLint diffuse_tex_uniform;
 		GLint normal_tex_uniform;
 		GLint specular_tex_uniform;
+		GLint bump_tex_uniform;
 
 		GLint clip_uniform;
 		GLint clip_dist_uniform;
@@ -38,10 +42,10 @@ class CGeometryPassShader : public CFaceShader
 		void SetDiffuseTexture(bool enabled, GLuint tex = 0);
 		void SetSpecularTexture(bool enabled, GLuint tex = 0);
 		void SetNormalTexture(bool enabled, GLuint tex = 0);
-		void SetHeightTexture(bool enabled, GLuint tex = 0);
+		void SetBumpTexture(bool enabled, GLuint tex = 0);
 		void SetTexCoord(CVector2 coord);
 		void SetVectors(CVector normal, CVector tangx, CVector tangy, CVector fnormal = Vec(0.0, 0.0, 0.0));
-		void SetBumpFactor(float f);
+		void SetBumpDepth(float depth);
 		void SetTransformation(const float m[16]);
 		void SetVertexMix(float m = 0.0);
 		void ResetUniforms(void);
