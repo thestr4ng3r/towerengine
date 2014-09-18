@@ -12,28 +12,9 @@ private:
 	CSkyBox *sky_box;
 	CCamera *camera;
 
-	CGBuffer *gbuffer;
-	int screen_width, screen_height;
-
 	CRenderSpace *camera_render_space;
 	set<CPointLight *> camera_render_point_lights;
 	set<CDirectionalLight *> camera_render_dir_lights;
-
-	struct render
-	{
-		GLuint fbo;
-		GLuint tex;
-		GLuint depth_rbo;
-
-		float *point_light_pos, *point_light_color, *point_light_distance;
-		int *point_light_shadow_enabled;
-		GLuint *point_light_shadow_maps;
-
-		float *dir_light_dir, *dir_light_color, *dir_light_shadow_clip, *dir_light_shadow_tex_matrix;
-		float *dir_light_shadow_splits_count, *dir_light_shadow_splits_z;
-		int *dir_light_shadow_enabled;
-		GLuint *dir_light_shadow_maps;
-	} render;
 
 	CVector ambient_color;
 
@@ -46,15 +27,8 @@ private:
 		btDiscreteDynamicsWorld *dynamics_world;
 	} physics;
 
-	//void PaintObjects(void);
-	void FillRenderSpaces(void);
-	void RenderShadowMaps(void);
-
-	void GeometryPass(void);
-	void LightPass(void);
-
 public:
-	CWorld(int width, int height);
+	CWorld(void);
 	~CWorld(void);
 
 	void AddObject(CObject *o);
@@ -80,7 +54,14 @@ public:
 	void ClearDirectionalLights(void);
 
 	void Step(float time);
-	void Render(void);
+
+	void GetPointLightUniforms(int &count, float *pos, float *color, float *distance, int *shadow_enabled, GLuint *shadow_maps);
+	void GetDirectionalLightUniforms(int &count, float *dir, float *color, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z, int *shadow_enabled, GLuint *shadow_maps);
+
+	void FillRenderSpaces(void);
+	void RenderShadowMaps(void);
+	CRenderSpace *GetCameraRenderSpace(void)	{ return camera_render_space; }
+	CSkyBox *GetSkyBox(void)					{ return sky_box; }
 };
 
 

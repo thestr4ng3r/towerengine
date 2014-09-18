@@ -2,6 +2,8 @@
 
 #define MAX_LAYERS 8
 
+#define GAUSSIAN_BLUR
+
 out vec4 tex_out[MAX_LAYERS]; 
 
 uniform sampler2DArray tex_uni;

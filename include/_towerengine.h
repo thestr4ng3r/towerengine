@@ -17,6 +17,7 @@ class CPointLight;
 class CPointLightShadow;
 class CDirectionalLight;
 class CDirectionalLightShadow;
+class CRenderer;
 
 #include "tresources.h"
 
@@ -58,5 +59,6 @@ class CDirectionalLightShadow;
 #include "directional_light_shadow.h"
 #include "character_controller.h"
 #include "world.h"
+#include "renderer.h"
 
 #endif

@@ -49,6 +49,7 @@ set(towerengine_SRC
 	src/character_controller.cpp
 	src/post_process_shader.cpp
 	src/mesh_material.cpp
+	src/renderer.cpp
 	oglft/OGLFT.cpp)
 
 add_definitions(-g -Wall)

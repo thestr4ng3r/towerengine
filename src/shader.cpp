@@ -64,7 +64,7 @@ void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_nam
 	if(size > 1)
 	{
 		string = new GLchar [size];
-		glGetProgramInfoLog(handle, size, &size, string);
+		glGetShaderInfoLog(handle, size, &size, string);
 		printf("%s info log", log_title);
 		if(shader_name != 0)
 			 printf("for %s:\n", shader_name);

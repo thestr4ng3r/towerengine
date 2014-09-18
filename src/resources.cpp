@@ -614,6 +614,8 @@ const char *directional_shadow_blur_shader_frag =
 "\n"
 "#define MAX_LAYERS 8\n"
 "\n"
+"#define GAUSSIAN_BLUR\n"
+"\n"
 "out vec4 tex_out[MAX_LAYERS]; \n"
 "\n"
 "uniform sampler2DArray tex_uni;\n"
