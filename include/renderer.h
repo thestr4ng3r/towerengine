@@ -26,14 +26,36 @@ class CRenderer
 		int *dir_light_shadow_enabled;
 		GLuint *dir_light_shadow_maps;
 
+		float projection_matrix[16];
+		float modelview_matrix[16];
+
+		struct ssao
+		{
+			bool enabled;
+			float *kernel;
+			int kernel_size;
+			GLuint noise_tex;
+			int noise_tex_size;
+			float radius;
+
+			GLuint fbo;
+			GLuint tex;
+			GLuint depth_rbo;
+		} ssao;
+
 		void GeometryPass(void);
 		void LightPass(void);
+		void RenderSSAO(void);
 
 	public:
 		CRenderer(int width, int height, CWorld *world = 0);
 		~CRenderer();
 
+		void ChangeSize(int width, int height);
+
 		void SetWorld(CWorld *world)	{ this->world = world; }
+
+		void InitSSAO(int kernel_size, float radius, int noise_tex_size = 4);
 
 		void Render(void);
 };

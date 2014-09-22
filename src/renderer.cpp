@@ -8,6 +8,16 @@ CRenderer::CRenderer(int width, int height, CWorld *world)
 
 	this->world = world;
 
+	ssao.kernel = 0;
+	ssao.kernel_size = 0;
+	ssao.noise_tex = 0;
+	ssao.noise_tex_size = 0;
+	ssao.enabled = false;
+	ssao.fbo = 0;
+	ssao.tex = 0;
+	ssao.depth_rbo = 0;
+	ssao.radius = 0.0;
+
 	gbuffer = new CGBuffer(screen_width, screen_height);
 
 	glGenFramebuffers(1, &fbo);
@@ -31,7 +41,6 @@ CRenderer::CRenderer(int width, int height, CWorld *world)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 
 	point_light_count = 0;
 	point_light_pos = new float[CLightPassShader::max_point_lights * 3];
@@ -69,6 +78,79 @@ CRenderer::~CRenderer(void)
 	delete[] dir_light_shadow_maps;
 }
 
+void CRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
+{
+	ssao.kernel = new float[kernel_size*3];
+	ssao.kernel_size = kernel_size;
+
+	ssao.radius = radius;
+
+	float scale;
+	CVector v;
+
+	for(int i=0; i<ssao.kernel_size; i++)
+	{
+		v.x = RandomFloat(-1.0, 1.0);
+		v.y = RandomFloat(-1.0, 1.0);
+		v.z = RandomFloat(0.0, 1.0);
+		v.Normalize();
+
+		scale = (float)i / (float)ssao.kernel_size;
+		scale = Mix(0.1, 1.0, scale * scale);
+		v *= scale;
+
+		memcpy(ssao.kernel + i*3, v.v, sizeof(float) * 3);
+	}
+
+	ssao.noise_tex_size = noise_tex_size;
+	GLubyte *noise_tex_data = new GLubyte[noise_tex_size * noise_tex_size * 3];
+	int x, y;
+
+	for(y=0; y<ssao.noise_tex_size; y++)
+	{
+		for(x=0; x<ssao.noise_tex_size; x++)
+		{
+			noise_tex_data[y*ssao.noise_tex_size*3 + x*3 + 0] = (GLubyte)(RandomFloat() * 255.0);
+			noise_tex_data[y*ssao.noise_tex_size*3 + x*3 + 1] = (GLubyte)(RandomFloat() * 255.0);
+			noise_tex_data[y*ssao.noise_tex_size*3 + x*3 + 2] = 0.0;
+		}
+	}
+
+	glGenTextures(1, &ssao.noise_tex);
+	glBindTexture(GL_TEXTURE_2D, ssao.noise_tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ssao.noise_tex_size, ssao.noise_tex_size, 0, GL_RGB, GL_UNSIGNED_BYTE, noise_tex_data);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+
+	glGenFramebuffers(1, &ssao.fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, ssao.fbo);
+
+	glGenTextures(1, &ssao.tex);
+
+	glBindTexture(GL_TEXTURE_2D, ssao.tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, screen_width, screen_height, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssao.tex, 0);
+
+	glGenRenderbuffers(1, &ssao.depth_rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, ssao.depth_rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, screen_width, screen_height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ssao.depth_rbo);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	ssao.enabled = true;
+}
+
 void CRenderer::Render(void)
 {
 	CCamera *camera = world->GetCamera();
@@ -80,6 +162,9 @@ void CRenderer::Render(void)
 	world->RenderShadowMaps();
 
 	GeometryPass();
+
+	if(ssao.enabled)
+		RenderSSAO();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	LightPass();
@@ -119,13 +204,16 @@ void CRenderer::GeometryPass(void)
 {
 	CCamera *camera = world->GetCamera();
 
-	gbuffer->BindForDrawing();
+	gbuffer->Bind();
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, screen_width, screen_height);
 
 	camera->SetModelviewProjectionMatrix();
+
+	glGetFloatv(GL_PROJECTION_MATRIX, projection_matrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
@@ -136,7 +224,7 @@ void CRenderer::GeometryPass(void)
 	world->GetCameraRenderSpace()->Render();
 
 	CShader::Unbind();
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void CRenderer::LightPass(void)
@@ -189,6 +277,7 @@ void CRenderer::LightPass(void)
 															dir_light_shadow_splits_z);
 	CEngine::GetLightPassShader()->SetLightAmbientColor(world->GetAmbientColor());
 	CEngine::GetLightPassShader()->SetCameraPosition(camera->GetPosition());
+	CEngine::GetLightPassShader()->SetSSAO(ssao.enabled, ssao.tex);
 
 
 	glBegin(GL_QUADS);
@@ -200,3 +289,103 @@ void CRenderer::LightPass(void)
 
 	CShader::Unbind();
 }
+
+void CRenderer::RenderSSAO(void)
+{
+	CSSAOShader *ssao_shader = CEngine::GetSSAOShader();
+	CVector2 noise_tex_scale;
+	CVector *view_rays = world->GetCamera()->GetViewRays();
+
+	noise_tex_scale.x = (float)screen_width / (float)ssao.noise_tex_size;
+	noise_tex_scale.y = (float)screen_height / (float)ssao.noise_tex_size;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, ssao.fbo);
+
+	ssao_shader->Bind();
+	ssao_shader->SetKernel(ssao.kernel_size, ssao.kernel);
+	ssao_shader->SetNoiseTex(ssao.noise_tex, noise_tex_scale);
+	ssao_shader->SetTextures(gbuffer->GetDepthTexture(), gbuffer->GetTexture(CGBuffer::POSITION_TEX), gbuffer->GetTexture(CGBuffer::NORMAL_TEX));
+	ssao_shader->SetMatrices(projection_matrix, modelview_matrix);
+	ssao_shader->SetRadius(ssao.radius);
+	ssao_shader->SetCamera(world->GetCamera()->GetPosition(), world->GetCamera()->GetDirection());
+
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, screen_width, screen_height);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0, 1.0, 0.0, 1.0, 0.1, 2.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0); //pos x, y, z, to x, y, z
+
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+
+	glBegin(GL_QUADS);
+	view_rays[0].AttrToGL(CSSAOShader::view_ray_attribute);
+	glVertex2f(0.0, 1.0);
+	view_rays[1].AttrToGL(CSSAOShader::view_ray_attribute);
+	glVertex2f(0.0, 0.0);
+	view_rays[2].AttrToGL(CSSAOShader::view_ray_attribute);
+	glVertex2f(1.0, 0.0);
+	view_rays[3].AttrToGL(CSSAOShader::view_ray_attribute);
+	glVertex2f(1.0, 1.0);
+	glEnd();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void CRenderer::ChangeSize(int width, int height)
+{
+	if(screen_width == width && screen_height == height)
+		return;
+
+	screen_width = width;
+	screen_height = height;
+
+	glBindTexture(GL_TEXTURE_2D, color_tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, screen_width, screen_height);
+
+	gbuffer->ChangeSize(width, height);
+
+	if(ssao.tex)
+	{
+		glBindTexture(GL_TEXTURE_2D, ssao.tex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, screen_width, screen_height, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+	}
+
+	if(ssao.depth_rbo)
+	{
+		glBindRenderbuffer(GL_RENDERBUFFER, ssao.depth_rbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, screen_width, screen_height);
+	}
+
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

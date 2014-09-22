@@ -67,7 +67,7 @@ void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_nam
 		glGetShaderInfoLog(handle, size, &size, string);
 		printf("%s info log", log_title);
 		if(shader_name != 0)
-			 printf("for %s:\n", shader_name);
+			 printf(" for %s:\n", shader_name);
 		printf(":\n");
 		printf("-----------\n%s\n-----------\n", string);
 		delete [] string;

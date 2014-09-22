@@ -33,19 +33,23 @@ class CLightPassShader : public CShader
 		GLint specular_tex_uniform;
 		GLint specular_exponent_tex_uniform;
 
+		GLint ssao_enabled_uniform;
+		GLint ssao_tex_uniform;
+
 
 	public:
 		static const GLint max_point_lights = 8;
 		static const GLint max_directional_lights = 8;
 		static const GLint max_directional_light_splits = 8;
 
-		static const unsigned int point_light_shadow_tex_first_unit = 5;
+		static const unsigned int point_light_shadow_tex_first_unit = 6;
 		static const unsigned int directional_light_shadow_tex_first_unit = point_light_shadow_tex_first_unit + max_point_lights;
 
 
 		void Init(void);
 
 		void SetGBuffer(CGBuffer *gbuffer);
+		void SetSSAO(bool enabled, GLuint tex);
 		void SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps);
 		void SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z);
 		void SetLightAmbientColor(CVector color);

@@ -50,6 +50,7 @@ set(towerengine_SRC
 	src/post_process_shader.cpp
 	src/mesh_material.cpp
 	src/renderer.cpp
+	src/ssao_shader.cpp
 	oglft/OGLFT.cpp)
 
 add_definitions(-g -Wall)

@@ -32,6 +32,9 @@ void CLightPassShader::Init(void)
 	directional_light_shadow_map_uniform = GetUniformLocation("directional_light_shadow_map_uni");
 
 	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
+
+	ssao_enabled_uniform = GetUniformLocation("ssao_enabled_uni");
+	ssao_tex_uniform = GetUniformLocation("ssao_tex_uni");
 }
 
 void CLightPassShader::SetGBuffer(CGBuffer *gbuffer)
@@ -55,6 +58,15 @@ void CLightPassShader::SetGBuffer(CGBuffer *gbuffer)
 	glUniform1i(specular_exponent_tex_uniform, 4);
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(CGBuffer::SPECULAR_EXPONENT_TEX));
+}
+
+void CLightPassShader::SetSSAO(bool enabled, GLuint tex)
+{
+	glUniform1i(ssao_enabled_uniform, enabled ? 1 : 0);
+
+	glUniform1i(ssao_tex_uniform, 5);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
 void CLightPassShader::SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps)

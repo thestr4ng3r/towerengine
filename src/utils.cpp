@@ -224,3 +224,13 @@ void Base64Decode(char *in, unsigned char **out, size_t *out_size)
 	Base64Decode(in, in_size, *out, out_size);
 }
 
+float RandomFloat(float min, float max)
+{
+	return ((float)rand() / (float)RAND_MAX) * (max - min) + min;
+}
+
+float Mix(float a, float b, float mix)
+{
+	return a + (b-a) * max(min(mix, 1.0f), 0.0f);
+}
+

@@ -44,6 +44,22 @@ CVector *CCamera::GetRelativeFrustumCorners(float near, float far)
 	return c;
 }
 
+CVector *CCamera::GetViewRays(void)
+{
+	CVector *c = new CVector[4];
+	float vert, horz;
+
+	vert = tan(degtorad(angle) / 2.0);
+	horz = vert * aspect;
+
+	c[0] = Vec(vert, -horz, 1.0);
+	c[1] = Vec(-vert, -horz, 1.0);
+	c[2] = Vec(-vert, horz, 1.0);
+	c[3] = Vec(vert, horz, 1.0);
+
+	return c;
+}
+
 
 void CCamera::CalculateFrustumPlanes(void)
 {
@@ -151,6 +167,7 @@ void CCamera::SetModelviewProjectionMatrix(void)
 	CVector to = pos + dir;
 	gluLookAt(pos.x, pos.y, pos.z, to.x, to.y, to.z, 0.0, 1.0, 0.0);
 }
+
 
 
 

@@ -22,5 +22,7 @@ extern const char *directional_shadow_blur_shader_vert;
 extern const char *directional_shadow_blur_shader_frag;
 extern const char *post_process_shader_vert;
 extern const char *post_process_shader_frag;
+extern const char *ssao_shader_vert;
+extern const char *ssao_shader_frag;
 
 #endif

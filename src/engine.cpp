@@ -10,6 +10,7 @@ CDirectionalShadowShader *CEngine::directional_shadow_shader = 0;
 CDirectionalShadowBlurShader *CEngine::directional_shadow_blur_shader = 0;
 CFaceShader *CEngine::current_face_shader = 0;
 CPostProcessShader *CEngine::post_process_shader = 0;
+CSSAOShader *CEngine::ssao_shader = 0;
 
 const float CEngine::identity_matrix4[16] = { 1.0, 0.0, 0.0, 0.0,
 										  0.0, 1.0, 0.0, 0.0,
@@ -28,7 +29,8 @@ void CEngine::Init(void)
 		glewInit();
 	#endif
 
-	glShadeModel(GL_SMOOTH);
+	srand(time(0));
+
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
@@ -61,6 +63,9 @@ void CEngine::Init(void)
 
 	post_process_shader = new CPostProcessShader();
 	post_process_shader->Init();
+
+	ssao_shader = new CSSAOShader();
+	ssao_shader->Init();
 }
 
 void CEngine::Destroy(void)

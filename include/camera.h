@@ -31,6 +31,7 @@ class CCamera
 		CVector *GetRelativeFrustumCorners(void) { return GetRelativeFrustumCorners(near_clip, far_clip); }
 		CVector *GetFrustumPlanesPoints(void)	{ return frustum_planes_points; }
 		CVector *GetFrustumPlanesNormals(void)	{ return frustum_planes_normals; }
+		CVector *GetViewRays(void);
 
 		bool TestPointCulling(CVector point);
 		bool TestSphereCulling(CVector center, float radius);

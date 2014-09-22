@@ -33,6 +33,9 @@ uniform sampler2D normal_tex_uni;
 uniform sampler2D specular_tex_uni;
 uniform sampler2D specular_exponent_tex_uni;
 
+uniform bool ssao_enabled_uni;
+uniform sampler2D ssao_tex_uni;
+
 in vec2 uv_coord_var;
 
 out vec4 gl_FragColor;
@@ -41,6 +44,7 @@ out vec4 gl_FragColor;
 float linstep(float min, float max, float v);
 vec4 PointLightShadowLookup(int i, vec3 dir);
 vec4 DirectionalLightShadowLookup(int i, vec3 coord);
+float GetSSAO(void);
 
 void main(void)
 {
@@ -50,7 +54,7 @@ void main(void)
 		discard;
 		
 	vec3 position = texture2D(position_tex_uni, uv_coord_var).rgb; 	
-	vec3 normal = texture2D(normal_tex_uni, uv_coord_var).rgb;
+	vec3 normal = normalize(texture2D(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
 	vec4 specular = vec4(texture2D(specular_tex_uni, uv_coord_var).rgb, texture2D(specular_exponent_tex_uni, uv_coord_var).r);
 	
 	
@@ -162,9 +166,34 @@ void main(void)
 		color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow;
 	}
 	
+	if(ssao_enabled_uni)
+	{
+		color *= vec3(GetSSAO());
+	}
+	
 	gl_FragColor = vec4(color, alpha);
 }
 
+
+float GetSSAO(void)
+{
+	vec2 texel_size = 1.0 / textureSize(ssao_tex_uni, 0);
+	float result = 0.0;
+	int uBlurSize = 4;
+	
+	vec2 hlim = vec2(float(-uBlurSize) * 0.5 + 0.5);
+	
+	for (int i = 0; i < uBlurSize; ++i)
+	{
+		for (int j = 0; j < uBlurSize; ++j)
+		{
+			vec2 offset = (hlim + vec2(float(i), float(j))) * texel_size;
+			result += texture(ssao_tex_uni, uv_coord_var + offset).r;
+		}
+	}
+ 
+	return result / float(uBlurSize * uBlurSize);
+}
 
 float linstep(float min, float max, float v)
 {

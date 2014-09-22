@@ -19,4 +19,7 @@ void PrintMatrix4(float m[16]);
 int Base64Decode(char *in, size_t inLen, unsigned char *out, size_t *outLen);
 void Base64Decode(char *in, unsigned char **out, size_t *out_size);
 
+float RandomFloat(float min = 0.0, float max = 1.0);
+float Mix(float a, float b, float mix);
+
 #endif

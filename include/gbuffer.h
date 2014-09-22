@@ -28,8 +28,9 @@ class CGBuffer
 		CGBuffer(int width, int height);
 		~CGBuffer(void);
 
-		void BindForDrawing(void);
-		void BindForReading(void);
+		void ChangeSize(int width, int height);
+
+		void Bind(void);
 
 		GLuint GetTexture(GBUFFER_TEXTURE_TYPE type)	{ return tex[type]; }
 		GLuint GetDepthTexture(void)					{ return depth_tex; }
