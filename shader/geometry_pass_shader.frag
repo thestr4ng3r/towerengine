@@ -67,6 +67,9 @@ void main(void)
 	if(diffuse_tex_enabled_uni)
 		diffuse_color = texture2D(diffuse_tex_uni, uv).rgba;
 		
+	if(diffuse_color.a < 0.5)
+		discard;
+		
 	diffuse_color *= vec4(diffuse_color_uni.rgb, 1.0) * diffuse_color2_uni;
 	
 	vec3 normal;
@@ -102,7 +105,7 @@ vec2 ParallaxUV(void)
 }
 
 #define PARALLAX_OCCLUSION_MIN_SAMPLES 4
-#define PARALLAX_OCCLUSION_MAX_SAMPLES 20
+#define PARALLAX_OCCLUSION_MAX_SAMPLES 15
 
 vec2 ParallaxOcclusionUV(mat3 tang_mat)
 {

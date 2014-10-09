@@ -13,7 +13,7 @@ class CRenderer
 
 		GLuint fbo;
 		GLuint color_tex;
-		GLuint depth_rbo;
+		GLuint depth_tex;
 
 		int point_light_count;
 		float *point_light_pos, *point_light_color, *point_light_distance;
@@ -38,13 +38,14 @@ class CRenderer
 			int noise_tex_size;
 			float radius;
 
-			GLuint fbo;
 			GLuint tex;
-			GLuint depth_rbo;
+			GLenum draw_buffer;
 		} ssao;
 
 		void GeometryPass(void);
 		void LightPass(void);
+		void ForwardPass(void);
+
 		void RenderSSAO(void);
 
 	public:

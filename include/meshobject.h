@@ -58,7 +58,8 @@ class CMeshObject : public CObject
 
 		void UpdateRigidBodyTransformation(void);
 
-		void PutToGL(void);
+		void GeometryPass(void);
+		void ForwardPass(void);
 		CBoundingBox GetBoundingBox(void);
 };
 

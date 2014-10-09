@@ -116,7 +116,7 @@ void CPointLightShadow::Render(CWorld *world)
 			v_vec = Vec(0.0, 0.0, -1.0);
 		gluLookAt(pos.x, pos.y, pos.z, cam_to.x, cam_to.y, cam_to.z, v_vec.x, v_vec.y, v_vec.z);
 
-		render_space->Render();
+		render_space->GeometryPass();
 	}
 	CShader::Unbind();
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);

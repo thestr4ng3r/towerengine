@@ -20,12 +20,14 @@ class CGBuffer
 	private:
 		GLuint fbo;
 		GLuint tex[tex_count];
-		GLuint depth_tex;
+
+		int first_attachment;
 
 		GLenum *draw_buffers;
 
+
 	public:
-		CGBuffer(int width, int height);
+		CGBuffer(int width, int height, GLuint fbo, int first_attachment);
 		~CGBuffer(void);
 
 		void ChangeSize(int width, int height);
@@ -33,7 +35,8 @@ class CGBuffer
 		void Bind(void);
 
 		GLuint GetTexture(GBUFFER_TEXTURE_TYPE type)	{ return tex[type]; }
-		GLuint GetDepthTexture(void)					{ return depth_tex; }
+
+		static int GetTexCount(void)					{ return tex_count; }
 };
 
 

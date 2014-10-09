@@ -11,7 +11,8 @@ class CRenderSpace
 	public:
 		void ClearObjects(void);
 
-		void Render(void);
+		void GeometryPass(void);
+		void ForwardPass(void);
 };
 
 

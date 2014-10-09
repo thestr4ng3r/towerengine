@@ -49,6 +49,7 @@ class CRenderer;
 #include "engine.h"
 #include "object.h"
 #include "meshobject.h"
+#include "utilobjects.h"
 #include "heightmap.h"
 #include "terrain.h"
 #include "terrainobject.h"

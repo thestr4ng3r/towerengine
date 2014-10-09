@@ -42,7 +42,8 @@ void CWorld::AddObject(CObject *o)
 
 	objects.push_back(o);
 
-	physics.dynamics_world->addRigidBody(o->GetRigidBody());
+	if(o->GetRigidBody())
+		physics.dynamics_world->addRigidBody(o->GetRigidBody());
 }
 
 void CWorld::RemoveObject(CObject *o)
@@ -58,6 +59,8 @@ void CWorld::RemoveObject(CObject *o)
 	for(i=objects.begin(); i!=objects.end(); i++)
 		if(*i == o)
 		{
+			if((*i)->GetRigidBody())
+				physics.dynamics_world->removeRigidBody((*i)->GetRigidBody());
 			objects.erase(i);
 			return;
 		}
@@ -204,9 +207,6 @@ void CWorld::FillRenderSpaces(void)
 
 	for(pi=point_lights.begin(); pi!=point_lights.end(); pi++)
 	{
-		if(!(*pi)->GetShadowEnabled())
-			continue;
-
 		light_pos = (*pi)->GetPosition();
 		light_dist = (*pi)->GetDistance();
 
@@ -214,6 +214,9 @@ void CWorld::FillRenderSpaces(void)
 			continue;
 
 		camera_render_point_lights.insert(*pi);
+
+		if(!(*pi)->GetShadowEnabled())
+			continue;
 
 		for(i=objects.begin(); i!=objects.end(); i++)
 		{
@@ -241,10 +244,10 @@ void CWorld::FillRenderSpaces(void)
 
 	for(di=dir_lights.begin(); di!=dir_lights.end(); di++)
 	{
+		camera_render_dir_lights.insert(*di);
+
 		if(!(*di)->GetShadowEnabled())
 			continue;
-
-		camera_render_dir_lights.insert(*di);
 
 		for(i=objects.begin(); i!=objects.end(); i++)
 			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i));

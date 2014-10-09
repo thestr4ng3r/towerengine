@@ -114,7 +114,7 @@ CBoundingBox CMeshObject::GetBoundingBox(void)
 	return b;
 }
 
-void CMeshObject::PutToGL(void)
+void CMeshObject::GeometryPass(void)
 {
 	if(!visible || alpha <= 0.0)
 		return;
@@ -142,6 +142,11 @@ void CMeshObject::PutToGL(void)
 			mesh->ChangePose("Idle");
 	}
 	mesh->PutToGL();
+}
+
+void CMeshObject::ForwardPass(void)
+{
+
 }
 
 void CMeshObject::UpdateRigidBodyTransformation(void)

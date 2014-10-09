@@ -43,11 +43,8 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glGenRenderbuffers(1, &depth_rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
-	//glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT24, size, size);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
 	this->blur_enabled = blur_enabled;
@@ -66,14 +63,10 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RG32F, size, size, splits, 0, GL_RG, GL_FLOAT, 0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-	glGenFramebuffers(1, &blur_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, blur_fbo);
-
 	blur_draw_buffers = new GLenum[splits];
 	for(i=0; i<splits; i++)
-		blur_draw_buffers[i] = GL_COLOR_ATTACHMENT0 + i;
+		blur_draw_buffers[i] = GL_COLOR_ATTACHMENT0 + 1 + i;
 
-	glDrawBuffers(splits, blur_draw_buffers);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	blur_vao = new VAO();
@@ -131,6 +124,7 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	glEnable(GL_DEPTH_TEST);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	glViewport(0, 0, size, size);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
@@ -198,22 +192,16 @@ void CDirectionalLightShadow::Render(CWorld *world)
 		glClearColor(1.0, 1.0, 1.0, 1.0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-		glEnable(GL_MULTISAMPLE);
-
-		render_space->Render();
-
-		glDisable(GL_MULTISAMPLE);
+		render_space->GeometryPass();
 	}
 
 	CShader::Unbind();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	if(!blur_enabled)
 		return;
 
 	glDisable(GL_DEPTH_TEST);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, blur_fbo);
 	glViewport(0, 0, size, size);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -231,8 +219,11 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	CEngine::GetDirectionalShadowBlurShader()->SetTextureLayers(splits, h_blur);
 	CEngine::GetDirectionalShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0) * blur_size);
 
+	glDrawBuffers(splits, blur_draw_buffers);
+
 	for(s=0; s<splits; s++)
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, blur_draw_buffers[s], blur_tex, 0, s);
+
 
 	blur_vao->Draw(GL_QUADS, 0, 4);
 
@@ -243,12 +234,7 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	for(s=0; s<splits; s++)
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, blur_draw_buffers[s], tex, 0, s);
 
-
 	blur_vao->Draw(GL_QUADS, 0, 4);
-
-	CShader::Unbind();
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 

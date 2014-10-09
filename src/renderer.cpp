@@ -13,12 +13,8 @@ CRenderer::CRenderer(int width, int height, CWorld *world)
 	ssao.noise_tex = 0;
 	ssao.noise_tex_size = 0;
 	ssao.enabled = false;
-	ssao.fbo = 0;
 	ssao.tex = 0;
-	ssao.depth_rbo = 0;
 	ssao.radius = 0.0;
-
-	gbuffer = new CGBuffer(screen_width, screen_height);
 
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -34,13 +30,21 @@ CRenderer::CRenderer(int width, int height, CWorld *world)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_tex, 0);
 
-	glGenRenderbuffers(1, &depth_rbo);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depth_rbo);
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, screen_width, screen_height);
+	glGenTextures(1, &depth_tex);
+	glBindTexture(GL_TEXTURE_2D, depth_tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	gbuffer = new CGBuffer(screen_width, screen_height, fbo, 1);
 
 	point_light_count = 0;
 	point_light_pos = new float[CLightPassShader::max_point_lights * 3];
@@ -116,6 +120,8 @@ void CRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 		}
 	}
 
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
 	glGenTextures(1, &ssao.noise_tex);
 	glBindTexture(GL_TEXTURE_2D, ssao.noise_tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -126,10 +132,6 @@ void CRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ssao.noise_tex_size, ssao.noise_tex_size, 0, GL_RGB, GL_UNSIGNED_BYTE, noise_tex_data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-
-	glGenFramebuffers(1, &ssao.fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, ssao.fbo);
-
 	glGenTextures(1, &ssao.tex);
 
 	glBindTexture(GL_TEXTURE_2D, ssao.tex);
@@ -139,12 +141,8 @@ void CRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, screen_width, screen_height, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssao.tex, 0);
-
-	glGenRenderbuffers(1, &ssao.depth_rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, ssao.depth_rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, screen_width, screen_height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ssao.depth_rbo);
+	ssao.draw_buffer = GL_COLOR_ATTACHMENT0 + 1 + gbuffer->GetTexCount();
+	glFramebufferTexture2D(GL_FRAMEBUFFER, ssao.draw_buffer, GL_TEXTURE_2D, ssao.tex, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -161,13 +159,18 @@ void CRenderer::Render(void)
 
 	world->RenderShadowMaps();
 
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
 	GeometryPass();
 
 	if(ssao.enabled)
 		RenderSSAO();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	LightPass();
+
+	ForwardPass();
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
@@ -187,7 +190,7 @@ void CRenderer::Render(void)
 	glDisable(GL_BLEND);
 
 	CEngine::GetPostProcessShader()->Bind();
-	CEngine::GetPostProcessShader()->SetTextures(color_tex, gbuffer->GetDepthTexture(), screen_width, screen_height);
+	CEngine::GetPostProcessShader()->SetTextures(color_tex, depth_tex, screen_width, screen_height);
 
 	glBegin(GL_QUADS);
 	glVertex2f(0.0, 1.0);
@@ -221,10 +224,7 @@ void CRenderer::GeometryPass(void)
 	CEngine::SetCurrentFaceShader(CEngine::GetGeometryPassShader());
 	CEngine::BindCurrentFaceShader();
 
-	world->GetCameraRenderSpace()->Render();
-
-	CShader::Unbind();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	world->GetCameraRenderSpace()->GeometryPass();
 }
 
 void CRenderer::LightPass(void)
@@ -238,7 +238,7 @@ void CRenderer::LightPass(void)
 										dir_light_shadow_splits_z, dir_light_shadow_enabled, dir_light_shadow_maps);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, screen_width, screen_height);
 
 	camera->SetModelviewProjectionMatrix();
@@ -286,8 +286,13 @@ void CRenderer::LightPass(void)
 	glVertex2f(1.0, 0.0);
 	glVertex2f(1.0, 1.0);
 	glEnd();
+}
 
-	CShader::Unbind();
+void CRenderer::ForwardPass(void)
+{
+	world->GetCamera()->SetModelviewProjectionMatrix();
+
+	world->GetCameraRenderSpace()->ForwardPass();
 }
 
 void CRenderer::RenderSSAO(void)
@@ -299,12 +304,12 @@ void CRenderer::RenderSSAO(void)
 	noise_tex_scale.x = (float)screen_width / (float)ssao.noise_tex_size;
 	noise_tex_scale.y = (float)screen_height / (float)ssao.noise_tex_size;
 
-	glBindFramebuffer(GL_FRAMEBUFFER, ssao.fbo);
+	glDrawBuffer(ssao.draw_buffer);
 
 	ssao_shader->Bind();
 	ssao_shader->SetKernel(ssao.kernel_size, ssao.kernel);
 	ssao_shader->SetNoiseTex(ssao.noise_tex, noise_tex_scale);
-	ssao_shader->SetTextures(gbuffer->GetDepthTexture(), gbuffer->GetTexture(CGBuffer::POSITION_TEX), gbuffer->GetTexture(CGBuffer::NORMAL_TEX));
+	ssao_shader->SetTextures(depth_tex, gbuffer->GetTexture(CGBuffer::POSITION_TEX), gbuffer->GetTexture(CGBuffer::NORMAL_TEX));
 	ssao_shader->SetMatrices(projection_matrix, modelview_matrix);
 	ssao_shader->SetRadius(ssao.radius);
 	ssao_shader->SetCamera(world->GetCamera()->GetPosition(), world->GetCamera()->GetDirection());
@@ -334,8 +339,6 @@ void CRenderer::RenderSSAO(void)
 	view_rays[3].AttrToGL(CSSAOShader::view_ray_attribute);
 	glVertex2f(1.0, 1.0);
 	glEnd();
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void CRenderer::ChangeSize(int width, int height)
@@ -349,8 +352,8 @@ void CRenderer::ChangeSize(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, color_tex);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-	glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, screen_width, screen_height);
+	glBindTexture(GL_TEXTURE_2D, depth_tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 
 	gbuffer->ChangeSize(width, height);
 
@@ -360,13 +363,6 @@ void CRenderer::ChangeSize(int width, int height)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, screen_width, screen_height, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
 	}
 
-	if(ssao.depth_rbo)
-	{
-		glBindRenderbuffer(GL_RENDERBUFFER, ssao.depth_rbo);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, screen_width, screen_height);
-	}
-
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

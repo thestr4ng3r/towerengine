@@ -9,7 +9,7 @@ class CTerrainObject : public CObject
 	public:
 		CTerrainObject(CTerrain *terrain);
 
-		void PutToGL(void);
+		void GeometryPass(void);
 		CBoundingBox GetBoundingBox(void);
 };
 

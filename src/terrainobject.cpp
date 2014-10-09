@@ -9,7 +9,7 @@ CTerrainObject::CTerrainObject(CTerrain *terrain)
 	rigid_body->setRestitution(0.0);
 }
 
-void CTerrainObject::PutToGL(void)
+void CTerrainObject::GeometryPass(void)
 {
 	terrain->Paint();
 }

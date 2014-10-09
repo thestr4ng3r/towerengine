@@ -25,7 +25,6 @@ class CDirectionalLightShadow
 		bool blur_enabled;
 		float blur_size;
 		GLuint blur_tex;
-		GLuint blur_fbo;
 		GLenum *blur_draw_buffers;
 
 		VAO *blur_vao;
