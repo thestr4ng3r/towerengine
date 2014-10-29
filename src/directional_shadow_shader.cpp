@@ -9,6 +9,7 @@ void CDirectionalShadowShader::Init(void)
 	CreateProgram();
 	glBindAttribLocation(program, CFaceShader::vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, CFaceShader::vertex2_attribute, "vertex2_attr");
+	glBindAttribLocation(program, CFaceShader::uvcoord_attribute, "uv_attr");
 	LinkProgram();
 
 	light_dir_uniform = GetUniformLocation("light_dir_uni");
@@ -16,6 +17,9 @@ void CDirectionalShadowShader::Init(void)
 	transformation_uniform = GetUniformLocation("transformation_uni");
 	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
+
+	diffuse_tex_enabled_uniform = GetUniformLocation("diffuse_tex_enabled_uni");
+	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 
 	Unbind();
 }
@@ -46,6 +50,19 @@ void CDirectionalShadowShader::SetCamPos(CVector v)
 	glUniform3f(cam_pos_uniform, v.x, v.y, v.z);
 }
 
+
+
+void CDirectionalShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
+{
+	glUniform1i(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
+
+	if(enabled)
+	{
+		glUniform1i(diffuse_tex_uniform, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex);
+	}
+}
 
 
 

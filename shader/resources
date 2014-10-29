@@ -16,3 +16,5 @@ post_process_shader_vert: shader/post_process_shader.vert
 post_process_shader_frag: shader/post_process_shader.frag
 ssao_shader_vert: shader/ssao_shader.vert
 ssao_shader_frag: shader/ssao_shader.frag
+color_shader_vert: shader/color_shader.vert
+color_shader_frag: shader/color_shader.frag

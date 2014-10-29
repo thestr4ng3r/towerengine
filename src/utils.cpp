@@ -234,3 +234,28 @@ float Mix(float a, float b, float mix)
 	return a + (b-a) * max(min(mix, 1.0f), 0.0f);
 }
 
+
+xmlNodePtr WriteDataXMLNode(const char *data, unsigned int size, xmlDocPtr doc)
+{
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

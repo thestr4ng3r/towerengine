@@ -22,4 +22,6 @@ void Base64Decode(char *in, unsigned char **out, size_t *out_size);
 float RandomFloat(float min = 0.0, float max = 1.0);
 float Mix(float a, float b, float mix);
 
+xmlNodePtr WriteDataXMLNode(const char *data, unsigned int size, xmlDocPtr doc);
+
 #endif

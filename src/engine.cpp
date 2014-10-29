@@ -8,6 +8,7 @@ CPointShadowShader *CEngine::point_shadow_shader = 0;
 CPointShadowBlurShader *CEngine::point_shadow_blur_shader = 0;
 CDirectionalShadowShader *CEngine::directional_shadow_shader = 0;
 CDirectionalShadowBlurShader *CEngine::directional_shadow_blur_shader = 0;
+CColorShader *CEngine::color_shader = 0;
 CFaceShader *CEngine::current_face_shader = 0;
 CPostProcessShader *CEngine::post_process_shader = 0;
 CSSAOShader *CEngine::ssao_shader = 0;
@@ -61,6 +62,9 @@ void CEngine::Init(void)
 	directional_shadow_blur_shader = new CDirectionalShadowBlurShader();
 	directional_shadow_blur_shader->Init();
 
+	color_shader = new CColorShader();
+	color_shader->Init();
+
 	post_process_shader = new CPostProcessShader();
 	post_process_shader->Init();
 
@@ -75,5 +79,6 @@ void CEngine::Destroy(void)
 	delete point_shadow_shader;
 	delete point_shadow_blur_shader;
 	delete directional_shadow_shader;
+	delete color_shader;
 }
 

@@ -225,7 +225,7 @@ class TowerEngineExporter(bpy.types.Operator, ExportHelper):
 							uv = [0.0, 0.0]
 						
 						for j in range(len(vertex_id[vertex])):
-							if vertex_uv[vertex][j][0] == uv[0] and vertex_uv[vertex][j][1] == uv[1] and vertex_normal[vertex][j] == normal:
+							if vertex_uv[vertex][j][0] == uv[0] and vertex_uv[vertex][j][1] == uv[1] and vertex_normal[vertex][j] == normal: # might be wrong
 								face_vertex_id[face][i] = vertex_id[vertex][j]
 								vertex_found = True
 								break

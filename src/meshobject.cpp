@@ -35,7 +35,12 @@ CMeshObject::CMeshObject(CMesh *mesh, float mass)
 	}
 	else
 	{
-		btBvhTriangleMeshShape *shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), false);
+		btCollisionShape *shape;
+		if(mesh->GetPhysicsMesh())
+			shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), false);
+		else
+			shape = new btEmptyShape();
+
 		rigid_body = new btRigidBody(0.0, motion_state, shape, btVector3(0.0, 0.0, 0.0));
 	}
 }

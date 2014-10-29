@@ -16,27 +16,34 @@ CCoordinateSystemObject::~CCoordinateSystemObject(void)
 
 void CCoordinateSystemObject::ForwardPass(void)
 {
-	CShader::Unbind();
 	if(depth_test)
 		glEnable(GL_DEPTH_TEST);
 	else
 		glDisable(GL_DEPTH_TEST);
 
+	CEngine::GetColorShader()->Bind();
+	CEngine::GetColorShader()->SetTransformation(CEngine::identity_matrix4);
+
 	glLineWidth(3.0);
+
+	CEngine::GetColorShader()->SetDiffuseColor(Vec(1.0, 0.0, 0.0));
 	glBegin(GL_LINES);
+	pos.AttrToGL(CFaceShader::vertex_attribute);
+	(pos + size * Vec(1.0, 0.0, 0.0)).AttrToGL(CFaceShader::vertex_attribute);
+	glEnd();
 
-	glColor4f(1.0, 0.0, 0.0, 1.0);
-	pos.PutToGL();
-	(pos + size * Vec(1.0, 0.0, 0.0)).PutToGL();
-
+	CEngine::GetColorShader()->SetDiffuseColor(Vec(0.0, 1.0, 0.0));
+	glBegin(GL_LINES);
 	glColor4f(0.0, 1.0, 0.0, 1.0);
-	pos.PutToGL();
-	(pos + size * Vec(0.0, 1.0, 0.0)).PutToGL();
+	pos.AttrToGL(CFaceShader::vertex_attribute);
+	(pos + size * Vec(0.0, 1.0, 0.0)).AttrToGL(CFaceShader::vertex_attribute);
+	glEnd();
 
+	CEngine::GetColorShader()->SetDiffuseColor(Vec(0.0, 0.0, 1.0));
+	glBegin(GL_LINES);
 	glColor4f(0.0, 0.0, 1.0, 1.0);
-	pos.PutToGL();
-	(pos + size * Vec(0.0, 0.0, 1.0)).PutToGL();
-
+	pos.AttrToGL(CFaceShader::vertex_attribute);
+	(pos + size * Vec(0.0, 0.0, 1.0)).AttrToGL(CFaceShader::vertex_attribute);
 	glEnd();
 }
 

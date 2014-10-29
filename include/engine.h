@@ -11,6 +11,7 @@ private:
 	static CPointShadowBlurShader *point_shadow_blur_shader;
 	static CDirectionalShadowShader *directional_shadow_shader;
 	static CDirectionalShadowBlurShader *directional_shadow_blur_shader;
+	static CColorShader *color_shader;
 	static CPostProcessShader *post_process_shader;
 	static CSSAOShader *ssao_shader;
 
@@ -29,6 +30,7 @@ public:
 	static CPointShadowBlurShader *GetPointShadowBlurShader(void)				{ return point_shadow_blur_shader; }
 	static CDirectionalShadowShader *GetDirectionalShadowShader(void)			{ return directional_shadow_shader; }
 	static CDirectionalShadowBlurShader *GetDirectionalShadowBlurShader(void)	{ return directional_shadow_blur_shader; }
+	static CColorShader *GetColorShader(void)									{ return color_shader; }
 	static CPostProcessShader *GetPostProcessShader(void)						{ return post_process_shader; }
 	static CSSAOShader *GetSSAOShader(void)										{ return ssao_shader; }
 

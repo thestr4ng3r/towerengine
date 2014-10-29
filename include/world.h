@@ -8,7 +8,6 @@ private:
 	vector<CObject *> objects;
 	vector<CPointLight *> point_lights;
 	vector<CDirectionalLight *> dir_lights;
-	CMeshObject *world_object;
 	CSkyBox *sky_box;
 	CCamera *camera;
 
@@ -33,9 +32,7 @@ public:
 
 	void AddObject(CObject *o);
 	void RemoveObject(CObject *o);
-	void SetWorldMesh(CMesh *m, bool load_light = true);
 	void SetSkyBox(CSkyBox *sky_box)	{ this->sky_box = sky_box; }
-	void RemoveWorldMesh(void);
 	void Clear(void);
 
 	CVector GetAmbientColor(void)		{ return ambient_color; }

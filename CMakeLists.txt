@@ -52,6 +52,9 @@ set(towerengine_SRC
 	src/renderer.cpp
 	src/ssao_shader.cpp
 	src/utilobjects.cpp
+	src/color_shader.cpp
+	src/scene.cpp
+	src/scene_object.cpp
 	oglft/OGLFT.cpp)
 
 add_definitions(-g -Wall)

@@ -106,12 +106,13 @@ void main(void)
 		else
 			shadow = 1.0;
 	
-		light_intensity = max(dot(normal, light_dir), 0.0) *  (1.0 - light_dist / point_light_distance_uni[i]);
+		float light_dist_attenuation = (1.0 - light_dist / point_light_distance_uni[i]);
+		light_intensity = max(dot(normal, light_dir), 0.0) *  light_dist_attenuation;
 		color += shadow * light_intensity * point_light_color_uni[i] * diffuse.rgb; // diffuse light
 	
 		//specular
 		specular_color = specular.rgb * point_light_color_uni[i];
-		specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0);// * light_intensity;
+		specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0) * light_dist_attenuation;
 		color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow;
 	}
 	

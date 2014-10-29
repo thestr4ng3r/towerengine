@@ -87,13 +87,9 @@ class CMesh
         static void DeleteG3DContext(void) { if(!g3d_context) return; g3d_context_free(g3d_context); g3d_context = 0; };
 		#endif
 
-       	int LoadFromFile_libg3d(const char *file);
-		int MergeWithFile_libg3d(const char *file);
-
-        int LoadFromFile_lib3ds(const char *file);
-		int MergeWithFile_lib3ds(const char *file);
 		bool LoadFromFile(const char *file, int no_material = 0);
-		bool LoadFromFile_xml(const char *file, const char *path, int no_material);
+		bool LoadFromData(const char *data, const char *path = "");
+		bool LoadFromXML(xmlDocPtr doc, const char *path, int no_material);
         //int LoadFromFile_0_0(const char *file) { printf("LoadFromFile_0_0 function was removed.\n"); return 0; };
         int SaveToFile(const char *file);
  	    int SaveToFile_0_1(const char *file);
@@ -197,7 +193,7 @@ class CMesh
 
 		void SetRefreshFunc(void (*func)(void)) { refresh_func = func; }
 
-		CMesh(void);
+		CMesh(const char *file = 0);
 		~CMesh(void);
 };
 

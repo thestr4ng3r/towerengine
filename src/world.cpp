@@ -7,7 +7,6 @@
 CWorld::CWorld(void)
 {
 	ambient_color = Vec(0.1, 0.1, 0.1);
-	world_object = 0;
 	sky_box = 0;
 	camera = new CCamera();
 	camera_render_space = new CRenderSpace();
@@ -22,9 +21,6 @@ CWorld::CWorld(void)
 
 CWorld::~CWorld(void)
 {
-	if(world_object)
-		delete world_object;
-
 	delete physics.broadphase;
 	delete physics.collision_configuration;
 	delete physics.collision_dispatcher;
@@ -49,12 +45,6 @@ void CWorld::AddObject(CObject *o)
 void CWorld::RemoveObject(CObject *o)
 {
 	vector<CObject *>::iterator i;
-
-	if(o == world_object)
-	{
-		world_object = 0;
-		ambient_color = Vec(0.1, 0.1, 0.1);
-	}
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		if(*i == o)
@@ -108,64 +98,8 @@ void CWorld::RemoveDirectionalLight(CDirectionalLight *light)
 		}
 }
 
-
-void CWorld::SetWorldMesh(CMesh *m, bool load_light)
-{
-	map<string, CEntity *> light_entities;
-	map<string, CEntity *>::iterator ei;
-	map<string, CEntityAttribute *>::iterator ai;
-	CEntity *light_entity;
-	CVector light_pos, light_color;
-	CPointLight *point_light;
-
-	RemoveWorldMesh();
-	AddObject(world_object = new CMeshObject(m));
-
-	if(load_light)
-	{
-		light_pos = Vec(0.0, 0.0, 0.0);
-		light_color = Vec(1.0, 1.0, 1.0);
-		ambient_color = Vec(0.1, 0.1, 0.1);
-
-		light_entities = m->GetEntitiesInGroup("lights");
-		if((ei = light_entities.find(string("light"))) != light_entities.end())
-		{
-			light_entity = ei->second;
-
-			if((ai = light_entity->attributes.find(string("pos"))) != light_entity->attributes.end())
-				if(ai->second->type == CEntityAttribute::VECTOR)
-					light_pos = ai->second->vec_v;
-
-			if((ai = light_entity->attributes.find(string("color"))) != light_entity->attributes.end())
-				if(ai->second->type == CEntityAttribute::VECTOR)
-					light_color = ai->second->vec_v;
-
-			point_light = new CPointLight(light_pos, light_color, 300.0);
-			AddPointLight(point_light);
-			point_light->InitShadow(512, true, 0.00001);
-
-
-			if((ai = light_entity->attributes.find(string("ambient"))) != light_entity->attributes.end())
-				if(ai->second->type == CEntityAttribute::VECTOR)
-					ambient_color = ai->second->vec_v;
-		}
-	}
-}
-
-void CWorld::RemoveWorldMesh(void)
-{
-	if(!world_object)
-		return;
-
-	CMeshObject *m = world_object;
-	RemoveObject(world_object);
-
-	delete m;
-}
-
 void CWorld::Clear(void)
 {
-	RemoveWorldMesh();
 	objects.clear();
 }
 

@@ -34,7 +34,7 @@ void CMesh::CalculateNormalsSolid(void)
 		(*i)->CalculateNormalSolid();
 }
 
-CMesh::CMesh(void)
+CMesh::CMesh(const char *file)
 {
 	idle_pose = 0;
 	vao = 0;
@@ -48,6 +48,9 @@ CMesh::CMesh(void)
 	vertex_indices.clear();
 	entities.clear();
 	Create();
+
+	if(file)
+		LoadFromFile(file);
 }
 
 CMesh::~CMesh(void)
@@ -660,7 +663,19 @@ bool CMesh::LoadFromFile(const char *file, int no_material)
 	
 	path = PathOfFile(file);
 
-	r = LoadFromFile_xml(file, path, no_material);
+	r = LoadFromXML(xmlParseFile(file), path, no_material);
+
+	refresh_vbos = true;
+	refresh_ibos = true;
+
+	return r;
+}
+
+bool CMesh::LoadFromData(const char *data, const char *path)
+{
+	bool r;
+
+	r = LoadFromXML(xmlParseDoc((const xmlChar *)data), path, 0);
 
 	refresh_vbos = true;
 	refresh_ibos = true;
@@ -679,13 +694,10 @@ int TEMVersionFromString(const char *s)
 	return -1;
 }
 
-bool CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material)
+bool CMesh::LoadFromXML(xmlDocPtr doc, const char *path, int no_material)
 {
-	xmlDocPtr doc;
 	xmlNodePtr cur;
 	char *version_string;
-
-	doc = xmlParseFile(file);
 
 	if(!doc)
 		return 0;
@@ -700,7 +712,7 @@ bool CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material
 	version_string = (char *)xmlGetProp(cur, (const xmlChar *)"version");
 	if(!version_string)
 	{
-		printf("WARNING: File \"%s\" does not contain version info. Assuming it is %s.\n", file, TEM_VERSION_0_1_STRING);
+		printf("WARNING: File does not contain version info. Assuming it is %s.\n", TEM_VERSION_0_1_STRING);
 		file_version = TEM_VERSION_0_1;
 	}
 	else
@@ -708,14 +720,14 @@ bool CMesh::LoadFromFile_xml(const char *file, const char *path, int no_material
 		file_version = TEMVersionFromString(version_string);
 		if(file_version == -1)
 		{
-			printf("WARNING: Version \"%s\" of file \"%s\" could not be recognized. Assuming it is %s.\n",
-					version_string, file, TEM_CURRENT_VERSION_STRING);
+			printf("WARNING: Version \"%s\" of could not be recognized. Assuming it is %s.\n",
+					version_string, TEM_CURRENT_VERSION_STRING);
 			file_version = TEM_CURRENT_VERSION;
 		}
 		else if(file_version != TEM_CURRENT_VERSION)
 		{
-			printf("WARNING: Version \"%s\" of file \"%s\" is outdated. Use \"%s\" instead.\n",
-					version_string, file, TEM_CURRENT_VERSION_STRING);
+			printf("WARNING: Version \"%s\" of is outdated. Use \"%s\" instead.\n",
+					version_string, TEM_CURRENT_VERSION_STRING);
 		}
 	}
 

@@ -37,6 +37,7 @@ class CRenderer;
 #include "directional_shadow_shader.h"
 #include "post_process_shader.h"
 #include "ssao_shader.h"
+#include "color_shader.h"
 #include "skybox.h"
 #include "vertex.h"
 #include "triangle.h"
@@ -61,6 +62,8 @@ class CRenderer;
 #include "directional_light_shadow.h"
 #include "character_controller.h"
 #include "world.h"
+#include "scene_object.h"
+#include "scene.h"
 #include "renderer.h"
 
 #endif

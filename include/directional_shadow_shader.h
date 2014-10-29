@@ -13,12 +13,16 @@ class CDirectionalShadowShader : public CFaceShader
 
 		GLint vertex_mix_uniform;
 
+		GLint diffuse_tex_enabled_uniform;
+		GLint diffuse_tex_uniform;
+
 	public:
 		void Init(void);
 		void SetLightDir(CVector v);
 		void SetClip(float near, float far);
 		void SetTransformation(const float m[16]);
 		void SetVertexMix(float m = 0.0);
+		void SetDiffuseTexture(bool enabled, GLuint tex = 0);
 		void SetCamPos(CVector v);
 };
 
