@@ -2,37 +2,37 @@
 #ifndef _TERRAIN_H
 #define _TERRAIN_H
 
-class CTerrainMaterial;
+class tTerrainMaterial;
 
-class CTerrain
+class tTerrain
 {
 	private:
-		CHeightMap *height_map;
+		tHeightMap *height_map;
 
 		int map_size;
 		float size;
 		float height;
 
-		CTerrainMaterial *material;
+		tTerrainMaterial *material;
 
-		VAO *vao;
-		IBO *ibo;
-		VBO<float> *vertex_vbo;
-		VBO<float> *normal_vbo;
-		VBO<float> *tang_vbo;
-		VBO<float> *bitang_vbo;
-		VBO<float> *uvcoord_vbo;
+		tVAO *vao;
+		tIBO *ibo;
+		tVBO<float> *vertex_vbo;
+		tVBO<float> *normal_vbo;
+		tVBO<float> *tang_vbo;
+		tVBO<float> *bitang_vbo;
+		tVBO<float> *uvcoord_vbo;
 
 		int *physics_triangles;
 		float *physics_vertices;
 		btCollisionShape *collision_shape;
 
 	public:
-		CTerrain(CHeightMap *height_map, float size = 10.0, float height = 1.0, CTerrainMaterial *material = 0);
+		tTerrain(tHeightMap *height_map, float size = 10.0, float height = 1.0, tTerrainMaterial *material = 0);
 
-		CBoundingBox GetBoundingBox(void);
+		tBoundingBox GetBoundingBox(void);
 
-		void SetMaterial(CTerrainMaterial *material) { this->material = material; }
+		void SetMaterial(tTerrainMaterial *material) { this->material = material; }
 
 		btCollisionShape *GetCollisionShape(void)	{ return collision_shape; }
 
@@ -40,7 +40,7 @@ class CTerrain
 
 };
 
-class CTerrainMaterial : public CMaterial
+class tTerrainMaterial : public tMaterial
 {
 };
 

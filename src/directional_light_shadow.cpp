@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int size, int splits, bool blur_enabled, float blur_size)
+tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int size, int splits, bool blur_enabled, float blur_size)
 {
 	int i;
 
@@ -18,11 +18,11 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	{
 		splits_z[i] = 0.0;
 		tex_matrix[i] = new float[16];
-		memcpy(tex_matrix[i], CEngine::identity_matrix4, 16 * sizeof(float));
+		memcpy(tex_matrix[i], tEngine::identity_matrix4, 16 * sizeof(float));
 	}
 	splits_z[splits] = 0.0;
 
-	render_space = new CRenderSpace();
+	render_space = new tRenderSpace();
 
 	glGenTextures(1, &tex);
 
@@ -69,9 +69,9 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	blur_vao = new VAO();
+	blur_vao = new tVAO();
 
-	blur_vertex_vbo = new VBO<float>(2, blur_vao, 4);
+	blur_vertex_vbo = new tVBO<float>(2, blur_vao, 4);
 	static const float blur_vertices[] = {	-1.0, 1.0,
 											-1.0, -1.0,
 											1.0, -1.0,
@@ -79,7 +79,7 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	memcpy(blur_vertex_vbo->GetData(), blur_vertices, sizeof(float) * 8);
 	blur_vertex_vbo->AssignData();
 
-	blur_uv_vbo = new VBO<float>(2, blur_vao, 4);
+	blur_uv_vbo = new tVBO<float>(2, blur_vao, 4);
 	static const float blur_uv_coords[] = {	0.0, 1.0,
 											0.0, 0.0,
 											1.0, 0.0,
@@ -88,18 +88,18 @@ CDirectionalLightShadow::CDirectionalLightShadow(CDirectionalLight *light, int s
 	blur_uv_vbo->AssignData();
 
 	blur_vao->Bind();
-	blur_vertex_vbo->SetAttribute(CDirectionalShadowBlurShader::vertex_attribute, GL_FLOAT);
-	blur_uv_vbo->SetAttribute(CDirectionalShadowBlurShader::uv_coord_attribute, GL_FLOAT);
+	blur_vertex_vbo->SetAttribute(tDirectionalShadowBlurShader::vertex_attribute, GL_FLOAT);
+	blur_uv_vbo->SetAttribute(tDirectionalShadowBlurShader::uv_coord_attribute, GL_FLOAT);
 	blur_vao->UnBind();
 }
 
-void CDirectionalLightShadow::Render(CWorld *world)
+void tDirectionalLightShadow::Render(tWorld *world)
 {
 	int s;
-	CVector cam_pos = world->GetCamera()->GetPosition();
+	tVector cam_pos = world->GetCamera()->GetPosition();
 	//CVector cam_dir = world->GetCamera()->GetDirection();
-	CVector light_dir, light_to, light_up, light_right;
-	CVector *cam_frustum;
+	tVector light_dir, light_to, light_up, light_right;
+	tVector *cam_frustum;
 	float left, right, top, bottom;
 	float d;
 
@@ -128,11 +128,11 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	glViewport(0, 0, size, size);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-	CEngine::SetCurrentFaceShader(CEngine::GetDirectionalShadowShader());
-	CEngine::BindCurrentFaceShader();
-	CEngine::GetDirectionalShadowShader()->SetLightDir(light_dir);
-	CEngine::GetDirectionalShadowShader()->SetClip(near_clip, far_clip);
-	CEngine::GetDirectionalShadowShader()->SetCamPos(cam_pos);
+	tEngine::SetCurrentFaceShader(tEngine::GetDirectionalShadowShader());
+	tEngine::BindCurrentFaceShader();
+	tEngine::GetDirectionalShadowShader()->SetLightDir(light_dir);
+	tEngine::GetDirectionalShadowShader()->SetClip(near_clip, far_clip);
+	tEngine::GetDirectionalShadowShader()->SetCamPos(cam_pos);
 
 	splits_z[0] = world->GetCamera()->GetNearClip();
 
@@ -195,7 +195,7 @@ void CDirectionalLightShadow::Render(CWorld *world)
 		render_space->GeometryPass();
 	}
 
-	CShader::Unbind();
+	tShader::Unbind();
 
 	if(!blur_enabled)
 		return;
@@ -214,10 +214,10 @@ void CDirectionalLightShadow::Render(CWorld *world)
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
 
-	CEngine::GetDirectionalShadowBlurShader()->Bind();
-	CEngine::GetDirectionalShadowBlurShader()->SetTexture(tex);
-	CEngine::GetDirectionalShadowBlurShader()->SetTextureLayers(splits, h_blur);
-	CEngine::GetDirectionalShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0) * blur_size);
+	tEngine::GetDirectionalShadowBlurShader()->Bind();
+	tEngine::GetDirectionalShadowBlurShader()->SetTexture(tex);
+	tEngine::GetDirectionalShadowBlurShader()->SetTextureLayers(splits, h_blur);
+	tEngine::GetDirectionalShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0) * blur_size);
 
 	glDrawBuffers(splits, blur_draw_buffers);
 
@@ -227,9 +227,9 @@ void CDirectionalLightShadow::Render(CWorld *world)
 
 	blur_vao->Draw(GL_QUADS, 0, 4);
 
-	CEngine::GetDirectionalShadowBlurShader()->SetTexture(blur_tex);
-	CEngine::GetDirectionalShadowBlurShader()->SetTextureLayers(splits, v_blur);
-	CEngine::GetDirectionalShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0) * blur_size);
+	tEngine::GetDirectionalShadowBlurShader()->SetTexture(blur_tex);
+	tEngine::GetDirectionalShadowBlurShader()->SetTextureLayers(splits, v_blur);
+	tEngine::GetDirectionalShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0) * blur_size);
 
 	for(s=0; s<splits; s++)
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, blur_draw_buffers[s], tex, 0, s);

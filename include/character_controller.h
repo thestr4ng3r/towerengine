@@ -3,10 +3,10 @@
 #define _CHARACTERCONTROLLER_H
 
 
-class CCharacterController : public btActionInterface
+class tCharacterController : public btActionInterface
 {
 	private:
-		CVector velocity;
+		tVector velocity;
 		float vertical_velocity;
 
 		float step_height;
@@ -17,14 +17,14 @@ class CCharacterController : public btActionInterface
 		btConvexShape *shape;
 
 	public:
-		CCharacterController(btRigidBody *body, btConvexShape *shape, float step_height);
+		tCharacterController(btRigidBody *body, btConvexShape *shape, float step_height);
 
 		virtual void updateAction(btCollisionWorld *world, btScalar time);
 
 		void debugDraw(btIDebugDraw* debugDrawer) {};
 
 
-		void SetVelocity(CVector v)		{ velocity = v; }
+		void SetVelocity(tVector v)		{ velocity = v; }
 		void Jump(float v)				{ if(on_ground) vertical_velocity += v; }
 
 		bool GetOnGround(void)			{ return on_ground; }

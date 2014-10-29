@@ -1,13 +1,13 @@
 #include "towerengine.h"
 
-CHeightMap::CHeightMap(int size)
+tHeightMap::tHeightMap(int size)
 {
 	this->size = size;
 	height_tex = 0;
 	data = new float [size*size];
 }
 
-bool CHeightMap::Load(const char *file)
+bool tHeightMap::Load(const char *file)
 {
 	ILuint image;
 	ILenum error;

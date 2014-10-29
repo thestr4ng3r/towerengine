@@ -4,13 +4,13 @@
 /* gegeben ist eine Ebene durch den Normalvektor n und den Abstand zum Ursprung d
    SetFromPlane setzt meine Koordinaten von dem zweidimensionalen Punkt p (von oben gesehen), der auf der Ebene liegt
    und erg�nzt die y-Koordinate, sodass der Ergebnispunkt auf der Ebene liegt */
-void CVector::SetFromPlane(const CVector2 &p, const CVector &n, float d)
+void tVector::SetFromPlane(const tVector2 &p, const tVector &n, float d)
 {
 	x = p.x;
 	y = (d - p.x * n.x - p.y * n.z) / n.y;
 	z = p.y;
 }
-int IsInside(CVector2 c[4], const CVector2 &p)
+int IsInside(tVector2 c[4], const tVector2 &p)
 {
 	
 	int hit_count;
@@ -36,7 +36,7 @@ int IsInside(CVector2 c[4], const CVector2 &p)
 	return hit_count % 2;
 }
 
-int PointInRange(CVector p, CVector s, CVector b)
+int PointInRange(tVector p, tVector s, tVector b)
 {
 	bool i;
 
@@ -46,31 +46,31 @@ int PointInRange(CVector p, CVector s, CVector b)
 	return (int)i;	
 }
 
-CVector PointToLine(CVector p, CVector r, CVector n)
+tVector PointToLine(tVector p, tVector r, tVector n)
 {
 	float l = Dot(p, n) - Dot(n, r);
 	l /= Dot(n*n, Vec(1.0, 1.0, 1.0));
-	CVector f = r + n*l;
+	tVector f = r + n*l;
 	return f-p;
 }
 
-float DistToLine(CVector p, CVector r, CVector n)
+float DistToLine(tVector p, tVector r, tVector n)
 {
 	return PointToLine(p, r, n).Len();
 }
 
-void DistToPlane(const CVector &a, const CVector &b, const CVector &c, const CVector &point, double *dist, CVector *dir)
+void DistToPlane(const tVector &a, const tVector &b, const tVector &c, const tVector &point, double *dist, tVector *dir)
 {
-	CVector d = c;
+	tVector d = c;
 	DistToPlane(a, b, c, d, point, dist, dir);
 }
 
-void DistToPlane(const CVector &a, const CVector &b, const CVector &c, const CVector &d, const CVector &point, double *mdist, CVector *dir)
+void DistToPlane(const tVector &a, const tVector &b, const tVector &c, const tVector &d, const tVector &point, double *mdist, tVector *dir)
 {           
-	CVector2 cp[4];
-	CVector2 p;
-	CVector normal;
-	CVector proj;
+	tVector2 cp[4];
+	tVector2 p;
+	tVector normal;
+	tVector proj;
 	double dist;
 
 	normal = Cross(b-a, c-a);
@@ -121,9 +121,9 @@ void DistToPlane(const CVector &a, const CVector &b, const CVector &c, const CVe
 }
 
 
-CVector Vec(float x, float y, float z)
+tVector Vec(float x, float y, float z)
 {
-	CVector v;
+	tVector v;
 
 	v.x = x;
 	v.y = y;
@@ -132,7 +132,7 @@ CVector Vec(float x, float y, float z)
 	return v;
 }
 
-CVector Vec(btVector3 v)
+tVector Vec(btVector3 v)
 {
 	return Vec(v.x(), v.y(), v.z());
 }
@@ -151,14 +151,14 @@ CVector VecG3D(G3DVector v[3])
 }
 #endif*/
 
-CVector NullVec(void)
+tVector NullVec(void)
 {
     return Vec(0.0, 0.0, 0.0);
 }
 
-CVector operator+(const CVector &a, const CVector &b)
+tVector operator+(const tVector &a, const tVector &b)
 {
-	CVector r;
+	tVector r;
 
 	r.x = a.x + b.x;
 	r.y = a.y + b.y;
@@ -166,9 +166,9 @@ CVector operator+(const CVector &a, const CVector &b)
 	return r;
 }
 
-CVector operator-(const CVector &a, const CVector &b)
+tVector operator-(const tVector &a, const tVector &b)
 {
-	CVector r;
+	tVector r;
 
 	r.x = a.x - b.x;
 	r.y = a.y - b.y;
@@ -176,9 +176,9 @@ CVector operator-(const CVector &a, const CVector &b)
 	return r;
 }
 
-CVector operator*(const CVector &a, float scalar)
+tVector operator*(const tVector &a, float scalar)
 {
-	CVector r;
+	tVector r;
 
 	r.x = a.x * scalar;
 	r.y = a.y * scalar;
@@ -186,9 +186,9 @@ CVector operator*(const CVector &a, float scalar)
 	return r;
 }
 
-CVector operator*(float scalar, const CVector &a)
+tVector operator*(float scalar, const tVector &a)
 {
-	CVector r;
+	tVector r;
 
 	r.x = scalar * a.x;
 	r.y = scalar * a.y;
@@ -196,9 +196,9 @@ CVector operator*(float scalar, const CVector &a)
 	return r;
 }
 
-CVector operator*(const CVector &a, const CVector &b)
+tVector operator*(const tVector &a, const tVector &b)
 {
-	CVector r;
+	tVector r;
 
 	r.x = a.x * b.x;
 	r.y = a.y * b.y;
@@ -206,14 +206,14 @@ CVector operator*(const CVector &a, const CVector &b)
 	return r;
 }
 
-int operator==(const CVector a, const CVector b)
+int operator==(const tVector a, const tVector b)
 {
     if(a.x == b.x && a.y == b.y && a.z == b.z)
         return 1;
     return 0;
 }
 
-double Dot(const CVector &a, const CVector &b)
+double Dot(const tVector &a, const tVector &b)
 {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
@@ -221,9 +221,9 @@ double Dot(const CVector &a, const CVector &b)
  * Die L�nge des Vektors entspricht der Fl�che des Parallelogramms aus a und b
  */
 
-CVector Cross(const CVector &a, const CVector &b)
+tVector Cross(const tVector &a, const tVector &b)
 {
-	CVector ret;
+	tVector ret;
 
 	ret.x = a.y * b.z - a.z * b.y;
 	ret.y = a.z * b.x - a.x * b.z;
@@ -232,9 +232,9 @@ CVector Cross(const CVector &a, const CVector &b)
 	return ret;
 }
 
-CVector Vec(const CVector2 &v, float y)
+tVector Vec(const tVector2 &v, float y)
 {
-	CVector r;
+	tVector r;
 
 	r.x = v.x;
 	r.y = y;
@@ -244,12 +244,12 @@ CVector Vec(const CVector2 &v, float y)
 
 }
 
-CVector Rotate(const CVector &vec, const CVector &axis, float angle)
+tVector Rotate(const tVector &vec, const tVector &axis, float angle)
 {
-	CVector a;
-	CVector x;
-	CVector y;
-	CVector z;
+	tVector a;
+	tVector x;
+	tVector y;
+	tVector z;
 	double s, c, t;
 
 	a = axis;
@@ -274,14 +274,14 @@ CVector Rotate(const CVector &vec, const CVector &axis, float angle)
 	return vec.x * x + vec.y * y + vec.z * z;
 }
 
-double Det(const CVector &v1, const CVector &v2, const CVector &v3)
+double Det(const tVector &v1, const tVector &v2, const tVector &v3)
 {
 	return v1.x * v2.y * v3.z + v2.x * v3.y * v1.z + v3.x * v3.y * v2.z - v1.x * v3.y * v2.z - v2.x * v1.y * v3.z - v3.x * v2.y * v1.z;
 }
 
-CVector Mix(const CVector v1, const CVector v2, float mix)
+tVector Mix(const tVector v1, const tVector v2, float mix)
 {
-	CVector r;
+	tVector r;
 
 	if(mix < 0.0)
 		mix = 0.0;
@@ -292,7 +292,7 @@ CVector Mix(const CVector v1, const CVector v2, float mix)
 	return r;
 }
 
-CVector Mix(const CVector v[], const float a[], int count, float mix)
+tVector Mix(const tVector v[], const float a[], int count, float mix)
 {
 	int area = 0;
 	int i;
@@ -321,10 +321,10 @@ CVector Mix(const CVector v[], const float a[], int count, float mix)
 }
 
 
-CVector RandVec(void)
+tVector RandVec(void)
 {
-	CVector r;
-	CVector v;
+	tVector r;
+	tVector v;
 
 	r = Vec((float)rand(), (float)rand(), (float)rand());
 	r /= RAND_MAX;

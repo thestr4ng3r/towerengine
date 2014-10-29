@@ -1,28 +1,28 @@
 #ifndef _POSE_H
 #define _POSE_H
 
-class CVertex;
-class CMesh;
+class tVertex;
+class tMesh;
 
 
-struct CMeshPose
+struct tMeshPose
 {
-	CMesh *mesh;
+	tMesh *mesh;
 
-	VBO<float> *vbo;
-	map<CVertex *, CVector> vertices;
+	tVBO<float> *vbo;
+	map<tVertex *, tVector> vertices;
 
 	int id; // TODO: ID (nur zum saven) wo anders speichern (am besten in maps)
 	
-	CMeshPose(CMesh *mesh);
-	virtual ~CMeshPose(void);
+	tMeshPose(tMesh *mesh);
+	virtual ~tMeshPose(void);
 
 	void CopyFromVertices(void);
 	void Clear(void);
-	void CopyFromData(int c, int *vert, CVector *vec);
+	void CopyFromData(int c, int *vert, tVector *vec);
 	int Count(void);
 	void ApplyPoseToVertices(void);
-	void ApplyMixedPoseToVertices(CMeshPose *o, float mix);
+	void ApplyMixedPoseToVertices(tMeshPose *o, float mix);
 	void RefreshVBO(void);
 };
 

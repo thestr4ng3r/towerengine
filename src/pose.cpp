@@ -32,73 +32,73 @@ void CVertexPosition::ApplyMixedPosition(CVector o, float mix)
 //------------------------------------------------------------
 
 
-CMeshPose::CMeshPose(CMesh *mesh)
+tMeshPose::tMeshPose(tMesh *mesh)
 {
 	id = 0;
 	this->mesh = mesh;
 	vbo = mesh->CreateFloatVBO(3);
 }
 
-CMeshPose::~CMeshPose(void)
+tMeshPose::~tMeshPose(void)
 {
 	if(mesh->GetCurrentPose() == this)
 		mesh->ChangePose(mesh->GetIdlePose());
 	delete vbo;
 }
 
-void CMeshPose::CopyFromVertices(void)
+void tMeshPose::CopyFromVertices(void)
 {
-	CVertex *v;
-	CVector p;
+	tVertex *v;
+	tVector p;
 	int i;
 
 	for(i=0; i<mesh->GetVertexCount(); i++)
 	{
 		v = mesh->GetVertex(i);
 		p = *v;
-		vertices.insert(pair<CVertex *, CVector>(v, p));
+		vertices.insert(pair<tVertex *, tVector>(v, p));
 	}
 
 	RefreshVBO();
 }
 
-void CMeshPose::Clear(void)
+void tMeshPose::Clear(void)
 {
 	vertices.clear();
 }
 
-int CMeshPose::Count(void)
+int tMeshPose::Count(void)
 {
 	return vertices.size();
 }
 
-void CMeshPose::CopyFromData(int c, int *vert, CVector *vec)
+void tMeshPose::CopyFromData(int c, int *vert, tVector *vec)
 {
 	int i;//, vi;
-	CVertex *v;
+	tVertex *v;
 
 	for(i=0; i<c; i++)
 	{
 		v = mesh->GetVertexByID(vert[i]);
 		if(!v)
 			continue;
-		vertices.insert(pair<CVertex *, CVector>(v, vec[i]));
+		vertices.insert(pair<tVertex *, tVector>(v, vec[i]));
 	}
 	RefreshVBO();
 }
 
 
-void CMeshPose::ApplyPoseToVertices(void)
+void tMeshPose::ApplyPoseToVertices(void)
 {
-	map<CVertex *, CVector>::iterator i;
+	map<tVertex *, tVector>::iterator i;
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
 		i->first->SetVector(i->second);
 }
 
-void CMeshPose::ApplyMixedPoseToVertices(CMeshPose *o, float mix)
+void tMeshPose::ApplyMixedPoseToVertices(tMeshPose *o, float mix)
 {
-	map<CVertex *, CVector>::iterator i, oi;
+	map<tVertex *, tVector>::iterator i, oi;
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
 	{
@@ -112,12 +112,12 @@ void CMeshPose::ApplyMixedPoseToVertices(CMeshPose *o, float mix)
 }
 
 
-void CMeshPose::RefreshVBO(void)
+void tMeshPose::RefreshVBO(void)
 {
-	vector<CVertex *>::iterator v;
-	CVertex *vt;
+	vector<tVertex *>::iterator v;
+	tVertex *vt;
 	float *p;
-	map<CVertex *, CVector>::iterator vi;
+	map<tVertex *, tVector>::iterator vi;
 	float *vertex_data;
 	int i;
 

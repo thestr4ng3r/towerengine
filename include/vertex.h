@@ -2,30 +2,30 @@
 #ifndef _VERTEX_H
 #define _VERTEX_H
 
-struct CVertex : public CVector
+struct tVertex : public tVector
 {
-	CMesh *mesh;
+	tMesh *mesh;
 	//CVertex *chain_next;
 	int id;
 	float cam_dist;
-	CVector2 uv;
+	tVector2 uv;
 	bool uv_set;
-	CVector normal;
-	CVector tang, bitang;
+	tVector normal;
+	tVector tang, bitang;
 	int normal_count; // only for calculating smooth normals
 
 	int index;
 
-	CVertex(CMesh *mesh = 0);
-	CVertex(CVector v, CMesh *mesh = 0);
-	~CVertex(void);
-	void Create(CMesh *mesh);
+	tVertex(tMesh *mesh = 0);
+	tVertex(tVector v, tMesh *mesh = 0);
+	~tVertex(void);
+	void Create(tMesh *mesh);
 
-	int GetTriangles(CTriangle **&t, int *&number, CTriangle *exclude = 0);
+	int GetTriangles(tTriangle **&t, int *&number, tTriangle *exclude = 0);
 
-	void SetVector(CVector v) { x = v.x; y = v.y; z = v.z; };
+	void SetVector(tVector v) { x = v.x; y = v.y; z = v.z; };
 
-	CVector operator=(CVertex v);
+	tVector operator=(tVertex v);
 };
 
 #endif

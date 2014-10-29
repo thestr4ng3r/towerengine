@@ -1,7 +1,7 @@
 #ifndef _SHADER_H
 #define _SHADER_H
 
-struct CShaderProgram
+struct tShaderProgram
 {
 	const char *vertex_src;
 	const char *fragment_src;
@@ -11,7 +11,7 @@ struct CShaderProgram
 	GLuint program;
 };
 
-class CShader : protected CShaderProgram
+class tShader : protected tShaderProgram
 {
 	private:
 		const char *name;
@@ -32,7 +32,7 @@ class CShader : protected CShaderProgram
 
 		virtual void ResetUniforms(void) {};
 
-		virtual ~CShader(void) {};
+		virtual ~tShader(void) {};
 };
 
 
@@ -50,6 +50,6 @@ inline GLuint LoadGLTexture(const char *filename, bool *transparent, int alpha_c
 inline GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, bool *transparent, int alpha_channel = 3)
 		{ return LoadGLTextureBinary(ext, data, size, 0, 0, transparent, alpha_channel); }
 
-GLuint GLTextureFromColor(const CVector &color);
+GLuint GLTextureFromColor(const tVector &color);
 
 #endif

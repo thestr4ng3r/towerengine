@@ -4,12 +4,12 @@
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletDynamics/Character/btKinematicCharacterController.h"
 
-CWorld::CWorld(void)
+tWorld::tWorld(void)
 {
 	ambient_color = Vec(0.1, 0.1, 0.1);
 	sky_box = 0;
-	camera = new CCamera();
-	camera_render_space = new CRenderSpace();
+	camera = new tCamera();
+	camera_render_space = new tRenderSpace();
 
 	physics.broadphase = new btDbvtBroadphase();
 	physics.collision_configuration = new btDefaultCollisionConfiguration();
@@ -19,7 +19,7 @@ CWorld::CWorld(void)
 	physics.dynamics_world->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
 }
 
-CWorld::~CWorld(void)
+tWorld::~tWorld(void)
 {
 	delete physics.broadphase;
 	delete physics.collision_configuration;
@@ -28,9 +28,9 @@ CWorld::~CWorld(void)
 	delete physics.dynamics_world;
 }
 
-void CWorld::AddObject(CObject *o)
+void tWorld::AddObject(tObject *o)
 {
-	vector<CObject *>::iterator i;
+	vector<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		if(*i == o)
@@ -42,9 +42,9 @@ void CWorld::AddObject(CObject *o)
 		physics.dynamics_world->addRigidBody(o->GetRigidBody());
 }
 
-void CWorld::RemoveObject(CObject *o)
+void tWorld::RemoveObject(tObject *o)
 {
-	vector<CObject *>::iterator i;
+	vector<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		if(*i == o)
@@ -56,20 +56,20 @@ void CWorld::RemoveObject(CObject *o)
 		}
 }
 
-void CWorld::AddPointLight(CPointLight *light)
+void tWorld::AddPointLight(tPointLight *light)
 {
-	if(point_lights.size() >= CLightPassShader::max_point_lights)
+	if(point_lights.size() >= tLightPassShader::max_point_lights)
 		return;
 
-	for(vector<CPointLight *>::iterator i = point_lights.begin(); i != point_lights.end(); i++)
+	for(vector<tPointLight *>::iterator i = point_lights.begin(); i != point_lights.end(); i++)
 		if((*i) == light)
 			return;
 	point_lights.push_back(light);
 }
 
-void CWorld::RemovePointLight(CPointLight *light)
+void tWorld::RemovePointLight(tPointLight *light)
 {
-	for(vector<CPointLight *>::iterator i = point_lights.begin(); i != point_lights.end(); i++)
+	for(vector<tPointLight *>::iterator i = point_lights.begin(); i != point_lights.end(); i++)
 		if((*i) == light)
 		{
 			point_lights.erase(i);
@@ -77,20 +77,20 @@ void CWorld::RemovePointLight(CPointLight *light)
 		}
 }
 
-void CWorld::AddDirectionalLight(CDirectionalLight *light)
+void tWorld::AddDirectionalLight(tDirectionalLight *light)
 {
-	if(dir_lights.size() >= CLightPassShader::max_directional_lights)
+	if(dir_lights.size() >= tLightPassShader::max_directional_lights)
 		return;
 
-	for(vector<CDirectionalLight *>::iterator i = dir_lights.begin(); i != dir_lights.end(); i++)
+	for(vector<tDirectionalLight *>::iterator i = dir_lights.begin(); i != dir_lights.end(); i++)
 		if((*i) == light)
 			return;
 	dir_lights.push_back(light);
 }
 
-void CWorld::RemoveDirectionalLight(CDirectionalLight *light)
+void tWorld::RemoveDirectionalLight(tDirectionalLight *light)
 {
-	for(vector<CDirectionalLight *>::iterator i = dir_lights.begin(); i != dir_lights.end(); i++)
+	for(vector<tDirectionalLight *>::iterator i = dir_lights.begin(); i != dir_lights.end(); i++)
 		if((*i) == light)
 		{
 			dir_lights.erase(i);
@@ -98,31 +98,31 @@ void CWorld::RemoveDirectionalLight(CDirectionalLight *light)
 		}
 }
 
-void CWorld::Clear(void)
+void tWorld::Clear(void)
 {
 	objects.clear();
 }
 
-void CWorld::RenderShadowMaps(void)
+void tWorld::RenderShadowMaps(void)
 {
-	set<CPointLight *>::iterator pi;
+	set<tPointLight *>::iterator pi;
 
 	for(pi=camera_render_point_lights.begin(); pi!=camera_render_point_lights.end(); pi++)
 		(*pi)->RenderShadow(this);
 
-	set<CDirectionalLight *>::iterator di;
+	set<tDirectionalLight *>::iterator di;
 
 	for(di=camera_render_dir_lights.begin(); di!=camera_render_dir_lights.end(); di++)
 		(*di)->RenderShadow(this);
 }
 
-void CWorld::FillRenderSpaces(void)
+void tWorld::FillRenderSpaces(void)
 {
-	CBoundingBox b;
-	CVector minv, maxv;
-	CVector light_pos;
+	tBoundingBox b;
+	tVector minv, maxv;
+	tVector light_pos;
 	float light_dist;
-	vector<CObject *>::iterator i;
+	vector<tObject *>::iterator i;
 
 	camera->CalculateFrustumPlanes();
 
@@ -137,7 +137,7 @@ void CWorld::FillRenderSpaces(void)
 		camera_render_space->objects.insert((*i));
 	}
 
-	vector<CPointLight *>::iterator pi;
+	vector<tPointLight *>::iterator pi;
 
 	for(pi=point_lights.begin(); pi!=point_lights.end(); pi++)
 	{
@@ -174,7 +174,7 @@ void CWorld::FillRenderSpaces(void)
 		}
 	}
 
-	vector<CDirectionalLight *>::iterator di;
+	vector<tDirectionalLight *>::iterator di;
 
 	for(di=dir_lights.begin(); di!=dir_lights.end(); di++)
 	{
@@ -189,21 +189,21 @@ void CWorld::FillRenderSpaces(void)
 }
 
 
-void CWorld::Step(float time)
+void tWorld::Step(float time)
 {
 	physics.dynamics_world->stepSimulation(time, 10);
 }
 
 
-void CWorld::GetPointLightUniforms(int &count, float *pos, float *color, float *distance, int *shadow_enabled, GLuint *shadow_maps)
+void tWorld::GetPointLightUniforms(int &count, float *pos, float *color, float *distance, int *shadow_enabled, GLuint *shadow_maps)
 {
 	int i;
-	CPointLight *point_light;
-	set<CPointLight *>::iterator pi;
+	tPointLight *point_light;
+	set<tPointLight *>::iterator pi;
 
 	count = camera_render_point_lights.size();
 
-	for(pi=camera_render_point_lights.begin(), i=0; pi!=camera_render_point_lights.end() && i<CLightPassShader::max_point_lights; pi++, i++)
+	for(pi=camera_render_point_lights.begin(), i=0; pi!=camera_render_point_lights.end() && i<tLightPassShader::max_point_lights; pi++, i++)
 	{
 		point_light = *pi;
 		memcpy(pos + i*3, point_light->GetPosition().v, 3 * sizeof(float));
@@ -215,15 +215,15 @@ void CWorld::GetPointLightUniforms(int &count, float *pos, float *color, float *
 
 }
 
-void CWorld::GetDirectionalLightUniforms(int &count, float *dir, float *color, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z, int *shadow_enabled, GLuint *shadow_maps)
+void tWorld::GetDirectionalLightUniforms(int &count, float *dir, float *color, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z, int *shadow_enabled, GLuint *shadow_maps)
 {
 	int i, s;
-	CDirectionalLight *dir_light;
-	set<CDirectionalLight *>::iterator di;
+	tDirectionalLight *dir_light;
+	set<tDirectionalLight *>::iterator di;
 
 	count = camera_render_dir_lights.size();
 
-	for(di=camera_render_dir_lights.begin(), i=0; di!=camera_render_dir_lights.end() && i<CLightPassShader::max_directional_lights; di++, i++)
+	for(di=camera_render_dir_lights.begin(), i=0; di!=camera_render_dir_lights.end() && i<tLightPassShader::max_directional_lights; di++, i++)
 	{
 		dir_light = *di;
 		memcpy(dir + i*3, dir_light->GetDirection().v, 3 * sizeof(float));
@@ -237,10 +237,10 @@ void CWorld::GetDirectionalLightUniforms(int &count, float *dir, float *color, f
 			shadow_splits_count[i] = dir_light->GetShadow()->GetSplitsCount();
 			for(s=0; s<dir_light->GetShadow()->GetSplitsCount(); s++)
 			{
-				memcpy(shadow_tex_matrix + i*16*CLightPassShader::max_directional_light_splits + 16*s,
+				memcpy(shadow_tex_matrix + i*16*tLightPassShader::max_directional_light_splits + 16*s,
 						dir_light->GetShadow()->GetTextureMatrix()[s], sizeof(float) * 16);
 			}
-			memcpy(shadow_splits_z + i*(CLightPassShader::max_directional_light_splits+1),
+			memcpy(shadow_splits_z + i*(tLightPassShader::max_directional_light_splits+1),
 					dir_light->GetShadow()->GetSplitsZ(), sizeof(float) * (dir_light->GetShadow()->GetSplitsCount()+1));
 		}
 		else
@@ -248,7 +248,7 @@ void CWorld::GetDirectionalLightUniforms(int &count, float *dir, float *color, f
 			shadow_enabled[i] = 0;
 			shadow_clip[i*2 + 0] = 0.0;
 			shadow_clip[i*2 + 1] = 0.0;
-			memcpy(shadow_tex_matrix + i*16, CEngine::identity_matrix4, sizeof(float) * 16);
+			memcpy(shadow_tex_matrix + i*16, tEngine::identity_matrix4, sizeof(float) * 16);
 			shadow_maps[i] = 0;
 		}
 	}

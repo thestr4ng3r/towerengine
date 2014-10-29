@@ -17,29 +17,29 @@
 #define READ_MODUS_VALUES 0
 
 
-CVector light_dir;
-CVector light_pos;
-CVector cam_pos;
-CVector ambient_color;
-CVector light_attenuation;
+tVector light_dir;
+tVector light_pos;
+tVector cam_pos;
+tVector ambient_color;
+tVector light_attenuation;
 
 
 
 
 
-void CMesh::CalculateNormalsSolid(void)
+void tMesh::CalculateNormalsSolid(void)
 {
-	vector<CTriangle *>::iterator i;
+	vector<tTriangle *>::iterator i;
 	for(i=triangles.begin(); i!=triangles.end(); i++)
 		(*i)->CalculateNormalSolid();
 }
 
-CMesh::CMesh(const char *file)
+tMesh::tMesh(const char *file)
 {
 	idle_pose = 0;
 	vao = 0;
 	physics_triangle_mesh = 0;
-	bounding_box = CBoundingBox();
+	bounding_box = tBoundingBox();
 	//mat_indices = 0;
 	refresh_func = 0;
 	refresh_vbos = true;
@@ -53,15 +53,15 @@ CMesh::CMesh(const char *file)
 		LoadFromFile(file);
 }
 
-CMesh::~CMesh(void)
+tMesh::~tMesh(void)
 {
 	Delete();
 }
 
-float CMesh::color[4] = { 1.0, 1.0, 1.0, 1.0 };
+float tMesh::color[4] = { 1.0, 1.0, 1.0, 1.0 };
 
 
-void CMesh::Color(CVector c, float a)
+void tMesh::Color(tVector c, float a)
 {
 	color[0] = c.x;
 	color[1] = c.y;
@@ -70,33 +70,33 @@ void CMesh::Color(CVector c, float a)
 }
 
 
-void CMesh::ApplyMatrix(float m[16])
+void tMesh::ApplyMatrix(float m[16])
 {
-	vector<CVertex *>::iterator v;
+	vector<tVertex *>::iterator v;
 
 	for(v=vertices.begin(); v!=vertices.end(); v++)
 		(*v)->SetVector(ApplyMatrix4(m, **v));
 }
 
 
-void CMesh::Create(void)
+void tMesh::Create(void)
 {
 	Delete();
 
-	vao = new VAO();
-	current_pose = idle_pose = new CMeshPose(this);
+	vao = new tVAO();
+	current_pose = idle_pose = new tMeshPose(this);
 	//vertex_vbo = new VBO<float>(3, vao);
-	normal_vbo = new VBO<float>(3, vao);
-	tang_vbo = new VBO<float>(3, vao);
-	bitang_vbo = new VBO<float>(3, vao);
-	face_normal_vbo = new VBO<float>(3, vao);
-	uvcoord_vbo = new VBO<float>(2, vao);
+	normal_vbo = new tVBO<float>(3, vao);
+	tang_vbo = new tVBO<float>(3, vao);
+	bitang_vbo = new tVBO<float>(3, vao);
+	face_normal_vbo = new tVBO<float>(3, vao);
+	uvcoord_vbo = new tVBO<float>(2, vao);
 	outdated_vertices.clear();
 	data_count = 0;
 	refresh_func = 0;
 	refresh_vbos = true;
 	refresh_ibos = true;
-	idle_material = new CMeshMaterial(this, string());
+	idle_material = new tMeshMaterial(this, string());
 	//VAO::UnBind();
 
 	SetWireframe(0);
@@ -104,12 +104,12 @@ void CMesh::Create(void)
 	ResetAnimationFinished();
 }
 
-void CMesh::Delete(void)
+void tMesh::Delete(void)
 {
 	if(!GetState())
 		return;
 
-	map<string, CMeshPose *>::iterator cpi;
+	map<string, tMeshPose *>::iterator cpi;
 	for(cpi=custom_pose.begin(); cpi!=custom_pose.end(); cpi++)
 		delete custom_pose.begin()->second;
 	custom_pose.clear();
@@ -152,7 +152,7 @@ void CMesh::Delete(void)
 	data_count = 0;
 }
 
-void CMesh::DeleteVBOData(void)
+void tMesh::DeleteVBOData(void)
 {
 	if(vao)
 	{
@@ -167,34 +167,34 @@ void CMesh::DeleteVBOData(void)
 	}
 }
 
-VBO<float> *CMesh::CreateFloatVBO(int components)
+tVBO<float> *tMesh::CreateFloatVBO(int components)
 {
-	return new VBO<float>(components, vao);
+	return new tVBO<float>(components, vao);
 }
 
 
-CVertex *CMesh::CreateVertex(CVector v)
+tVertex *tMesh::CreateVertex(tVector v)
 {
-	CVertex *o;
-	o = new CVertex(v, this);
+	tVertex *o;
+	o = new tVertex(v, this);
 	refresh_vbos = false;
 	return o;
 }
 
-CTriangle *CMesh::CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3) // TODO: Optimieren!
+tTriangle *tMesh::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3) // TODO: Optimieren!
 {
     if(!GetState())
         return 0;
 
 	refresh_ibos = true;
 
-    return CTriangle::CreateTriangle(v1, v2, v3, color, material, t1, t2, t3, this);
+    return tTriangle::CreateTriangle(v1, v2, v3, color, material, t1, t2, t3, this);
 }
 
-CTriangle *CMesh::CreateTriangleAuto(CVector v1, CVector v2, CVector v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3)
+tTriangle *tMesh::CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3)
 {
-	CVertex *vert[3];
-	vector<CVertex *>::iterator verti;
+	tVertex *vert[3];
+	vector<tVertex *>::iterator verti;
 	int i;
 	float v[9] = {v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z};
 
@@ -221,18 +221,18 @@ CTriangle *CMesh::CreateTriangleAuto(CVector v1, CVector v2, CVector v3, CVector
                t3);			    // t3
 }
 
-CEntity *CMesh::CreateEntity(string name, string group)
+tEntity *tMesh::CreateEntity(string name, string group)
 {
-	CEntity *e = new CEntity();
+	tEntity *e = new tEntity();
 	e->name = name;
 	e->group = group;
 	entities.push_back(e);
 	return e;
 }
 
-CMeshMaterial *CMesh::GetMaterialByName(string name)
+tMeshMaterial *tMesh::GetMaterialByName(string name)
 {
-    vector<CMeshMaterial *>::iterator m;
+    vector<tMeshMaterial *>::iterator m;
 
     for(m=materials.begin(); m!=materials.end(); m++)
     {
@@ -243,9 +243,9 @@ CMeshMaterial *CMesh::GetMaterialByName(string name)
     return 0;
 }
 
-CVertex *CMesh::GetVertexByID(int id)
+tVertex *tMesh::GetVertexByID(int id)
 {
-	map<int, CVertex *>::iterator i = vertex_indices.find(id);
+	map<int, tVertex *>::iterator i = vertex_indices.find(id);
 	if(i != vertex_indices.end())
 		return i->second;
 
@@ -266,18 +266,18 @@ CVertex *CMesh::GetVertexByID(int id)
 	return 0;*/
 }
 
-void CMesh::SetVertexId(CVertex *v, int id)
+void tMesh::SetVertexId(tVertex *v, int id)
 {
 	if(v->id != 0)
 		vertex_indices.erase(v->id);
 
 	v->id = id;
-	vertex_indices.insert(pair<int, CVertex *>(id, v));
+	vertex_indices.insert(pair<int, tVertex *>(id, v));
 }
 
-void CMesh::AddVertex(CVertex *v)
+void tMesh::AddVertex(tVertex *v)
 {
-	vector<CVertex *>::iterator i;
+	vector<tVertex *>::iterator i;
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
 		if(*i == v)
@@ -287,9 +287,9 @@ void CMesh::AddVertex(CVertex *v)
 	refresh_vbos = true;
 }
 
-void CMesh::AddTriangle(CTriangle *t)
+void tMesh::AddTriangle(tTriangle *t)
 {
-	vector<CTriangle *>::iterator i;
+	vector<tTriangle *>::iterator i;
 
 	for(i=triangles.begin(); i!=triangles.end(); i++)
 		if(*i == t)
@@ -299,9 +299,9 @@ void CMesh::AddTriangle(CTriangle *t)
 	refresh_ibos = true;
 }
 
-void CMesh::AddMaterial(CMeshMaterial *m)
+void tMesh::AddMaterial(tMeshMaterial *m)
 {
-	vector<CMeshMaterial *>::iterator i;
+	vector<tMeshMaterial *>::iterator i;
 
 	for(i=materials.begin(); i!=materials.end(); i++)
 		if(*i == m)
@@ -310,18 +310,18 @@ void CMesh::AddMaterial(CMeshMaterial *m)
 	refresh_ibos = true;
 }
 
-void CMesh::AddCustomPose(string name, CMeshPose *p)
+void tMesh::AddCustomPose(string name, tMeshPose *p)
 {
 	if(custom_pose.find(name) != custom_pose.end())
 		return;
 
-	custom_pose.insert(pair<string, CMeshPose *>(name, p));
+	custom_pose.insert(pair<string, tMeshPose *>(name, p));
 	//refresh_vbo = true;
 }
 
-void CMesh::AddAnimation(CAnimation *a)
+void tMesh::AddAnimation(tAnimation *a)
 {
-	vector<CAnimation *>::iterator i;
+	vector<tAnimation *>::iterator i;
 
 	for(i=animations.begin(); i!=animations.end(); i++)
 		if(*i == a)
@@ -330,9 +330,9 @@ void CMesh::AddAnimation(CAnimation *a)
 	//refresh_vbo = true;
 }
 
-void CMesh::RemoveVertex(CVertex *v)
+void tMesh::RemoveVertex(tVertex *v)
 {
-	vector<CVertex *>::iterator i;
+	vector<tVertex *>::iterator i;
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
 		if(*i == v)
@@ -344,9 +344,9 @@ void CMesh::RemoveVertex(CVertex *v)
 	refresh_ibos = true;
 }
 
-void CMesh::RemoveTriangle(CTriangle *t)
+void tMesh::RemoveTriangle(tTriangle *t)
 {
-	vector<CTriangle *>::iterator i;
+	vector<tTriangle *>::iterator i;
 
 	for(i=triangles.begin(); i!=triangles.end(); i++)
 		if(*i == t)
@@ -358,9 +358,9 @@ void CMesh::RemoveTriangle(CTriangle *t)
 	//refresh_vbo = true;
 }
 
-void CMesh::RemoveMaterial(CMeshMaterial *m)
+void tMesh::RemoveMaterial(tMeshMaterial *m)
 {
-	vector<CMeshMaterial *>::iterator i;
+	vector<tMeshMaterial *>::iterator i;
 
 	for(i=materials.begin(); i!=materials.end(); i++)
 		if(*i == m)
@@ -372,9 +372,9 @@ void CMesh::RemoveMaterial(CMeshMaterial *m)
 	//refresh_vbo = true;
 }
 
-void CMesh::RemoveCustomPose(string name)
+void tMesh::RemoveCustomPose(string name)
 {
-	map<string, CMeshPose *>::iterator i;
+	map<string, tMeshPose *>::iterator i;
 
 	i = custom_pose.find(name);
 
@@ -382,9 +382,9 @@ void CMesh::RemoveCustomPose(string name)
 		custom_pose.erase(i);
 }
 
-void CMesh::RemoveAnimation(CAnimation *a)
+void tMesh::RemoveAnimation(tAnimation *a)
 {
-	vector<CAnimation *>::iterator i;
+	vector<tAnimation *>::iterator i;
 
 	for(i=animations.begin(); i!=animations.end(); i++)
 		if(*i == a)
@@ -395,9 +395,9 @@ void CMesh::RemoveAnimation(CAnimation *a)
 	//refresh_vbo = true;
 }
 
-void CMesh::RemoveEntity(CEntity *e)
+void tMesh::RemoveEntity(tEntity *e)
 {
-	vector<CEntity *>::iterator i;
+	vector<tEntity *>::iterator i;
 
 	for(i=entities.begin(); i!=entities.end(); i++)
 		if(*i == e)
@@ -407,13 +407,13 @@ void CMesh::RemoveEntity(CEntity *e)
 		}
 }
 
-void CMesh::SetIDs(void)
+void tMesh::SetIDs(void)
 {
 	int i;
-	vector<CVertex *>::iterator v;
-	vector<CAnimation *>::iterator a;
-	CKeyFrame *f;
-	map<string, CMeshPose *>::iterator p;
+	vector<tVertex *>::iterator v;
+	vector<tAnimation *>::iterator a;
+	tKeyFrame *f;
+	map<string, tMeshPose *>::iterator p;
 
 	for(v=vertices.begin(), i=0; v!=vertices.end(); v++, i++)
 		SetVertexId((*v), i);
@@ -426,9 +426,9 @@ void CMesh::SetIDs(void)
 		p->second->id = i;
 }
 
-void CMesh::SetTriangleMaterials(void)
+void tMesh::SetTriangleMaterials(void)
 {
-    vector<CTriangle *>::iterator t;
+    vector<tTriangle *>::iterator t;
 
     for(t=triangles.begin(); t!=triangles.end(); t++)
     {
@@ -439,9 +439,9 @@ void CMesh::SetTriangleMaterials(void)
 	//refresh_vbo = true;
 }
 
-void CMesh::AssignVertexArrayPositions(void)
+void tMesh::AssignVertexArrayPositions(void)
 {
-	vector<CVertex *>::iterator i;
+	vector<tVertex *>::iterator i;
 	int c;
 
 	for(c=0, i=vertices.begin(); i!=vertices.end(); c++, i++)
@@ -450,18 +450,18 @@ void CMesh::AssignVertexArrayPositions(void)
 	refresh_vbos = true;
 }
 
-void CMesh::GenerateBoundingBox(void)
+void tMesh::GenerateBoundingBox(void)
 {
-	vector<CVertex *>::iterator i;
-	bounding_box = CBoundingBox();
+	vector<tVertex *>::iterator i;
+	bounding_box = tBoundingBox();
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
 		bounding_box.AddPoint(**i);
 }
 
-btTriangleMesh *CMesh::GeneratePhysicsMesh(void)
+btTriangleMesh *tMesh::GeneratePhysicsMesh(void)
 {
-	vector<CTriangle *>::iterator i;
+	vector<tTriangle *>::iterator i;
 
 	if(physics_triangle_mesh)
 		delete physics_triangle_mesh;
@@ -475,12 +475,12 @@ btTriangleMesh *CMesh::GeneratePhysicsMesh(void)
 }
 
 
-void CMesh::RefreshAllVBOs(void)
+void tMesh::RefreshAllVBOs(void)
 {
-	vector<CTriangle *>::iterator i;
-	vector<CMeshMaterial *>::iterator m;
-	vector<CVertex *>::iterator v;
-	CVertex *vt;
+	vector<tTriangle *>::iterator i;
+	vector<tMeshMaterial *>::iterator m;
+	vector<tVertex *>::iterator v;
+	tVertex *vt;
 	int d;
 	float *normal_data;
 	float *tang_data;
@@ -524,12 +524,12 @@ void CMesh::RefreshAllVBOs(void)
 	refresh_vbos = false;
 }
 
-void CMesh::RefreshIBOs(void)
+void tMesh::RefreshIBOs(void)
 {
-	vector<CTriangle *>::iterator i;
-	vector<CMeshMaterial *>::iterator m;
-	CTriangle *t;
-	CMeshMaterial *mt;
+	vector<tTriangle *>::iterator i;
+	vector<tMeshMaterial *>::iterator m;
+	tTriangle *t;
+	tMeshMaterial *mt;
 	int c;
 	int j;
 
@@ -566,11 +566,11 @@ void CMesh::RefreshIBOs(void)
 	refresh_ibos = false;
 }
 
-void CMesh::PutToGL(void)
+void tMesh::PutToGL(void)
 {
-	vector<CMeshMaterial *>::iterator i;
-	VBO<float> *vertex_vbo, *vertex2_vbo;
-	CKeyFrame *a, *b;
+	vector<tMeshMaterial *>::iterator i;
+	tVBO<float> *vertex_vbo, *vertex2_vbo;
+	tKeyFrame *a, *b;
 	float mix;
 
 	vertex2_vbo = 0;
@@ -614,25 +614,25 @@ void CMesh::PutToGL(void)
 		glEnd();
 	}*/
 
-	vertex_vbo->SetAttribute(CFaceShader::vertex_attribute, GL_FLOAT);
+	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
 	if(vertex2_vbo)
 	{
-		CEngine::GetCurrentFaceShader()->SetVertexMix(mix);
-		vertex2_vbo->SetAttribute(CFaceShader::vertex2_attribute, GL_FLOAT);
+		tEngine::GetCurrentFaceShader()->SetVertexMix(mix);
+		vertex2_vbo->SetAttribute(tFaceShader::vertex2_attribute, GL_FLOAT);
 	}
 	else
-		CEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
+		tEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
 
-	normal_vbo->SetAttribute(CFaceShader::normal_attribute, GL_FLOAT);
-	tang_vbo->SetAttribute(CFaceShader::tang_attribute, GL_FLOAT);
-	bitang_vbo->SetAttribute(CFaceShader::bitang_attribute, GL_FLOAT);
-	uvcoord_vbo->SetAttribute(CFaceShader::uvcoord_attribute, GL_FLOAT);
+	normal_vbo->SetAttribute(tFaceShader::normal_attribute, GL_FLOAT);
+	tang_vbo->SetAttribute(tFaceShader::tang_attribute, GL_FLOAT);
+	bitang_vbo->SetAttribute(tFaceShader::bitang_attribute, GL_FLOAT);
+	uvcoord_vbo->SetAttribute(tFaceShader::uvcoord_attribute, GL_FLOAT);
 
 	if(refresh_ibos)
 		RefreshIBOs();
 
 	//CEngine::GetFaceShader()->BindShader();
-	CEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
+	tEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -647,12 +647,12 @@ void CMesh::PutToGL(void)
 	}
 }
 
-int CMesh::GetState(void)
+int tMesh::GetState(void)
 {
     return 1;
 }
 
-bool CMesh::LoadFromFile(const char *file, int no_material)
+bool tMesh::LoadFromFile(const char *file, int no_material)
 {
 	bool r;
 	char *path;
@@ -671,7 +671,7 @@ bool CMesh::LoadFromFile(const char *file, int no_material)
 	return r;
 }
 
-bool CMesh::LoadFromData(const char *data, const char *path)
+bool tMesh::LoadFromData(const char *data, const char *path)
 {
 	bool r;
 
@@ -694,7 +694,7 @@ int TEMVersionFromString(const char *s)
 	return -1;
 }
 
-bool CMesh::LoadFromXML(xmlDocPtr doc, const char *path, int no_material)
+bool tMesh::LoadFromXML(xmlDocPtr doc, const char *path, int no_material)
 {
 	xmlNodePtr cur;
 	char *version_string;
@@ -768,13 +768,13 @@ bool CMesh::LoadFromXML(xmlDocPtr doc, const char *path, int no_material)
 	return 1;
 }
 
-CVertex *CMesh::ParseVertexNode(xmlNodePtr cur)
+tVertex *tMesh::ParseVertexNode(xmlNodePtr cur)
 {
 	int id;
-	CVector p;
-	CVector normal;
-	CVector2 uv;
-	CVertex *r;
+	tVector p;
+	tVector normal;
+	tVector2 uv;
+	tVertex *r;
 
 	id = atoi((const char *)xmlGetProp(cur, (const xmlChar *)"id"));
 	p.x = atof((const char *)xmlGetProp(cur, (const xmlChar *)"x"));
@@ -790,7 +790,7 @@ CVertex *CMesh::ParseVertexNode(xmlNodePtr cur)
 		normal.z = atof((const char *)xmlGetProp(cur, (const xmlChar *)"nz"));
 	}
 
-	r = new CVertex(p, this);
+	r = new tVertex(p, this);
 	SetVertexId(r, id);
 	r->uv_set = file_version >= TEM_VERSION_0_2;
 	r->uv = uv;
@@ -802,12 +802,12 @@ CVertex *CMesh::ParseVertexNode(xmlNodePtr cur)
 #define TEXTURE_FILE 1
 #define TEXTURE_DATA 2
 
-CMeshMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
+tMeshMaterial *tMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 {
 	xmlNodePtr child;
 	int diffuse_mode, specular_mode, normal_mode, bump_mode;
-	string diffuse_file; CVector diffuse_color;
-	string specular_file; float exponent; CVector specular_color;
+	string diffuse_file; tVector diffuse_color;
+	string specular_file; float exponent; tVector specular_color;
 	string normal_file;
 	string bump_file; float bump_depth;
 
@@ -818,7 +818,7 @@ CMeshMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 
 	string name;
 	xmlChar *temp;
-	CMeshMaterial *r;
+	tMeshMaterial *r;
 
 	diffuse_mode = specular_mode = normal_mode = bump_mode = TEXTURE_DISABLED;
 	diffuse_ext = specular_ext = normal_ext = bump_ext = 0;
@@ -924,7 +924,7 @@ CMeshMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 		child = child->next;
 	}
 
-	r = new CMeshMaterial(this, name);
+	r = new tMeshMaterial(this, name);
 
 
 	r->SetDiffuse(diffuse_color);
@@ -955,14 +955,14 @@ CMeshMaterial *CMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 	return r;
 }
 
-CTriangle *CMesh::ParseTriangleNode(xmlNodePtr cur)
+tTriangle *tMesh::ParseTriangleNode(xmlNodePtr cur)
 {
 	char *material;
 	int v[3];
 	int i;
-	CVector uv[3];
-	CVertex *vt[3];
-	CTriangle *r;
+	tVector uv[3];
+	tVertex *vt[3];
+	tTriangle *r;
 	xmlNodePtr child;
 
 	material = (char *)xmlGetProp(cur, (const xmlChar *)"mat");
@@ -1007,15 +1007,15 @@ CTriangle *CMesh::ParseTriangleNode(xmlNodePtr cur)
 	return r;
 }
 
-CMeshPose *CMesh::ParsePoseNode(xmlNodePtr cur)
+tMeshPose *tMesh::ParsePoseNode(xmlNodePtr cur)
 {
 	char *name;
 	xmlNodePtr child;
 	int count;
 	int i;
 	int *vert;
-	CVector *vec;
-	CMeshPose *r;
+	tVector *vec;
+	tMeshPose *r;
 
 	name = (char *)xmlGetProp(cur, (const xmlChar *)"name");
 
@@ -1029,7 +1029,7 @@ CMeshPose *CMesh::ParsePoseNode(xmlNodePtr cur)
 	}
 
 	vert = new int[count];
-	vec = new CVector[count];
+	vec = new tVector[count];
 
 	child = cur->children;
 	for(child = cur->children, i=0; child && i<count; child = child->next)
@@ -1045,23 +1045,23 @@ CMeshPose *CMesh::ParsePoseNode(xmlNodePtr cur)
 		i++;
 	}
 
-	r = new CMeshPose(this);
+	r = new tMeshPose(this);
 	r->CopyFromData(count, vert, vec);
 	AddCustomPose(name, r);
 	return r;
 }
 
-CAnimation *CMesh::ParseAnimationNode(xmlNodePtr cur)
+tAnimation *tMesh::ParseAnimationNode(xmlNodePtr cur)
 {
 	char *name;
 	float len;
 	xmlNodePtr child;
-	CAnimation *r;
+	tAnimation *r;
 
 	name = (char *)xmlGetProp(cur, (const xmlChar *)"name");
 	len = atof((char *)xmlGetProp(cur, (const xmlChar *)"len"));
 
-	r = new CAnimation(this, name, len, 0);
+	r = new tAnimation(this, name, len, 0);
 
 	for(child = cur->children; child; child = child->next)
 	{
@@ -1073,15 +1073,15 @@ CAnimation *CMesh::ParseAnimationNode(xmlNodePtr cur)
 	return r;
 }
 
-CKeyFrame *CMesh::ParseKeyFrameNode(xmlNodePtr cur, CAnimation *anim)
+tKeyFrame *tMesh::ParseKeyFrameNode(xmlNodePtr cur, tAnimation *anim)
 {
 	float time;
 	xmlNodePtr child;
 	int count;
 	int i;
 	int *vert;
-	CVector *vec;
-	CKeyFrame *r;
+	tVector *vec;
+	tKeyFrame *r;
 
 	time = atof((char *)xmlGetProp(cur, (const xmlChar *)"time"));
 
@@ -1095,7 +1095,7 @@ CKeyFrame *CMesh::ParseKeyFrameNode(xmlNodePtr cur, CAnimation *anim)
 	}
 
 	vert = new int[count];
-	vec = new CVector[count];
+	vec = new tVector[count];
 
 
 	child = cur->children;
@@ -1116,7 +1116,7 @@ CKeyFrame *CMesh::ParseKeyFrameNode(xmlNodePtr cur, CAnimation *anim)
 	return r;
 }
 
-int CMesh::SaveToFile(const char *file)
+int tMesh::SaveToFile(const char *file)
 {
 	printf("CMesh::SaveToFile does not do anything at the moment.\n");
 	return 0;
@@ -1318,10 +1318,10 @@ int CMesh::SaveToFile(const char *file)
 }
 
 
-CEntity *CMesh::ParseEntityNode(xmlNodePtr root)
+tEntity *tMesh::ParseEntityNode(xmlNodePtr root)
 {
-	CEntity *e = new CEntity();
-	CEntityAttribute *a;
+	tEntity *e = new tEntity();
+	tEntityAttribute *a;
 	xmlNodePtr cur;
 	string a_type, a_name;
 
@@ -1338,34 +1338,34 @@ CEntity *CMesh::ParseEntityNode(xmlNodePtr root)
 	{
 		a_type = string((const char *)cur->name);
 
-		a = new CEntityAttribute();
+		a = new tEntityAttribute();
 
 		if(a_type.compare("vec3") == 0)
 		{
-			a->type = CEntityAttribute::VECTOR;
+			a->type = tEntityAttribute::VECTOR;
 			a->vec_v = Vec(atof((const char *)xmlGetProp(cur, (const xmlChar *)"x")),
 					atof((const char *)xmlGetProp(cur, (const xmlChar *)"y")),
 					atof((const char *)xmlGetProp(cur, (const xmlChar *)"z")));
 		}
 		else if(a_type.compare("vec2") == 0)
 		{
-			a->type = CEntityAttribute::VECTOR2;
+			a->type = tEntityAttribute::VECTOR2;
 			a->vec2_v = Vec(atof((const char *)xmlGetProp(cur, (const xmlChar *)"x")),
 					atof((const char *)xmlGetProp(cur, (const xmlChar *)"y")));
 		}
 		else if(a_type.compare("float") == 0)
 		{
-			a->type = CEntityAttribute::FLOAT;
+			a->type = tEntityAttribute::FLOAT;
 			a->float_v = atof((const char *)xmlGetProp(cur, (const xmlChar *)"v"));
 		}
 		else if(a_type.compare("int") == 0)
 		{
-			a->type = CEntityAttribute::INT;
+			a->type = tEntityAttribute::INT;
 			a->int_v = atoi((const char *)xmlGetProp(cur, (const xmlChar *)"v"));
 		}
 		else if(a_type.compare("string") == 0)
 		{
-			a->type = CEntityAttribute::STRING;
+			a->type = tEntityAttribute::STRING;
 			a->string_v = string((const char *)xmlGetProp(cur, (const xmlChar *)"v"));
 		}
 		else
@@ -1376,7 +1376,7 @@ CEntity *CMesh::ParseEntityNode(xmlNodePtr root)
 
 		a_name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
 
-		e->attributes.insert(pair<string, CEntityAttribute *>(a_name, a));
+		e->attributes.insert(pair<string, tEntityAttribute *>(a_name, a));
 	}
 
 	entities.push_back(e);
@@ -1386,20 +1386,20 @@ CEntity *CMesh::ParseEntityNode(xmlNodePtr root)
 
 
 
-map<string, CEntity *> CMesh::GetEntitiesInGroup(const char *group)
+map<string, tEntity *> tMesh::GetEntitiesInGroup(const char *group)
 {
-	map<string, CEntity *> r;
-	vector<CEntity *>::iterator i;
+	map<string, tEntity *> r;
+	vector<tEntity *>::iterator i;
 
 	for(i=entities.begin(); i!=entities.end(); i++)
 		if((*i)->group.compare(group) == 0)
-			r.insert(pair<string, CEntity *>((*i)->name, *i));
+			r.insert(pair<string, tEntity *>((*i)->name, *i));
 
 	return r;
 }
 
 
-CMeshPose *CMesh::GetCustomPoseByName(string name)
+tMeshPose *tMesh::GetCustomPoseByName(string name)
 {
 	try
 	{
@@ -1410,21 +1410,21 @@ CMeshPose *CMesh::GetCustomPoseByName(string name)
 	return 0;
 }
 
-CMeshPose *CMesh::CreateCustomPose(string name)
+tMeshPose *tMesh::CreateCustomPose(string name)
 {
 	if(GetCustomPoseByName(name))
 		return 0;
 
-	CMeshPose *p = new CMeshPose(this);
+	tMeshPose *p = new tMeshPose(this);
 	p->CopyFromVertices();
-	custom_pose.insert(pair<string, CMeshPose *>(name, p));
+	custom_pose.insert(pair<string, tMeshPose *>(name, p));
 
 	return p;
 }
 
-void CMesh::ChangePose(string name, string idle)
+void tMesh::ChangePose(string name, string idle)
 {
-	CMeshPose *p;
+	tMeshPose *p;
 
 	if(name == idle)
 		current_pose = idle_pose;
@@ -1438,7 +1438,7 @@ void CMesh::ChangePose(string name, string idle)
 	//current_pose->ApplyPose();
 }
 
-void CMesh::ChangePose(CMeshPose *pos)
+void tMesh::ChangePose(tMeshPose *pos)
 {
 	if(pos == current_pose)
 		return;
@@ -1451,19 +1451,19 @@ void CMesh::ChangePose(CMeshPose *pos)
 	//	current_pose->ApplyPose();
 }
 
-CMeshPose *CMesh::GetCurrentPose(void)
+tMeshPose *tMesh::GetCurrentPose(void)
 {
 	return current_pose;
 }
 
-void CMesh::CopyPoseFromVertices(void)
+void tMesh::CopyPoseFromVertices(void)
 {
 	if(current_pose)
 		current_pose->CopyFromVertices();
 }
 
 
-string CMesh::GetCurrentPoseName(string idle) // deprecated
+string tMesh::GetCurrentPoseName(string idle) // deprecated
 {
 	string r;
 
@@ -1474,7 +1474,7 @@ string CMesh::GetCurrentPoseName(string idle) // deprecated
 		return idle;
 	else
 	{
-		map<string, CMeshPose *>::iterator i;
+		map<string, tMeshPose *>::iterator i;
 		for(i=custom_pose.begin(); i!=custom_pose.end(); i++)
 		{
 			if(i->second == current_pose)
@@ -1487,15 +1487,15 @@ string CMesh::GetCurrentPoseName(string idle) // deprecated
 
 
 
-CAnimation *CMesh::CreateAnimation(const char *name, float len)
+tAnimation *tMesh::CreateAnimation(const char *name, float len)
 {
 	if(GetAnimationByName(name))
 		return 0;
 
-	return new CAnimation(this, name, len);
+	return new tAnimation(this, name, len);
 }
 
-void CMesh::ChangeAnimation(CAnimation *a)
+void tMesh::ChangeAnimation(tAnimation *a)
 {
 	if(a->mesh != this)
 		return;
@@ -1507,9 +1507,9 @@ void CMesh::ChangeAnimation(CAnimation *a)
 	//RefreshAllVBOs();
 }
 
-void CMesh::ChangeAnimation(const char *name)
+void tMesh::ChangeAnimation(const char *name)
 {
-	CAnimation *a;
+	tAnimation *a;
 
 	a = GetAnimationByName(name);
 
@@ -1519,9 +1519,9 @@ void CMesh::ChangeAnimation(const char *name)
 	ChangeAnimation(a);
 }
 
-CAnimation *CMesh::GetAnimationByName(const char *name)
+tAnimation *tMesh::GetAnimationByName(const char *name)
 {
-	vector<CAnimation *>::iterator a;
+	vector<tAnimation *>::iterator a;
 
 	for(a=animations.begin(); a!=animations.end(); a++)
 		if(strcmp(name, (*a)->GetName()) == 0)
@@ -1530,12 +1530,12 @@ CAnimation *CMesh::GetAnimationByName(const char *name)
 
 }
 
-CAnimation *CMesh::GetCurrentAnimation(void)
+tAnimation *tMesh::GetCurrentAnimation(void)
 {
 	return current_animation;
 }
 
-char *CMesh::GetCurrentAnimationName(void)
+char *tMesh::GetCurrentAnimationName(void)
 {
 	char *r;
 	char *n;
@@ -1550,7 +1550,7 @@ char *CMesh::GetCurrentAnimationName(void)
 	return r;
 }
 
-void CMesh::PlayAnimation(float t)
+void tMesh::PlayAnimation(float t)
 {
 	if(!current_animation)
 		return;
@@ -1558,18 +1558,18 @@ void CMesh::PlayAnimation(float t)
 	current_animation->ApplyCurrentFrame();
 }
 
-void CMesh::ApplyAnimation(void)
+void tMesh::ApplyAnimation(void)
 {
 	if(current_animation)
 		current_animation->ApplyCurrentFrame();
 }
 
-bool CompareTriangleDist(CTriangle *a, CTriangle *b)
+bool CompareTriangleDist(tTriangle *a, tTriangle *b)
 {
 	return a->cam_dist > b->cam_dist;
 }
 
-bool CompareTriangleMaterial(CTriangle *a, CTriangle *b)
+bool CompareTriangleMaterial(tTriangle *a, tTriangle *b)
 {
 	//if(a->mat == b->mat)
 	//	return CompareDist(a, b);
@@ -1580,7 +1580,7 @@ bool CompareTriangleMaterial(CTriangle *a, CTriangle *b)
 		return b->mat->GetTransparent() && !a->mat->GetTransparent();
 }
 
-bool CompareMaterialTransparency(CMeshMaterial *a, CMeshMaterial *b)
+bool CompareMaterialTransparency(tMeshMaterial *a, tMeshMaterial *b)
 {
 	if(b->GetTransparent() == a->GetTransparent())
 		return a < b;
@@ -1588,7 +1588,7 @@ bool CompareMaterialTransparency(CMeshMaterial *a, CMeshMaterial *b)
 		return b->GetTransparent() && !a->GetTransparent();
 }
 
-void CMesh::SortTriangles(CVector cam)
+void tMesh::SortTriangles(tVector cam)
 {
 	//vector<CTriangle *>::iterator t;
 	//vector<CVertex *>::iterator v;
@@ -1603,7 +1603,7 @@ void CMesh::SortTriangles(CVector cam)
 	refresh_vbos = true;
 }
 
-void CMesh::SortMaterials(void)
+void tMesh::SortMaterials(void)
 {
 	sort(materials.begin(), materials.end(), CompareMaterialTransparency);
 }

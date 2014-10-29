@@ -1,7 +1,7 @@
 #ifndef _ENVIRONMENT_SHADER_H
 #define _ENVIRONMENT_SHADER_H
 
-class CSkyBoxShader : public CShader
+class tSkyBoxShader : public tShader
 {
 	private:
 		GLint tex_uniform;
@@ -14,12 +14,12 @@ class CSkyBoxShader : public CShader
 
 GLenum CubeTex(int side);
 int CubeSide(GLenum tex);
-CVector CubeVecS(int side);
+tVector CubeVecS(int side);
 
 //GLuint LoadGLTexture(const char *filename, GLenum type = GL_TEXTURE_2D);
 GLuint LoadGLCubeMap(const char *filename[6]);
 
 GLuint CreateCubeTexture(GLenum type, int width, int height);
-GLuint GLTextureFromColor(const CVector &color);
+GLuint GLTextureFromColor(const tVector &color);
 
 #endif

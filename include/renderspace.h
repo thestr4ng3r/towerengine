@@ -3,10 +3,10 @@
 #define _RENDERSPACE_H
 
 
-class CRenderSpace
+class tRenderSpace
 {
 	public:
-		set<CObject *> objects;
+		set<tObject *> objects;
 
 	public:
 		void ClearObjects(void);

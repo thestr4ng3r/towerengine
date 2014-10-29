@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-CRenderer::CRenderer(int width, int height, CWorld *world)
+tRenderer::tRenderer(int width, int height, tWorld *world)
 {
 	this->screen_width = width;
 	this->screen_height = height;
@@ -44,27 +44,27 @@ CRenderer::CRenderer(int width, int height, CWorld *world)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	gbuffer = new CGBuffer(screen_width, screen_height, fbo, 1);
+	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 1);
 
 	point_light_count = 0;
-	point_light_pos = new float[CLightPassShader::max_point_lights * 3];
-	point_light_color = new float[CLightPassShader::max_point_lights * 3];
-	point_light_distance = new float[CLightPassShader::max_point_lights];
-	point_light_shadow_enabled = new int[CLightPassShader::max_point_lights];
-	point_light_shadow_maps = new GLuint[CLightPassShader::max_point_lights];
+	point_light_pos = new float[tLightPassShader::max_point_lights * 3];
+	point_light_color = new float[tLightPassShader::max_point_lights * 3];
+	point_light_distance = new float[tLightPassShader::max_point_lights];
+	point_light_shadow_enabled = new int[tLightPassShader::max_point_lights];
+	point_light_shadow_maps = new GLuint[tLightPassShader::max_point_lights];
 
 	dir_light_count = 0;
-	dir_light_dir = new float[CLightPassShader::max_directional_lights * 3];
-	dir_light_color = new float[CLightPassShader::max_directional_lights * 3];
-	dir_light_shadow_enabled = new int[CLightPassShader::max_directional_lights];
-	dir_light_shadow_clip = new float[CLightPassShader::max_directional_lights * 2];
-	dir_light_shadow_tex_matrix = new float[CLightPassShader::max_directional_lights * 16 * CLightPassShader::max_directional_light_splits];
-	dir_light_shadow_splits_count = new float[CLightPassShader::max_directional_lights];
-	dir_light_shadow_splits_z = new float[CLightPassShader::max_directional_lights * (CLightPassShader::max_directional_light_splits+1)];
-	dir_light_shadow_maps = new GLuint[CLightPassShader::max_directional_lights];
+	dir_light_dir = new float[tLightPassShader::max_directional_lights * 3];
+	dir_light_color = new float[tLightPassShader::max_directional_lights * 3];
+	dir_light_shadow_enabled = new int[tLightPassShader::max_directional_lights];
+	dir_light_shadow_clip = new float[tLightPassShader::max_directional_lights * 2];
+	dir_light_shadow_tex_matrix = new float[tLightPassShader::max_directional_lights * 16 * tLightPassShader::max_directional_light_splits];
+	dir_light_shadow_splits_count = new float[tLightPassShader::max_directional_lights];
+	dir_light_shadow_splits_z = new float[tLightPassShader::max_directional_lights * (tLightPassShader::max_directional_light_splits+1)];
+	dir_light_shadow_maps = new GLuint[tLightPassShader::max_directional_lights];
 }
 
-CRenderer::~CRenderer(void)
+tRenderer::~tRenderer(void)
 {
 	delete[] point_light_pos;
 	delete[] point_light_color;
@@ -82,7 +82,7 @@ CRenderer::~CRenderer(void)
 	delete[] dir_light_shadow_maps;
 }
 
-void CRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
+void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 {
 	ssao.kernel = new float[kernel_size*3];
 	ssao.kernel_size = kernel_size;
@@ -90,7 +90,7 @@ void CRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 	ssao.radius = radius;
 
 	float scale;
-	CVector v;
+	tVector v;
 
 	for(int i=0; i<ssao.kernel_size; i++)
 	{
@@ -149,9 +149,9 @@ void CRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 	ssao.enabled = true;
 }
 
-void CRenderer::Render(void)
+void tRenderer::Render(void)
 {
-	CCamera *camera = world->GetCamera();
+	tCamera *camera = world->GetCamera();
 
 	camera->SetAspect((float)screen_width / (float)screen_height);
 
@@ -189,8 +189,8 @@ void CRenderer::Render(void)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	CEngine::GetPostProcessShader()->Bind();
-	CEngine::GetPostProcessShader()->SetTextures(color_tex, depth_tex, screen_width, screen_height);
+	tEngine::GetPostProcessShader()->Bind();
+	tEngine::GetPostProcessShader()->SetTextures(color_tex, depth_tex, screen_width, screen_height);
 
 	glBegin(GL_QUADS);
 	glVertex2f(0.0, 1.0);
@@ -199,13 +199,13 @@ void CRenderer::Render(void)
 	glVertex2f(1.0, 1.0);
 	glEnd();
 
-	CShader::Unbind();
+	tShader::Unbind();
 }
 
 
-void CRenderer::GeometryPass(void)
+void tRenderer::GeometryPass(void)
 {
-	CCamera *camera = world->GetCamera();
+	tCamera *camera = world->GetCamera();
 
 	gbuffer->Bind();
 
@@ -221,16 +221,16 @@ void CRenderer::GeometryPass(void)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	CEngine::SetCurrentFaceShader(CEngine::GetGeometryPassShader());
-	CEngine::BindCurrentFaceShader();
+	tEngine::SetCurrentFaceShader(tEngine::GetGeometryPassShader());
+	tEngine::BindCurrentFaceShader();
 
 	world->GetCameraRenderSpace()->GeometryPass();
 }
 
-void CRenderer::LightPass(void)
+void tRenderer::LightPass(void)
 {
-	CCamera *camera = world->GetCamera();
-	CSkyBox *sky_box = world->GetSkyBox();
+	tCamera *camera = world->GetCamera();
+	tSkyBox *sky_box = world->GetSkyBox();
 
 	world->GetPointLightUniforms(point_light_count, point_light_pos, point_light_color, point_light_distance, point_light_shadow_enabled, point_light_shadow_maps);
 
@@ -258,15 +258,15 @@ void CRenderer::LightPass(void)
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 
-	CEngine::GetLightPassShader()->Bind();
-	CEngine::GetLightPassShader()->SetGBuffer(gbuffer);
-	CEngine::GetLightPassShader()->SetPointLights(		point_light_count,
+	tEngine::GetLightPassShader()->Bind();
+	tEngine::GetLightPassShader()->SetGBuffer(gbuffer);
+	tEngine::GetLightPassShader()->SetPointLights(		point_light_count,
 														point_light_pos,
 														point_light_color,
 														point_light_distance,
 														point_light_shadow_enabled,
 														point_light_shadow_maps);
-	CEngine::GetLightPassShader()->SetDirectionalLights(	dir_light_count,
+	tEngine::GetLightPassShader()->SetDirectionalLights(	dir_light_count,
 															dir_light_dir,
 															dir_light_color,
 															dir_light_shadow_enabled,
@@ -275,9 +275,9 @@ void CRenderer::LightPass(void)
 															dir_light_shadow_tex_matrix,
 															dir_light_shadow_splits_count,
 															dir_light_shadow_splits_z);
-	CEngine::GetLightPassShader()->SetLightAmbientColor(world->GetAmbientColor());
-	CEngine::GetLightPassShader()->SetCameraPosition(camera->GetPosition());
-	CEngine::GetLightPassShader()->SetSSAO(ssao.enabled, ssao.tex);
+	tEngine::GetLightPassShader()->SetLightAmbientColor(world->GetAmbientColor());
+	tEngine::GetLightPassShader()->SetCameraPosition(camera->GetPosition());
+	tEngine::GetLightPassShader()->SetSSAO(ssao.enabled, ssao.tex);
 
 
 	glBegin(GL_QUADS);
@@ -288,18 +288,18 @@ void CRenderer::LightPass(void)
 	glEnd();
 }
 
-void CRenderer::ForwardPass(void)
+void tRenderer::ForwardPass(void)
 {
 	world->GetCamera()->SetModelviewProjectionMatrix();
 
 	world->GetCameraRenderSpace()->ForwardPass();
 }
 
-void CRenderer::RenderSSAO(void)
+void tRenderer::RenderSSAO(void)
 {
-	CSSAOShader *ssao_shader = CEngine::GetSSAOShader();
-	CVector2 noise_tex_scale;
-	CVector *view_rays = world->GetCamera()->GetViewRays();
+	tSSAOShader *ssao_shader = tEngine::GetSSAOShader();
+	tVector2 noise_tex_scale;
+	tVector *view_rays = world->GetCamera()->GetViewRays();
 
 	noise_tex_scale.x = (float)screen_width / (float)ssao.noise_tex_size;
 	noise_tex_scale.y = (float)screen_height / (float)ssao.noise_tex_size;
@@ -309,7 +309,7 @@ void CRenderer::RenderSSAO(void)
 	ssao_shader->Bind();
 	ssao_shader->SetKernel(ssao.kernel_size, ssao.kernel);
 	ssao_shader->SetNoiseTex(ssao.noise_tex, noise_tex_scale);
-	ssao_shader->SetTextures(depth_tex, gbuffer->GetTexture(CGBuffer::POSITION_TEX), gbuffer->GetTexture(CGBuffer::NORMAL_TEX));
+	ssao_shader->SetTextures(depth_tex, gbuffer->GetTexture(tGBuffer::POSITION_TEX), gbuffer->GetTexture(tGBuffer::NORMAL_TEX));
 	ssao_shader->SetMatrices(projection_matrix, modelview_matrix);
 	ssao_shader->SetRadius(ssao.radius);
 	ssao_shader->SetCamera(world->GetCamera()->GetPosition(), world->GetCamera()->GetDirection());
@@ -330,18 +330,18 @@ void CRenderer::RenderSSAO(void)
 	glDisable(GL_BLEND);
 
 	glBegin(GL_QUADS);
-	view_rays[0].AttrToGL(CSSAOShader::view_ray_attribute);
+	view_rays[0].AttrToGL(tSSAOShader::view_ray_attribute);
 	glVertex2f(0.0, 1.0);
-	view_rays[1].AttrToGL(CSSAOShader::view_ray_attribute);
+	view_rays[1].AttrToGL(tSSAOShader::view_ray_attribute);
 	glVertex2f(0.0, 0.0);
-	view_rays[2].AttrToGL(CSSAOShader::view_ray_attribute);
+	view_rays[2].AttrToGL(tSSAOShader::view_ray_attribute);
 	glVertex2f(1.0, 0.0);
-	view_rays[3].AttrToGL(CSSAOShader::view_ray_attribute);
+	view_rays[3].AttrToGL(tSSAOShader::view_ray_attribute);
 	glVertex2f(1.0, 1.0);
 	glEnd();
 }
 
-void CRenderer::ChangeSize(int width, int height)
+void tRenderer::ChangeSize(int width, int height)
 {
 	if(screen_width == width && screen_height == height)
 		return;

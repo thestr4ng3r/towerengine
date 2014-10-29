@@ -4,27 +4,27 @@
 
 // TODO: CEntity and CEntityAttribute as class with private attributes instead of struct
 
-struct CEntityAttribute;
+struct tEntityAttribute;
 
-struct CEntity
+struct tEntity
 {
 	string name;
 	string group;
 
-	map<string, CEntityAttribute *> attributes;
+	map<string, tEntityAttribute *> attributes;
 
 	void RemoveAttribute(string name) { attributes.erase(name); }
 };
 
 
-struct CEntityAttribute
+struct tEntityAttribute
 {
 	enum Type { VECTOR, VECTOR2, FLOAT, INT, STRING } type;
 
 	union
 	{
-		CVector vec_v;
-		CVector2 vec2_v;
+		tVector vec_v;
+		tVector2 vec2_v;
 		float float_v;
 		int int_v;
 	};

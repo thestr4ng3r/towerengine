@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-CCamera::CCamera(void)
+tCamera::tCamera(void)
 {
 	pos = Vec(0.0, 0.0, 0.0);
 	dir = Vec(0.0, 0.0, -1.0);
@@ -12,12 +12,12 @@ CCamera::CCamera(void)
 	far_clip = 300.0;
 }
 
-CVector *CCamera::GetRelativeFrustumCorners(float near, float far)
+tVector *tCamera::GetRelativeFrustumCorners(float near, float far)
 {
-	CVector *c = new CVector[8];
+	tVector *c = new tVector[8];
 	float vert, horz;
-	CVector hvec = Cross(dir, up);
-	CVector vvec = Cross(hvec, dir);
+	tVector hvec = Cross(dir, up);
+	tVector vvec = Cross(hvec, dir);
 	hvec.Normalize();
 	vvec.Normalize();
 
@@ -44,9 +44,9 @@ CVector *CCamera::GetRelativeFrustumCorners(float near, float far)
 	return c;
 }
 
-CVector *CCamera::GetViewRays(void)
+tVector *tCamera::GetViewRays(void)
 {
-	CVector *c = new CVector[4];
+	tVector *c = new tVector[4];
 	float vert, horz;
 
 	vert = tan(degtorad(angle) / 2.0);
@@ -61,13 +61,13 @@ CVector *CCamera::GetViewRays(void)
 }
 
 
-void CCamera::CalculateFrustumPlanes(void)
+void tCamera::CalculateFrustumPlanes(void)
 {
-	CVector *points = frustum_planes_points;
-	CVector *normals = frustum_planes_normals;
+	tVector *points = frustum_planes_points;
+	tVector *normals = frustum_planes_normals;
 
-	CVector hvec = Cross(dir, up);
-	CVector vvec = Cross(hvec, dir);
+	tVector hvec = Cross(dir, up);
+	tVector vvec = Cross(hvec, dir);
 	hvec.Normalize();
 	vvec.Normalize();
 
@@ -75,7 +75,7 @@ void CCamera::CalculateFrustumPlanes(void)
 	float nh = near_clip * tang;
 	float nw = nh * aspect;
 
-	CVector aux;
+	tVector aux;
 
 	points[0] = pos + dir * near_clip;
 	normals[0] = dir;
@@ -104,7 +104,7 @@ void CCamera::CalculateFrustumPlanes(void)
 	points[5] = points[0] + hvec*nw;
 }
 
-bool CCamera::TestPointCulling(CVector point)
+bool tCamera::TestPointCulling(tVector point)
 {
 	for(int i=0; i<6; i++)
 	{
@@ -114,7 +114,7 @@ bool CCamera::TestPointCulling(CVector point)
 	return false;
 }
 
-bool CCamera::TestSphereCulling(CVector center, float radius)
+bool tCamera::TestSphereCulling(tVector center, float radius)
 {
 	for(int i=0; i<6; i++)
 	{
@@ -124,10 +124,10 @@ bool CCamera::TestSphereCulling(CVector center, float radius)
 	return false;
 }
 
-bool CCamera::TestBoundingBoxCulling(CBoundingBox b)
+bool tCamera::TestBoundingBoxCulling(tBoundingBox b)
 {
-	CVector p, n;
-	CVector normal;
+	tVector p, n;
+	tVector normal;
 
 	for(int i=0; i<6; i++)
 	{
@@ -156,7 +156,7 @@ bool CCamera::TestBoundingBoxCulling(CBoundingBox b)
 	return false;
 }
 
-void CCamera::SetModelviewProjectionMatrix(void)
+void tCamera::SetModelviewProjectionMatrix(void)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -164,7 +164,7 @@ void CCamera::SetModelviewProjectionMatrix(void)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	CVector to = pos + dir;
+	tVector to = pos + dir;
 	gluLookAt(pos.x, pos.y, pos.z, to.x, to.y, to.z, 0.0, 1.0, 0.0);
 }
 

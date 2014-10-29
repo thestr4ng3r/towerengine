@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-CObject::CObject(void)
+tObject::tObject(void)
 {
 	rigid_body = 0;
 	motion_state = 0;

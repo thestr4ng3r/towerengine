@@ -1,11 +1,11 @@
 #include "towerengine.h"
 
-CTerrain::CTerrain(CHeightMap *height_map, float size, float height, CTerrainMaterial *material)
+tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMaterial *material)
 {
 	float *vertex_data, *normal_data, *tang_data, *bitang_data, *uvcoord_data;
-	CVector ***face_normals;
-	CVector a, b, c;
-	CVector n;
+	tVector ***face_normals;
+	tVector a, b, c;
+	tVector n;
 	int n_count;
 	GLuint *ibo_data;
 	int x, y, d;
@@ -19,12 +19,12 @@ CTerrain::CTerrain(CHeightMap *height_map, float size, float height, CTerrainMat
 
 	this->material = material;
 
-	vao = new VAO();
-	vertex_vbo = new VBO<float>(3, vao, map_size * map_size);
-	normal_vbo = new VBO<float>(3, vao, map_size * map_size);
-	tang_vbo = new VBO<float>(3, vao, map_size * map_size);
-	bitang_vbo = new VBO<float>(3, vao, map_size * map_size);
-	uvcoord_vbo = new VBO<float>(2, vao, map_size * map_size);
+	vao = new tVAO();
+	vertex_vbo = new tVBO<float>(3, vao, map_size * map_size);
+	normal_vbo = new tVBO<float>(3, vao, map_size * map_size);
+	tang_vbo = new tVBO<float>(3, vao, map_size * map_size);
+	bitang_vbo = new tVBO<float>(3, vao, map_size * map_size);
+	uvcoord_vbo = new tVBO<float>(2, vao, map_size * map_size);
 
 	vertex_data = vertex_vbo->GetData();
 	normal_data = normal_vbo->GetData();
@@ -60,18 +60,18 @@ CTerrain::CTerrain(CHeightMap *height_map, float size, float height, CTerrainMat
 	bitang_vbo->AssignData();
 	uvcoord_vbo->AssignData();
 
-	ibo = new IBO(vao, (map_size - 1) * (map_size - 1) * 6);
+	ibo = new tIBO(vao, (map_size - 1) * (map_size - 1) * 6);
 
-	face_normals = new CVector **[map_size-1];
+	face_normals = new tVector **[map_size-1];
 
 	ibo_data = ibo->GetData();
 	d = 0;
 	for(x=0; x<map_size-1; x++)
 	{
-		face_normals[x] = new CVector *[map_size-1];
+		face_normals[x] = new tVector *[map_size-1];
 		for(y=0; y<map_size-1; y++)
 		{
-			face_normals[x][y] = new CVector[2];
+			face_normals[x][y] = new tVector[2];
 
 			ibo_data[d + 0] = y * map_size + x;
 			ibo_data[d + 1] = ibo_data[d + 0] + map_size;
@@ -158,39 +158,39 @@ CTerrain::CTerrain(CHeightMap *height_map, float size, float height, CTerrainMat
 
 }
 
-void CTerrain::Paint(void)
+void tTerrain::Paint(void)
 {
-	vertex_vbo->SetAttribute(CFaceShader::vertex_attribute, GL_FLOAT);
-	normal_vbo->SetAttribute(CFaceShader::normal_attribute, GL_FLOAT);
-	tang_vbo->SetAttribute(CFaceShader::tang_attribute, GL_FLOAT);
-	bitang_vbo->SetAttribute(CFaceShader::bitang_attribute, GL_FLOAT);
-	uvcoord_vbo->SetAttribute(CFaceShader::uvcoord_attribute, GL_FLOAT);
-	CEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
+	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
+	normal_vbo->SetAttribute(tFaceShader::normal_attribute, GL_FLOAT);
+	tang_vbo->SetAttribute(tFaceShader::tang_attribute, GL_FLOAT);
+	bitang_vbo->SetAttribute(tFaceShader::bitang_attribute, GL_FLOAT);
+	uvcoord_vbo->SetAttribute(tFaceShader::uvcoord_attribute, GL_FLOAT);
+	tEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
 
-	CEngine::GetCurrentFaceShader()->SetTransformation(CEngine::identity_matrix4);
+	tEngine::GetCurrentFaceShader()->SetTransformation(tEngine::identity_matrix4);
 
-	CEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
+	tEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
 
 	if(material)
 		material->PutToGL();
 	else
 	{
-		CEngine::GetCurrentFaceShader()->SetDiffuseTexture(true, height_map->GetHeightTex());
-		CEngine::GetCurrentFaceShader()->SetSpecularTexture(false);
-		CEngine::GetCurrentFaceShader()->SetNormalTexture(false);
+		tEngine::GetCurrentFaceShader()->SetDiffuseTexture(true, height_map->GetHeightTex());
+		tEngine::GetCurrentFaceShader()->SetSpecularTexture(false);
+		tEngine::GetCurrentFaceShader()->SetNormalTexture(false);
 		//CEngine::GetCurrentFaceShader()->SetHeightTexture(false);
-		CEngine::GetCurrentFaceShader()->SetDiffuseColor(Vec(1.0, 1.0, 1.0));
-		CEngine::GetCurrentFaceShader()->SetSpecularColor(Vec(0.0, 0.0, 0.0));
-		CEngine::GetCurrentFaceShader()->SetSpecular(0.0);
+		tEngine::GetCurrentFaceShader()->SetDiffuseColor(Vec(1.0, 1.0, 1.0));
+		tEngine::GetCurrentFaceShader()->SetSpecularColor(Vec(0.0, 0.0, 0.0));
+		tEngine::GetCurrentFaceShader()->SetSpecular(0.0);
 		//CEngine::GetCurrentFaceShader()->SetHeightFactor(Vec(0.0, 0.0, 0.0));
 	}
 
 	ibo->Draw(GL_TRIANGLES);
 }
 
-CBoundingBox CTerrain::GetBoundingBox(void)
+tBoundingBox tTerrain::GetBoundingBox(void)
 {
-	return CBoundingBox(	Vec(-size / 2.0, height, -size / 2.0),
+	return tBoundingBox(	Vec(-size / 2.0, height, -size / 2.0),
 							Vec(size / 2.0, 0.0, size / 2.0));
 }
 

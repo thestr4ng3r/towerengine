@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-CMeshMaterial::CMeshMaterial(CMesh *mesh, string name) : CMaterial()
+tMeshMaterial::tMeshMaterial(tMesh *mesh, string name) : tMaterial()
 {
 	ibo_data = 0;
 	triangle_count = 0;
@@ -13,7 +13,7 @@ CMeshMaterial::CMeshMaterial(CMesh *mesh, string name) : CMaterial()
 	ibo = mesh->CreateIBO();
 }
 
-CMeshMaterial::~CMeshMaterial(void)
+tMeshMaterial::~tMeshMaterial(void)
 {
 	if(mesh)
 		mesh->RemoveMaterial(this);

@@ -1,6 +1,6 @@
 #include "towerengine.h"
 
-CMaterial::CMaterial(void)
+tMaterial::tMaterial(void)
 {
 	diffuse.enabled = false;
 	diffuse.color.Set(1.0, 1.0, 1.0);
@@ -20,7 +20,7 @@ CMaterial::CMaterial(void)
 	bump.depth = 0;
 }
 
-CMaterial::~CMaterial(void)
+tMaterial::~tMaterial(void)
 {
 	if(diffuse.tex != 0)
 		glDeleteTextures(1, &diffuse.tex);
@@ -30,23 +30,23 @@ CMaterial::~CMaterial(void)
 		glDeleteTextures(1, &normal.tex);
 }
 
-void CMaterial::SetDiffuse(CVector color)
+void tMaterial::SetDiffuse(tVector color)
 {
 	diffuse.color = color;
 }
 
-void CMaterial::SetSpecular(CVector color, float exponent)
+void tMaterial::SetSpecular(tVector color, float exponent)
 {
 	specular.color = color;
 	specular.exponent = exponent;
 }
 
-void CMaterial::SetBump(float depth)
+void tMaterial::SetBump(float depth)
 {
 	bump.depth = depth;
 }
 
-void CMaterial::LoadDiffuseTextureURL(string file)
+void tMaterial::LoadDiffuseTextureURL(string file)
 {
 	struct stat s;
 	if(stat(file.c_str(), &s) == 0)
@@ -56,7 +56,7 @@ void CMaterial::LoadDiffuseTextureURL(string file)
 	}
 }
 
-void CMaterial::LoadSpecularTextureURL(string file)
+void tMaterial::LoadSpecularTextureURL(string file)
 {
 	struct stat s;
 	if(stat(file.c_str(), &s) == 0)
@@ -66,7 +66,7 @@ void CMaterial::LoadSpecularTextureURL(string file)
 	}
 }
 
-void CMaterial::LoadNormalTextureURL(string file)
+void tMaterial::LoadNormalTextureURL(string file)
 {
 	struct stat s;
 	if(stat(file.c_str(), &s) == 0)
@@ -76,7 +76,7 @@ void CMaterial::LoadNormalTextureURL(string file)
 	}
 }
 
-void CMaterial::LoadBumpTextureURL(string file)
+void tMaterial::LoadBumpTextureURL(string file)
 {
 	struct stat s;
 	if(stat(file.c_str(), &s) == 0)
@@ -86,38 +86,38 @@ void CMaterial::LoadBumpTextureURL(string file)
 	}
 }
 
-void CMaterial::LoadDiffuseTextureBinary(const char *extension, const void *data, unsigned int size)
+void tMaterial::LoadDiffuseTextureBinary(const char *extension, const void *data, unsigned int size)
 {
 	diffuse.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
 	diffuse.enabled = diffuse.tex ? 1 : 0;
 }
 
-void CMaterial::LoadSpecularTextureBinary(const char *extension, const void *data, unsigned int size)
+void tMaterial::LoadSpecularTextureBinary(const char *extension, const void *data, unsigned int size)
 {
 	specular.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
 	specular.enabled = specular.tex ? 1 : 0;
 }
 
-void CMaterial::LoadNormalTextureBinary(const char *extension, const void *data, unsigned int size)
+void tMaterial::LoadNormalTextureBinary(const char *extension, const void *data, unsigned int size)
 {
 	normal.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
 	normal.enabled = normal.tex ? 1 : 0;
 }
 
-void CMaterial::LoadBumpTextureBinary(const char *extension, const void *data, unsigned int size)
+void tMaterial::LoadBumpTextureBinary(const char *extension, const void *data, unsigned int size)
 {
 	bump.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
 	bump.enabled = bump.tex ? 1 : 0;
 }
 
-void CMaterial::PutToGL(void)
+void tMaterial::PutToGL(void)
 {
-	CEngine::GetCurrentFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse.tex);
-	CEngine::GetCurrentFaceShader()->SetSpecularTexture(specular.enabled, specular.tex);
-	CEngine::GetCurrentFaceShader()->SetNormalTexture(normal.enabled, normal.tex);
-	CEngine::GetCurrentFaceShader()->SetBumpTexture(bump.enabled, bump.tex);
-	CEngine::GetCurrentFaceShader()->SetDiffuseColor(diffuse.color);
-	CEngine::GetCurrentFaceShader()->SetSpecularColor(specular.color);
-	CEngine::GetCurrentFaceShader()->SetSpecular(specular.exponent);
-	CEngine::GetCurrentFaceShader()->SetBumpDepth(bump.depth);
+	tEngine::GetCurrentFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse.tex);
+	tEngine::GetCurrentFaceShader()->SetSpecularTexture(specular.enabled, specular.tex);
+	tEngine::GetCurrentFaceShader()->SetNormalTexture(normal.enabled, normal.tex);
+	tEngine::GetCurrentFaceShader()->SetBumpTexture(bump.enabled, bump.tex);
+	tEngine::GetCurrentFaceShader()->SetDiffuseColor(diffuse.color);
+	tEngine::GetCurrentFaceShader()->SetSpecularColor(specular.color);
+	tEngine::GetCurrentFaceShader()->SetSpecular(specular.exponent);
+	tEngine::GetCurrentFaceShader()->SetBumpDepth(bump.depth);
 }

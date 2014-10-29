@@ -1,17 +1,17 @@
 
 #include "towerengine.h"
 
-CScene::CScene(CWorld *world)
+tScene::tScene(tWorld *world)
 {
 	this->world = world;
 }
 
-CScene::~CScene(void)
+tScene::~tScene(void)
 {
 
 }
 
-bool CScene::LoadFromFile(string file)
+bool tScene::LoadFromFile(string file)
 {
 	xmlDocPtr doc = xmlReadFile(file.data(), 0, XML_PARSE_HUGE);
 
@@ -45,7 +45,7 @@ bool CScene::LoadFromFile(string file)
 	return true;
 }
 
-void CScene::ParseAssetsNode(xmlNodePtr cur)
+void tScene::ParseAssetsNode(xmlNodePtr cur)
 {
 	xmlNodePtr child = cur->children;
 	char *base64_temp;
@@ -60,10 +60,10 @@ void CScene::ParseAssetsNode(xmlNodePtr cur)
 			if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
 			{
 				Base64Decode(base64_temp, &file_data, &file_size);
-				CMesh *mesh = new CMesh();
+				tMesh *mesh = new tMesh();
 				mesh->LoadFromData((const char *)file_data, "");
 				name = string((const char *)xmlGetProp(child, (const xmlChar *)"name"));
-				meshes.insert(pair<string, CMesh *>(name, mesh));
+				meshes.insert(pair<string, tMesh *>(name, mesh));
 			}
 		}
 
@@ -71,14 +71,14 @@ void CScene::ParseAssetsNode(xmlNodePtr cur)
 	}
 }
 
-void CScene::ParseObjectsNode(xmlNodePtr cur)
+void tScene::ParseObjectsNode(xmlNodePtr cur)
 {
 	xmlChar *temp;
 	string name;
 	string mesh_name;
-	CVector pos;
+	tVector pos;
 	//CVector color;
-	map<string, CMesh *>::iterator mesh_i;
+	map<string, tMesh *>::iterator mesh_i;
 
 	for(xmlNodePtr child = cur->children; child; child=child->next)
 	{
@@ -107,10 +107,10 @@ void CScene::ParseObjectsNode(xmlNodePtr cur)
 			if((mesh_i = meshes.find(mesh_name)) == meshes.end())
 				continue;
 
-			CMeshObject *object = new CMeshObject(mesh_i->second);
+			tMeshObject *object = new tMeshObject(mesh_i->second);
 			object->SetPosition(pos);
-			CObjectSceneObject *scene_object = new CObjectSceneObject(object);
-			objects.insert(pair<string, CSceneObject *>(name, (CSceneObject *)scene_object));
+			tObjectSceneObject *scene_object = new tObjectSceneObject(object);
+			objects.insert(pair<string, tSceneObject *>(name, (tSceneObject *)scene_object));
 		}
 
 		if(xmlStrEqual(child->name, (const xmlChar *)"dir_light"))
@@ -123,9 +123,9 @@ void CScene::ParseObjectsNode(xmlNodePtr cur)
 	}
 }
 
-void CScene::AddToWorld(void)
+void tScene::AddToWorld(void)
 {
-	map<string, CSceneObject *>::iterator i;
+	map<string, tSceneObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 	{
@@ -135,9 +135,9 @@ void CScene::AddToWorld(void)
 	}
 }
 
-void CScene::RemoveFromWorld(void)
+void tScene::RemoveFromWorld(void)
 {
-	map<string, CSceneObject *>::iterator i;
+	map<string, tSceneObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		i->second->RemoveFromWorld(world);

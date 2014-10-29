@@ -1,6 +1,6 @@
 #include "towerengine.h"
 
-void CSkyBoxShader::Init(void)
+void tSkyBoxShader::Init(void)
 {
 	SetSource(cube_env_shader_vert, cube_env_shader_frag);
 	CreateVertexShader();
@@ -13,7 +13,7 @@ void CSkyBoxShader::Init(void)
 	Unbind();
 }
 
-void CSkyBoxShader::SetCubeMap(GLuint tex)
+void tSkyBoxShader::SetCubeMap(GLuint tex)
 {
 	glUniform1i(tex_uniform, 0);
 
@@ -51,7 +51,7 @@ int CubeSide(GLenum tex)
 	return 0;
 }
 
-CVector CubeVecS(int side)
+tVector CubeVecS(int side)
 {
 	switch(side)
 	{

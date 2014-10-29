@@ -4,23 +4,23 @@
 #define _UTILOBJECTS_H
 
 
-class CCoordinateSystemObject : public CObject
+class tCoordinateSystemObject : public tObject
 {
 	private:
-		CVector pos;
-		CVector size;
+		tVector pos;
+		tVector size;
 		bool depth_test;
 
 	public:
-		CCoordinateSystemObject(bool depth_test = false);
-		~CCoordinateSystemObject(void);
+		tCoordinateSystemObject(bool depth_test = false);
+		~tCoordinateSystemObject(void);
 
-		void SetPosition(CVector pos)	{ this->pos = pos; }
-		void SetSize(CVector size)		{ this->size = size; }
+		void SetPosition(tVector pos)	{ this->pos = pos; }
+		void SetSize(tVector size)		{ this->size = size; }
 
 		void ForwardPass(void);
 
-		CBoundingBox GetBoundingBox(void);
+		tBoundingBox GetBoundingBox(void);
 };
 
 

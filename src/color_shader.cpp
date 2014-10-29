@@ -2,7 +2,7 @@
 #include "towerengine.h"
 
 
-void CColorShader::Init(void)
+void tColorShader::Init(void)
 {
 	SetSource(color_shader_vert, color_shader_frag);
 	CreateVertexShader();
@@ -21,20 +21,20 @@ void CColorShader::Init(void)
 	Unbind();
 }
 
-void CColorShader::SetTransformation(const float m[16])
+void tColorShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
 		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void CColorShader::SetDiffuseColor(CVector color)
+void tColorShader::SetDiffuseColor(tVector color)
 {
 	if(diffuse_color_uniform != -1)
 		glUniform3f(diffuse_color_uniform, color.x, color.y, color.z);
 }
 
-void CColorShader::ResetUniforms(void)
+void tColorShader::ResetUniforms(void)
 {
 	SetDiffuseColor(Vec(1.0, 1.0, 1.0));
-	SetTransformation(CEngine::identity_matrix4);
+	SetTransformation(tEngine::identity_matrix4);
 }

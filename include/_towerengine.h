@@ -1,23 +1,23 @@
 #ifndef __TOWERENGINE_H
 #define __TOWERENGINE_H
 
-class CMeshPose;
-class CAnimation;
-struct CKeyFrame;
-class CMesh;
-struct CTriangle;
-class CMaterial;
-class CMeshMaterial;
-struct CVertex;
-struct CEntity;
-class CWorld;
-class CObject;
-class CCamera;
-class CPointLight;
-class CPointLightShadow;
-class CDirectionalLight;
-class CDirectionalLightShadow;
-class CRenderer;
+class tMeshPose;
+class tAnimation;
+struct tKeyFrame;
+class tMesh;
+struct tTriangle;
+class tMaterial;
+class tMeshMaterial;
+struct tVertex;
+struct tEntity;
+class tWorld;
+class tObject;
+class tCamera;
+class tPointLight;
+class tPointLightShadow;
+class tDirectionalLight;
+class tDirectionalLightShadow;
+class tRenderer;
 
 #include "tresources.h"
 

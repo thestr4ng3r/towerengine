@@ -1,14 +1,14 @@
 
 #include "towerengine.h"
 
-void CPointShadowShader::Init(void)
+void tPointShadowShader::Init(void)
 {
 	SetSource(point_shadow_shader_vert, point_shadow_shader_frag);
 	CreateVertexShader();
 	CreateFragmentShader();
 	CreateProgram();
-	glBindAttribLocation(program, CFaceShader::vertex_attribute, "vertex_attr");
-	glBindAttribLocation(program, CFaceShader::vertex2_attribute, "vertex2_attr");
+	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
+	glBindAttribLocation(program, tFaceShader::vertex2_attribute, "vertex2_attr");
 	LinkProgram();
 
 	light_pos_uniform = GetUniformLocation("light_pos_uni");
@@ -19,23 +19,23 @@ void CPointShadowShader::Init(void)
 	Unbind();
 }
 
-void CPointShadowShader::SetLightPos(CVector v)
+void tPointShadowShader::SetLightPos(tVector v)
 {
 	glUniform3f(light_pos_uniform, v.x, v.y, v.z);
 }
 
-void CPointShadowShader::SetLightDist(float d)
+void tPointShadowShader::SetLightDist(float d)
 {
 	glUniform1f(light_dist_uniform, d);
 }
 
-void CPointShadowShader::SetTransformation(const float m[16])
+void tPointShadowShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
 		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void CPointShadowShader::SetVertexMix(float m)
+void tPointShadowShader::SetVertexMix(float m)
 {
 	glUniform1f(vertex_mix_uniform, m);
 }
@@ -45,7 +45,7 @@ void CPointShadowShader::SetVertexMix(float m)
 
 
 
-void CPointShadowBlurShader::Init(void)
+void tPointShadowBlurShader::Init(void)
 {
 	SetSource(point_shadow_blur_shader_vert, point_shadow_blur_shader_frag);
 	CreateVertexShader();
@@ -61,14 +61,14 @@ void CPointShadowBlurShader::Init(void)
 	Unbind();
 }
 
-void CPointShadowBlurShader::SetTexture(GLuint tex)
+void tPointShadowBlurShader::SetTexture(GLuint tex)
 {
 	glUniform1i(tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 }
 
-void CPointShadowBlurShader::SetBlurDir(CVector v)
+void tPointShadowBlurShader::SetBlurDir(tVector v)
 {
 	glUniform3f(blur_dir_uniform, v.x, v.y, v.z);
 }

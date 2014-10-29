@@ -2,7 +2,7 @@
 #ifndef _POINT_SHADOW_SHADER_H
 #define _POINT_SHADOW_SHADER_H
 
-class CPointShadowShader : public CFaceShader
+class tPointShadowShader : public tFaceShader
 {
 	private:
 		GLint light_pos_uniform;
@@ -14,13 +14,13 @@ class CPointShadowShader : public CFaceShader
 
 	public:
 		void Init(void);
-		void SetLightPos(CVector v);
+		void SetLightPos(tVector v);
 		void SetLightDist(float d);
 		void SetTransformation(const float m[16]);
 		void SetVertexMix(float m = 0.0);
 };
 
-class CPointShadowBlurShader : public CShader
+class tPointShadowBlurShader : public tShader
 {
 	private:
 		GLint tex_uniform;
@@ -31,7 +31,7 @@ class CPointShadowBlurShader : public CShader
 
 		void Init(void);
 		void SetTexture(GLuint tex);
-		void SetBlurDir(CVector v);
+		void SetBlurDir(tVector v);
 };
 
 #endif

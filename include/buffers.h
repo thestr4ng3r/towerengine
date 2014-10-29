@@ -1,33 +1,33 @@
 #ifndef _BUFFERS_H
 #define _BUFFERS_H
 
-class VAO
+class tVAO
 {
 private:
 	GLuint vao;
 
 public:
-	VAO(void);
-	~VAO(void);
+	tVAO(void);
+	~tVAO(void);
 
 	void Bind(void)					{ glBindVertexArray(vao); };
 	static void UnBind(void)		{ glBindVertexArray(0); };
 	void Draw(GLenum mode, GLint first, GLsizei count);
 };
 
-template <class T> class VBO
+template <class T> class tVBO
 {
 private:
 	T *data;
 	int size;
 	int components;
-	VAO *vao;
+	tVAO *vao;
 
 	GLuint vbo;
 
 public:
-	VBO(int components, VAO *vao, int size = 0);
-	~VBO(void);
+	tVBO(int components, tVAO *vao, int size = 0);
+	~tVBO(void);
 
 	void SetAttribute(GLuint index, GLenum type, GLboolean normalize = GL_FALSE, GLsizei stride = 0);
 	void AssignData(void);
@@ -40,7 +40,7 @@ public:
 };
 
 
-class IBO
+class tIBO
 {
 private:
 	GLuint ibo;
@@ -48,8 +48,8 @@ private:
 	int size;
 
 public:
-	IBO(VAO *vao, int size = 0);
-	~IBO(void);
+	tIBO(tVAO *vao, int size = 0);
+	~tIBO(void);
 
 	void SetAttribute(GLuint index, GLenum type, GLboolean normalize = GL_FALSE, GLsizei stride = 0);
 	void Bind(void)					{ glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); };
@@ -68,7 +68,7 @@ public:
 
 
 
-template <class T> VBO<T>::VBO(int components, VAO *vao, int size)
+template <class T> tVBO<T>::tVBO(int components, tVAO *vao, int size)
 {
 	this->components = components;
 	this->size = 0;
@@ -76,20 +76,20 @@ template <class T> VBO<T>::VBO(int components, VAO *vao, int size)
 
 	vao->Bind();
 	glGenBuffers(1, &vbo);
-	VAO::UnBind();
+	tVAO::UnBind();
 	this->vao = vao;
 
 	SetSize(size);
 }
 
-template <class T> VBO<T>::~VBO(void)
+template <class T> tVBO<T>::~tVBO(void)
 {
 	glDeleteBuffers(1, &vbo);
 	if(data != 0)
 		delete [] data;
 }
 
-template <class T> void VBO<T>::SetAttribute(GLuint index, GLenum type, GLboolean normalize, GLsizei stride)
+template <class T> void tVBO<T>::SetAttribute(GLuint index, GLenum type, GLboolean normalize, GLsizei stride)
 {
 	Bind();
 	glVertexAttribPointer(index, components, type, normalize, stride, 0);
@@ -97,14 +97,14 @@ template <class T> void VBO<T>::SetAttribute(GLuint index, GLenum type, GLboolea
 	UnBind();
 }
 
-template <class T> void VBO<T>::AssignData(void)
+template <class T> void tVBO<T>::AssignData(void)
 {
 	Bind();
 	glBufferData(GL_ARRAY_BUFFER, size * components * sizeof(T), data, GL_DYNAMIC_DRAW);
 	UnBind();
 }
 
-template <class T> bool VBO<T>::SetSize(int size, bool copy)
+template <class T> bool tVBO<T>::SetSize(int size, bool copy)
 {
 	if(size == this->size)
 		return false;

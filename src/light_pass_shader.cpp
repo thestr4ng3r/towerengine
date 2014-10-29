@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-void CLightPassShader::Init(void)
+void tLightPassShader::Init(void)
 {
 	InitShader(light_pass_shader_vert, light_pass_shader_frag, "Light Pass Shader");
 	LinkProgram();
@@ -37,30 +37,30 @@ void CLightPassShader::Init(void)
 	ssao_tex_uniform = GetUniformLocation("ssao_tex_uni");
 }
 
-void CLightPassShader::SetGBuffer(CGBuffer *gbuffer)
+void tLightPassShader::SetGBuffer(tGBuffer *gbuffer)
 {
 	glUniform1i(position_tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(CGBuffer::POSITION_TEX));
+	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::POSITION_TEX));
 
 	glUniform1i(diffuse_tex_uniform, 1);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(CGBuffer::DIFFUSE_TEX));
+	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::DIFFUSE_TEX));
 
 	glUniform1i(normal_tex_uniform, 2);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(CGBuffer::NORMAL_TEX));
+	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::NORMAL_TEX));
 
 	glUniform1i(specular_tex_uniform, 3);
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(CGBuffer::SPECULAR_TEX));
+	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::SPECULAR_TEX));
 
 	glUniform1i(specular_exponent_tex_uniform, 4);
 	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(CGBuffer::SPECULAR_EXPONENT_TEX));
+	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::SPECULAR_EXPONENT_TEX));
 }
 
-void CLightPassShader::SetSSAO(bool enabled, GLuint tex)
+void tLightPassShader::SetSSAO(bool enabled, GLuint tex)
 {
 	glUniform1i(ssao_enabled_uniform, enabled ? 1 : 0);
 
@@ -69,7 +69,7 @@ void CLightPassShader::SetSSAO(bool enabled, GLuint tex)
 	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
-void CLightPassShader::SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps)
+void tLightPassShader::SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps)
 {
 	int i;
 	count = min(count, max_point_lights);
@@ -92,7 +92,7 @@ void CLightPassShader::SetPointLights(int count, float *pos, float *color, float
 	glUniform1iv(point_light_shadow_map_uniform, max_point_lights, tex_units);
 }
 
-void CLightPassShader::SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z)
+void tLightPassShader::SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z)
 {
 	int i;
 
@@ -119,12 +119,12 @@ void CLightPassShader::SetDirectionalLights(int count, float *dir, float *color,
 	glUniform1iv(directional_light_shadow_map_uniform, max_directional_lights, tex_units);
 }
 
-void CLightPassShader::SetLightAmbientColor(CVector color)
+void tLightPassShader::SetLightAmbientColor(tVector color)
 {
 	glUniform3f(light_ambient_color_uniform, color.x, color.y, color.z);
 }
 
-void CLightPassShader::SetCameraPosition(CVector pos)
+void tLightPassShader::SetCameraPosition(tVector pos)
 {
 	glUniform3f(cam_pos_uniform, pos.x, pos.y, pos.z);
 }

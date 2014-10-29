@@ -2,44 +2,44 @@
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
-class CCamera
+class tCamera
 {
 	private:
-		CVector pos;
-		CVector dir;
-		CVector up;
+		tVector pos;
+		tVector dir;
+		tVector up;
 		float angle;
 		float aspect;
 		float near_clip, far_clip;
 
-		CVector frustum_planes_points[6];
-		CVector frustum_planes_normals[6];
+		tVector frustum_planes_points[6];
+		tVector frustum_planes_normals[6];
 
 	public:
-		CCamera(void);
+		tCamera(void);
 
-		CVector GetPosition(void)		{ return pos; }
-		CVector GetDirection(void)		{ return dir; }
-		CVector GetUp(void)				{ return up; }
+		tVector GetPosition(void)		{ return pos; }
+		tVector GetDirection(void)		{ return dir; }
+		tVector GetUp(void)				{ return up; }
 		float GetAngle(void)			{ return angle; }
 		float GetAspect(void)			{ return aspect; }
 		float GetNearClip(void)			{ return near_clip; }
 		float GetFarClip(void)			{ return far_clip; }
 
 		void CalculateFrustumPlanes(void);
-		CVector *GetRelativeFrustumCorners(float near, float far);
-		CVector *GetRelativeFrustumCorners(void) { return GetRelativeFrustumCorners(near_clip, far_clip); }
-		CVector *GetFrustumPlanesPoints(void)	{ return frustum_planes_points; }
-		CVector *GetFrustumPlanesNormals(void)	{ return frustum_planes_normals; }
-		CVector *GetViewRays(void);
+		tVector *GetRelativeFrustumCorners(float near, float far);
+		tVector *GetRelativeFrustumCorners(void) { return GetRelativeFrustumCorners(near_clip, far_clip); }
+		tVector *GetFrustumPlanesPoints(void)	{ return frustum_planes_points; }
+		tVector *GetFrustumPlanesNormals(void)	{ return frustum_planes_normals; }
+		tVector *GetViewRays(void);
 
-		bool TestPointCulling(CVector point);
-		bool TestSphereCulling(CVector center, float radius);
-		bool TestBoundingBoxCulling(CBoundingBox b);
+		bool TestPointCulling(tVector point);
+		bool TestSphereCulling(tVector center, float radius);
+		bool TestBoundingBoxCulling(tBoundingBox b);
 
-		void SetPosition(CVector p)		{ pos = p; }
-		void SetDirection(CVector d)	{ dir = d; }
-		void SetUp(CVector t)			{ up = t; }
+		void SetPosition(tVector p)		{ pos = p; }
+		void SetDirection(tVector d)	{ dir = d; }
+		void SetUp(tVector t)			{ up = t; }
 		void SetAngle(float a)			{ angle = a; }
 		void SetAspect(float a)			{ aspect = a; }
 		void SetClip(float n, float f)	{ near_clip = n; far_clip = f; }

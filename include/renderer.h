@@ -3,12 +3,12 @@
 #define _RENDERER_H
 
 
-class CRenderer
+class tRenderer
 {
 	private:
-		CWorld *world;
+		tWorld *world;
 
-		CGBuffer *gbuffer;
+		tGBuffer *gbuffer;
 		int screen_width, screen_height;
 
 		GLuint fbo;
@@ -49,12 +49,12 @@ class CRenderer
 		void RenderSSAO(void);
 
 	public:
-		CRenderer(int width, int height, CWorld *world = 0);
-		~CRenderer();
+		tRenderer(int width, int height, tWorld *world = 0);
+		~tRenderer();
 
 		void ChangeSize(int width, int height);
 
-		void SetWorld(CWorld *world)	{ this->world = world; }
+		void SetWorld(tWorld *world)	{ this->world = world; }
 
 		void InitSSAO(int kernel_size, float radius, int noise_tex_size = 4);
 

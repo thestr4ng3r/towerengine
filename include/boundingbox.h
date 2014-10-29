@@ -3,24 +3,24 @@
 #define _BOUNDINGBOX_H
 
 
-class CBoundingBox
+class tBoundingBox
 {
 	private:
-		CVector minv, maxv;
+		tVector minv, maxv;
 
 	public:
-		CBoundingBox(void);
-		CBoundingBox(CVector a, CVector b);
+		tBoundingBox(void);
+		tBoundingBox(tVector a, tVector b);
 
-		CVector GetMin(void)	{ return minv; }
-		CVector GetMax(void)	{ return maxv; }
+		tVector GetMin(void)	{ return minv; }
+		tVector GetMax(void)	{ return maxv; }
 
-		CVector *GetCornerPoints(void);
+		tVector *GetCornerPoints(void);
 
-		void SetBounds(CVector a, CVector b);
-		void AddPoint(CVector p);
+		void SetBounds(tVector a, tVector b);
+		void AddPoint(tVector p);
 };
 
-CBoundingBox operator+(CBoundingBox a, const CVector &b);
+tBoundingBox operator+(tBoundingBox a, const tVector &b);
 
 #endif

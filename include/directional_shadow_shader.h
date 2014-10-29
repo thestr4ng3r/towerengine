@@ -2,7 +2,7 @@
 #ifndef _DIRECTIONAL_SHADOW_SHADER_H
 #define _DIRECTIONAL_SHADOW_SHADER_H
 
-class CDirectionalShadowShader : public CFaceShader
+class tDirectionalShadowShader : public tFaceShader
 {
 	private:
 		GLint light_dir_uniform;
@@ -18,15 +18,15 @@ class CDirectionalShadowShader : public CFaceShader
 
 	public:
 		void Init(void);
-		void SetLightDir(CVector v);
+		void SetLightDir(tVector v);
 		void SetClip(float near, float far);
 		void SetTransformation(const float m[16]);
 		void SetVertexMix(float m = 0.0);
 		void SetDiffuseTexture(bool enabled, GLuint tex = 0);
-		void SetCamPos(CVector v);
+		void SetCamPos(tVector v);
 };
 
-class CDirectionalShadowBlurShader : public CShader
+class tDirectionalShadowBlurShader : public tShader
 {
 	private:
 		GLint tex_uniform;
@@ -43,7 +43,7 @@ class CDirectionalShadowBlurShader : public CShader
 		void Init(void);
 		void SetTexture(GLuint tex);
 		void SetTextureLayers(int layers, float *blur_factors);
-		void SetBlurDir(CVector2 v);
+		void SetBlurDir(tVector2 v);
 };
 
 #endif

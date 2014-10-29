@@ -3,7 +3,7 @@
 #define _GBUFFER_H
 
 
-class CGBuffer
+class tGBuffer
 {
 	public:
 		enum GBUFFER_TEXTURE_TYPE
@@ -27,8 +27,8 @@ class CGBuffer
 
 
 	public:
-		CGBuffer(int width, int height, GLuint fbo, int first_attachment);
-		~CGBuffer(void);
+		tGBuffer(int width, int height, GLuint fbo, int first_attachment);
+		~tGBuffer(void);
 
 		void ChangeSize(int width, int height);
 

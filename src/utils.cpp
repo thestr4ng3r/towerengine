@@ -137,9 +137,9 @@ void InverseMatrix4(float m[16], float *ret)
 	memcpy(ret,inv,64);
 }
 
-CVector ApplyMatrix4(float m[16], CVector v)
+tVector ApplyMatrix4(float m[16], tVector v)
 {
-	CVector r;
+	tVector r;
 	r.x = Dot(Vec(m[0], m[1], m[2]), v) + m[3];
 	r.y = Dot(Vec(m[4], m[5], m[6]), v) + m[7];
 	r.z = Dot(Vec(m[8], m[9], m[10]), v) + m[11];

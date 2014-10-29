@@ -2,12 +2,12 @@
 #ifndef _DIRECTIONAL_LIGHT_SHADOW_H
 #define _DIRECTIONAL_LIGHT_SHADOW_H
 
-class CDirectionalLightShadow
+class tDirectionalLightShadow
 {
 	private:
-		CDirectionalLight *light;
+		tDirectionalLight *light;
 
-		CRenderSpace *render_space;
+		tRenderSpace *render_space;
 
 		GLuint tex;
 		GLuint fbo;
@@ -27,14 +27,14 @@ class CDirectionalLightShadow
 		GLuint blur_tex;
 		GLenum *blur_draw_buffers;
 
-		VAO *blur_vao;
-		VBO<float> *blur_vertex_vbo;
-		VBO<float> *blur_uv_vbo;
+		tVAO *blur_vao;
+		tVBO<float> *blur_vertex_vbo;
+		tVBO<float> *blur_uv_vbo;
 
 	public:
-		CDirectionalLightShadow(CDirectionalLight *light, int size, int splits, bool blur_enabled = false, float blur_size = 0.003);
+		tDirectionalLightShadow(tDirectionalLight *light, int size, int splits, bool blur_enabled = false, float blur_size = 0.003);
 
-		void Render(CWorld *world);
+		void Render(tWorld *world);
 
 		GLuint GetShadowMap(void)			{ return tex; }
 		float **GetTextureMatrix(void)		{ return tex_matrix; }
@@ -42,7 +42,7 @@ class CDirectionalLightShadow
 		float GetFarClip(void)				{ return far_clip; }
 		int GetSplitsCount(void)			{ return splits; }
 		float *GetSplitsZ(void)				{ return splits_z; }
-		CRenderSpace *GetRenderSpace(void)	{ return render_space; }
+		tRenderSpace *GetRenderSpace(void)	{ return render_space; }
 };
 
 

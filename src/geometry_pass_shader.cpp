@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-void CGeometryPassShader::Init(void)
+void tGeometryPassShader::Init(void)
 {
 	SetSource(geometry_pass_shader_vert, geometry_pass_shader_frag);
 	CreateVertexShader();
@@ -47,32 +47,32 @@ void CGeometryPassShader::Init(void)
 	Unbind();
 }
 
-void CGeometryPassShader::SetTransformation(const float m[16])
+void tGeometryPassShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
 		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void CGeometryPassShader::SetDiffuseColor(CVector color)
+void tGeometryPassShader::SetDiffuseColor(tVector color)
 {
 	if(diffuse_color_uniform != -1)
 		glUniform3f(diffuse_color_uniform, color.x, color.y, color.z);
 }
 
-void CGeometryPassShader::SetDiffuseColor2(CVector color, float alpha)
+void tGeometryPassShader::SetDiffuseColor2(tVector color, float alpha)
 {
 	if(diffuse_color2_uniform != -1)
 		glUniform4f(diffuse_color2_uniform, color.x, color.y, color.z, alpha);
 }
 
-void CGeometryPassShader::SetSpecularColor(CVector color)
+void tGeometryPassShader::SetSpecularColor(tVector color)
 {
 	if(specular_color_uniform != -1)
 		glUniform3f(specular_color_uniform, color.x, color.y, color.z);
 }
 
 
-void CGeometryPassShader::SetSpecular(float size)
+void tGeometryPassShader::SetSpecular(float size)
 {
 	if(specular_size_uniform != -1)
 		glUniform1f(specular_size_uniform, size);
@@ -80,7 +80,7 @@ void CGeometryPassShader::SetSpecular(float size)
 }
 
 
-void CGeometryPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
+void tGeometryPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
 {
 	glUniform1i(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
 
@@ -92,7 +92,7 @@ void CGeometryPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
 	}
 }
 
-void CGeometryPassShader::SetSpecularTexture(bool enabled, GLuint tex)
+void tGeometryPassShader::SetSpecularTexture(bool enabled, GLuint tex)
 {
 	glUniform1i(specular_tex_enabled_uniform, enabled ? 1 : 0);
 
@@ -105,7 +105,7 @@ void CGeometryPassShader::SetSpecularTexture(bool enabled, GLuint tex)
 
 }
 
-void CGeometryPassShader::SetNormalTexture(bool enabled, GLuint tex)
+void tGeometryPassShader::SetNormalTexture(bool enabled, GLuint tex)
 {
 	glUniform1i(normal_tex_enabled_uniform, enabled ? 1 : 0);
 
@@ -118,12 +118,12 @@ void CGeometryPassShader::SetNormalTexture(bool enabled, GLuint tex)
 
 }
 
-void CGeometryPassShader::SetBumpDepth(float depth)
+void tGeometryPassShader::SetBumpDepth(float depth)
 {
 	glUniform1f(bump_depth_uniform, depth);
 }
 
-void CGeometryPassShader::SetBumpTexture(bool enabled, GLuint tex)
+void tGeometryPassShader::SetBumpTexture(bool enabled, GLuint tex)
 {
 	glUniform1i(bump_tex_enabled_uniform, enabled ? 1 : 0);
 
@@ -136,13 +136,13 @@ void CGeometryPassShader::SetBumpTexture(bool enabled, GLuint tex)
 }
 
 
-void CGeometryPassShader::SetTexCoord(CVector2 coord)
+void tGeometryPassShader::SetTexCoord(tVector2 coord)
 {
 	glMultiTexCoord2fv(GL_TEXTURE0, coord.v);
 }
 
 
-void CGeometryPassShader::SetVectors(CVector normal, CVector tangx, CVector tangy, CVector fnormal)
+void tGeometryPassShader::SetVectors(tVector normal, tVector tangx, tVector tangy, tVector fnormal)
 {
 	if(normal.SquaredLen() < 0.5)
 		printf("%f, %f, %f\n", pvec(normal));
@@ -156,18 +156,18 @@ void CGeometryPassShader::SetVectors(CVector normal, CVector tangx, CVector tang
 
 
 
-void CGeometryPassShader::SetClip(CVector c, float d)
+void tGeometryPassShader::SetClip(tVector c, float d)
 {
 	glUniform3f(clip_uniform, c.x, c.y, c.z);
 	glUniform1f(clip_dist_uniform, d);
 }
 
-void CGeometryPassShader::SetVertexMix(float m)
+void tGeometryPassShader::SetVertexMix(float m)
 {
 	glUniform1f(vertex_mix_uniform, m);
 }
 
-void CGeometryPassShader::ResetUniforms(void)
+void tGeometryPassShader::ResetUniforms(void)
 {
 	SetVectors(Vec(0.0, 0.0, 1.0), Vec(1.0, 0.0, 0.0), Vec(0.0, 1.0, 0.0));
 	SetDiffuseColor(Vec(1.0, 1.0, 1.0));

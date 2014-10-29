@@ -1,6 +1,6 @@
 #include "towerengine.h"
 
-CAnimation::CAnimation(CMesh *mesh, const char *name, float len, int create_keyframes)
+tAnimation::tAnimation(tMesh *mesh, const char *name, float len, int create_keyframes)
 {
 	this->mesh = mesh;
 	mesh->AddAnimation(this);
@@ -21,7 +21,7 @@ CAnimation::CAnimation(CMesh *mesh, const char *name, float len, int create_keyf
 	}
 }
 
-CAnimation::~CAnimation(void)
+tAnimation::~tAnimation(void)
 {
 	while(key_first)
 		delete key_first;
@@ -31,7 +31,7 @@ CAnimation::~CAnimation(void)
 
 }
 
-int CAnimation::Play(float t, int loop)
+int tAnimation::Play(float t, int loop)
 {
 	float tp;
 	int r = 0;
@@ -62,32 +62,32 @@ int CAnimation::Play(float t, int loop)
 	return r;
 }
 
-void CAnimation::ChangeLength(float len)
+void tAnimation::ChangeLength(float len)
 {
 	if(len > 0.0)
 		this->len = len;
 }
 
-float CAnimation::GetLength(void)
+float tAnimation::GetLength(void)
 {
 	return len;
 }
 
-void CAnimation::SetTime(float time)
+void tAnimation::SetTime(float time)
 {
 	if(time <= len)
 		this->time = time;
 }
 
-void CAnimation::SetName(const char *name)
+void tAnimation::SetName(const char *name)
 {
 	this->name = new char[strlen(name) + 1];
 	strcpy(this->name, name);
 }
 
-CKeyFrame *CAnimation::NewKeyFrame(float time)
+tKeyFrame *tAnimation::NewKeyFrame(float time)
 {
-	CKeyFrame *f;
+	tKeyFrame *f;
 
 	if(time < 0.0 || time > len)
 		return 0;
@@ -96,12 +96,12 @@ CKeyFrame *CAnimation::NewKeyFrame(float time)
 		if(f->time == time)
 			return 0;
 
-	return new CKeyFrame(this, time);
+	return new tKeyFrame(this, time);
 }
 
-CKeyFrame *CAnimation::NewKeyFrameFromData(float time, int c, int *vert, CVector *vec)
+tKeyFrame *tAnimation::NewKeyFrameFromData(float time, int c, int *vert, tVector *vec)
 {
-	CKeyFrame *f;
+	tKeyFrame *f;
 
 	if(time < 0.0 || time > len)
 		return 0;
@@ -110,14 +110,14 @@ CKeyFrame *CAnimation::NewKeyFrameFromData(float time, int c, int *vert, CVector
 		if(f->time == time)
 			return 0;
 
-	f = new CKeyFrame(this, time);
+	f = new tKeyFrame(this, time);
 	f->CopyFromData(c, vert, vec);
 	return f;
 }
 
-void CAnimation::ApplyCurrentFrame(void)
+void tAnimation::ApplyCurrentFrame(void)
 {
-	CKeyFrame *a, *b;
+	tKeyFrame *a, *b;
 	float mix;
 
 	GetKeyframePair(&a, &b, &mix);
@@ -125,10 +125,10 @@ void CAnimation::ApplyCurrentFrame(void)
 	a->ApplyMixedPoseToVertices(b, mix);
 }
 
-void CAnimation::GetKeyframePair(CKeyFrame **r_a, CKeyFrame **r_b, float *mix)
+void tAnimation::GetKeyframePair(tKeyFrame **r_a, tKeyFrame **r_b, float *mix)
 {
-	CKeyFrame *a, *b; // a = last keyframe; b = next keyframe
-	CKeyFrame *f;
+	tKeyFrame *a, *b; // a = last keyframe; b = next keyframe
+	tKeyFrame *f;
 	float a_dist, b_dist;
 	float t_dist;
 	int one_pos; // if there is one pose with the same time as the current time, then this will be one.
@@ -177,10 +177,10 @@ void CAnimation::GetKeyframePair(CKeyFrame **r_a, CKeyFrame **r_b, float *mix)
 	*r_b = b;
 }
 
-int CAnimation::Count(void)
+int tAnimation::Count(void)
 {
 	int i;
-	CKeyFrame *f;
+	tKeyFrame *f;
 
 	i = 0;
 	for(f=key_first; f; f=f->chain_next)
@@ -188,12 +188,12 @@ int CAnimation::Count(void)
 	return i;
 }
 
-CAnimation *CAnimation::Copy(CMesh *m)
+tAnimation *tAnimation::Copy(tMesh *m)
 {
-	CAnimation *r;
-	r = new CAnimation(m, name, len, 0);
+	tAnimation *r;
+	r = new tAnimation(m, name, len, 0);
 
-	CKeyFrame *k;
+	tKeyFrame *k;
 	for(k=key_first; k; k=k->chain_next)
 		k->Copy(r);
 
@@ -202,7 +202,7 @@ CAnimation *CAnimation::Copy(CMesh *m)
 
 //------------------------------------------------------------
 
-CKeyFrame::CKeyFrame(CAnimation *anim, float time) : CMeshPose(anim->mesh)
+tKeyFrame::tKeyFrame(tAnimation *anim, float time) : tMeshPose(anim->mesh)
 {
 	this->anim = anim;
 	chain_next = anim->key_first;
@@ -211,9 +211,9 @@ CKeyFrame::CKeyFrame(CAnimation *anim, float time) : CMeshPose(anim->mesh)
 	this->time = time;
 }
 
-CKeyFrame::~CKeyFrame(void)
+tKeyFrame::~tKeyFrame(void)
 {
-	CKeyFrame *k;
+	tKeyFrame *k;
 
 	if(anim->key_first == this)
 		anim->key_first = chain_next;
@@ -223,15 +223,15 @@ CKeyFrame::~CKeyFrame(void)
 				k->chain_next = chain_next;
 }
 
-CKeyFrame *CKeyFrame::Copy(CAnimation *a)
+tKeyFrame *tKeyFrame::Copy(tAnimation *a)
 {
-	CKeyFrame *r;
-	map<CVertex *, CVector>::iterator i;
+	tKeyFrame *r;
+	map<tVertex *, tVector>::iterator i;
 
-	r = new CKeyFrame(a, time);
+	r = new tKeyFrame(a, time);
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
-		r->vertices.insert(pair<CVertex *, CVector>(i->first, i->second));
+		r->vertices.insert(pair<tVertex *, tVector>(i->first, i->second));
 
 	return r;
 

@@ -3,7 +3,7 @@
 #define _COLOR_FACE_SHADER_H
 
 
-class CColorShader : public CFaceShader
+class tColorShader : public tFaceShader
 {
 	private:
 		GLint transformation_uniform;
@@ -13,7 +13,7 @@ class CColorShader : public CFaceShader
 	public:
 		void Init(void);
 
-		void SetDiffuseColor(CVector color);
+		void SetDiffuseColor(tVector color);
 		void SetTransformation(const float m[16]);
 		void ResetUniforms(void);
 };

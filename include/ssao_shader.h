@@ -4,7 +4,7 @@
 
 #define MAX_SSAO_KERNEL_SIZE 32
 
-class CSSAOShader : public CShader
+class tSSAOShader : public tShader
 {
 	private:
 		GLint kernel_uniform;
@@ -30,11 +30,11 @@ class CSSAOShader : public CShader
 		void Init(void);
 
 		void SetKernel(int kernel_size, float *kernel);
-		void SetNoiseTex(GLuint tex, CVector2 tex_scale);
+		void SetNoiseTex(GLuint tex, tVector2 tex_scale);
 		void SetTextures(GLuint depth, GLuint pos, GLuint normal);
 		void SetMatrices(float *proj, float *modelview);
 		void SetRadius(float radius);
-		void SetCamera(CVector pos, CVector dir);
+		void SetCamera(tVector pos, tVector dir);
 };
 
 

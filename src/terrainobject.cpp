@@ -1,6 +1,6 @@
 #include "towerengine.h"
 
-CTerrainObject::CTerrainObject(CTerrain *terrain)
+tTerrainObject::tTerrainObject(tTerrain *terrain)
 {
 	this->terrain = terrain;
 
@@ -9,12 +9,12 @@ CTerrainObject::CTerrainObject(CTerrain *terrain)
 	rigid_body->setRestitution(0.0);
 }
 
-void CTerrainObject::GeometryPass(void)
+void tTerrainObject::GeometryPass(void)
 {
 	terrain->Paint();
 }
 
-CBoundingBox CTerrainObject::GetBoundingBox(void)
+tBoundingBox tTerrainObject::GetBoundingBox(void)
 {
 	return terrain->GetBoundingBox();
 }

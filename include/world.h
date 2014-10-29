@@ -2,20 +2,20 @@
 #ifndef _WORLD_H
 #define _WORLD_H
 
-class CWorld
+class tWorld
 {
 private:
-	vector<CObject *> objects;
-	vector<CPointLight *> point_lights;
-	vector<CDirectionalLight *> dir_lights;
-	CSkyBox *sky_box;
-	CCamera *camera;
+	vector<tObject *> objects;
+	vector<tPointLight *> point_lights;
+	vector<tDirectionalLight *> dir_lights;
+	tSkyBox *sky_box;
+	tCamera *camera;
 
-	CRenderSpace *camera_render_space;
-	set<CPointLight *> camera_render_point_lights;
-	set<CDirectionalLight *> camera_render_dir_lights;
+	tRenderSpace *camera_render_space;
+	set<tPointLight *> camera_render_point_lights;
+	set<tDirectionalLight *> camera_render_dir_lights;
 
-	CVector ambient_color;
+	tVector ambient_color;
 
 	struct physics
 	{
@@ -27,27 +27,27 @@ private:
 	} physics;
 
 public:
-	CWorld(void);
-	~CWorld(void);
+	tWorld(void);
+	~tWorld(void);
 
-	void AddObject(CObject *o);
-	void RemoveObject(CObject *o);
-	void SetSkyBox(CSkyBox *sky_box)	{ this->sky_box = sky_box; }
+	void AddObject(tObject *o);
+	void RemoveObject(tObject *o);
+	void SetSkyBox(tSkyBox *sky_box)	{ this->sky_box = sky_box; }
 	void Clear(void);
 
-	CVector GetAmbientColor(void)		{ return ambient_color; }
-	CCamera *GetCamera(void)			{ return camera; }
+	tVector GetAmbientColor(void)		{ return ambient_color; }
+	tCamera *GetCamera(void)			{ return camera; }
 	btDiscreteDynamicsWorld *GetDynamicsWorld(void) { return physics.dynamics_world; }
 	btBroadphaseInterface *GetBroadphase(void)		{ return physics.broadphase; }
 
-	void SetAmbientColor(CVector v)		{ ambient_color = v; }
+	void SetAmbientColor(tVector v)		{ ambient_color = v; }
 
-	void AddPointLight(CPointLight *light);
-	void RemovePointLight(CPointLight *light);
+	void AddPointLight(tPointLight *light);
+	void RemovePointLight(tPointLight *light);
 	void ClearPointLights(void)			{ point_lights.clear(); }
 
-	void AddDirectionalLight(CDirectionalLight *light);
-	void RemoveDirectionalLight(CDirectionalLight *light);
+	void AddDirectionalLight(tDirectionalLight *light);
+	void RemoveDirectionalLight(tDirectionalLight *light);
 	void ClearDirectionalLights(void);
 
 	void Step(float time);
@@ -57,8 +57,8 @@ public:
 
 	void FillRenderSpaces(void);
 	void RenderShadowMaps(void);
-	CRenderSpace *GetCameraRenderSpace(void)	{ return camera_render_space; }
-	CSkyBox *GetSkyBox(void)					{ return sky_box; }
+	tRenderSpace *GetCameraRenderSpace(void)	{ return camera_render_space; }
+	tSkyBox *GetSkyBox(void)					{ return sky_box; }
 };
 
 

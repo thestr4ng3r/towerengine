@@ -3,12 +3,12 @@
 #define _POINT_LIGHT_SHADOW_H
 
 
-class CPointLightShadow
+class tPointLightShadow
 {
 	private:
-		CPointLight *light;
+		tPointLight *light;
 
-		CRenderSpace *render_space;
+		tRenderSpace *render_space;
 
 		GLuint tex;
 		GLuint fbo;
@@ -20,17 +20,17 @@ class CPointLightShadow
 		GLuint blur_fbo;
 		static const GLenum blur_draw_buffers[6];
 
-		VAO *blur_vao;
-		VBO<float> *blur_vertex_vbo;
+		tVAO *blur_vao;
+		tVBO<float> *blur_vertex_vbo;
 
 		int size;
 
 		bool culled;
 
 	public:
-		CPointLightShadow(CPointLight *light, int size, bool blur_enabled = false, float blur_size = 0.003);
+		tPointLightShadow(tPointLight *light, int size, bool blur_enabled = false, float blur_size = 0.003);
 
-		void Render(CWorld *world);
+		void Render(tWorld *world);
 
 		GLuint GetShadowMap(void)			{ return tex; }
 
@@ -40,7 +40,7 @@ class CPointLightShadow
 
 		bool GetBlurEnabled(void)			{ return blur_enabled; }
 		float GetBlurSize(void)				{ return blur_size; }
-		CRenderSpace *GetRenderSpace(void)	{ return render_space; }
+		tRenderSpace *GetRenderSpace(void)	{ return render_space; }
 		bool GetCulled(void)				{ return culled; }
 };
 

@@ -1,7 +1,7 @@
 #ifndef _HEIGHTMAP_H
 #define _HEIGHTMAP_H
 
-class CHeightMap
+class tHeightMap
 {
 	private:
 		int size;
@@ -10,7 +10,7 @@ class CHeightMap
 		GLuint height_tex;
 
 	public:
-		CHeightMap(int size);
+		tHeightMap(int size);
 
 		bool Load(const char *file);
 

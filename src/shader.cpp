@@ -1,33 +1,33 @@
 
 #include "towerengine.h"
 
-void CShader::SetSource(const char *vertex, const char *fragment)
+void tShader::SetSource(const char *vertex, const char *fragment)
 {
 	vertex_src = vertex;
 	fragment_src = fragment;
 }
 
-void CShader::CreateVertexShader(void)
+void tShader::CreateVertexShader(void)
 {
 	vertex_shader = CreateShader(GL_VERTEX_SHADER, vertex_src, name);
 }
 
-void CShader::CreateFragmentShader(void)
+void tShader::CreateFragmentShader(void)
 {
 	fragment_shader = CreateShader(GL_FRAGMENT_SHADER, fragment_src, name);
 }
 
-void CShader::CreateProgram(void)
+void tShader::CreateProgram(void)
 {
 	program = CreateShaderProgram(vertex_shader, fragment_shader);
 }
 
-void CShader::LinkProgram(void)
+void tShader::LinkProgram(void)
 {
 	LinkShaderProgram(program);
 }
 
-void CShader::InitShader(const char *vert_src, const char *frag_src, const char *shader_name)
+void tShader::InitShader(const char *vert_src, const char *frag_src, const char *shader_name)
 {
 	name = shader_name;
 
@@ -37,19 +37,19 @@ void CShader::InitShader(const char *vert_src, const char *frag_src, const char 
 	CreateProgram();
 }
 
-GLint CShader::GetUniformLocation(const char *uniform)
+GLint tShader::GetUniformLocation(const char *uniform)
 {
 	return glGetUniformLocation(program, uniform);
 }
 
-void CShader::Bind(void)
+void tShader::Bind(void)
 {
 	glUseProgram(program);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void CShader::Unbind(void)
+void tShader::Unbind(void)
 {
 	glUseProgram(0);
 }
@@ -242,7 +242,7 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 	return textureID;
 }
 
-GLuint GLTextureFromColor(const CVector &color)
+GLuint GLTextureFromColor(const tVector &color)
 {
 	const int width = 64;
 	const int height = 64;

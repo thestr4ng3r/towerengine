@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-CDirectionalLight::CDirectionalLight(CVector dir, CVector color)
+tDirectionalLight::tDirectionalLight(tVector dir, tVector color)
 {
 	SetDirection(dir);
 	this->color = color;
@@ -9,16 +9,16 @@ CDirectionalLight::CDirectionalLight(CVector dir, CVector color)
 	shadow_enabled = false;
 }
 
-void CDirectionalLight::InitShadow(int size, int splits, bool blur_enabled, float blur_size)
+void tDirectionalLight::InitShadow(int size, int splits, bool blur_enabled, float blur_size)
 {
 	if(shadow)
 		delete shadow;
 
-	shadow = new CDirectionalLightShadow(this, size, splits, blur_enabled, blur_size);
+	shadow = new tDirectionalLightShadow(this, size, splits, blur_enabled, blur_size);
 	shadow_enabled = true;
 }
 
-void CDirectionalLight::RenderShadow(CWorld *world)
+void tDirectionalLight::RenderShadow(tWorld *world)
 {
 	if(!shadow_enabled)
 		return;

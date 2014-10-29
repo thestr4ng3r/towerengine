@@ -2,31 +2,31 @@
 #ifndef _POINT_LIGHT_H
 #define _POINT_LIGHT_H
 
-class CPointLight
+class tPointLight
 {
 	private:
-		CVector pos;
-		CVector color;
+		tVector pos;
+		tVector color;
 		float distance;
 
 		bool shadow_enabled;
-		CPointLightShadow *shadow;
+		tPointLightShadow *shadow;
 
 	public:
-		CPointLight(CVector pos, CVector color, float distance);
+		tPointLight(tVector pos, tVector color, float distance);
 
-		void SetPosition(CVector pos)		{ this->pos = pos; }
-		void SetColor(CVector color)	{ this->color = color; }
+		void SetPosition(tVector pos)		{ this->pos = pos; }
+		void SetColor(tVector color)	{ this->color = color; }
 		void SetDistance(float dist)	{ this->distance = dist; }
 
-		CVector GetPosition(void)			{ return pos; }
-		CVector GetColor(void)				{ return color; }
+		tVector GetPosition(void)			{ return pos; }
+		tVector GetColor(void)				{ return color; }
 		float GetDistance(void)				{ return distance; }
 		bool GetShadowEnabled(void)			{ return shadow_enabled; }
-		CPointLightShadow *GetShadow(void)	{ return shadow; }
+		tPointLightShadow *GetShadow(void)	{ return shadow; }
 
 		void InitShadow(int size, bool blur_enabled = false, float blur_size = 0.003);
-		void RenderShadow(CWorld *world);
+		void RenderShadow(tWorld *world);
 };
 
 #endif

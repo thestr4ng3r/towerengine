@@ -1,15 +1,15 @@
 
 #include "towerengine.h"
 
-void CDirectionalShadowShader::Init(void)
+void tDirectionalShadowShader::Init(void)
 {
 	SetSource(directional_shadow_shader_vert, directional_shadow_shader_frag);
 	CreateVertexShader();
 	CreateFragmentShader();
 	CreateProgram();
-	glBindAttribLocation(program, CFaceShader::vertex_attribute, "vertex_attr");
-	glBindAttribLocation(program, CFaceShader::vertex2_attribute, "vertex2_attr");
-	glBindAttribLocation(program, CFaceShader::uvcoord_attribute, "uv_attr");
+	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
+	glBindAttribLocation(program, tFaceShader::vertex2_attribute, "vertex2_attr");
+	glBindAttribLocation(program, tFaceShader::uvcoord_attribute, "uv_attr");
 	LinkProgram();
 
 	light_dir_uniform = GetUniformLocation("light_dir_uni");
@@ -24,35 +24,35 @@ void CDirectionalShadowShader::Init(void)
 	Unbind();
 }
 
-void CDirectionalShadowShader::SetLightDir(CVector v)
+void tDirectionalShadowShader::SetLightDir(tVector v)
 {
 	glUniform3f(light_dir_uniform, v.x, v.y, v.z);
 }
 
-void CDirectionalShadowShader::SetTransformation(const float m[16])
+void tDirectionalShadowShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
 		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void CDirectionalShadowShader::SetVertexMix(float m)
+void tDirectionalShadowShader::SetVertexMix(float m)
 {
 	glUniform1f(vertex_mix_uniform, m);
 }
 
-void CDirectionalShadowShader::SetClip(float near, float far)
+void tDirectionalShadowShader::SetClip(float near, float far)
 {
 	glUniform2f(clip_uniform, near, far);
 }
 
-void CDirectionalShadowShader::SetCamPos(CVector v)
+void tDirectionalShadowShader::SetCamPos(tVector v)
 {
 	glUniform3f(cam_pos_uniform, v.x, v.y, v.z);
 }
 
 
 
-void CDirectionalShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
+void tDirectionalShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
 {
 	glUniform1i(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
 
@@ -67,7 +67,7 @@ void CDirectionalShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
 
 
 
-void CDirectionalShadowBlurShader::Init(void)
+void tDirectionalShadowBlurShader::Init(void)
 {
 	InitShader(directional_shadow_blur_shader_vert, directional_shadow_blur_shader_frag, "Directional Shadow Blur Shader");
 
@@ -84,21 +84,21 @@ void CDirectionalShadowBlurShader::Init(void)
 	Unbind();
 }
 
-void CDirectionalShadowBlurShader::SetTexture(GLuint tex)
+void tDirectionalShadowBlurShader::SetTexture(GLuint tex)
 {
 	glUniform1i(tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
 }
 
-void CDirectionalShadowBlurShader::SetTextureLayers(int count, float *blur_factors)
+void tDirectionalShadowBlurShader::SetTextureLayers(int count, float *blur_factors)
 {
 	glUniform1i(tex_layers_count_uniform, count);
 	glUniform1fv(blur_factors_uniform, count, blur_factors);
 }
 
 
-void CDirectionalShadowBlurShader::SetBlurDir(CVector2 v)
+void tDirectionalShadowBlurShader::SetBlurDir(tVector2 v)
 {
 	glUniform2f(blur_dir_uniform, v.x, v.y);
 }

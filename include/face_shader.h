@@ -3,7 +3,7 @@
 #define _FACE_SHADER_H
 
 
-class CFaceShader : public CShader
+class tFaceShader : public tShader
 {
 	public:
 		static const GLint vertex_attribute = 0;
@@ -18,21 +18,21 @@ class CFaceShader : public CShader
 		static const unsigned int normal_tex_unit = 2;
 		static const unsigned int bump_tex_unit = 3;
 
-		virtual void SetClip(CVector c, float d) {}
-		virtual void SetDiffuseColor(CVector color) {}
-		virtual void SetDiffuseColor2(CVector color, float alpha) {}
-		virtual void SetSpecularColor(CVector color) {}
+		virtual void SetClip(tVector c, float d) {}
+		virtual void SetDiffuseColor(tVector color) {}
+		virtual void SetDiffuseColor2(tVector color, float alpha) {}
+		virtual void SetSpecularColor(tVector color) {}
 		virtual void SetBumpDepth(float depth) {}
 		virtual void SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps) {}
 		virtual void SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_martix, float *shadow_splits_count, float *shadow_splits_z) {}
-		virtual void SetLightAmbientColor(CVector color) {}
+		virtual void SetLightAmbientColor(tVector color) {}
 		virtual void SetSpecular(float size) {}
 		virtual void SetDiffuseTexture(bool enabled, GLuint tex = 0) {}
 		virtual void SetSpecularTexture(bool enabled, GLuint tex = 0) {}
 		virtual void SetNormalTexture(bool enabled, GLuint tex = 0) {}
 		virtual void SetBumpTexture(bool enabled, GLuint tex = 0) {}
-		virtual void SetTexCoord(CVector2 coord) {}
-		virtual void SetVectors(CVector normal, CVector tangx, CVector tangy, CVector fnormal = Vec(0.0, 0.0, 0.0)) {}
+		virtual void SetTexCoord(tVector2 coord) {}
+		virtual void SetVectors(tVector normal, tVector tangx, tVector tangy, tVector fnormal = Vec(0.0, 0.0, 0.0)) {}
 		virtual void SetTransformation(const float m[16]) {}
 		virtual void SetVertexMix(float m = 0.0) {}
 		virtual void ResetUniforms(void) {}

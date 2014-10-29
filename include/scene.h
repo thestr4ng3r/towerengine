@@ -3,20 +3,20 @@
 #define _SCENE_H
 
 
-class CScene
+class tScene
 {
 	private:
-		CWorld *world;
+		tWorld *world;
 
-		map<string, CMesh *> meshes;
-		map<string, CSceneObject *> objects;
+		map<string, tMesh *> meshes;
+		map<string, tSceneObject *> objects;
 
 		void ParseAssetsNode(xmlNodePtr cur);
 		void ParseObjectsNode(xmlNodePtr cur);
 
 	public:
-		CScene(CWorld *world);
-		~CScene(void);
+		tScene(tWorld *world);
+		~tScene(void);
 
 		bool LoadFromFile(string file);
 

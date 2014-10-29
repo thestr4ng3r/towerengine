@@ -1,16 +1,16 @@
 #ifndef _TERRAINOBJECT_H
 #define _TERRAINOBJECT_H
 
-class CTerrainObject : public CObject
+class tTerrainObject : public tObject
 {
 	private:
-		CTerrain *terrain;
+		tTerrain *terrain;
 
 	public:
-		CTerrainObject(CTerrain *terrain);
+		tTerrainObject(tTerrain *terrain);
 
 		void GeometryPass(void);
-		CBoundingBox GetBoundingBox(void);
+		tBoundingBox GetBoundingBox(void);
 };
 
 #endif

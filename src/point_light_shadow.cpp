@@ -1,10 +1,10 @@
 
 #include "towerengine.h"
 
-const GLenum CPointLightShadow::blur_draw_buffers[6] = {	GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
+const GLenum tPointLightShadow::blur_draw_buffers[6] = {	GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
 																GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
 
-CPointLightShadow::CPointLightShadow(CPointLight *light, int size, bool blur_enabled, float blur_size)
+tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_enabled, float blur_size)
 {
 	int i;
 
@@ -13,7 +13,7 @@ CPointLightShadow::CPointLightShadow(CPointLight *light, int size, bool blur_ena
 
 	culled = false;
 
-	render_space = new CRenderSpace();
+	render_space = new tRenderSpace();
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
@@ -62,9 +62,9 @@ CPointLightShadow::CPointLightShadow(CPointLight *light, int size, bool blur_ena
 	glDrawBuffers(6, blur_draw_buffers);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-	blur_vao = new VAO();
+	blur_vao = new tVAO();
 
-	blur_vertex_vbo = new VBO<float>(2, blur_vao, 4);
+	blur_vertex_vbo = new tVBO<float>(2, blur_vao, 4);
 	static const float blur_vertices[] = {	-1.0, 1.0,
 											-1.0, -1.0,
 											1.0, -1.0,
@@ -73,16 +73,16 @@ CPointLightShadow::CPointLightShadow(CPointLight *light, int size, bool blur_ena
 	blur_vertex_vbo->AssignData();
 
 	blur_vao->Bind();
-	blur_vertex_vbo->SetAttribute(CPointShadowBlurShader::vertex_attribute, GL_FLOAT);
+	blur_vertex_vbo->SetAttribute(tPointShadowBlurShader::vertex_attribute, GL_FLOAT);
 	blur_vao->UnBind();
 }
 
-void CPointLightShadow::Render(CWorld *world)
+void tPointLightShadow::Render(tWorld *world)
 {
 	int s;
-	CVector pos = light->GetPosition();
-	CVector cam_dir, cam_to;
-	CVector v_vec;
+	tVector pos = light->GetPosition();
+	tVector cam_dir, cam_to;
+	tVector v_vec;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -95,10 +95,10 @@ void CPointLightShadow::Render(CWorld *world)
 	glLoadIdentity();
 	gluPerspective(90.0, 1.0, 0.001, light->GetDistance());
 
-	CEngine::SetCurrentFaceShader(CEngine::GetPointShadowShader());
-	CEngine::BindCurrentFaceShader();
-	CEngine::GetPointShadowShader()->SetLightPos(pos);
-	CEngine::GetPointShadowShader()->SetLightDist(light->GetDistance());
+	tEngine::SetCurrentFaceShader(tEngine::GetPointShadowShader());
+	tEngine::BindCurrentFaceShader();
+	tEngine::GetPointShadowShader()->SetLightPos(pos);
+	tEngine::GetPointShadowShader()->SetLightDist(light->GetDistance());
 
 	for(s=0; s<6; s++)
 	{
@@ -118,7 +118,7 @@ void CPointLightShadow::Render(CWorld *world)
 
 		render_space->GeometryPass();
 	}
-	CShader::Unbind();
+	tShader::Unbind();
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
 
@@ -134,8 +134,8 @@ void CPointLightShadow::Render(CWorld *world)
 	glLoadIdentity();
 	gluPerspective(90.0, 1.0, 0.001, 5.0);
 
-	CEngine::GetPointShadowBlurShader()->Bind();
-	CEngine::GetPointShadowBlurShader()->SetTexture(tex);
+	tEngine::GetPointShadowBlurShader()->Bind();
+	tEngine::GetPointShadowBlurShader()->SetTexture(tex);
 
 	for(s=0; s<6; s++)
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, blur_tex, 0);
@@ -146,23 +146,23 @@ void CPointLightShadow::Render(CWorld *world)
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
 
-	CEngine::GetPointShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0, 0.0) * blur_size);
+	tEngine::GetPointShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0, 0.0) * blur_size);
 
 	blur_vao->Draw(GL_QUADS, 0, 4);
 
 
-	CEngine::GetPointShadowBlurShader()->SetTexture(blur_tex);
+	tEngine::GetPointShadowBlurShader()->SetTexture(blur_tex);
 
 	for(s=0; s<6; s++)
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	CEngine::GetPointShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0, 0.0) * blur_size);
+	tEngine::GetPointShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0, 0.0) * blur_size);
 
 	blur_vao->Draw(GL_QUADS, 0, 4);
 
-	CShader::Unbind();
+	tShader::Unbind();
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }

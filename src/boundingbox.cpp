@@ -2,18 +2,18 @@
 #include "towerengine.h"
 
 
-CBoundingBox::CBoundingBox(CVector a, CVector b)
+tBoundingBox::tBoundingBox(tVector a, tVector b)
 {
 	SetBounds(a, b);
 }
 
-CBoundingBox::CBoundingBox(void)
+tBoundingBox::tBoundingBox(void)
 {
 	minv = Vec(INFINITY, INFINITY, INFINITY);
 	maxv = Vec(-INFINITY, -INFINITY, -INFINITY);
 }
 
-void CBoundingBox::SetBounds(CVector a, CVector b)
+void tBoundingBox::SetBounds(tVector a, tVector b)
 {
 	minv.x = min(a.x, b.x);
 	minv.y = min(a.y, b.y);
@@ -24,7 +24,7 @@ void CBoundingBox::SetBounds(CVector a, CVector b)
 	maxv.z = max(a.z, b.z);
 }
 
-void CBoundingBox::AddPoint(CVector p)
+void tBoundingBox::AddPoint(tVector p)
 {
 	minv.x = min(minv.x, p.x);
 	minv.y = min(minv.y, p.y);
@@ -35,9 +35,9 @@ void CBoundingBox::AddPoint(CVector p)
 	maxv.z = max(maxv.z, p.z);
 }
 
-CVector *CBoundingBox::GetCornerPoints(void)
+tVector *tBoundingBox::GetCornerPoints(void)
 {
-	CVector *p = new CVector[8];
+	tVector *p = new tVector[8];
 
 	p[0] = Vec(minv.x, maxv.y, minv.z);
 	p[1] = Vec(minv.x, maxv.y, maxv.z);
@@ -51,7 +51,7 @@ CVector *CBoundingBox::GetCornerPoints(void)
 	return p;
 }
 
-CBoundingBox operator+(CBoundingBox a, const CVector &b)
+tBoundingBox operator+(tBoundingBox a, const tVector &b)
 {
-	return CBoundingBox(a.GetMin() + b, a.GetMax() + b);
+	return tBoundingBox(a.GetMin() + b, a.GetMax() + b);
 }

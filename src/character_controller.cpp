@@ -3,10 +3,10 @@
 
 
 
-class CCharacterControllerCollisionCallback : public btCollisionWorld::ClosestConvexResultCallback
+class tCharacterControllerCollisionCallback : public btCollisionWorld::ClosestConvexResultCallback
 {
 	public:
-		CCharacterControllerCollisionCallback (btCollisionObject* me)
+		tCharacterControllerCollisionCallback (btCollisionObject* me)
 				: btCollisionWorld::ClosestConvexResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
 		{
 			this->me = me;
@@ -40,7 +40,7 @@ class CCharacterControllerCollisionCallback : public btCollisionWorld::ClosestCo
 
 
 
-CCharacterController::CCharacterController(btRigidBody *body, btConvexShape *shape, float step_height)
+tCharacterController::tCharacterController(btRigidBody *body, btConvexShape *shape, float step_height)
 {
 	this->body = body;
 	this->shape = shape;
@@ -56,7 +56,7 @@ CCharacterController::CCharacterController(btRigidBody *body, btConvexShape *sha
 
 
 
-void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
+void tCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 {
 	btVector3 pos;
 
@@ -72,7 +72,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 	vertical_velocity -= 9.81 * time;
 	end.setOrigin(start.getOrigin() + btVector3(0.0, vertical_velocity * time, 0.0));
 
-	CCharacterControllerCollisionCallback callback_vert = CCharacterControllerCollisionCallback(body);
+	tCharacterControllerCollisionCallback callback_vert = tCharacterControllerCollisionCallback(body);
 
 	world->convexSweepTest(shape, start, end, callback_vert, 0.005);
 
@@ -100,7 +100,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 			slide_vec *= slide_vec.dot(btVector3(0.0, -1.0, 0.0)) * (-rest_v_velocity);
 
 			end.setOrigin(pos + slide_vec);
-			CCharacterControllerCollisionCallback callback_vert_slide = CCharacterControllerCollisionCallback(body);
+			tCharacterControllerCollisionCallback callback_vert_slide = tCharacterControllerCollisionCallback(body);
 			world->convexSweepTest(shape, start, end, callback_vert_slide, 0.005);
 
 			if(callback_vert_slide.hasHit())
@@ -120,7 +120,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 
 	end.setOrigin(target_pos);
 
-	CCharacterControllerCollisionCallback callback = CCharacterControllerCollisionCallback(body);
+	tCharacterControllerCollisionCallback callback = tCharacterControllerCollisionCallback(body);
 
 	world->convexSweepTest(shape, start, end, callback);
 
@@ -151,7 +151,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 
 	// go up
 
-	CCharacterControllerCollisionCallback callback_up = CCharacterControllerCollisionCallback(body);
+	tCharacterControllerCollisionCallback callback_up = tCharacterControllerCollisionCallback(body);
 	world->convexSweepTest(shape, start, end, callback_up, 0.001);
 
 	if(callback_up.hasHit())
@@ -169,7 +169,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 
 	// go forward
 
-	CCharacterControllerCollisionCallback callback_f = CCharacterControllerCollisionCallback(body);
+	tCharacterControllerCollisionCallback callback_f = tCharacterControllerCollisionCallback(body);
 	world->convexSweepTest(shape, start, end, callback_f);
 
 	forward_step = rest_walk_dir.length();
@@ -195,7 +195,7 @@ void CCharacterController::updateAction(btCollisionWorld *world, btScalar time)
 
 	// go down again
 
-	CCharacterControllerCollisionCallback callback_down = CCharacterControllerCollisionCallback(body);
+	tCharacterControllerCollisionCallback callback_down = tCharacterControllerCollisionCallback(body);
 	world->convexSweepTest(shape, start, end, callback_down);
 
 	if(callback_down.hasHit())

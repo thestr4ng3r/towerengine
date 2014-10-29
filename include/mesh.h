@@ -12,9 +12,9 @@
 #define TEM_CURRENT_VERSION			TEM_VERSION_0_3
 #define TEM_CURRENT_VERSION_STRING	TEM_VERSION_0_3_STRING
 
-template <class T> class VBO;
+template <class T> class tVBO;
 
-class CMesh
+class tMesh
 {
 	private:
 		int file_version;
@@ -27,33 +27,33 @@ class CMesh
 		bool refresh_vbos;
 		bool refresh_ibos;
 
-		VAO *vao;
-		VBO<float> *normal_vbo;
-		VBO<float> *tang_vbo;
-		VBO<float> *bitang_vbo;
-		VBO<float> *face_normal_vbo;
-		VBO<float> *uvcoord_vbo;
+		tVAO *vao;
+		tVBO<float> *normal_vbo;
+		tVBO<float> *tang_vbo;
+		tVBO<float> *bitang_vbo;
+		tVBO<float> *face_normal_vbo;
+		tVBO<float> *uvcoord_vbo;
 		int data_count;
 
-		CBoundingBox bounding_box;
+		tBoundingBox bounding_box;
 
-		set<CVertex *> outdated_vertices;
+		set<tVertex *> outdated_vertices;
 
-		CMeshPose *current_pose;
-		CAnimation *current_animation;
+		tMeshPose *current_pose;
+		tAnimation *current_animation;
 
-		CMeshPose *idle_pose;
+		tMeshPose *idle_pose;
 
-		CMeshMaterial *idle_material;
+		tMeshMaterial *idle_material;
 
-		vector<CVertex *> vertices;
-		vector<CTriangle *> triangles;
-		vector<CMeshMaterial *> materials;
-		map<string, CMeshPose *> custom_pose;
-		vector<CAnimation *> animations;
-		vector<CEntity *> entities;
+		vector<tVertex *> vertices;
+		vector<tTriangle *> triangles;
+		vector<tMeshMaterial *> materials;
+		map<string, tMeshPose *> custom_pose;
+		vector<tAnimation *> animations;
+		vector<tEntity *> entities;
 
-		map<int, CVertex *> vertex_indices;
+		map<int, tVertex *> vertex_indices;
 
 
 		btTriangleMesh *physics_triangle_mesh;
@@ -66,18 +66,18 @@ class CMesh
 		void RefreshAllVBOs(void);
 		void DeleteVBOData(void);
 
-		CVertex *ParseVertexNode(xmlNodePtr cur);
-		CMeshMaterial *ParseMaterialNode(xmlNodePtr cur, const char *path);
-		CTriangle *ParseTriangleNode(xmlNodePtr cur);
-		CMeshPose *ParsePoseNode(xmlNodePtr cur);
-		CAnimation *ParseAnimationNode(xmlNodePtr cur);
-		CKeyFrame *ParseKeyFrameNode(xmlNodePtr cur, CAnimation *anim);
-		CEntity *ParseEntityNode(xmlNodePtr cur);
+		tVertex *ParseVertexNode(xmlNodePtr cur);
+		tMeshMaterial *ParseMaterialNode(xmlNodePtr cur, const char *path);
+		tTriangle *ParseTriangleNode(xmlNodePtr cur);
+		tMeshPose *ParsePoseNode(xmlNodePtr cur);
+		tAnimation *ParseAnimationNode(xmlNodePtr cur);
+		tKeyFrame *ParseKeyFrameNode(xmlNodePtr cur, tAnimation *anim);
+		tEntity *ParseEntityNode(xmlNodePtr cur);
 
 	public:
 		static float color[4];
 
-		static void Color(CVector c, float a = 1.0);
+		static void Color(tVector c, float a = 1.0);
 
 		void ApplyMatrix(float m[16]);
 
@@ -111,44 +111,44 @@ class CMesh
 		int GetAnimationCount(void)					{ return animations.size(); }
 		int GetEntityCount(void)					{ return entities.size(); }
 
-		CVertex *GetVertex(int i)					{ return vertices.at(i); }
-		CTriangle *GetTriangle(int i)				{ return triangles.at(i); }
-		CMeshMaterial *GetMaterial(int i)				{ return materials.at(i); }
-		CMeshPose *GetCustomPose(string s) 			{ return custom_pose.at(s); }
-		CAnimation *GetAnimation(int i)				{ return animations.at(i); }
-		CEntity *GetEntity(int i)					{ return entities.at(i); }
+		tVertex *GetVertex(int i)					{ return vertices.at(i); }
+		tTriangle *GetTriangle(int i)				{ return triangles.at(i); }
+		tMeshMaterial *GetMaterial(int i)				{ return materials.at(i); }
+		tMeshPose *GetCustomPose(string s) 			{ return custom_pose.at(s); }
+		tAnimation *GetAnimation(int i)				{ return animations.at(i); }
+		tEntity *GetEntity(int i)					{ return entities.at(i); }
 
-		CMeshMaterial *GetIdleMaterial(void)			{ return idle_material; }
+		tMeshMaterial *GetIdleMaterial(void)			{ return idle_material; }
 
-		map<string, CEntity *> GetEntitiesInGroup(const char *group = "");
+		map<string, tEntity *> GetEntitiesInGroup(const char *group = "");
 
-		CBoundingBox GetBoundingBox(void)			{ return bounding_box; }
+		tBoundingBox GetBoundingBox(void)			{ return bounding_box; }
 
-		void AddVertex(CVertex *v);
-		void AddTriangle(CTriangle *t);
-		void AddMaterial(CMeshMaterial *m);
-		void AddCustomPose(string name, CMeshPose *p);
-		void AddAnimation(CAnimation *a);
+		void AddVertex(tVertex *v);
+		void AddTriangle(tTriangle *t);
+		void AddMaterial(tMeshMaterial *m);
+		void AddCustomPose(string name, tMeshPose *p);
+		void AddAnimation(tAnimation *a);
 
-		void RemoveVertex(CVertex *v);
-		void RemoveTriangle(CTriangle *t);
-		void RemoveMaterial(CMeshMaterial *m);
+		void RemoveVertex(tVertex *v);
+		void RemoveTriangle(tTriangle *t);
+		void RemoveMaterial(tMeshMaterial *m);
 		void RemoveCustomPose(string name);
-		void RemoveAnimation(CAnimation *a);
-		void RemoveEntity(CEntity *e);
+		void RemoveAnimation(tAnimation *a);
+		void RemoveEntity(tEntity *e);
 
-		IBO *CreateIBO(void)						{ return new IBO(vao); }
+		tIBO *CreateIBO(void)						{ return new tIBO(vao); }
 
-		CMeshPose *GetIdlePose(void)		{ return idle_pose; }
-		CMeshPose *GetCustomPoseByName(string name);
-		CMeshPose *GetCurrentPose(void);
+		tMeshPose *GetIdlePose(void)		{ return idle_pose; }
+		tMeshPose *GetCustomPoseByName(string name);
+		tMeshPose *GetCurrentPose(void);
 		string GetCurrentPoseName(string idle = string("Idle"));
 
-		CAnimation *CreateAnimation(const char *name, float len = 1.0);
-		void ChangeAnimation(CAnimation *a);
+		tAnimation *CreateAnimation(const char *name, float len = 1.0);
+		void ChangeAnimation(tAnimation *a);
 		void ChangeAnimation(const char *name);
-		CAnimation *GetAnimationByName(const char *name);
-		CAnimation *GetCurrentAnimation(void);
+		tAnimation *GetAnimationByName(const char *name);
+		tAnimation *GetCurrentAnimation(void);
 		char *GetCurrentAnimationName(void);
 		void PlayAnimation(float t);
 		void ApplyAnimation(void);
@@ -164,37 +164,37 @@ class CMesh
 		btTriangleMesh *GeneratePhysicsMesh(void);
 		btTriangleMesh *GetPhysicsMesh(void)		{ return physics_triangle_mesh; }
 
-		CVertex *CreateVertex(CVector v);
-		CTriangle *CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3);
-		CTriangle *CreateTriangleAuto(CVector v1, CVector v2, CVector v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3);
-		CMeshPose *CreateCustomPose(string name);
-		CEntity *CreateEntity(string name, string group = string());
+		tVertex *CreateVertex(tVector v);
+		tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3);
+		tTriangle *CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3);
+		tMeshPose *CreateCustomPose(string name);
+		tEntity *CreateEntity(string name, string group = string());
 
-		VBO<float> *CreateFloatVBO(int components);
+		tVBO<float> *CreateFloatVBO(int components);
 		void AssignVertexArrayPositions(void);
 
 		void ChangePose(string name, string idle = "Idle");
-		void ChangePose(CMeshPose *pos);
+		void ChangePose(tMeshPose *pos);
 		void CopyPoseFromVertices(void);
 
-		CMeshMaterial *GetMaterialByName(string name);
-		CVertex *GetVertexByID(int id);
+		tMeshMaterial *GetMaterialByName(string name);
+		tVertex *GetVertexByID(int id);
 
-		void SetVertexId(CVertex *v, int id);
+		void SetVertexId(tVertex *v, int id);
 
 		void TriggerAllVBOsRefresh(void)	{ refresh_vbos = true; }
 		void TriggerIBOsRefresh(void)		{ refresh_ibos = true; }
 		void RefreshIBOs(void);
 
-		void SortTriangles(CVector cam);
+		void SortTriangles(tVector cam);
 		void SortMaterials(void);
 
 		void SetIDs(void);
 
 		void SetRefreshFunc(void (*func)(void)) { refresh_func = func; }
 
-		CMesh(const char *file = 0);
-		~CMesh(void);
+		tMesh(const char *file = 0);
+		~tMesh(void);
 };
 
 #endif

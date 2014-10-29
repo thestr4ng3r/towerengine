@@ -1,22 +1,22 @@
 
 #include "towerengine.h"
 
-CObjectSceneObject::CObjectSceneObject(CObject *object)
+tObjectSceneObject::tObjectSceneObject(tObject *object)
 {
 	this->object = object;
 }
 
-CObjectSceneObject::~CObjectSceneObject(void)
+tObjectSceneObject::~tObjectSceneObject(void)
 {
 	delete object;
 }
 
-void CObjectSceneObject::AddToWorld(CWorld *world)
+void tObjectSceneObject::AddToWorld(tWorld *world)
 {
 	world->AddObject(object);
 }
 
-void CObjectSceneObject::RemoveFromWorld(CWorld *world)
+void tObjectSceneObject::RemoveFromWorld(tWorld *world)
 {
 	world->RemoveObject(object);
 }

@@ -2,32 +2,32 @@
 #ifndef _TRIANGLE_H
 #define _TRIANGLE_H
 
-struct CTriangle
+struct tTriangle
 {
-	CMesh *mesh;
-	CVertex **v;
-	CVector normal[3];
-	CVector fnormal;
-	CVector tang, bitang;
-	CMeshMaterial *mat;
-	CVector color;
+	tMesh *mesh;
+	tVertex **v;
+	tVector normal[3];
+	tVector fnormal;
+	tVector tang, bitang;
+	tMeshMaterial *mat;
+	tVector color;
 	char *m_name;
 
 	float cam_dist;
 
-	CTriangle(CMesh *mesh = 0);
-	~CTriangle(void);
-	void Create(CVertex *v1, CVertex *v2, CVertex *v3, CVector _color) { v[0] = v1; v[1] = v2; v[2] = v3; color = _color; };
+	tTriangle(tMesh *mesh = 0);
+	~tTriangle(void);
+	void Create(tVertex *v1, tVertex *v2, tVertex *v3, tVector _color) { v[0] = v1; v[1] = v2; v[2] = v3; color = _color; };
 	void SetMaterial(char material[100]);
 	void CalculateNormalSolid(void);
 	void CalculateTangents(void);
-	CVector CrossNormal(void) { CVector n = Cross((CVector)*v[2] - (CVector)*v[1], (CVector)*v[0] - (CVector)*v[1]); n.Normalize(); return n; };
-	void Set(CVertex *v1, CVertex *v2, CVertex *v3, CVector color);
-	void Flip(void) { CVertex *temp = v[0]; v[0] = v[2]; v[2] = temp; };
+	tVector CrossNormal(void) { tVector n = Cross((tVector)*v[2] - (tVector)*v[1], (tVector)*v[0] - (tVector)*v[1]); n.Normalize(); return n; };
+	void Set(tVertex *v1, tVertex *v2, tVertex *v3, tVector color);
+	void Flip(void) { tVertex *temp = v[0]; v[0] = v[2]; v[2] = temp; };
 
 	int MaterialState(void);
 
-	static CTriangle *CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3, CMesh *parent = 0);
+	static tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3, tMesh *parent = 0);
 };
 
 #endif

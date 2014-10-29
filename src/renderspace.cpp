@@ -1,21 +1,21 @@
 #include "towerengine.h"
 
-void CRenderSpace::ClearObjects(void)
+void tRenderSpace::ClearObjects(void)
 {
 	objects.clear();
 }
 
-void CRenderSpace::GeometryPass(void)
+void tRenderSpace::GeometryPass(void)
 {
-	set<CObject *>::iterator i;
+	set<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		(*i)->GeometryPass();
 }
 
-void CRenderSpace::ForwardPass(void)
+void tRenderSpace::ForwardPass(void)
 {
-	set<CObject *>::iterator i;
+	set<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		(*i)->ForwardPass();

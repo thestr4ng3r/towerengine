@@ -2,12 +2,12 @@
 #include "towerengine.h"
 
 
-void CTransformationMatrix::LoadIdentity(void)
+void tTransformationMatrix::LoadIdentity(void)
 {
-	memcpy(matrix, CEngine::identity_matrix4, 16 * sizeof(float));
+	memcpy(matrix, tEngine::identity_matrix4, 16 * sizeof(float));
 }
 
-void CTransformationMatrix::Translate(CVector v)
+void tTransformationMatrix::Translate(tVector v)
 {
 	float m[16] =
 		{ 1.0, 0.0, 0.0, v.x,
@@ -18,7 +18,7 @@ void CTransformationMatrix::Translate(CVector v)
 	CombineMatrix4(matrix, m, matrix);
 }
 
-void CTransformationMatrix::RotateX(float a)
+void tTransformationMatrix::RotateX(float a)
 {
 	float m[16] =
 		{ (float)cos(a), -(float)sin(a), 0.0, 0.0,
@@ -28,7 +28,7 @@ void CTransformationMatrix::RotateX(float a)
 	CombineMatrix4(matrix, m, matrix);
 }
 
-void CTransformationMatrix::RotateY(float a)
+void tTransformationMatrix::RotateY(float a)
 {
 	float m[16] =
 		{ (float)cos(a), 0.0,  (float)sin(a), 0.0,
@@ -38,7 +38,7 @@ void CTransformationMatrix::RotateY(float a)
 	CombineMatrix4(matrix, m, matrix);
 }
 
-void CTransformationMatrix::RotateZ(float a)
+void tTransformationMatrix::RotateZ(float a)
 {
 	float m[16] =
 		{ 1.0,    0.0,     0.0, 0.0,
@@ -48,14 +48,14 @@ void CTransformationMatrix::RotateZ(float a)
 	CombineMatrix4(matrix, m, matrix);
 }
 
-void CTransformationMatrix::Rotate(CVector v)
+void tTransformationMatrix::Rotate(tVector v)
 {
 	RotateX(v.x);
 	RotateY(v.y);
 	RotateZ(v.z);
 }
 
-void CTransformationMatrix::Scale(CVector v)
+void tTransformationMatrix::Scale(tVector v)
 {
 	matrix[0] *= v.x;
 	matrix[1] *= v.x;
@@ -68,25 +68,25 @@ void CTransformationMatrix::Scale(CVector v)
 	matrix[11] *= v.z;
 }
 
-void CTransformationMatrix::SetXY(CVector x, CVector y)
+void tTransformationMatrix::SetXY(tVector x, tVector y)
 {
-	CVector z = Cross(x, y);
+	tVector z = Cross(x, y);
 	SetXYZ(x, y, z);
 }
 
-void CTransformationMatrix::SetYZ(CVector y, CVector z)
+void tTransformationMatrix::SetYZ(tVector y, tVector z)
 {
-	CVector x = Cross(y, z);
+	tVector x = Cross(y, z);
 	SetXYZ(x, y, z);
 }
 
-void CTransformationMatrix::SetXZ(CVector x, CVector z)
+void tTransformationMatrix::SetXZ(tVector x, tVector z)
 {
-	CVector y = Cross(x, z);
+	tVector y = Cross(x, z);
 	SetXYZ(x, y, z);
 }
 
-void CTransformationMatrix::SetXYZ(CVector x, CVector y, CVector z)
+void tTransformationMatrix::SetXYZ(tVector x, tVector y, tVector z)
 {
 	/*float m[16] =
 			{ x.x, y.x, z.x, 0.0,

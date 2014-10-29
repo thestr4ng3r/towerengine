@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-CGBuffer::CGBuffer(int width, int height, GLuint fbo, int first_attachment)
+tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 {
 	this->fbo = fbo;
 	this->first_attachment = first_attachment;
@@ -64,17 +64,17 @@ CGBuffer::CGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-CGBuffer::~CGBuffer(void)
+tGBuffer::~tGBuffer(void)
 {
 }
 
 
-void CGBuffer::Bind(void)
+void tGBuffer::Bind(void)
 {
 	glDrawBuffers(tex_count, draw_buffers);
 }
 
-void CGBuffer::ChangeSize(int width, int height)
+void tGBuffer::ChangeSize(int width, int height)
 {
 	glBindTexture(GL_TEXTURE_2D, tex[POSITION_TEX]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, 0);

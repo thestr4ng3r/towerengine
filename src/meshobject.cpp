@@ -4,7 +4,7 @@
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 
 
-CMeshObject::CMeshObject(CMesh *mesh, float mass)
+tMeshObject::tMeshObject(tMesh *mesh, float mass)
 {
 	this->mesh = mesh;
 	animation = 0;
@@ -16,12 +16,12 @@ CMeshObject::CMeshObject(CMesh *mesh, float mass)
 	y = Vec(0.0, 1.0, 0.0);
 	z = Vec(0.0, 0.0, 1.0);
 	scale = Vec(1.0, 1.0, 1.0);
-	transformation = new CTransformationMatrix();
+	transformation = new tTransformationMatrix();
 	color = Vec(1.0, 1.0, 1.0);
 	alpha = 1.0;
 	visible = true;
 	time = 0.0;
-	motion_state = new CMeshObjectMotionState(this);
+	motion_state = new tMeshObjectMotionState(this);
 	if(mass > 0.0)
 	{
 		btVector3 inertia;
@@ -45,21 +45,21 @@ CMeshObject::CMeshObject(CMesh *mesh, float mass)
 	}
 }
 
-void CMeshObject::SetAnimation(const char *animation)
+void tMeshObject::SetAnimation(const char *animation)
 {
-	CAnimation *a = mesh->GetAnimationByName(animation);
+	tAnimation *a = mesh->GetAnimationByName(animation);
 	if(a != this->animation)
 		time = 0.0;
 	this->animation = a;
 }
 
-void CMeshObject::Fade(float fade_end, float time)
+void tMeshObject::Fade(float fade_end, float time)
 {
 	this->fade_end = fade_end;
 	fade_speed = (fade_end - alpha) / time;
 }
 
-void CMeshObject::Play(float time)
+void tMeshObject::Play(float time)
 {
 	if(fade_speed != 0.0)
 	{
@@ -82,7 +82,7 @@ void CMeshObject::Play(float time)
 		this->time = fmod(this->time + time, animation->GetLength());
 }
 
-bool CMeshObject::GetAnimationFinished(void)
+bool tMeshObject::GetAnimationFinished(void)
 {
 	if(!animation_mode || !animation)
 		return true;
@@ -90,17 +90,17 @@ bool CMeshObject::GetAnimationFinished(void)
 	return !loop && this->time >= animation->GetLength();
 }
 
-void CMeshObject::SetPose(const char *pose)
+void tMeshObject::SetPose(const char *pose)
 {
 	if(this->pose)
 		delete [] this->pose;
 	this->pose = cstr(pose);
 }
 
-CBoundingBox CMeshObject::GetBoundingBox(void)
+tBoundingBox tMeshObject::GetBoundingBox(void)
 {
-	CBoundingBox b;
-	CVector *p = mesh->GetBoundingBox().GetCornerPoints();
+	tBoundingBox b;
+	tVector *p = mesh->GetBoundingBox().GetCornerPoints();
 	float *mat;
 
 	transformation->LoadIdentity();
@@ -119,7 +119,7 @@ CBoundingBox CMeshObject::GetBoundingBox(void)
 	return b;
 }
 
-void CMeshObject::GeometryPass(void)
+void tMeshObject::GeometryPass(void)
 {
 	if(!visible || alpha <= 0.0)
 		return;
@@ -129,9 +129,9 @@ void CMeshObject::GeometryPass(void)
 	transformation->SetXYZ(x, y, z);
 	transformation->Scale(scale);
 
-	CEngine::GetCurrentFaceShader()->SetTransformation(transformation->GetMatrix());
+	tEngine::GetCurrentFaceShader()->SetTransformation(transformation->GetMatrix());
 
-	CMesh::Color(color, alpha);
+	tMesh::Color(color, alpha);
 
 	if(animation_mode && animation)
 	{
@@ -149,12 +149,12 @@ void CMeshObject::GeometryPass(void)
 	mesh->PutToGL();
 }
 
-void CMeshObject::ForwardPass(void)
+void tMeshObject::ForwardPass(void)
 {
 
 }
 
-void CMeshObject::UpdateRigidBodyTransformation(void)
+void tMeshObject::UpdateRigidBodyTransformation(void)
 {
 	btTransform trans;
 
@@ -166,24 +166,24 @@ void CMeshObject::UpdateRigidBodyTransformation(void)
 }
 
 
-CMeshObjectMotionState::CMeshObjectMotionState(CMeshObject *object)
+tMeshObjectMotionState::tMeshObjectMotionState(tMeshObject *object)
 {
 	this->object = object;
 }
 
-void CMeshObjectMotionState::getWorldTransform(btTransform &trans) const
+void tMeshObjectMotionState::getWorldTransform(btTransform &trans) const
 {
 	trans.setOrigin(BtVec(object->GetPosition()));
-	CVector x = object->GetX();
-	CVector y = object->GetY();
-	CVector z = object->GetZ();
+	tVector x = object->GetX();
+	tVector y = object->GetY();
+	tVector z = object->GetZ();
 	trans.setBasis(btMatrix3x3(x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z));
 }
 
-void CMeshObjectMotionState::setWorldTransform(const btTransform &trans)
+void tMeshObjectMotionState::setWorldTransform(const btTransform &trans)
 {
 	object->SetPosition(Vec(trans.getOrigin()));
-	CVector x, y, z;
+	tVector x, y, z;
 	x = trans.getBasis().getRow(0);
 	y = trans.getBasis().getRow(1);
 	z = trans.getBasis().getRow(2);

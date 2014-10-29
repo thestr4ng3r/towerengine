@@ -1,16 +1,16 @@
 #include "towerengine.h"
 
-VAO::VAO(void)
+tVAO::tVAO(void)
 {
 	glGenVertexArrays(1, &vao);
 }
 
-VAO::~VAO(void)
+tVAO::~tVAO(void)
 {
 	glDeleteVertexArrays(1, &vao);
 }
 
-void VAO::Draw(GLenum mode, GLint first, GLsizei count)
+void tVAO::Draw(GLenum mode, GLint first, GLsizei count)
 {
 	Bind();
 	glDrawArrays(mode, first, count);
@@ -21,22 +21,22 @@ void VAO::Draw(GLenum mode, GLint first, GLsizei count)
 // --------------------------------------------------------------------
 
 
-IBO::IBO(VAO *vao, int size)
+tIBO::tIBO(tVAO *vao, int size)
 {
 	data = 0;
 	this->size = 0;
 	vao->Bind();
 	glGenBuffers(1, &ibo);
-	VAO::UnBind();
+	tVAO::UnBind();
 	SetSize(size);
 }
 
-IBO::~IBO(void)
+tIBO::~tIBO(void)
 {
 	glDeleteBuffers(1, &ibo);
 }
 
-bool IBO::SetSize(int size, bool copy)
+bool tIBO::SetSize(int size, bool copy)
 {
 	if(size == this->size && data != 0)
 		return false;
@@ -57,14 +57,14 @@ bool IBO::SetSize(int size, bool copy)
 	return true;
 }
 
-void IBO::AssignData(void)
+void tIBO::AssignData(void)
 {
 	Bind();
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * size, data, GL_DYNAMIC_DRAW);
 	UnBind();
 }
 
-void IBO::Draw(GLenum mode)
+void tIBO::Draw(GLenum mode)
 {
 	Bind();
 	glDrawElements(mode, size, GL_UNSIGNED_INT, NULL);

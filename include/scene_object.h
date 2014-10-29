@@ -3,34 +3,34 @@
 #ifndef _SCENE_OBJECT_H
 #define _SCENE_OBJECT_H
 
-#define SCENE_OBJECT_TYPE_OBJECT 1
-#define SCENE_OBJECT_TYPE_DIRECTIONAL_LIGHT 2
-#define SCENE_OBJECT_TYPE_POINT_LIGHT 3
+#define T_SCENE_OBJECT_TYPE_OBJECT 1
+#define T_SCENE_OBJECT_TYPE_DIRECTIONAL_LIGHT 2
+#define T_SCENE_OBJECT_TYPE_POINT_LIGHT 3
 
-class CSceneObject
+class tSceneObject
 {
 	public:
-		virtual ~CSceneObject(void) {};
+		virtual ~tSceneObject(void) {};
 
-		virtual void AddToWorld(CWorld *world) =0;
-		virtual void RemoveFromWorld(CWorld *world) =0;
+		virtual void AddToWorld(tWorld *world) =0;
+		virtual void RemoveFromWorld(tWorld *world) =0;
 
 		virtual int GetType(void) =0;
 };
 
-class CObjectSceneObject : public CSceneObject
+class tObjectSceneObject : public tSceneObject
 {
 	private:
-		CObject *object;
+		tObject *object;
 
 	public:
-		CObjectSceneObject(CObject *object);
-		~CObjectSceneObject(void);
+		tObjectSceneObject(tObject *object);
+		~tObjectSceneObject(void);
 
-		void AddToWorld(CWorld *world);
-		void RemoveFromWorld(CWorld *world);
+		void AddToWorld(tWorld *world);
+		void RemoveFromWorld(tWorld *world);
 
-		int GetType(void)	{ return SCENE_OBJECT_TYPE_OBJECT; }
+		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_OBJECT; }
 
 };
 

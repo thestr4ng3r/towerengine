@@ -1,12 +1,12 @@
 #include "towerengine.h"
 
 
-CVertex::CVertex(CMesh *mesh) : CVector()
+tVertex::tVertex(tMesh *mesh) : tVector()
 {
 	Create(mesh);
 }
 
-CVertex::CVertex(CVector v, CMesh *mesh)
+tVertex::tVertex(tVector v, tMesh *mesh)
 {
 	Create(mesh);
 	x = v.x;
@@ -14,7 +14,7 @@ CVertex::CVertex(CVector v, CMesh *mesh)
 	z = v.z;
 }
 
-void CVertex::Create(CMesh *mesh)
+void tVertex::Create(tMesh *mesh)
 {
 	if(mesh)
 	{
@@ -29,9 +29,9 @@ void CVertex::Create(CMesh *mesh)
 	}
 }
 
-CVertex::~CVertex(void)
+tVertex::~tVertex(void)
 {
-	CTriangle **t;
+	tTriangle **t;
 	int *n;
 	int c, i;
 
@@ -43,9 +43,9 @@ CVertex::~CVertex(void)
         mesh->RemoveVertex(this);
 }
 
-int CVertex::GetTriangles(CTriangle **&t, int *&number, CTriangle *exclude)
+int tVertex::GetTriangles(tTriangle **&t, int *&number, tTriangle *exclude)
 {
-	CTriangle *ti;
+	tTriangle *ti;
 	int i;
 	int count, j, k;
 
@@ -69,7 +69,7 @@ int CVertex::GetTriangles(CTriangle **&t, int *&number, CTriangle *exclude)
 			}
 	}
 
-	t = new CTriangle *[count];
+	t = new tTriangle *[count];
 	number = new int[count];
 	k = 0;
 	for(i=0; i<mesh->GetTriangleCount(); i++)
@@ -90,7 +90,7 @@ int CVertex::GetTriangles(CTriangle **&t, int *&number, CTriangle *exclude)
 	return count;
 }
 
-CVector CVertex::operator=(CVertex v)
+tVector tVertex::operator=(tVertex v)
 {
-	return (CVector)v;
+	return (tVector)v;
 }

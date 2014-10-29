@@ -3,7 +3,7 @@
 #define _LIGHT_PASS_SHADER_H
 
 
-class CLightPassShader : public CShader
+class tLightPassShader : public tShader
 {
 	private:
 		GLint cam_pos_uniform;
@@ -48,12 +48,12 @@ class CLightPassShader : public CShader
 
 		void Init(void);
 
-		void SetGBuffer(CGBuffer *gbuffer);
+		void SetGBuffer(tGBuffer *gbuffer);
 		void SetSSAO(bool enabled, GLuint tex);
 		void SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_maps);
 		void SetDirectionalLights(int count, float *dir, float *color, int *shadow_enabled, GLuint *shadow_maps, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z);
-		void SetLightAmbientColor(CVector color);
-		void SetCameraPosition(CVector pos);
+		void SetLightAmbientColor(tVector color);
+		void SetCameraPosition(tVector pos);
 };
 
 

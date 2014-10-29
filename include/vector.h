@@ -1,10 +1,10 @@
-#ifndef _CVECTOR_H
-#define _CVECTOR_H
+#ifndef _VECTOR_H
+#define _VECTOR_H
 
 #define pvec(v) v.x, v.y, v.z
 #define pvec2(v) v.x, v.y
 
-struct CVector
+struct tVector
 {
 	union
 	{
@@ -23,12 +23,12 @@ struct CVector
                 };
 	};
 
-	CVector2 xy(void) { return Vec(x, y); };
-	CVector2 xz(void) { return Vec(x, z); };
-	CVector2 yx(void) { return Vec(y, x); };
-	CVector2 yz(void) { return Vec(y, z); };
-	CVector2 zx(void) { return Vec(z, x); };
-	CVector2 zy(void) { return Vec(z, y); };
+	tVector2 xy(void) { return Vec(x, y); };
+	tVector2 xz(void) { return Vec(x, z); };
+	tVector2 yx(void) { return Vec(y, x); };
+	tVector2 yz(void) { return Vec(y, z); };
+	tVector2 zx(void) { return Vec(z, x); };
+	tVector2 zy(void) { return Vec(z, y); };
 
 	void Set(float _x, float _y, float _z) { x = _x; y = _y; z = _z; };
 	float Len(void) const		{ return sqrt(x * x + y * y + z * z); };
@@ -40,59 +40,59 @@ struct CVector
 	void TangXToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE1, v); };
 	void TangYToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE2, v); };
 	void AttrToGL(int which) const             { glVertexAttrib3fv(which, v); };
-	void SetFromPlane(const CVector2 &p, const CVector &n, float d);
-	CVector operator -(void) const	{CVector r; r.x = -x, r.y = -y, r.z = -z; return r; };
-	operator CVector2() const	{CVector2 r; r.x = x; r.y = z; return r; };
+	void SetFromPlane(const tVector2 &p, const tVector &n, float d);
+	tVector operator -(void) const	{tVector r; r.x = -x, r.y = -y, r.z = -z; return r; };
+	operator tVector2() const	{tVector2 r; r.x = x; r.y = z; return r; };
 
-	CVector &operator+=(const CVector o)	{x += o.x; y += o.y; z += o.z; return *this;};
-	CVector &operator-=(const CVector o)	{x -= o.x; y -= o.y; z -= o.z; return *this;};
-	CVector &operator*=(const CVector o)	{x *= o.x; y *= o.y; z *= o.z; return *this;};
-	CVector &operator*=(float f)			{x *= f; y *= f; z *= f; return *this;};
-	CVector &operator/=(float f)			{x /= f; y /= f; z /= f; return *this;};
+	tVector &operator+=(const tVector o)	{x += o.x; y += o.y; z += o.z; return *this;};
+	tVector &operator-=(const tVector o)	{x -= o.x; y -= o.y; z -= o.z; return *this;};
+	tVector &operator*=(const tVector o)	{x *= o.x; y *= o.y; z *= o.z; return *this;};
+	tVector &operator*=(float f)			{x *= f; y *= f; z *= f; return *this;};
+	tVector &operator/=(float f)			{x /= f; y /= f; z /= f; return *this;};
 	#ifdef TMS_USE_LIB_3DS
-        CVector &operator=(Lib3dsVector o)      {x = o[0]; y = o[1]; z = o[2]; return *this;};
+        tVector &operator=(Lib3dsVector o)      {x = o[0]; y = o[1]; z = o[2]; return *this;};
 	#endif
 
-	CVector &operator=(const btVector3 a)	{ x = a.x(); y = a.y(); z = a.z(); return *this; }
+	tVector &operator=(const btVector3 a)	{ x = a.x(); y = a.y(); z = a.z(); return *this; }
 };
 
-CVector Vec(float x, float y, float z);
-CVector Vec(btVector3 v);
+tVector Vec(float x, float y, float z);
+tVector Vec(btVector3 v);
 #ifdef TMS_USE_LIB_3DS
-CVector Vec3ds(Lib3dsVector v);
+tVector Vec3ds(Lib3dsVector v);
 #endif
 #ifdef TMS_USE_LIB_G3D
-CVector VecG3D(G3DVector v[3]);
+tVector VecG3D(G3DVector v[3]);
 #endif
-inline btVector3 BtVec(CVector a)		{ return btVector3(a.x, a.y, a.z); }
-CVector NullVec(void);
-CVector operator+(const CVector &a, const CVector &b);
-CVector operator-(const CVector &a, const CVector &b);
-CVector operator*(const CVector &a, float scalar);
-CVector operator*(float scalar, const CVector &a);
-CVector operator*(const CVector &a, const CVector &b);
-int operator==(const CVector a, const CVector b);
+inline btVector3 BtVec(tVector a)		{ return btVector3(a.x, a.y, a.z); }
+tVector NullVec(void);
+tVector operator+(const tVector &a, const tVector &b);
+tVector operator-(const tVector &a, const tVector &b);
+tVector operator*(const tVector &a, float scalar);
+tVector operator*(float scalar, const tVector &a);
+tVector operator*(const tVector &a, const tVector &b);
+int operator==(const tVector a, const tVector b);
 
-double Dot(const CVector &a, const CVector &b);
-CVector Cross(const CVector &a, const CVector &b);
-CVector Vec(const CVector2 &v, float y);
-CVector Rotate(const CVector &vec, const CVector &axis, float angle);
-double Det(const CVector &v1, const CVector &v2, const CVector &v3);
-CVector Mix(const CVector v1, const CVector v2, float mix);
-CVector Mix(const CVector v[], const float a[], int count, float mix);
+double Dot(const tVector &a, const tVector &b);
+tVector Cross(const tVector &a, const tVector &b);
+tVector Vec(const tVector2 &v, float y);
+tVector Rotate(const tVector &vec, const tVector &axis, float angle);
+double Det(const tVector &v1, const tVector &v2, const tVector &v3);
+tVector Mix(const tVector v1, const tVector v2, float mix);
+tVector Mix(const tVector v[], const float a[], int count, float mix);
 
 #define vecmin(a, b) Vec(a.x > b.x ? b.x : a.x, a.y > b.y ? b.y : a.y, a.z > b.z ? b.z : a.z) 
 #define vecmax(a, b) Vec(a.x < b.x ? b.x : a.x, a.y < b.y ? b.y : a.y, a.z < b.z ? b.z : a.z) 
 
-int IsInside(CVector2 c[4], const CVector2 &p);
-void DistToPlane(const CVector &a, const CVector &b, const CVector &c, const CVector &point, double *dist, CVector *dir);
-void DistToPlane(const CVector &a, const CVector &b, const CVector &c, const CVector &d, const CVector &point, double *min_dist, CVector *min_dir);
+int IsInside(tVector2 c[4], const tVector2 &p);
+void DistToPlane(const tVector &a, const tVector &b, const tVector &c, const tVector &point, double *dist, tVector *dir);
+void DistToPlane(const tVector &a, const tVector &b, const tVector &c, const tVector &d, const tVector &point, double *min_dist, tVector *min_dir);
 
-CVector PointToLine(CVector p, CVector r, CVector n);
-float DistToLine(CVector p, CVector r, CVector n);
+tVector PointToLine(tVector p, tVector r, tVector n);
+float DistToLine(tVector p, tVector r, tVector n);
 
-int PointInRange(CVector p, CVector s, CVector b);
+int PointInRange(tVector p, tVector s, tVector b);
 
-CVector RandVec(void);
+tVector RandVec(void);
 
 #endif

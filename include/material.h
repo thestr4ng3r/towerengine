@@ -1,14 +1,14 @@
 #ifndef _MATERIAL_H_
 #define _MATERIAL_H_
 
-class CMaterial
+class tMaterial
 {
 	protected:
 		struct Diffuse
 		{
 			bool enabled;
 			GLuint tex;
-			CVector color;
+			tVector color;
 		} diffuse;
 
 		struct Specular
@@ -16,7 +16,7 @@ class CMaterial
 			bool enabled;
 			GLuint tex;
 			float exponent;
-			CVector color;
+			tVector color;
 		} specular;
 
 		struct Normal
@@ -35,13 +35,13 @@ class CMaterial
 		bool transparent;
 
 	public:
-		CMaterial(void);
-		~CMaterial(void);
+		tMaterial(void);
+		~tMaterial(void);
 
 		bool GetTransparent(void)	{ return transparent; }
 
-		void SetDiffuse(CVector color);
-		void SetSpecular(CVector color, float exponent);
+		void SetDiffuse(tVector color);
+		void SetSpecular(tVector color, float exponent);
 		void SetBump(float depth);
 
 		void LoadDiffuseTextureURL(string file);

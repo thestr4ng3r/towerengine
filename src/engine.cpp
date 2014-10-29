@@ -1,24 +1,24 @@
 
 #include "towerengine.h"
 
-CGeometryPassShader *CEngine::geometry_pass_shader = 0;
-CLightPassShader *CEngine::light_pass_shader = 0;
-CSkyBoxShader *CEngine::skybox_shader = 0;
-CPointShadowShader *CEngine::point_shadow_shader = 0;
-CPointShadowBlurShader *CEngine::point_shadow_blur_shader = 0;
-CDirectionalShadowShader *CEngine::directional_shadow_shader = 0;
-CDirectionalShadowBlurShader *CEngine::directional_shadow_blur_shader = 0;
-CColorShader *CEngine::color_shader = 0;
-CFaceShader *CEngine::current_face_shader = 0;
-CPostProcessShader *CEngine::post_process_shader = 0;
-CSSAOShader *CEngine::ssao_shader = 0;
+tGeometryPassShader *tEngine::geometry_pass_shader = 0;
+tLightPassShader *tEngine::light_pass_shader = 0;
+tSkyBoxShader *tEngine::skybox_shader = 0;
+tPointShadowShader *tEngine::point_shadow_shader = 0;
+tPointShadowBlurShader *tEngine::point_shadow_blur_shader = 0;
+tDirectionalShadowShader *tEngine::directional_shadow_shader = 0;
+tDirectionalShadowBlurShader *tEngine::directional_shadow_blur_shader = 0;
+tColorShader *tEngine::color_shader = 0;
+tFaceShader *tEngine::current_face_shader = 0;
+tPostProcessShader *tEngine::post_process_shader = 0;
+tSSAOShader *tEngine::ssao_shader = 0;
 
-const float CEngine::identity_matrix4[16] = { 1.0, 0.0, 0.0, 0.0,
+const float tEngine::identity_matrix4[16] = { 1.0, 0.0, 0.0, 0.0,
 										  0.0, 1.0, 0.0, 0.0,
 										  0.0, 0.0, 1.0, 0.0,
 										  0.0, 0.0, 0.0, 1.0 };
 
-void CEngine::Init(void)
+void tEngine::Init(void)
 {
 	int max_textures;
 
@@ -40,39 +40,39 @@ void CEngine::Init(void)
 	ilInit();
 	iluInit();
 
-	geometry_pass_shader = new CGeometryPassShader();
+	geometry_pass_shader = new tGeometryPassShader();
 	geometry_pass_shader->Init();
 	SetCurrentFaceShader(geometry_pass_shader);
 
-	light_pass_shader = new CLightPassShader();
+	light_pass_shader = new tLightPassShader();
 	light_pass_shader->Init();
 
-	skybox_shader = new CSkyBoxShader();
+	skybox_shader = new tSkyBoxShader();
 	skybox_shader->Init();
 
-	point_shadow_shader = new CPointShadowShader();
+	point_shadow_shader = new tPointShadowShader();
 	point_shadow_shader->Init();
 
-	point_shadow_blur_shader = new CPointShadowBlurShader();
+	point_shadow_blur_shader = new tPointShadowBlurShader();
 	point_shadow_blur_shader->Init();
 
-	directional_shadow_shader = new CDirectionalShadowShader();
+	directional_shadow_shader = new tDirectionalShadowShader();
 	directional_shadow_shader->Init();
 
-	directional_shadow_blur_shader = new CDirectionalShadowBlurShader();
+	directional_shadow_blur_shader = new tDirectionalShadowBlurShader();
 	directional_shadow_blur_shader->Init();
 
-	color_shader = new CColorShader();
+	color_shader = new tColorShader();
 	color_shader->Init();
 
-	post_process_shader = new CPostProcessShader();
+	post_process_shader = new tPostProcessShader();
 	post_process_shader->Init();
 
-	ssao_shader = new CSSAOShader();
+	ssao_shader = new tSSAOShader();
 	ssao_shader->Init();
 }
 
-void CEngine::Destroy(void)
+void tEngine::Destroy(void)
 {
 	delete geometry_pass_shader;
 	delete skybox_shader;

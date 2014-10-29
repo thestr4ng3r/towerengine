@@ -1,29 +1,29 @@
 
-#ifndef _CTRANSFORMATION_H
-#define _CTRANSFORMATION_H
+#ifndef _TRANSFORMATION_MATRIX_H
+#define _TRANSFORMATION_MATRIX_H
 
 
-class CTransformationMatrix
+class tTransformationMatrix
 {
 	private:
 		float matrix[16];
 
 	public:
-		CTransformationMatrix(void)	{ LoadIdentity(); }
+		tTransformationMatrix(void)	{ LoadIdentity(); }
 
 		float *GetMatrix(void)		{ return matrix; }
 
 		void LoadIdentity(void);
-		void Translate(CVector v);
+		void Translate(tVector v);
 		void RotateX(float a);
 		void RotateY(float a);
 		void RotateZ(float a);
-		void SetXY(CVector x, CVector y);
-		void SetYZ(CVector y, CVector z);
-		void SetXZ(CVector x, CVector z);
-		void SetXYZ(CVector x, CVector y, CVector z);
-		void Rotate(CVector v);
-		void Scale(CVector v);
+		void SetXY(tVector x, tVector y);
+		void SetYZ(tVector y, tVector z);
+		void SetXZ(tVector x, tVector z);
+		void SetXYZ(tVector x, tVector y, tVector z);
+		void Rotate(tVector v);
+		void Scale(tVector v);
 };
 
 

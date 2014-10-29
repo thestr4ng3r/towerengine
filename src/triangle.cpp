@@ -1,9 +1,9 @@
 #include "towerengine.h"
 
 
-CTriangle::CTriangle(CMesh *mesh)
+tTriangle::tTriangle(tMesh *mesh)
 {
-	v = new CVertex *[3];
+	v = new tVertex *[3];
     if(mesh)
     {
         this->mesh = mesh;
@@ -20,7 +20,7 @@ CTriangle::CTriangle(CMesh *mesh)
     strcpy(m_name, "$NONE");
 }
 
-CTriangle::~CTriangle()
+tTriangle::~tTriangle()
 {
     if(!mesh)
         return;
@@ -28,7 +28,7 @@ CTriangle::~CTriangle()
     mesh->RemoveTriangle(this);
 }
 
-void CTriangle::SetMaterial(char material[100])
+void tTriangle::SetMaterial(char material[100])
 {
     mat = mesh->GetMaterialByName(string(material));
     if(!mat)
@@ -38,7 +38,7 @@ void CTriangle::SetMaterial(char material[100])
     strcpy(m_name, material);
 }
 
-void CTriangle::Set(CVertex *v1, CVertex *v2, CVertex *v3, CVector color)
+void tTriangle::Set(tVertex *v1, tVertex *v2, tVertex *v3, tVector color)
 {
     v[0] = v1;
     v[1] = v2;
@@ -46,11 +46,11 @@ void CTriangle::Set(CVertex *v1, CVertex *v2, CVertex *v3, CVector color)
     this->color = color;
 }
 
-CTriangle *CTriangle::CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVector color, char material[100], CVector t1, CVector t2, CVector t3, CMesh *chain)
+tTriangle *tTriangle::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3, tMesh *chain)
 {
-    CTriangle *t;
+    tTriangle *t;
 
-    t = new CTriangle(chain);
+    t = new tTriangle(chain);
 
     t->Create(v1, v2, v3, color);
     t->SetMaterial(material);
@@ -59,7 +59,7 @@ CTriangle *CTriangle::CreateTriangle(CVertex *v1, CVertex *v2, CVertex *v3, CVec
     return t;
 }
 
-void CTriangle::CalculateNormalSolid(void)
+void tTriangle::CalculateNormalSolid(void)
 {
 	v[0]->normal = v[1]->normal = v[2]->normal = CrossNormal();
 	// normal[0] = normal[1] = normal[2] = fnormal =
@@ -85,12 +85,12 @@ void CTriangle::CalculateNormalSolid(void)
    }
 }*/
 
-void CTriangle::CalculateTangents(void)
+void tTriangle::CalculateTangents(void)
 {
-	CVector edge1 = *v[1] - *v[0];
-	CVector edge2 = *v[2] - *v[0];
-	CVector2 uv_edge1 = v[1]->uv - v[0]->uv;
-	CVector2 uv_edge2 = v[2]->uv - v[0]->uv;
+	tVector edge1 = *v[1] - *v[0];
+	tVector edge2 = *v[2] - *v[0];
+	tVector2 uv_edge1 = v[1]->uv - v[0]->uv;
+	tVector2 uv_edge2 = v[2]->uv - v[0]->uv;
 
 	float r = uv_edge1.x * uv_edge2.y - uv_edge2.x * uv_edge1.y;
 
@@ -124,7 +124,7 @@ void CTriangle::CalculateTangents(void)
 	v[0]->bitang = v[1]->bitang = v[2]->bitang = bitang;
 }
 
-int CTriangle::MaterialState(void)
+int tTriangle::MaterialState(void)
 {
     if(!mat)
         return 0;

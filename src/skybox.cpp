@@ -1,12 +1,12 @@
 
 #include "towerengine.h"
 
-void CSkyBox::Paint(CVector pos, float size)
+void tSkyBox::Paint(tVector pos, float size)
 {
 	glDisable(GL_DEPTH_TEST);
 
-	CEngine::GetSkyBoxShader()->Bind();
-	CEngine::GetSkyBoxShader()->SetCubeMap(cube_map);
+	tEngine::GetSkyBoxShader()->Bind();
+	tEngine::GetSkyBoxShader()->SetCubeMap(cube_map);
 
 	glPushMatrix();
 	glTranslatef(pos.x, pos.y, pos.z);
