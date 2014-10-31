@@ -128,11 +128,7 @@ void tScene::AddToWorld(void)
 	map<string, tSceneObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
-	{
-		printf("%ld\n", (long)i->second);
 		i->second->AddToWorld(world);
-		printf("adding object %s\n", i->first.data());
-	}
 }
 
 void tScene::RemoveFromWorld(void)

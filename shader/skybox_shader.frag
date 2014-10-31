@@ -1,11 +1,13 @@
-uniform samplerCube Texture;
+#version 330
 
-varying vec3 Pos;
+uniform samplerCube cube_map_uni;
 
-vec3 pos;
+in vec3 pos_var;
+
+out vec4 gl_FragColor;
 
 void main(void)
 {
-	vec3 color = textureCube(Texture, normalize(Pos)).xyz;
+	vec3 color = texture(cube_map_uni, normalize(pos_var)).xyz;
 	gl_FragColor = vec4(color, 1.0);
 }

@@ -1,59 +1,52 @@
 
 #include "towerengine.h"
 
-void tSkyBox::Paint(tVector pos, float size)
+tSkyBox::tSkyBox(GLuint cube_map, float size)
+{
+	this->size = size;
+
+	vao = new tVAO();
+	vbo = new tVBO<float>(3, vao, 8);
+
+	float vertices[24] = { 	-size, size, -size, // top
+							size, size, -size,
+							size, size, size,
+							-size, size, size,
+
+							-size, -size, -size, // bottom
+							size, -size, -size,
+							size, -size, size,
+							-size, -size, size };
+
+	memcpy(vbo->GetData(), vertices, 24*sizeof(float));
+	vbo->AssignData();
+
+	ibo = new tIBO(vao, 24);
+
+	GLuint indices[24] = { 	0, 1, 2, 3, // top
+							7, 6, 5, 4, // bottom
+							0, 3, 7, 4, // left
+							2, 1, 5, 6, // right
+							3, 2, 6, 7, // front
+							1, 0, 4, 5  // back
+						};
+
+	memcpy(ibo->GetData(), indices, 24 * sizeof(GLuint));
+	ibo->AssignData();
+
+	SetCubeMap(cube_map);
+}
+
+void tSkyBox::Paint(tVector pos)
 {
 	glDisable(GL_DEPTH_TEST);
 
 	tEngine::GetSkyBoxShader()->Bind();
 	tEngine::GetSkyBoxShader()->SetCubeMap(cube_map);
 
-	glPushMatrix();
-	glTranslatef(pos.x, pos.y, pos.z);
+	vbo->SetAttribute(tSkyBoxShader::vertex_attribute, GL_FLOAT);
 
-	glBegin(GL_QUADS);
-		glVertex3f(size, size, size);
-		glVertex3f(size, -size, size);
-		glVertex3f(-size, -size, size);
-		glVertex3f(-size, size, size);
-	glEnd();
-
-	glBegin(GL_QUADS);
-		glVertex3f(size, size, -size);
-		glVertex3f(size, size, size);
-		glVertex3f(-size, size, size);
-		glVertex3f(-size, size, -size);
-	glEnd();
-
-	glBegin(GL_QUADS);
-		glVertex3f(-size, size, -size);
-		glVertex3f(-size, -size, -size);
-		glVertex3f(size, -size, -size);
-		glVertex3f(size, size, -size);
-	glEnd();
-
-	glBegin(GL_QUADS);
-		glVertex3f(size, -size, -size);
-		glVertex3f(-size, -size, -size);
-		glVertex3f(-size, -size, size);
-		glVertex3f(size, -size, size);
-	glEnd();
-
-	glBegin(GL_QUADS);
-		glVertex3f(-size, size, size);
-		glVertex3f(-size, -size, size);
-		glVertex3f(-size, -size, -size);
-		glVertex3f(-size, size, -size);
-	glEnd();
-
-	glBegin(GL_QUADS);
-		glVertex3f(size, size, -size);
-		glVertex3f(size, -size, -size);
-		glVertex3f(size, -size, size);
-		glVertex3f(size, size, size);
-	glEnd();
-
-	glPopMatrix();
+	ibo->Draw(GL_QUADS);
 
 	glEnable(GL_DEPTH_TEST);
 }

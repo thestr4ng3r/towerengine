@@ -81,6 +81,9 @@ char *PathOfFile(const char *file)
         return path;
     }
 
+    if(strlen(file) == 0)
+    	return cstr("");
+
     for(i = strlen(file); i > 0; i--)
     {
         path = new char [i];

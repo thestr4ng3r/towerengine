@@ -2,13 +2,11 @@
 
 void tSkyBoxShader::Init(void)
 {
-	SetSource(cube_env_shader_vert, cube_env_shader_frag);
-	CreateVertexShader();
-	CreateFragmentShader();
-	CreateProgram();
+	InitShader(cube_env_shader_vert, cube_env_shader_frag, "SkyBox Shader");
+	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	LinkProgram();
 
-	tex_uniform = GetUniformLocation("Texture");
+	tex_uniform = GetUniformLocation("cube_map_uni");
 
 	Unbind();
 }
@@ -121,6 +119,100 @@ GLuint LoadGLCubeMap(const char *filename[6])
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	//glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_anisotropy);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	return handle;
+}
+
+void GetSubImage(GLubyte *dst, GLubyte *src, int src_width, int src_height, int components, int offset_x, int offset_y, int dst_width, int dst_height)
+{
+	for(int i=0; i<dst_height && i+offset_y<src_height; i++)
+	{
+		memcpy(dst + i*dst_width*components,
+				src + (i + offset_y) * src_width * components + offset_x * components,
+				dst_width * components * sizeof(GLubyte));
+	}
+}
+
+GLuint LoadGLCubeMap(const char *filename)
+{
+	ILinfo ImageInfo;
+	ILboolean success;
+	ILenum error;
+	GLuint handle;
+
+	glGenTextures(1, &handle);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
+
+	success = ilLoadImage(filename);
+	if(!success)
+	{
+		printf("Failed to load cube map texture: %s\n", filename);
+		printf("%s\n", iluErrorString(ilGetError()));
+		return 0;
+	}
+	iluGetImageInfo(&ImageInfo);
+	if (ImageInfo.Origin != IL_ORIGIN_UPPER_LEFT)
+	{
+		iluFlipImage();
+	}
+	success = ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
+
+	if (!success)
+	{
+		error = ilGetError();
+		std::cout << "Image conversion failed - IL reports error: " << error << " - " << iluErrorString(error) << std::endl;
+		return 0;
+	}
+
+	/*
+	 * ----------------
+	 * | -x | -z | +x |
+	 * ----------------
+	 * | -y | +y | +z |
+	 * ----------------
+	 */
+
+	int width = ilGetInteger(IL_IMAGE_WIDTH);
+	int height = ilGetInteger(IL_IMAGE_HEIGHT);
+	int side_width = width / 3;
+	int side_height = height / 2;
+	GLenum format = ilGetInteger(IL_IMAGE_FORMAT);
+	GLint bpp = ilGetInteger(IL_IMAGE_BPP);
+	GLubyte *data = ilGetData();
+
+	GLubyte *side_data = new GLubyte[side_width * side_height * bpp];
+
+
+	GetSubImage(side_data, data, width, height, bpp, 0, 0, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	GetSubImage(side_data, data, width, height, bpp, side_width, 0, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	GetSubImage(side_data, data, width, height, bpp, side_width * 2, 0, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+
+	GetSubImage(side_data, data, width, height, bpp, 0, side_height, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	GetSubImage(side_data, data, width, height, bpp, side_width, side_height, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	GetSubImage(side_data, data, width, height, bpp, side_width * 2, side_height, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	delete [] side_data;
+
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+
 
 	return handle;
 }

@@ -483,24 +483,36 @@ const char *light_pass_shader_frag =
 "";
 
 const char *cube_env_shader_vert = 
-"varying vec3 Pos;\n"
+"#version 330\n"
+"\n"
+"uniform mat4 gl_ModelViewMatrix;\n"
+"uniform mat4 gl_ProjectionMatrix;\n"
+"\n"
+"uniform mat4 gl_ModelViewProjectionMatrix;\n"
+"\n"
+"in vec3 vertex_attr;\n"
+"\n"
+"out vec3 pos_var;\n"
 "\n"
 "void main(void)\n"
 "{\n"
-"	Pos = gl_Vertex.xyz;\n"
-"	gl_Position = ftransform();\n"
+"	pos_var = vertex_attr;\n"
+"	vec4 p = gl_ModelViewMatrix * vec4(vertex_attr, 0.0);\n"
+"	gl_Position = gl_ProjectionMatrix * vec4(p.xyz, 1.0);\n"
 "}";
 
 const char *cube_env_shader_frag = 
-"uniform samplerCube Texture;\n"
+"#version 330\n"
 "\n"
-"varying vec3 Pos;\n"
+"uniform samplerCube cube_map_uni;\n"
 "\n"
-"vec3 pos;\n"
+"in vec3 pos_var;\n"
+"\n"
+"out vec4 gl_FragColor;\n"
 "\n"
 "void main(void)\n"
 "{\n"
-"	vec3 color = textureCube(Texture, normalize(Pos)).xyz;\n"
+"	vec3 color = texture(cube_map_uni, normalize(pos_var)).xyz;\n"
 "	gl_FragColor = vec4(color, 1.0);\n"
 "}";
 

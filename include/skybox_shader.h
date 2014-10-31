@@ -7,6 +7,8 @@ class tSkyBoxShader : public tShader
 		GLint tex_uniform;
 	
 	public:
+		static const int vertex_attribute = 0;
+
 		void Init(void);
 		void SetCubeMap(GLuint tex);
 		void ResetUniforms(void) {};
@@ -18,6 +20,7 @@ tVector CubeVecS(int side);
 
 //GLuint LoadGLTexture(const char *filename, GLenum type = GL_TEXTURE_2D);
 GLuint LoadGLCubeMap(const char *filename[6]);
+GLuint LoadGLCubeMap(const char *filename);
 
 GLuint CreateCubeTexture(GLenum type, int width, int height);
 GLuint GLTextureFromColor(const tVector &color);
