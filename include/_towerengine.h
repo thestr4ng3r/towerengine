@@ -47,6 +47,7 @@ class tRenderer;
 #include "pose.h"
 #include "animation.h"
 #include "entity.h"
+#include "asset.h"
 #include "engine.h"
 #include "object.h"
 #include "meshobject.h"

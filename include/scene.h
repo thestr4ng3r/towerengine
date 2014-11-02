@@ -8,11 +8,13 @@ class tScene
 	private:
 		tWorld *world;
 
-		map<string, tMesh *> meshes;
+		map<string, tAsset *> assets;
 		map<string, tSceneObject *> objects;
 
 		void ParseAssetsNode(xmlNodePtr cur);
 		void ParseObjectsNode(xmlNodePtr cur);
+
+		void AddObject(string name, tSceneObject *object);
 
 	public:
 		tScene(tWorld *world);

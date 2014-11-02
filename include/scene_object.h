@@ -34,5 +34,35 @@ class tObjectSceneObject : public tSceneObject
 
 };
 
+class tDirectionalLightSceneObject : public tSceneObject
+{
+	private:
+		tDirectionalLight *light;
+
+	public:
+		tDirectionalLightSceneObject(tDirectionalLight *light);
+		~tDirectionalLightSceneObject(void);
+
+		void AddToWorld(tWorld *world);
+		void RemoveFromWorld(tWorld *world);
+
+		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_DIRECTIONAL_LIGHT; }
+};
+
+class tPointLightSceneObject : public tSceneObject
+{
+	private:
+		tPointLight *light;
+
+	public:
+		tPointLightSceneObject(tPointLight *light);
+		~tPointLightSceneObject(void);
+
+		void AddToWorld(tWorld *world);
+		void RemoveFromWorld(tWorld *world);
+
+		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_POINT_LIGHT; }
+};
+
 
 #endif
