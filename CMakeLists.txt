@@ -5,9 +5,7 @@ project(towerengine)
 set(CMAKE_BUILD_TYPE Release)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/oglft)
 FILE(GLOB towerengine_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-FILE(GLOB oglft_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/oglft/*.h")
 
 set(towerengine_SRC 
 	src/animation.cpp 
@@ -55,8 +53,7 @@ set(towerengine_SRC
 	src/color_shader.cpp
 	src/scene.cpp
 	src/scene_object.cpp
-	src/asset.cpp
-	oglft/OGLFT.cpp)
+	src/asset.cpp)
 
 add_definitions(-g -Wall)
 
@@ -75,10 +72,6 @@ include_directories(${IL_INCLUDE_DIR})
 target_link_libraries(towerengine ${IL_LIBRARIES})
 target_link_libraries(towerengine ${ILU_LIBRARIES})
 
-find_package(Freetype REQUIRED)
-include_directories(${FREETYPE_INCLUDE_DIRS})
-target_link_libraries(towerengine ${FREETYPE_LIBRARIES})
-
 find_package(Bullet REQUIRED)
 include_directories(${BULLET_INCLUDE_DIRS})
 target_link_libraries(towerengine ${BULLET_LIBRARIES})
@@ -86,7 +79,6 @@ target_link_libraries(towerengine ${BULLET_LIBRARIES})
 install(TARGETS towerengine DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
 INSTALL(FILES ${towerengine_INCLUDES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/towerengine)
-INSTALL(FILES ${oglft_INCLUDES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/towerengine)
 
 # uninstall target
 configure_file(
