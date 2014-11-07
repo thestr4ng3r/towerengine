@@ -135,13 +135,12 @@ void GetSubImage(GLubyte *dst, GLubyte *src, int src_width, int src_height, int 
 
 GLuint LoadGLCubeMap(const char *filename)
 {
-	ILinfo ImageInfo;
+	ILuint image;
 	ILboolean success;
-	ILenum error;
-	GLuint handle;
+	GLuint r;
 
-	glGenTextures(1, &handle);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
+	image = ilGenImage();
+	ilBindImage(image);
 
 	success = ilLoadImage(filename);
 	if(!success)
@@ -150,6 +149,57 @@ GLuint LoadGLCubeMap(const char *filename)
 		printf("%s\n", iluErrorString(ilGetError()));
 		return 0;
 	}
+
+	r = LoadGLCubeMapIL(image);
+	ilDeleteImage(image);
+	return r;
+}
+
+GLuint LoadGLCubeMapBinary(const char *ext, const void *data, unsigned int size)
+{
+	ILuint imageID;
+	ILboolean success;
+	ILenum error;
+	GLuint r_tex;
+
+	ILenum file_type = IL_TYPE_UNKNOWN;
+
+	if(ext)
+		file_type = ilTypeFromExt((string("f.") + string(ext)).c_str());
+
+	if(file_type == IL_TYPE_UNKNOWN)
+		file_type = ilDetermineTypeL(data, size);
+
+	ilGenImages(1, &imageID);
+	ilBindImage(imageID);
+	success = ilLoadL(file_type, data, size);
+
+	if (!success)
+	{
+		error = ilGetError();
+		printf("Failed to load cube map texture: %s\n", iluErrorString(error));
+		return 0;
+	}
+
+	r_tex = LoadGLCubeMapIL(imageID);
+
+	ilDeleteImages(1, &imageID);
+
+	return r_tex;
+}
+
+GLuint LoadGLCubeMapIL(ILuint image)
+{
+	ILinfo ImageInfo;
+	ILboolean success;
+	ILenum error;
+	GLuint handle;
+
+	glGenTextures(1, &handle);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
+
+	ilBindImage(image);
+
 	iluGetImageInfo(&ImageInfo);
 	if (ImageInfo.Origin != IL_ORIGIN_UPPER_LEFT)
 	{

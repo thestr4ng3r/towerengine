@@ -11,8 +11,12 @@ class tScene
 		map<string, tAsset *> assets;
 		map<string, tSceneObject *> objects;
 
+		tCubeMapAsset *sky_cubemap;
+		tSkyBox *skybox;
+
 		void ParseAssetsNode(xmlNodePtr cur);
 		void ParseObjectsNode(xmlNodePtr cur);
+		void ParseSceneNode(xmlNodePtr cur);
 
 		void AddObject(string name, tSceneObject *object);
 

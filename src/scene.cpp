@@ -3,6 +3,8 @@
 
 tScene::tScene(tWorld *world)
 {
+	sky_cubemap = 0;
+	skybox = 0;
 	this->world = world;
 }
 
@@ -35,9 +37,10 @@ bool tScene::LoadFromFile(string file)
 	{
 		if(xmlStrEqual(cur->name, (const xmlChar *)"assets"))
 			ParseAssetsNode(cur);
-
 		else if(xmlStrEqual(cur->name, (const xmlChar *)"objects"))
 			ParseObjectsNode(cur);
+		else if(xmlStrEqual(cur->name, (const xmlChar *)"scene"))
+			ParseSceneNode(cur);
 
 		cur = cur->next;
 	}
@@ -52,6 +55,7 @@ void tScene::ParseAssetsNode(xmlNodePtr cur)
 	unsigned char *file_data;
 	unsigned long int file_size;
 	string name;
+	const char *file_ext;
 
 	while(child)
 	{
@@ -65,6 +69,18 @@ void tScene::ParseAssetsNode(xmlNodePtr cur)
 				name = string((const char *)xmlGetProp(child, (const xmlChar *)"name"));
 
 				assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tMeshAsset(mesh))));
+			}
+		}
+		else if(xmlStrEqual(child->name, (const xmlChar *)"cubemap"))
+		{
+			if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			{
+				Base64Decode(base64_temp, &file_data, &file_size);
+				file_ext = (const char *)xmlGetProp(child, (const xmlChar *)"filename_ext");
+				name = string((const char *)xmlGetProp(child, (const xmlChar *)"name"));
+				GLuint cubemap = LoadGLCubeMapBinary(file_ext, file_data, file_size);
+
+				assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tCubeMapAsset(cubemap))));
 			}
 		}
 
@@ -196,6 +212,29 @@ void tScene::ParseObjectsNode(xmlNodePtr cur)
 	}
 }
 
+void tScene::ParseSceneNode(xmlNodePtr cur)
+{
+	xmlChar *temp;
+	map<string, tAsset *>::iterator asset_i;
+	string asset_name;
+
+	if((temp = xmlGetProp(cur, (const xmlChar *)"sky_cubemap")))
+	{
+		asset_name = string((const char *)temp);
+
+		if((asset_i = assets.find(asset_name)) != assets.end())
+		{
+			tAsset *asset = asset_i->second;
+
+			if(asset->GetType() == T_ASSET_TYPE_CUBE_MAP)
+			{
+				sky_cubemap = (tCubeMapAsset *)asset;
+				skybox = new tSkyBox(sky_cubemap->GetCubeMap());
+			}
+		}
+	}
+}
+
 void tScene::AddObject(string name, tSceneObject *object)
 {
 	objects.insert(pair<string, tSceneObject *>(name, object));
@@ -205,13 +244,18 @@ void tScene::AddToWorld(void)
 {
 	map<string, tSceneObject *>::iterator i;
 
+	world->SetSkyBox(skybox);
+
 	for(i=objects.begin(); i!=objects.end(); i++)
 		i->second->AddToWorld(world);
+
 }
 
 void tScene::RemoveFromWorld(void)
 {
 	map<string, tSceneObject *>::iterator i;
+
+	world->SetSkyBox(0);
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		i->second->RemoveFromWorld(world);

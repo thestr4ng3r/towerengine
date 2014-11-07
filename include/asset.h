@@ -3,7 +3,7 @@
 #define _ASSET_H
 
 #define T_ASSET_TYPE_MESH		0
-#define T_ASSET_TYPE_CUBEMAP	1
+#define T_ASSET_TYPE_CUBE_MAP	1
 
 class tAsset
 {
@@ -38,7 +38,7 @@ class tCubeMapAsset : public tAsset
 
 		GLuint GetCubeMap(void)	{ return cubemap; }
 
-		int GetType(void)		{ return T_ASSET_TYPE_CUBEMAP; }
+		int GetType(void)		{ return T_ASSET_TYPE_CUBE_MAP; }
 };
 
 #endif
