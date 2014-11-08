@@ -46,9 +46,15 @@ public:
 	void RemovePointLight(tPointLight *light);
 	void ClearPointLights(void)			{ point_lights.clear(); }
 
+	int GetPointLightsCount(void)			{ return point_lights.size(); }
+	tPointLight *GetPointLight(int i)		{ return point_lights.at(i); }
+
 	void AddDirectionalLight(tDirectionalLight *light);
 	void RemoveDirectionalLight(tDirectionalLight *light);
 	void ClearDirectionalLights(void);
+
+	int GetDirectionalLightsCount(void)				{ return dir_lights.size(); }
+	tDirectionalLight *GetDirectionalLight(int i)	{ return dir_lights.at(i); }
 
 	void Step(float time);
 

@@ -61,9 +61,8 @@ void tScene::ParseAssetsNode(xmlNodePtr cur)
 	{
 		if(xmlStrEqual(child->name, (const xmlChar *)"mesh"))
 		{
-			if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			if((file_data = (unsigned char *)xmlNodeListGetString(child->doc, child->children, 1)))
 			{
-				Base64Decode(base64_temp, &file_data, &file_size);
 				tMesh *mesh = new tMesh();
 				mesh->LoadFromData((const char *)file_data, "");
 				name = string((const char *)xmlGetProp(child, (const xmlChar *)"name"));
