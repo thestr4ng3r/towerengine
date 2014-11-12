@@ -45,8 +45,8 @@ GLint tShader::GetUniformLocation(const char *uniform)
 void tShader::Bind(void)
 {
 	glUseProgram(program);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void tShader::Unbind(void)
