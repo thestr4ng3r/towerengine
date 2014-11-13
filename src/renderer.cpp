@@ -45,41 +45,11 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 1);
-
-	point_light_count = 0;
-	point_light_pos = new float[tLightPassShader::max_point_lights * 3];
-	point_light_color = new float[tLightPassShader::max_point_lights * 3];
-	point_light_distance = new float[tLightPassShader::max_point_lights];
-	point_light_shadow_enabled = new int[tLightPassShader::max_point_lights];
-	point_light_shadow_maps = new GLuint[tLightPassShader::max_point_lights];
-
-	dir_light_count = 0;
-	dir_light_dir = new float[tLightPassShader::max_directional_lights * 3];
-	dir_light_color = new float[tLightPassShader::max_directional_lights * 3];
-	dir_light_shadow_enabled = new int[tLightPassShader::max_directional_lights];
-	dir_light_shadow_clip = new float[tLightPassShader::max_directional_lights * 2];
-	dir_light_shadow_tex_matrix = new float[tLightPassShader::max_directional_lights * 16 * tLightPassShader::max_directional_light_splits];
-	dir_light_shadow_splits_count = new float[tLightPassShader::max_directional_lights];
-	dir_light_shadow_splits_z = new float[tLightPassShader::max_directional_lights * (tLightPassShader::max_directional_light_splits+1)];
-	dir_light_shadow_maps = new GLuint[tLightPassShader::max_directional_lights];
 }
 
 tRenderer::~tRenderer(void)
 {
-	delete[] point_light_pos;
-	delete[] point_light_color;
-	delete[] point_light_distance;
-	delete[] point_light_shadow_enabled;
-	delete[] point_light_shadow_maps;
-
-	delete[] dir_light_dir;
-	delete[] dir_light_color;
-	delete[] dir_light_shadow_enabled;
-	delete[] dir_light_shadow_clip;
-	delete[] dir_light_shadow_tex_matrix;
-	delete[] dir_light_shadow_splits_count;
-	delete[] dir_light_shadow_splits_z;
-	delete[] dir_light_shadow_maps;
+	delete gbuffer;
 }
 
 void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
@@ -229,13 +199,10 @@ void tRenderer::GeometryPass(void)
 
 void tRenderer::LightPass(void)
 {
+	int i;
+
 	tCamera *camera = world->GetCamera();
 	tSkyBox *sky_box = world->GetSkyBox();
-
-	world->GetPointLightUniforms(point_light_count, point_light_pos, point_light_color, point_light_distance, point_light_shadow_enabled, point_light_shadow_maps);
-
-	world->GetDirectionalLightUniforms(dir_light_count, dir_light_dir, dir_light_color, dir_light_shadow_clip, dir_light_shadow_tex_matrix, dir_light_shadow_splits_count,
-										dir_light_shadow_splits_z, dir_light_shadow_enabled, dir_light_shadow_maps);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -264,24 +231,26 @@ void tRenderer::LightPass(void)
 	tEngine::GetAmbientLightingShader()->SetGBuffer(gbuffer);
 	tEngine::GetAmbientLightingShader()->SetAmbientLight(world->GetAmbientColor());
 
-	glBegin(GL_QUADS);
-	glVertex2f(0.0, 1.0);
-	glVertex2f(0.0, 0.0);
-	glVertex2f(1.0, 0.0);
-	glVertex2f(1.0, 1.0);
-	glEnd();
+	RenderScreenQuad();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 
+
 	tEngine::GetDirectionalLightingShader()->Bind();
 	tEngine::GetDirectionalLightingShader()->SetGBuffer(gbuffer);
+	tEngine::GetDirectionalLightingShader()->SetCameraPosition(camera->GetPosition());
+
+	for(i=0; i<world->GetDirectionalLightsCount(); i++)
+		world->GetDirectionalLight(i)->RenderLighting();
 
 
-	for(int i=0; i<world->GetDirectionalLightsCount(); i++)
-		world->GetDirectionalLight(i)->RenderLighting(gbuffer, camera->GetPosition());
+	tEngine::GetPointLightingShader()->Bind();
+	tEngine::GetPointLightingShader()->SetGBuffer(gbuffer);
+	tEngine::GetPointLightingShader()->SetCameraPosition(camera->GetPosition());
 
-
+	for(i=0; i<world->GetPointLightsCount(); i++)
+		world->GetPointLight(i)->RenderLighting();
 
 
 
@@ -391,6 +360,15 @@ void tRenderer::ChangeSize(int width, int height)
 }
 
 
+void tRenderer::RenderScreenQuad(void)
+{
+	glBegin(GL_QUADS); // TODO: Use VBO instead
+	glVertex2f(0.0, 1.0);
+	glVertex2f(0.0, 0.0);
+	glVertex2f(1.0, 0.0);
+	glVertex2f(1.0, 1.0);
+	glEnd();
+}
 
 
 

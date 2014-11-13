@@ -2,12 +2,11 @@
 
 uniform vec3 cam_pos_uni;
 
-uniform int point_light_count_uni;
-uniform vec3 point_light_pos_uni[MAX_POINT_LIGHTS];
-uniform vec3 point_light_color_uni[MAX_POINT_LIGHTS];
-uniform float point_light_distance_uni[MAX_POINT_LIGHTS];
-uniform bool point_light_shadow_enabled_uni[MAX_POINT_LIGHTS];
-uniform samplerCube point_light_shadow_map_uni[MAX_POINT_LIGHTS];
+uniform vec3 point_light_pos_uni;
+uniform vec3 point_light_color_uni;
+uniform float point_light_distance_uni;
+uniform bool point_light_shadow_enabled_uni;
+uniform samplerCube point_light_shadow_map_uni;
 
 
 uniform sampler2D position_tex_uni;
@@ -21,6 +20,11 @@ in vec2 uv_coord_var;
 
 out vec4 gl_FragColor;
 
+
+float linstep(float min, float max, float v)
+{
+	return clamp((v - min) / (max - min), 0.0, 1.0);
+}
 
 void main(void)
 {
@@ -37,14 +41,15 @@ void main(void)
 	
 	vec3 cam_dir = normalize(cam_pos_uni - position.xyz);
 	
-	vec3 color = light_ambient_color_uni * diffuse.rgb; // ambient
-	
 	float shadow = 1.0;
 
 	vec3 light_dir = point_light_pos_uni - position.xyz; // pos to light
 	float light_dist_sq = light_dir.x * light_dir.x + light_dir.y * light_dir.y + light_dir.z * light_dir.z; // squared distance
 	if(light_dist_sq > point_light_distance_uni * point_light_distance_uni)
-		continue;
+	{
+		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+		return;
+	}
 	float light_dist = sqrt(light_dist_sq); // real distance
 	light_dir /= light_dist; // normalized dir
 	
@@ -70,12 +75,12 @@ void main(void)
 	else
 		shadow = 1.0;
 
-	float light_dist_attenuation = (1.0 - light_dist / point_light_distance_uni[i]);
+	float light_dist_attenuation = (1.0 - light_dist / point_light_distance_uni);
 	float light_intensity = max(dot(normal, light_dir), 0.0) *  light_dist_attenuation;
-	vec3 color = shadow * light_intensity * point_light_color_uni[i] * diffuse.rgb; // diffuse light
+	vec3 color = shadow * light_intensity * point_light_color_uni * diffuse.rgb; // diffuse light
 
 	//specular
-	vec3 specular_color = specular.rgb * point_light_color_uni[i];
+	vec3 specular_color = specular.rgb * point_light_color_uni;
 	float specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0) * light_dist_attenuation;
 	color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow;
 	

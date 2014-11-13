@@ -17,8 +17,8 @@ set(towerengine_SRC
 	src/transformationmatrix.cpp
 	src/face_shader.cpp 
 	src/geometry_pass_shader.cpp
-	src/light_pass_shader.cpp
 	src/directional_lighting_shader.cpp
+	src/point_lighting_shader.cpp
 	src/ambient_lighting_shader.cpp
 	src/point_light.cpp 
 	src/directional_light.cpp 

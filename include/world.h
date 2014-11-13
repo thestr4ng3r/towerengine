@@ -58,9 +58,6 @@ public:
 
 	void Step(float time);
 
-	void GetPointLightUniforms(int &count, float *pos, float *color, float *distance, int *shadow_enabled, GLuint *shadow_maps);
-	void GetDirectionalLightUniforms(int &count, float *dir, float *color, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z, int *shadow_enabled, GLuint *shadow_maps);
-
 	void FillRenderSpaces(void);
 	void RenderShadowMaps(void);
 	tRenderSpace *GetCameraRenderSpace(void)	{ return camera_render_space; }

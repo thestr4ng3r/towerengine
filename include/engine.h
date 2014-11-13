@@ -5,9 +5,9 @@ class tEngine
 {
 private:
 	static tGeometryPassShader *geometry_pass_shader;
-	static tLightPassShader *light_pass_shader;
 	static tAmbientLightingShader *ambient_lighting_shader;
 	static tDirectionalLightingShader *directional_lighting_shader;
+	static tPointLightingShader *point_lighting_shader;
 
 	static tSkyBoxShader *skybox_shader;
 	static tPointShadowShader *point_shadow_shader;
@@ -27,9 +27,9 @@ public:
 	static void Destroy(void);
 
 	static tGeometryPassShader *GetGeometryPassShader(void)						{ return geometry_pass_shader; }
-	static tLightPassShader *GetLightPassShader(void)							{ return light_pass_shader; }
 	static tDirectionalLightingShader *GetDirectionalLightingShader(void)		{ return directional_lighting_shader; }
 	static tAmbientLightingShader *GetAmbientLightingShader(void)				{ return ambient_lighting_shader; }
+	static tPointLightingShader *GetPointLightingShader(void)					{ return point_lighting_shader; }
 	static tSkyBoxShader *GetSkyBoxShader(void)									{ return skybox_shader; }
 	static tPointShadowShader *GetPointShadowShader(void)						{ return point_shadow_shader; }
 	static tPointShadowBlurShader *GetPointShadowBlurShader(void)				{ return point_shadow_blur_shader; }

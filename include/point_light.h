@@ -27,6 +27,8 @@ class tPointLight
 
 		void InitShadow(int size, bool blur_enabled = false, float blur_size = 0.003);
 		void RenderShadow(tWorld *world);
+
+		void RenderLighting(void);
 };
 
 #endif

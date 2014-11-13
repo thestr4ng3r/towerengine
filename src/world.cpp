@@ -58,9 +58,6 @@ void tWorld::RemoveObject(tObject *o)
 
 void tWorld::AddPointLight(tPointLight *light)
 {
-	if(point_lights.size() >= tLightPassShader::max_point_lights)
-		return;
-
 	for(vector<tPointLight *>::iterator i = point_lights.begin(); i != point_lights.end(); i++)
 		if((*i) == light)
 			return;
@@ -79,9 +76,6 @@ void tWorld::RemovePointLight(tPointLight *light)
 
 void tWorld::AddDirectionalLight(tDirectionalLight *light)
 {
-	if(dir_lights.size() >= tLightPassShader::max_directional_lights)
-		return;
-
 	for(vector<tDirectionalLight *>::iterator i = dir_lights.begin(); i != dir_lights.end(); i++)
 		if((*i) == light)
 			return;
@@ -192,66 +186,6 @@ void tWorld::FillRenderSpaces(void)
 void tWorld::Step(float time)
 {
 	physics.dynamics_world->stepSimulation(time, 10);
-}
-
-
-void tWorld::GetPointLightUniforms(int &count, float *pos, float *color, float *distance, int *shadow_enabled, GLuint *shadow_maps)
-{
-	int i;
-	tPointLight *point_light;
-	set<tPointLight *>::iterator pi;
-
-	count = camera_render_point_lights.size();
-
-	for(pi=camera_render_point_lights.begin(), i=0; pi!=camera_render_point_lights.end() && i<tLightPassShader::max_point_lights; pi++, i++)
-	{
-		point_light = *pi;
-		memcpy(pos + i*3, point_light->GetPosition().v, 3 * sizeof(float));
-		memcpy(color + i*3, point_light->GetColor().v, 3 * sizeof(float));
-		distance[i] = point_light->GetDistance();
-		shadow_enabled[i] = (point_light->GetShadowEnabled() ? 1 : 0);
-		shadow_maps[i] = point_light->GetShadowEnabled() ? point_light->GetShadow()->GetShadowMap() : 0;
-	}
-
-}
-
-void tWorld::GetDirectionalLightUniforms(int &count, float *dir, float *color, float *shadow_clip, float *shadow_tex_matrix, float *shadow_splits_count, float *shadow_splits_z, int *shadow_enabled, GLuint *shadow_maps)
-{
-	int i, s;
-	tDirectionalLight *dir_light;
-	set<tDirectionalLight *>::iterator di;
-
-	count = camera_render_dir_lights.size();
-
-	for(di=camera_render_dir_lights.begin(), i=0; di!=camera_render_dir_lights.end() && i<tLightPassShader::max_directional_lights; di++, i++)
-	{
-		dir_light = *di;
-		memcpy(dir + i*3, dir_light->GetDirection().v, 3 * sizeof(float));
-		memcpy(color + i*3, dir_light->GetColor().v, 3 * sizeof(float));
-		if(dir_light->GetShadowEnabled())
-		{
-			shadow_enabled[i] = 1;
-			shadow_clip[i*2 + 0] = dir_light->GetShadow()->GetNearClip();
-			shadow_clip[i*2 + 1] = dir_light->GetShadow()->GetFarClip();
-			shadow_maps[i] = dir_light->GetShadow()->GetShadowMap();
-			shadow_splits_count[i] = dir_light->GetShadow()->GetSplitsCount();
-			for(s=0; s<dir_light->GetShadow()->GetSplitsCount(); s++)
-			{
-				memcpy(shadow_tex_matrix + i*16*tLightPassShader::max_directional_light_splits + 16*s,
-						dir_light->GetShadow()->GetTextureMatrix()[s], sizeof(float) * 16);
-			}
-			memcpy(shadow_splits_z + i*(tLightPassShader::max_directional_light_splits+1),
-					dir_light->GetShadow()->GetSplitsZ(), sizeof(float) * (dir_light->GetShadow()->GetSplitsCount()+1));
-		}
-		else
-		{
-			shadow_enabled[i] = 0;
-			shadow_clip[i*2 + 0] = 0.0;
-			shadow_clip[i*2 + 1] = 0.0;
-			memcpy(shadow_tex_matrix + i*16, tEngine::identity_matrix4, sizeof(float) * 16);
-			shadow_maps[i] = 0;
-		}
-	}
 }
 
 

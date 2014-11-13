@@ -32,10 +32,9 @@ class tRenderer;
 #include "geometry_pass_shader.h"
 #include "gbuffer.h"
 
-#include "light_pass_shader.h"
 #include "ambient_lighting_shader.h"
 #include "directional_lighting_shader.h"
-
+#include "point_lighting_shader.h"
 
 
 #include "skybox_shader.h"

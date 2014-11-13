@@ -2,9 +2,9 @@
 #include "towerengine.h"
 
 tGeometryPassShader *tEngine::geometry_pass_shader = 0;
-tLightPassShader *tEngine::light_pass_shader = 0;
 tAmbientLightingShader *tEngine::ambient_lighting_shader = 0;
 tDirectionalLightingShader *tEngine::directional_lighting_shader = 0;
+tPointLightingShader *tEngine::point_lighting_shader = 0;
 tSkyBoxShader *tEngine::skybox_shader = 0;
 tPointShadowShader *tEngine::point_shadow_shader = 0;
 tPointShadowBlurShader *tEngine::point_shadow_blur_shader = 0;
@@ -46,11 +46,11 @@ void tEngine::Init(void)
 	geometry_pass_shader->Init();
 	SetCurrentFaceShader(geometry_pass_shader);
 
-	light_pass_shader = new tLightPassShader();
-	light_pass_shader->Init();
-
 	directional_lighting_shader = new tDirectionalLightingShader();
 	directional_lighting_shader->Init();
+
+	point_lighting_shader = new tPointLightingShader();
+	point_lighting_shader->Init();
 
 	ambient_lighting_shader = new tAmbientLightingShader();
 	ambient_lighting_shader->Init();

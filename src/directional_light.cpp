@@ -29,7 +29,7 @@ void tDirectionalLight::RenderShadow(tWorld *world)
 	shadow->Render(world);
 }
 
-void tDirectionalLight::RenderLighting(tGBuffer *gbuffer, tVector cam_pos)
+void tDirectionalLight::RenderLighting(void)
 {
 	GLuint shadow_map = 0;
 	tVector2 shadow_clip = Vec(0.0, 0.0);
@@ -49,19 +49,13 @@ void tDirectionalLight::RenderLighting(tGBuffer *gbuffer, tVector cam_pos)
 	}
 
 	tEngine::GetDirectionalLightingShader()->SetDirectionalLight(	dir,
-																color,
-																shadow_enabled ? 1 : 0,
-																shadow_map,
-																shadow_clip,
-																shadow_tex_matrix,
-																shadow_splits_count,
-																shadow_splits_z);
-	tEngine::GetDirectionalLightingShader()->SetCameraPosition(cam_pos);
+																	color,
+																	shadow_enabled ? 1 : 0,
+																	shadow_map,
+																	shadow_clip,
+																	shadow_tex_matrix,
+																	shadow_splits_count,
+																	shadow_splits_z);
 
-	glBegin(GL_QUADS);
-	glVertex2f(0.0, 1.0);
-	glVertex2f(0.0, 0.0);
-	glVertex2f(1.0, 0.0);
-	glVertex2f(1.0, 1.0);
-	glEnd();
+	tRenderer::RenderScreenQuad();
 }

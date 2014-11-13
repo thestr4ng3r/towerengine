@@ -28,7 +28,7 @@ class tDirectionalLight
 		/*
 		 * tDirectionalLightShader must be bound and its GBuffer Uniform set before!
 		 */
-		void RenderLighting(tGBuffer *gbuffer, tVector cam_pos);
+		void RenderLighting(void);
 };
 
 #endif

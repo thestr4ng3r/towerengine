@@ -50,8 +50,6 @@ void tDirectionalLightingShader::SetGBuffer(tGBuffer *gbuffer)
 
 void tDirectionalLightingShader::SetDirectionalLight(tVector dir, tVector color, int shadow_enabled, GLuint shadow_map, tVector2 shadow_clip, float *shadow_tex_matrix, int shadow_splits_count, float *shadow_splits_z)
 {
-	int i;
-
 	glUniform3f(directional_light_dir_uniform, dir.x, dir.y, dir.z);
 	glUniform3f(directional_light_color_uniform, color.x, color.y, color.z);
 	glUniform1i(directional_light_shadow_enabled_uniform, shadow_enabled);
