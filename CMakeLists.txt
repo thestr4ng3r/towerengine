@@ -20,6 +20,7 @@ set(towerengine_SRC
 	src/directional_lighting_shader.cpp
 	src/point_lighting_shader.cpp
 	src/ambient_lighting_shader.cpp
+	src/ssao_lighting_shader.cpp
 	src/point_light.cpp 
 	src/directional_light.cpp 
 	src/point_light_shadow.cpp

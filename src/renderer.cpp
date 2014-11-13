@@ -252,6 +252,17 @@ void tRenderer::LightPass(void)
 	for(i=0; i<world->GetPointLightsCount(); i++)
 		world->GetPointLight(i)->RenderLighting();
 
+	if(ssao.enabled)
+	{
+		glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+
+		tEngine::GetSSAOLightingShader()->Bind();
+		tEngine::GetSSAOLightingShader()->SetGBuffer(gbuffer);
+		tEngine::GetSSAOLightingShader()->SetSSAOTexture(ssao.tex);
+
+		RenderScreenQuad();
+	}
+
 
 
 	/*tEngine::GetLightPassShader()->Bind();

@@ -8,6 +8,7 @@ private:
 	static tAmbientLightingShader *ambient_lighting_shader;
 	static tDirectionalLightingShader *directional_lighting_shader;
 	static tPointLightingShader *point_lighting_shader;
+	static tSSAOLightingShader *ssao_lighting_shader;
 
 	static tSkyBoxShader *skybox_shader;
 	static tPointShadowShader *point_shadow_shader;
@@ -30,6 +31,7 @@ public:
 	static tDirectionalLightingShader *GetDirectionalLightingShader(void)		{ return directional_lighting_shader; }
 	static tAmbientLightingShader *GetAmbientLightingShader(void)				{ return ambient_lighting_shader; }
 	static tPointLightingShader *GetPointLightingShader(void)					{ return point_lighting_shader; }
+	static tSSAOLightingShader *GetSSAOLightingShader(void)						{ return ssao_lighting_shader; }
 	static tSkyBoxShader *GetSkyBoxShader(void)									{ return skybox_shader; }
 	static tPointShadowShader *GetPointShadowShader(void)						{ return point_shadow_shader; }
 	static tPointShadowBlurShader *GetPointShadowBlurShader(void)				{ return point_shadow_blur_shader; }

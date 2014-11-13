@@ -5,6 +5,8 @@ tGeometryPassShader *tEngine::geometry_pass_shader = 0;
 tAmbientLightingShader *tEngine::ambient_lighting_shader = 0;
 tDirectionalLightingShader *tEngine::directional_lighting_shader = 0;
 tPointLightingShader *tEngine::point_lighting_shader = 0;
+tSSAOLightingShader *tEngine::ssao_lighting_shader = 0;
+
 tSkyBoxShader *tEngine::skybox_shader = 0;
 tPointShadowShader *tEngine::point_shadow_shader = 0;
 tPointShadowBlurShader *tEngine::point_shadow_blur_shader = 0;
@@ -54,6 +56,9 @@ void tEngine::Init(void)
 
 	ambient_lighting_shader = new tAmbientLightingShader();
 	ambient_lighting_shader->Init();
+
+	ssao_lighting_shader = new tSSAOLightingShader();
+	ssao_lighting_shader->Init();
 
 	skybox_shader = new tSkyBoxShader();
 	skybox_shader->Init();

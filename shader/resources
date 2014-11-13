@@ -5,6 +5,7 @@ light_pass_shader_frag: shader/light_pass_shader.frag
 directional_lighting_shader_frag: shader/directional_lighting_shader.frag
 point_lighting_shader_frag: shader/point_lighting_shader.frag
 ambient_lighting_shader_frag: shader/ambient_lighting_shader.frag
+ssao_lighting_shader_frag: shader/ssao_lighting_shader.frag
 cube_env_shader_vert: shader/skybox_shader.vert
 cube_env_shader_frag: shader/skybox_shader.frag
 point_shadow_shader_vert: shader/point_shadow_shader.vert

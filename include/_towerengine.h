@@ -35,7 +35,7 @@ class tRenderer;
 #include "ambient_lighting_shader.h"
 #include "directional_lighting_shader.h"
 #include "point_lighting_shader.h"
-
+#include "ssao_lighting_shader.h"
 
 #include "skybox_shader.h"
 #include "point_shadow_shader.h"
