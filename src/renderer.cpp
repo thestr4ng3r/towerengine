@@ -241,13 +241,12 @@ void tRenderer::LightPass(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, screen_width, screen_height);
 
+	glDisable(GL_BLEND);
+
 	camera->SetModelviewProjectionMatrix();
 
 	if(sky_box)
 		sky_box->Paint(camera->GetPosition());
-
-
-	glClear(GL_COLOR_BUFFER_BIT); // TODO: Render Ambient Lighting!
 
 
 	glMatrixMode(GL_PROJECTION);
@@ -260,47 +259,29 @@ void tRenderer::LightPass(void)
 	gluLookAt(0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0); //pos x, y, z, to x, y, z
 
 	glDisable(GL_DEPTH_TEST);
+
+	tEngine::GetAmbientLightingShader()->Bind();
+	tEngine::GetAmbientLightingShader()->SetGBuffer(gbuffer);
+	tEngine::GetAmbientLightingShader()->SetAmbientLight(world->GetAmbientColor());
+
+	glBegin(GL_QUADS);
+	glVertex2f(0.0, 1.0);
+	glVertex2f(0.0, 0.0);
+	glVertex2f(1.0, 0.0);
+	glVertex2f(1.0, 1.0);
+	glEnd();
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 
-	if(world->GetDirectionalLightsCount() == 0)
-		return;
+	tEngine::GetDirectionalLightingShader()->Bind();
+	tEngine::GetDirectionalLightingShader()->SetGBuffer(gbuffer);
 
-	tDirectionalLight *light = world->GetDirectionalLight(0);
 
-	tEngine::GetDirectionalLightShader()->Bind();
-	tEngine::GetDirectionalLightShader()->SetGBuffer(gbuffer);
+	for(int i=0; i<world->GetDirectionalLightsCount(); i++)
+		world->GetDirectionalLight(i)->RenderLighting(gbuffer, camera->GetPosition());
 
-	GLuint shadow_map = 0;
-	tDirectionalLightShadow *shadow;
-	tVector2 shadow_clip;
-	float *shadow_tex_matrix = new float[0];
-	int shadow_splits_count;
-	float *shadow_splits_z = new float[0];
 
-	if(light->GetShadowEnabled())
-	{
-		shadow = light->GetShadow();
-		shadow_map = shadow->GetShadowMap();
-		shadow_clip = Vec(shadow->GetNearClip(), shadow->GetFarClip());
-		shadow_splits_count = shadow->GetSplitsCount();
-		shadow_tex_matrix = new float[shadow_splits_count * 16];
-		for(int i=0; i<shadow->GetSplitsCount(); i++)
-		{
-			memcpy(shadow_tex_matrix + (i*16), shadow->GetTextureMatrix()[i], (size_t)(sizeof(float) * 16));
-		}
-		shadow_splits_z = shadow->GetSplitsZ();
-	}
-
-	tEngine::GetDirectionalLightShader()->SetDirectionalLight(	light->GetDirection(),
-																light->GetColor(),
-																light->GetShadowEnabled() ? 1 : 0,
-																shadow_map,
-																shadow_clip,
-																shadow_tex_matrix,
-																shadow_splits_count,
-																shadow_splits_z);
-	tEngine::GetDirectionalLightShader()->SetCameraPosition(camera->GetPosition());
 
 
 
@@ -326,12 +307,7 @@ void tRenderer::LightPass(void)
 	tEngine::GetLightPassShader()->SetSSAO(ssao.enabled, ssao.tex);*/
 
 
-	glBegin(GL_QUADS);
-	glVertex2f(0.0, 1.0);
-	glVertex2f(0.0, 0.0);
-	glVertex2f(1.0, 0.0);
-	glVertex2f(1.0, 1.0);
-	glEnd();
+
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

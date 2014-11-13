@@ -2,9 +2,9 @@
 #include "towerengine.h"
 
 
-void tDirectionalLightShader::Init(void)
+void tDirectionalLightingShader::Init(void)
 {
-	InitShader(light_pass_shader_vert, directional_light_shader_frag, "Directional Light Shader");
+	InitShader(light_pass_shader_vert, directional_lighting_shader_frag, "Directional Light Shader");
 	LinkProgram();
 
 	position_tex_uniform = GetUniformLocation("position_tex_uni");
@@ -25,7 +25,7 @@ void tDirectionalLightShader::Init(void)
 	directional_light_shadow_map_uniform = GetUniformLocation("directional_light_shadow_map_uni");
 }
 
-void tDirectionalLightShader::SetGBuffer(tGBuffer *gbuffer)
+void tDirectionalLightingShader::SetGBuffer(tGBuffer *gbuffer)
 {
 	glUniform1i(position_tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -48,7 +48,7 @@ void tDirectionalLightShader::SetGBuffer(tGBuffer *gbuffer)
 	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::SPECULAR_EXPONENT_TEX));
 }
 
-void tDirectionalLightShader::SetDirectionalLight(tVector dir, tVector color, int shadow_enabled, GLuint shadow_map, tVector2 shadow_clip, float *shadow_tex_matrix, int shadow_splits_count, float *shadow_splits_z)
+void tDirectionalLightingShader::SetDirectionalLight(tVector dir, tVector color, int shadow_enabled, GLuint shadow_map, tVector2 shadow_clip, float *shadow_tex_matrix, int shadow_splits_count, float *shadow_splits_z)
 {
 	int i;
 
@@ -65,7 +65,7 @@ void tDirectionalLightShader::SetDirectionalLight(tVector dir, tVector color, in
 	glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_map);
 }
 
-void tDirectionalLightShader::SetCameraPosition(tVector pos)
+void tDirectionalLightingShader::SetCameraPosition(tVector pos)
 {
 	glUniform3f(cam_pos_uniform, pos.x, pos.y, pos.z);
 }

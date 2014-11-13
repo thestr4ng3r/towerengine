@@ -28,3 +28,40 @@ void tDirectionalLight::RenderShadow(tWorld *world)
 
 	shadow->Render(world);
 }
+
+void tDirectionalLight::RenderLighting(tGBuffer *gbuffer, tVector cam_pos)
+{
+	GLuint shadow_map = 0;
+	tVector2 shadow_clip = Vec(0.0, 0.0);
+	float *shadow_tex_matrix = 0;
+	int shadow_splits_count = 0;
+	float *shadow_splits_z = 0;
+
+	if(shadow_enabled)
+	{
+		shadow_map = shadow->GetShadowMap();
+		shadow_clip = Vec(shadow->GetNearClip(), shadow->GetFarClip());
+		shadow_splits_count = shadow->GetSplitsCount();
+		shadow_tex_matrix = new float[shadow_splits_count * 16];
+		for(int i=0; i<shadow->GetSplitsCount(); i++)
+			memcpy(shadow_tex_matrix + (i*16), shadow->GetTextureMatrix()[i], (size_t)(sizeof(float) * 16));
+		shadow_splits_z = shadow->GetSplitsZ();
+	}
+
+	tEngine::GetDirectionalLightingShader()->SetDirectionalLight(	dir,
+																color,
+																shadow_enabled ? 1 : 0,
+																shadow_map,
+																shadow_clip,
+																shadow_tex_matrix,
+																shadow_splits_count,
+																shadow_splits_z);
+	tEngine::GetDirectionalLightingShader()->SetCameraPosition(cam_pos);
+
+	glBegin(GL_QUADS);
+	glVertex2f(0.0, 1.0);
+	glVertex2f(0.0, 0.0);
+	glVertex2f(1.0, 0.0);
+	glVertex2f(1.0, 1.0);
+	glEnd();
+}

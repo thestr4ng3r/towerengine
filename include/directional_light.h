@@ -24,6 +24,11 @@ class tDirectionalLight
 
 		void InitShadow(int size, int splits = 4, bool blur_enabled = false, float blur_size = 0.003);
 		void RenderShadow(tWorld *world);
+
+		/*
+		 * tDirectionalLightShader must be bound and its GBuffer Uniform set before!
+		 */
+		void RenderLighting(tGBuffer *gbuffer, tVector cam_pos);
 };
 
 #endif

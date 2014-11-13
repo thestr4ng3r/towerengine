@@ -2,9 +2,9 @@ geometry_pass_shader_vert: shader/geometry_pass_shader.vert
 geometry_pass_shader_frag: shader/geometry_pass_shader.frag
 light_pass_shader_vert: shader/light_pass_shader.vert
 light_pass_shader_frag: shader/light_pass_shader.frag
-directional_light_shader_frag: shader/directional_light_shader.frag
-point_light_shader_frag: shader/point_light_shader.frag
-ambient_light_shader_frag: shader/ambient_light_shader.frag
+directional_lighting_shader_frag: shader/directional_lighting_shader.frag
+point_lighting_shader_frag: shader/point_lighting_shader.frag
+ambient_lighting_shader_frag: shader/ambient_lighting_shader.frag
 cube_env_shader_vert: shader/skybox_shader.vert
 cube_env_shader_frag: shader/skybox_shader.frag
 point_shadow_shader_vert: shader/point_shadow_shader.vert

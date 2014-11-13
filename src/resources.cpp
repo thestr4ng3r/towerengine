@@ -482,7 +482,7 @@ const char *light_pass_shader_frag =
 "}\n"
 "";
 
-const char *directional_light_shader_frag = 
+const char *directional_lighting_shader_frag = 
 "#version 330\n"
 "\n"
 "#define MAX_DIRECTIONAL_SHADOW_SPLITS 8\n"
@@ -587,7 +587,7 @@ const char *directional_light_shader_frag =
 "}\n"
 "";
 
-const char *point_light_shader_frag = 
+const char *point_lighting_shader_frag = 
 "#version 330\n"
 "\n"
 "uniform vec3 cam_pos_uni;\n"
@@ -673,7 +673,7 @@ const char *point_light_shader_frag =
 "	gl_FragColor = vec4(color, 1.0);\n"
 "}";
 
-const char *ambient_light_shader_frag = 
+const char *ambient_lighting_shader_frag = 
 "#version 330\n"
 "\n"
 "uniform vec3 light_ambient_color_uni;\n"
