@@ -18,9 +18,9 @@ tPostProcessShader *tEngine::post_process_shader = 0;
 tSSAOShader *tEngine::ssao_shader = 0;
 
 const float tEngine::identity_matrix4[16] = { 1.0, 0.0, 0.0, 0.0,
-										  0.0, 1.0, 0.0, 0.0,
-										  0.0, 0.0, 1.0, 0.0,
-										  0.0, 0.0, 0.0, 1.0 };
+										  	  0.0, 1.0, 0.0, 0.0,
+										  	  0.0, 0.0, 1.0, 0.0,
+										  	  0.0, 0.0, 0.0, 1.0 };
 
 void tEngine::Init(void)
 {

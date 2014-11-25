@@ -142,7 +142,7 @@ void tDirectionalLightShadow::Render(tWorld *world)
 
 		c_log = cam_near * pow(cam_far / cam_near, (float)(s+1) / (float)splits);
 		c_uni = cam_near + (cam_far - cam_near) * ((float)(s+1) / (float)splits);
-		splits_z[s+1] = c_log * 0.7 + c_uni * 0.3;
+		splits_z[s+1] = c_log * 0.8 + c_uni * 0.2;
 
 		//splits_z[s+1] = world->GetCamera()->GetNearClip() +
 		//		(world->GetCamera()->GetFarClip() - world->GetCamera()->GetNearClip()) * pow(2, -(splits - (s+1)));

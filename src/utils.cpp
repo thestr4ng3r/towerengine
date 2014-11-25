@@ -150,7 +150,7 @@ tVector ApplyMatrix4(float m[16], tVector v)
 	return r;
 }
 
-void PrintMatrix4(float m[16])
+void PrintMatrix4(const float m[16])
 {
 	printf("%f, %f, %f, %f,\n%f, %f, %f, %f,\n%f, %f, %f, %f,\n%f, %f, %f, %f\n",
 				m[0], m[1], m[2], m[3],

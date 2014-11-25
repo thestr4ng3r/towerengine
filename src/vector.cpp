@@ -10,6 +10,17 @@ void tVector::SetFromPlane(const tVector2 &p, const tVector &n, float d)
 	y = (d - p.x * n.x - p.y * n.z) / n.y;
 	z = p.y;
 }
+
+tVector &tVector::operator*=(tMatrix3 m)
+{
+	return *this = m.ApplyToVector(*this);
+}
+
+tVector &tVector::operator*=(tTransform t)
+{
+	return *this = t.ApplyToVector(*this);
+}
+
 int IsInside(tVector2 c[4], const tVector2 &p)
 {
 	

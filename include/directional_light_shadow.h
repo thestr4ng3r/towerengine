@@ -43,6 +43,9 @@ class tDirectionalLightShadow
 		int GetSplitsCount(void)			{ return splits; }
 		float *GetSplitsZ(void)				{ return splits_z; }
 		tRenderSpace *GetRenderSpace(void)	{ return render_space; }
+
+		void SetNearClip(float v)			{ near_clip = v; }
+		void SetFarClip(float v)			{ far_clip = v; }
 };
 
 

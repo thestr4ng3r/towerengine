@@ -14,7 +14,7 @@ set(towerengine_SRC
 	src/engine.cpp 
 	src/entity.cpp 
 	src/boundingbox.cpp
-	src/transformationmatrix.cpp
+	src/transform.cpp
 	src/face_shader.cpp 
 	src/geometry_pass_shader.cpp
 	src/directional_lighting_shader.cpp

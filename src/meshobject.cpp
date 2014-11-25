@@ -4,23 +4,18 @@
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 
 
-tMeshObject::tMeshObject(tMesh *mesh, float mass)
+tMeshObject::tMeshObject(tMesh *mesh, float mass) : tTransformObject()
 {
 	this->mesh = mesh;
 	animation = 0;
 	pose = cstr("Idle");
 	animation_mode = 0;
 	loop = false;
-	pos = Vec(0.0, 0.0, 0.0);
-	x = Vec(1.0, 0.0, 0.0);
-	y = Vec(0.0, 1.0, 0.0);
-	z = Vec(0.0, 0.0, 1.0);
-	scale = Vec(1.0, 1.0, 1.0);
-	transformation = new tTransformationMatrix();
 	color = Vec(1.0, 1.0, 1.0);
 	alpha = 1.0;
 	visible = true;
 	time = 0.0;
+	transform_matrix = new float[16];
 	motion_state = new tMeshObjectMotionState(this);
 	if(mass > 0.0)
 	{
@@ -33,7 +28,7 @@ tMeshObject::tMeshObject(tMesh *mesh, float mass)
 		rigid_body = new btRigidBody(mass, motion_state, shape, inertia);
 		//rigid_body->setActivationState(DISABLE_DEACTIVATION);
 	}
-	else
+	else if(mass == 0.0)
 	{
 		btCollisionShape *shape;
 		if(mesh->GetPhysicsMesh())
@@ -42,6 +37,10 @@ tMeshObject::tMeshObject(tMesh *mesh, float mass)
 			shape = new btEmptyShape();
 
 		rigid_body = new btRigidBody(0.0, motion_state, shape, btVector3(0.0, 0.0, 0.0));
+	}
+	else
+	{
+		rigid_body = 0;
 	}
 }
 
@@ -53,26 +52,8 @@ void tMeshObject::SetAnimation(const char *animation)
 	this->animation = a;
 }
 
-void tMeshObject::Fade(float fade_end, float time)
-{
-	this->fade_end = fade_end;
-	fade_speed = (fade_end - alpha) / time;
-}
-
 void tMeshObject::Play(float time)
 {
-	if(fade_speed != 0.0)
-	{
-		alpha += fade_speed * time;
-
-		if((fade_speed > 0.0 && alpha >= fade_end)
-				|| (fade_speed < 0.0 && alpha <= fade_end))
-		{
-			fade_speed = 0.0;
-			alpha = fade_end;
-		}
-	}
-
 	if(!animation_mode || !animation)
 		return;
 
@@ -101,20 +82,12 @@ tBoundingBox tMeshObject::GetBoundingBox(void)
 {
 	tBoundingBox b;
 	tVector *p = mesh->GetBoundingBox().GetCornerPoints();
-	float *mat;
-
-	transformation->LoadIdentity();
-	transformation->Translate(pos);
-	transformation->SetXYZ(x, y, z);
-	transformation->Scale(scale);
-
-	mat = transformation->GetMatrix();
 
 	//btTransform trans(btMatrix3x3(mat[0], mat[1], mat[2], mat[4], mat[5], mat[6], mat[8], mat[9], mat[10]), btVector3(mat[3], mat[7], mat[11]));
 	//rigid_body->setWorldTransform(trans);
 
 	for(int i=0; i<8; i++)
-		b.AddPoint(ApplyMatrix4(mat, p[i]));
+		b.AddPoint(p[i] * transform);
 
 	return b;
 }
@@ -124,12 +97,9 @@ void tMeshObject::GeometryPass(void)
 	if(!visible || alpha <= 0.0)
 		return;
 
-	transformation->LoadIdentity();
-	transformation->Translate(pos);
-	transformation->SetXYZ(x, y, z);
-	transformation->Scale(scale);
+	float *temp = transform.GetMatrix(transform_matrix);
 
-	tEngine::GetCurrentFaceShader()->SetTransformation(transformation->GetMatrix());
+	tEngine::GetCurrentFaceShader()->SetTransformation(temp);
 
 	tMesh::Color(color, alpha);
 
@@ -173,21 +143,12 @@ tMeshObjectMotionState::tMeshObjectMotionState(tMeshObject *object)
 
 void tMeshObjectMotionState::getWorldTransform(btTransform &trans) const
 {
-	trans.setOrigin(BtVec(object->GetPosition()));
-	tVector x = object->GetX();
-	tVector y = object->GetY();
-	tVector z = object->GetZ();
-	trans.setBasis(btMatrix3x3(x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z));
+	trans = object->GetTransform().ToBtTransform();
 }
 
 void tMeshObjectMotionState::setWorldTransform(const btTransform &trans)
 {
-	object->SetPosition(Vec(trans.getOrigin()));
-	tVector x, y, z;
-	x = trans.getBasis().getRow(0);
-	y = trans.getBasis().getRow(1);
-	z = trans.getBasis().getRow(2);
-	object->SetXYZ(x, y, z);
+	object->SetTransform(tTransform::FromBtTransform(trans));
 }
 
 

@@ -130,7 +130,8 @@ void tScene::ParseObjectsNode(xmlNodePtr cur)
 				continue;
 
 			tMeshObject *object = new tMeshObject(((tMeshAsset *)asset)->GetMesh());
-			object->SetPosition(pos);
+			object->SetTransform(tTransform(tMatrix3::GetIdentity(), pos));
+			object->UpdateRigidBodyTransformation();
 			tObjectSceneObject *scene_object = new tObjectSceneObject(object);
 			AddObject(name, scene_object);
 		}

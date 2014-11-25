@@ -14,7 +14,7 @@ void PaintAxes(void);
 void CombineMatrix4(float MatrixA[16],float MatrixB[16], float *retM);
 void InverseMatrix4(float m[16], float *ret);
 tVector ApplyMatrix4(float m[16], tVector v);
-void PrintMatrix4(float m[16]);
+void PrintMatrix4(const float m[16]);
 
 int Base64Decode(char *in, size_t inLen, unsigned char *out, size_t *outLen);
 void Base64Decode(char *in, unsigned char **out, size_t *out_size);
