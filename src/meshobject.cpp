@@ -94,7 +94,7 @@ tBoundingBox tMeshObject::GetBoundingBox(void)
 
 void tMeshObject::GeometryPass(void)
 {
-	if(!visible || alpha <= 0.0)
+	if(!visible || alpha <= 0.0 || !mesh)
 		return;
 
 	float *temp = transform.GetMatrix(transform_matrix);

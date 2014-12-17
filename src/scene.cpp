@@ -45,6 +45,8 @@ bool tScene::LoadFromFile(string file)
 		cur = cur->next;
 	}
 
+	xmlFreeDoc(doc);
+
 	return true;
 }
 
