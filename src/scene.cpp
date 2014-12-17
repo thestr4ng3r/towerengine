@@ -73,8 +73,6 @@ void tScene::ParseMeshAssetNode(xmlNodePtr cur)
 	xmlNodePtr child = cur->children;
 	string name;
 
-	printf("parsing mesh asset node\n");
-
 	if(!(temp = xmlGetProp(cur, (const xmlChar *)"name")))
 			return;
 	name = string((const char *)temp);
@@ -91,12 +89,8 @@ void tScene::ParseMeshAssetNode(xmlNodePtr cur)
 		child = child->next;
 	}
 
-	printf("mmmhkay\n");
-
 	if(!file_data)
 		return;
-
-	printf("seems ok, name is %s\n", name.c_str());
 
 	tMesh *mesh = new tMesh();
 	mesh->LoadFromData((const char *)file_data, "");
@@ -160,8 +154,6 @@ void tScene::ParseMeshObjectNode(xmlNodePtr cur)
 	string mesh_asset_name;
 	tTransform transform;
 
-	printf("parsinng mesh object node\n");
-
 	if(!(temp = xmlGetProp(cur, (const xmlChar *)"name")))
 		return;
 	name = string((const char *)temp);
@@ -186,16 +178,12 @@ void tScene::ParseMeshObjectNode(xmlNodePtr cur)
 	map<string, tAsset *>::iterator asset_i;
 	tAsset *asset;
 
-	printf("trying to find mesh asset %s...\n", mesh_asset_name.c_str());
-
 	if((asset_i = assets.find(mesh_asset_name)) == assets.end())
 		return;
 	asset = asset_i->second;
 
 	if(asset->GetType() != T_ASSET_TYPE_MESH)
 		return;
-
-	printf("     ok, %s of asset %s\n", name.c_str(), mesh_asset_name.c_str());
 
 	tMeshObject *object = new tMeshObject(((tMeshAsset *)asset)->GetMesh());
 	object->SetTransform(transform);
