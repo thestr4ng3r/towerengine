@@ -53,165 +53,205 @@ bool tScene::LoadFromFile(string file)
 void tScene::ParseAssetsNode(xmlNodePtr cur)
 {
 	xmlNodePtr child = cur->children;
-	char *base64_temp;
-	unsigned char *file_data;
-	unsigned long int file_size;
 	string name;
-	const char *file_ext;
 
 	while(child)
 	{
 		if(xmlStrEqual(child->name, (const xmlChar *)"mesh"))
-		{
-			if((file_data = (unsigned char *)xmlNodeListGetString(child->doc, child->children, 1)))
-			{
-				tMesh *mesh = new tMesh();
-				mesh->LoadFromData((const char *)file_data, "");
-				name = string((const char *)xmlGetProp(child, (const xmlChar *)"name"));
-
-				assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tMeshAsset(mesh))));
-			}
-		}
+			ParseMeshAssetNode(child);
 		else if(xmlStrEqual(child->name, (const xmlChar *)"cubemap"))
-		{
-			if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
-			{
-				Base64Decode(base64_temp, &file_data, &file_size);
-				file_ext = (const char *)xmlGetProp(child, (const xmlChar *)"filename_ext");
-				name = string((const char *)xmlGetProp(child, (const xmlChar *)"name"));
-				GLuint cubemap = LoadGLCubeMapBinary(file_ext, file_data, file_size);
-
-				assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tCubeMapAsset(cubemap))));
-			}
-		}
+			ParseCubeMapAssetNode(child);
 
 		child = child->next;
 	}
 }
 
-void tScene::ParseObjectsNode(xmlNodePtr cur)
+void tScene::ParseMeshAssetNode(xmlNodePtr cur)
 {
 	xmlChar *temp;
+	unsigned char *file_data = 0;
+	xmlNodePtr child = cur->children;
 	string name;
-	string mesh_name;
-	tVector pos, dir;
-	float distance;
-	tVector color;
-	map<string, tAsset *>::iterator asset_i;
-	tAsset *asset;
 
+	printf("parsing mesh asset node\n");
+
+	if(!(temp = xmlGetProp(cur, (const xmlChar *)"name")))
+			return;
+	name = string((const char *)temp);
+
+	while(child)
+	{
+		if(xmlStrEqual(child->name, (const xmlChar *)"data"))
+		{
+			if((file_data = (unsigned char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			{
+				break; // remove this break if other things should be loaded
+			}
+		}
+		child = child->next;
+	}
+
+	printf("mmmhkay\n");
+
+	if(!file_data)
+		return;
+
+	printf("seems ok, name is %s\n", name.c_str());
+
+	tMesh *mesh = new tMesh();
+	mesh->LoadFromData((const char *)file_data, "");
+
+	assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tMeshAsset(mesh))));
+}
+
+void tScene::ParseCubeMapAssetNode(xmlNodePtr cur)
+{
+	xmlChar *temp;
+	char *base64_temp;
+	unsigned long int file_size;
+	unsigned char *file_data = 0;
+	const char *file_ext = "";
+	string name;
+
+	if(!(temp = xmlGetProp(cur, (const xmlChar *)"name")))
+			return;
+	name = string((const char *)temp);
+
+	xmlNodePtr child = cur->children;
+
+	while(child)
+	{
+		if(xmlStrEqual(child->name, (const xmlChar *)"data"))
+		{
+			if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			{
+				Base64Decode(base64_temp, &file_data, &file_size);
+				file_ext = (const char *)xmlGetProp(child, (const xmlChar *)"filename_ext");
+				break; // remove this break if other things should be loaded
+			}
+		}
+		child = child->next;
+	}
+
+	if(!file_data)
+		return;
+
+	GLuint cubemap = LoadGLCubeMapBinary(file_ext, file_data, file_size);
+	assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tCubeMapAsset(cubemap))));
+}
+
+void tScene::ParseObjectsNode(xmlNodePtr cur)
+{
 	for(xmlNodePtr child = cur->children; child; child=child->next)
 	{
 		if(xmlStrEqual(child->name, (const xmlChar *)"mesh"))
-		{
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"name")))
-				continue;
-			name = string((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"mesh")))
-				continue;
-			mesh_name = string((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"x")))
-				continue;
-			pos.x = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"y")))
-					continue;
-			pos.y = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"z")))
-				continue;
-			pos.z = atof((const char *)temp);
-
-			if((asset_i = assets.find(mesh_name)) == assets.end())
-				continue;
-			asset = asset_i->second;
-
-			if(asset->GetType() != T_ASSET_TYPE_MESH)
-				continue;
-
-			tMeshObject *object = new tMeshObject(((tMeshAsset *)asset)->GetMesh());
-			object->SetTransform(tTransform(tMatrix3::GetIdentity(), pos));
-			object->UpdateRigidBodyTransformation();
-			tObjectSceneObject *scene_object = new tObjectSceneObject(object);
-			AddObject(name, scene_object);
-		}
-
-		if(xmlStrEqual(child->name, (const xmlChar *)"dir_light"))
-		{
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"name")))
-				continue;
-			name = string((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"x")))
-				continue;
-			dir.x = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"y")))
-					continue;
-			dir.y = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"z")))
-				continue;
-			dir.z = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"r")))
-				continue;
-			color.x = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"g")))
-					continue;
-			color.y = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"b")))
-				continue;
-			color.z = atof((const char *)temp);
-
-			tDirectionalLight *dir_light = new tDirectionalLight(dir, color);
-			tDirectionalLightSceneObject *scene_object = new tDirectionalLightSceneObject(dir_light);
-			AddObject(name, scene_object);
-		}
-
-		if(xmlStrEqual(child->name, (const xmlChar *)"point_light"))
-		{
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"name")))
-				continue;
-			name = string((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"x")))
-				continue;
-			pos.x = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"y")))
-					continue;
-			pos.y = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"z")))
-				continue;
-			pos.z = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"r")))
-				continue;
-			color.x = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"g")))
-					continue;
-			color.y = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"b")))
-				continue;
-			color.z = atof((const char *)temp);
-
-			if(!(temp = xmlGetProp(child, (const xmlChar *)"dist")))
-				continue;
-			distance = atof((const char *)temp);
-
-			tPointLight *point_light = new tPointLight(pos, color, distance);
-			tPointLightSceneObject *scene_object = new tPointLightSceneObject(point_light);
-			AddObject(name, scene_object);
-		}
+			ParseMeshObjectNode(child);
+		else if(xmlStrEqual(child->name, (const xmlChar *)"dir_light"))
+			ParseDirectionalLightObjectNode(child);
+		else if(xmlStrEqual(child->name, (const xmlChar *)"point_light"))
+			ParsePointLightObjectNode(child);
 	}
+}
+
+void tScene::ParseMeshObjectNode(xmlNodePtr cur)
+{
+	xmlChar *temp;
+	string name;
+	string mesh_asset_name;
+	tTransform transform;
+
+	printf("parsinng mesh object node\n");
+
+	if(!(temp = xmlGetProp(cur, (const xmlChar *)"name")))
+		return;
+	name = string((const char *)temp);
+
+
+	xmlNodePtr child = cur->children;
+	while(child)
+	{
+		if(xmlStrEqual(child->name, (const xmlChar *)"mesh_asset"))
+		{
+			if((temp = xmlGetProp(child, (const xmlChar *)"asset")))
+			{
+				mesh_asset_name = string((const char *)temp);
+			}
+		}
+		else if(xmlStrEqual(child->name, (const xmlChar *)"transform"))
+			transform = ParseTransformNode(child);
+
+		child = child->next;
+	}
+
+	map<string, tAsset *>::iterator asset_i;
+	tAsset *asset;
+
+	printf("trying to find mesh asset %s...\n", mesh_asset_name.c_str());
+
+	if((asset_i = assets.find(mesh_asset_name)) == assets.end())
+		return;
+	asset = asset_i->second;
+
+	if(asset->GetType() != T_ASSET_TYPE_MESH)
+		return;
+
+	printf("     ok, %s of asset %s\n", name.c_str(), mesh_asset_name.c_str());
+
+	tMeshObject *object = new tMeshObject(((tMeshAsset *)asset)->GetMesh());
+	object->SetTransform(transform);
+	object->UpdateRigidBodyTransformation();
+	tObjectSceneObject *scene_object = new tObjectSceneObject(object);
+	AddObject(name, scene_object);
+}
+
+void tScene::ParseDirectionalLightObjectNode(xmlNodePtr cur)
+{
+	xmlChar *temp;
+	string name;
+	tVector direction, color;
+
+	if(!(temp = xmlGetProp(cur, (const xmlChar *)"name")))
+		return;
+	name = string((const char *)temp);
+
+
+	for(xmlNodePtr child=cur->children; child; child=child->next)
+	{
+		if(xmlStrEqual(child->name, (const xmlChar *)"direction"))
+			direction = ParseVectorNode(child);
+		else if(xmlStrEqual(child->name, (const xmlChar *)"color"))
+			color = ParseVectorNode(child, (const xmlChar *)"r", (const xmlChar *)"g", (const xmlChar *)"b");
+	}
+
+	tDirectionalLight *dir_light = new tDirectionalLight(direction, color);
+	tDirectionalLightSceneObject *scene_object = new tDirectionalLightSceneObject(dir_light);
+	AddObject(name, scene_object);
+}
+
+void tScene::ParsePointLightObjectNode(xmlNodePtr cur)
+{
+	xmlChar *temp;
+	string name;
+	tVector position, color;
+	float distance = 5.0;
+
+	if(!(temp = xmlGetProp(cur, (const xmlChar *)"name")))
+		return;
+	name = string((const char *)temp);
+
+	for(xmlNodePtr child=cur->children; child; child=child->next)
+	{
+		if(xmlStrEqual(child->name, (const xmlChar *)"position"))
+			position = ParseVectorNode(child);
+		else if(xmlStrEqual(child->name, (const xmlChar *)"color"))
+			color = ParseVectorNode(child, (const xmlChar *)"r", (const xmlChar *)"g", (const xmlChar *)"b");
+		else if(xmlStrEqual(child->name, (const xmlChar *)"distance"))
+			distance = ParseFloatNode(child);
+	}
+
+	tPointLight *point_light = new tPointLight(position, color, distance);
+	tPointLightSceneObject *scene_object = new tPointLightSceneObject(point_light);
+	AddObject(name, scene_object);
 }
 
 void tScene::ParseSceneNode(xmlNodePtr cur)
@@ -235,6 +275,60 @@ void tScene::ParseSceneNode(xmlNodePtr cur)
 			}
 		}
 	}
+}
+
+
+
+float tScene::ParseFloatNode(xmlNodePtr node, const xmlChar *p)
+{
+	float r = 0.0;
+
+	xmlChar *temp;
+
+	if((temp = xmlGetProp(node, p)))
+		r = atof((const char *)temp);
+
+	return r;
+}
+
+
+tTransform tScene::ParseTransformNode(xmlNodePtr cur)
+{
+	tVector position;
+	tMatrix3 basis;
+
+
+	for(xmlNodePtr child=cur->children; child; child=child->next)
+	{
+		if(xmlStrEqual(child->name, (const xmlChar *)"position"))
+			position = ParseVectorNode(child);
+		else if(xmlStrEqual(child->name, (const xmlChar *)"basis_x"))
+			basis.SetX(ParseVectorNode(child));
+		else if(xmlStrEqual(child->name, (const xmlChar *)"basis_y"))
+			basis.SetY(ParseVectorNode(child));
+		else if(xmlStrEqual(child->name, (const xmlChar *)"basis_z"))
+			basis.SetZ(ParseVectorNode(child));
+	}
+
+	return tTransform(basis, position);
+}
+
+tVector tScene::ParseVectorNode(xmlNodePtr cur, const xmlChar *x_p, const xmlChar *y_p, const xmlChar *z_p)
+{
+	tVector r = Vec(0.0, 0.0, 0.0);
+
+	xmlChar *temp;
+
+	if((temp = xmlGetProp(cur, x_p)))
+		r.x = atof((const char *)temp);
+
+	if((temp = xmlGetProp(cur, y_p)))
+		r.y = atof((const char *)temp);
+
+	if((temp = xmlGetProp(cur, z_p)))
+		r.z = atof((const char *)temp);
+
+	return r;
 }
 
 void tScene::AddObject(string name, tSceneObject *object)

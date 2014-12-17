@@ -14,11 +14,24 @@ class tScene
 		tCubeMapAsset *sky_cubemap;
 		tSkyBox *skybox;
 
-		void ParseAssetsNode(xmlNodePtr cur);
-		void ParseObjectsNode(xmlNodePtr cur);
 		void ParseSceneNode(xmlNodePtr cur);
 
-		void AddObject(string name, tSceneObject *object);
+		void ParseAssetsNode(xmlNodePtr cur);
+		void ParseMeshAssetNode(xmlNodePtr cur);
+		void ParseCubeMapAssetNode(xmlNodePtr cur);
+
+		void ParseObjectsNode(xmlNodePtr cur);
+		void ParseMeshObjectNode(xmlNodePtr cur);
+		void ParseDirectionalLightObjectNode(xmlNodePtr cur);
+		void ParsePointLightObjectNode(xmlNodePtr cur);
+
+		static float ParseFloatNode(xmlNodePtr cur, const xmlChar *p = (const xmlChar *)"v");
+		static tTransform ParseTransformNode(xmlNodePtr cur);
+		static tVector ParseVectorNode(xmlNodePtr cur,	const xmlChar *x_p = (const xmlChar *)"x",
+														const xmlChar *y_p = (const xmlChar *)"y",
+														const xmlChar *z_p = (const xmlChar *)"z");
+
+		void AddObject(std::string name, tSceneObject *object);
 
 	public:
 		tScene(tWorld *world);
