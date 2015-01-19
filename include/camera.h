@@ -32,6 +32,7 @@ class tCamera
 		tVector *GetFrustumPlanesPoints(void)	{ return frustum_planes_points; }
 		tVector *GetFrustumPlanesNormals(void)	{ return frustum_planes_normals; }
 		tVector *GetViewRays(void);
+		tVector GetScreenRay(float x, float y);
 
 		bool TestPointCulling(tVector point);
 		bool TestSphereCulling(tVector center, float radius);

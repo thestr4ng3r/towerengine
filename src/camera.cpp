@@ -60,6 +60,27 @@ tVector *tCamera::GetViewRays(void)
 	return c;
 }
 
+tVector tCamera::GetScreenRay(float x, float y)
+{
+	float vert, horz;
+
+	vert = tan(degtorad(angle) / 2.0);
+	horz = vert * aspect;
+
+	tVector r = Vec(x * horz, y * vert, 1.0);
+	r *= far_clip;
+
+	tVector hvec = Cross(dir, up);
+	tVector vvec = Cross(hvec, dir);
+	hvec.Normalize();
+	vvec.Normalize();
+
+	r = r.x * hvec + r.y * vvec + r.z * dir;
+
+	return r;
+
+}
+
 
 void tCamera::CalculateFrustumPlanes(void)
 {

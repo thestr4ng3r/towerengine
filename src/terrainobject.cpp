@@ -18,3 +18,16 @@ tBoundingBox tTerrainObject::GetBoundingBox(void)
 {
 	return terrain->GetBoundingBox();
 }
+
+
+void tTerrainObject::AddedToWorld(tWorld *world)
+{
+	if(rigid_body)
+		world->GetDynamicsWorld()->addRigidBody(rigid_body);
+}
+
+void tTerrainObject::RemovedFromWorld(tWorld *world)
+{
+	if(rigid_body)
+		world->GetDynamicsWorld()->removeRigidBody(rigid_body);
+}

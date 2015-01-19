@@ -47,7 +47,6 @@ set(towerengine_SRC
 	src/skybox_shader.cpp
 	src/point_shadow_shader.cpp
 	src/directional_shadow_shader.cpp
-	src/character_controller.cpp
 	src/post_process_shader.cpp
 	src/mesh_material.cpp
 	src/renderer.cpp

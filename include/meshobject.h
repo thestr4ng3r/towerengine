@@ -22,6 +22,12 @@ class tMeshObject : public tTransformObject
 
 		float *transform_matrix;
 
+		btRigidBody *rigid_body;
+		btMotionState *motion_state;
+
+	protected:
+		void TransformChanged(void);
+
 	public:
 		tMeshObject(tMesh *mesh, float mass = 0.0);
 
@@ -42,6 +48,13 @@ class tMeshObject : public tTransformObject
 		void GeometryPass(void);
 		void ForwardPass(void);
 		tBoundingBox GetBoundingBox(void);
+
+		void AddedToWorld(tWorld *world);
+		void RemovedFromWorld(tWorld *world);
+
+		btRigidBody *GetRigidBody(void)		{ return rigid_body; }
+
+		void SetTransformWithoutRigidBody(tTransform transform);
 };
 
 class tMeshObjectMotionState : public btMotionState

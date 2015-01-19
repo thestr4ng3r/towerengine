@@ -4,10 +4,6 @@
 
 class tObject
 {
-	protected:
-		btRigidBody *rigid_body;
-		btMotionState *motion_state;
-
 	public:
 		tObject(void);
 		virtual ~tObject(void) {}
@@ -16,7 +12,8 @@ class tObject
 		virtual void ForwardPass(void) {};
 		virtual tBoundingBox GetBoundingBox(void) = 0;
 
-		btRigidBody *GetRigidBody(void)		{ return rigid_body; }
+		virtual void AddedToWorld(tWorld *world) {};
+		virtual void RemovedFromWorld(tWorld *world) {};
 };
 
 class tTransformObject : public tObject
@@ -24,13 +21,14 @@ class tTransformObject : public tObject
 	protected:
 		tTransform transform;
 
+		virtual void TransformChanged(void) {}
+
 	public:
 		tTransformObject(void)						{ this->transform = tTransform::GetIdentity(); }
 		tTransformObject(tTransform transform)		{ this->transform = transform; }
 
 		tTransform GetTransform(void)				{ return transform; }
 		void SetTransform(tTransform transform);
-		void SetTransformWithoutRigidBody(tTransform transform);
 };
 
 

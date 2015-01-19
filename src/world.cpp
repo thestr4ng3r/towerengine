@@ -37,9 +37,8 @@ void tWorld::AddObject(tObject *o)
 			return;
 
 	objects.push_back(o);
+	o->AddedToWorld(this);
 
-	if(o->GetRigidBody())
-		physics.dynamics_world->addRigidBody(o->GetRigidBody());
 }
 
 void tWorld::RemoveObject(tObject *o)
@@ -49,9 +48,8 @@ void tWorld::RemoveObject(tObject *o)
 	for(i=objects.begin(); i!=objects.end(); i++)
 		if(*i == o)
 		{
-			if((*i)->GetRigidBody())
-				physics.dynamics_world->removeRigidBody((*i)->GetRigidBody());
 			objects.erase(i);
+			o->RemovedFromWorld(this);
 			return;
 		}
 }

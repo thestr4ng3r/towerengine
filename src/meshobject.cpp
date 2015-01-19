@@ -7,6 +7,8 @@
 tMeshObject::tMeshObject(tMesh *mesh, float mass) : tTransformObject()
 {
 	this->mesh = mesh;
+	rigid_body = 0;
+	motion_state = 0;
 	animation = 0;
 	pose = cstr("Idle");
 	animation_mode = 0;
@@ -42,7 +44,35 @@ tMeshObject::tMeshObject(tMesh *mesh, float mass) : tTransformObject()
 	{
 		rigid_body = 0;
 	}
+
+	if(rigid_body)
+		rigid_body->setUserPointer(this);
 }
+
+void tMeshObject::TransformChanged(void)
+{
+	if(rigid_body)
+		rigid_body->setWorldTransform(transform.ToBtTransform());
+}
+
+void tMeshObject::SetTransformWithoutRigidBody(tTransform transform)
+{
+	this->transform = transform;
+}
+
+
+void tMeshObject::AddedToWorld(tWorld *world)
+{
+	if(rigid_body)
+		world->GetDynamicsWorld()->addRigidBody(rigid_body);
+}
+
+void tMeshObject::RemovedFromWorld(tWorld *world)
+{
+	if(rigid_body)
+		world->GetDynamicsWorld()->removeRigidBody(rigid_body);
+}
+
 
 void tMeshObject::SetAnimation(const char *animation)
 {
