@@ -61,9 +61,7 @@ add_definitions(-g -Wall)
 
 add_library(towerengine SHARED ${towerengine_SRC})
 
-find_package(LibXml2 REQUIRED)
-include_directories(${LIBXML2_INCLUDE_DIR})
-target_link_libraries(towerengine ${LIBXML2_LIBRARIES})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/rapidxml)
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})

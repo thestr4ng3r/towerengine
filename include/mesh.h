@@ -14,6 +14,14 @@
 
 template <class T> class tVBO;
 
+// rapidxml forward declarations
+namespace rapidxml
+{
+    template<class Ch> class xml_node;
+    template<class Ch> class xml_attribute;
+    template<class Ch> class xml_document;
+}
+
 class tMesh
 {
 	private:
@@ -66,13 +74,13 @@ class tMesh
 		void RefreshAllVBOs(void);
 		void DeleteVBOData(void);
 
-		tVertex *ParseVertexNode(xmlNodePtr cur);
-		tMeshMaterial *ParseMaterialNode(xmlNodePtr cur, const char *path);
-		tTriangle *ParseTriangleNode(xmlNodePtr cur);
-		tMeshPose *ParsePoseNode(xmlNodePtr cur);
-		tAnimation *ParseAnimationNode(xmlNodePtr cur);
-		tKeyFrame *ParseKeyFrameNode(xmlNodePtr cur, tAnimation *anim);
-		tEntity *ParseEntityNode(xmlNodePtr cur);
+		tVertex *ParseVertexNode(rapidxml::xml_node<char> *cur);
+		tMeshMaterial *ParseMaterialNode(rapidxml::xml_node<char> *cur, const char *path);
+		tTriangle *ParseTriangleNode(rapidxml::xml_node<char> *cur);
+		tMeshPose *ParsePoseNode(rapidxml::xml_node<char> *cur);
+		tAnimation *ParseAnimationNode(rapidxml::xml_node<char> *cur);
+		tKeyFrame *ParseKeyFrameNode(rapidxml::xml_node<char> *cur, tAnimation *anim);
+		tEntity *ParseEntityNode(rapidxml::xml_node<char> *cur);
 
 	public:
 		static float color[4];
@@ -88,12 +96,9 @@ class tMesh
 		#endif
 
 		bool LoadFromFile(const char *file, int no_material = 0);
-		bool LoadFromData(const char *data, const char *path = "");
-		bool LoadFromXML(xmlDocPtr doc, const char *path, int no_material);
+		bool LoadFromData(char *data, const char *path = "");
+		bool LoadFromXML(rapidxml::xml_document<char> *doc, const char *path, int no_material);
         //int LoadFromFile_0_0(const char *file) { printf("LoadFromFile_0_0 function was removed.\n"); return 0; };
-        int SaveToFile(const char *file);
- 	    int SaveToFile_0_1(const char *file);
-		int SaveToFile_old(const char *file);
 		//void SetOrientation(CVector o);
 		//CVector ApplyOrientation(CVector v) { return Orientation(v, orient_x, orient_y, orient_z); };
 		void PutToGL(void);

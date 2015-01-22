@@ -1,5 +1,7 @@
 #include "towerengine.h"
 
+#include <fstream>
+
 char *ftoa(float f, int len)
 {
 	char *buf = new char[len + 1];
@@ -238,14 +240,46 @@ float Mix(float a, float b, float mix)
 }
 
 
-xmlNodePtr WriteDataXMLNode(const char *data, unsigned int size, xmlDocPtr doc)
+char *ReadFile(const char *file, size_t &size)
 {
+	ifstream in;
+	in.open(file, ios::in | ios::binary | ios::ate);
+
+	if(in.is_open())
+	{
+		in.seekg(0, ios::end);
+		size = (size_t)in.tellg();
+		in.seekg(0, ios::beg);
+
+		char *data = new char[size];
+		in.read(data, size);
+		return data;
+	}
+
 	return 0;
 }
 
 
+char *ReadFile(const char *file)
+{
+	size_t size;
+	ifstream in;
+	in.open(file, ios::in | ios::binary | ios::ate);
 
+	if(in.is_open())
+	{
+		in.seekg(0, ios::end);
+		size = (size_t)in.tellg();
+		in.seekg(0, ios::beg);
 
+		char *data = new char[size + 1];
+		in.read(data, size);
+		data[size] = 0;
+		return data;
+	}
+
+	return 0;
+}
 
 
 

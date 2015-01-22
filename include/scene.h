@@ -3,6 +3,15 @@
 #define _SCENE_H
 
 
+// rapidxml forward declarations
+namespace rapidxml
+{
+    template<class Ch> class xml_node;
+    template<class Ch> class xml_attribute;
+    template<class Ch> class xml_document;
+}
+
+
 class tScene
 {
 	private:
@@ -14,22 +23,22 @@ class tScene
 		tCubeMapAsset *sky_cubemap;
 		tSkyBox *skybox;
 
-		void ParseSceneNode(xmlNodePtr cur);
+		void ParseSceneNode(rapidxml::xml_node<char> *cur);
 
-		void ParseAssetsNode(xmlNodePtr cur);
-		void ParseMeshAssetNode(xmlNodePtr cur);
-		void ParseCubeMapAssetNode(xmlNodePtr cur);
+		void ParseAssetsNode(rapidxml::xml_node<char> *cur);
+		void ParseMeshAssetNode(rapidxml::xml_node<char> *cur);
+		void ParseCubeMapAssetNode(rapidxml::xml_node<char> *cur);
 
-		void ParseObjectsNode(xmlNodePtr cur);
-		void ParseMeshObjectNode(xmlNodePtr cur);
-		void ParseDirectionalLightObjectNode(xmlNodePtr cur);
-		void ParsePointLightObjectNode(xmlNodePtr cur);
+		void ParseObjectsNode(rapidxml::xml_node<char> *cur);
+		void ParseMeshObjectNode(rapidxml::xml_node<char> *cur);
+		void ParseDirectionalLightObjectNode(rapidxml::xml_node<char> *cur);
+		void ParsePointLightObjectNode(rapidxml::xml_node<char> *cur);
 
-		static float ParseFloatNode(xmlNodePtr cur, const xmlChar *p = (const xmlChar *)"v");
-		static tTransform ParseTransformNode(xmlNodePtr cur);
-		static tVector ParseVectorNode(xmlNodePtr cur,	const xmlChar *x_p = (const xmlChar *)"x",
-														const xmlChar *y_p = (const xmlChar *)"y",
-														const xmlChar *z_p = (const xmlChar *)"z");
+		static float ParseFloatNode(rapidxml::xml_node<char> *cur, const char *p = "v");
+		static tTransform ParseTransformNode(rapidxml::xml_node<char> *cur);
+		static tVector ParseVectorNode(rapidxml::xml_node<char> *cur,	const char *x_p = "x",
+																		const char *y_p = "y",
+																		const char *z_p = "z");
 
 		void AddObject(std::string name, tSceneObject *object);
 

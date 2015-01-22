@@ -45,9 +45,6 @@ using namespace std;
 #include <IL/il.h>
 #include <IL/ilu.h>
 
-#include <libxml/tree.h>
-
-
 #include <btBulletDynamicsCommon.h>
 #include <btBulletCollisionCommon.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>

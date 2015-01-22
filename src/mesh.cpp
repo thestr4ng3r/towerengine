@@ -1,6 +1,8 @@
 #include "towerengine.h"
 
-#define FILE_MODUS_MAT 0
+#include "rapidxml.hpp"
+
+/*#define FILE_MODUS_MAT 0
 #define FILE_MODUS_VERT 1
 #define FILE_MODUS_TRI 2
 #define FILE_MODUS_POS 3
@@ -14,7 +16,7 @@
 
 #define READ_MODUS_FINISH 1
 #define READ_MODUS_READ -1
-#define READ_MODUS_VALUES 0
+#define READ_MODUS_VALUES 0*/
 
 
 tVector light_dir;
@@ -24,6 +26,7 @@ tVector ambient_color;
 tVector light_attenuation;
 
 
+using namespace rapidxml;
 
 
 
@@ -663,7 +666,13 @@ bool tMesh::LoadFromFile(const char *file, int no_material)
 	
 	path = PathOfFile(file);
 
-	r = LoadFromXML(xmlParseFile(file), path, no_material);
+	char *data = ReadFile(file);
+
+	xml_document<> *doc = new xml_document<>();
+	doc->parse<0>(data);
+	r = LoadFromXML(doc, path, no_material);
+
+	delete [] data;
 
 	refresh_vbos = true;
 	refresh_ibos = true;
@@ -671,11 +680,14 @@ bool tMesh::LoadFromFile(const char *file, int no_material)
 	return r;
 }
 
-bool tMesh::LoadFromData(const char *data, const char *path)
+bool tMesh::LoadFromData(char *data, const char *path)
 {
 	bool r;
 
-	r = LoadFromXML(xmlParseDoc((const xmlChar *)data), path, 0);
+	xml_document<> *doc = new xml_document<>();
+	doc->parse<0>(data);
+
+	r = LoadFromXML(doc, path, 0);
 
 	refresh_vbos = true;
 	refresh_ibos = true;
@@ -694,66 +706,64 @@ int TEMVersionFromString(const char *s)
 	return -1;
 }
 
-bool tMesh::LoadFromXML(xmlDocPtr doc, const char *path, int no_material)
+bool tMesh::LoadFromXML(xml_document<> *doc, const char *path, int no_material)
 {
-	xmlNodePtr cur;
-	char *version_string;
+	xml_node<> *cur;
+	xml_attribute<> *attr;
 
 	if(!doc)
 		return 0;
 
-	cur = xmlDocGetRootElement(doc);
+	cur = doc->first_node();
 	if(!cur)
 		return 0;
 
-	if(xmlStrcmp(cur->name, (const xmlChar *)"tmesh"))
+	if(strcmp(cur->name(), "tmesh") != 0)
 		return 0;
 
-	version_string = (char *)xmlGetProp(cur, (const xmlChar *)"version");
-	if(!version_string)
+	attr = cur->first_attribute("version");
+	if(!attr)
 	{
-		printf("WARNING: File does not contain version info. Assuming it is %s.\n", TEM_VERSION_0_1_STRING);
-		file_version = TEM_VERSION_0_1;
+		printf("WARNING: File does not contain version info. Assuming it is %s.\n", TEM_CURRENT_VERSION_STRING);
+		file_version = TEM_CURRENT_VERSION;
 	}
 	else
 	{
-		file_version = TEMVersionFromString(version_string);
+		file_version = TEMVersionFromString(attr->value());
 		if(file_version == -1)
 		{
-			printf("WARNING: Version \"%s\" of could not be recognized. Assuming it is %s.\n",
-					version_string, TEM_CURRENT_VERSION_STRING);
+			printf("WARNING: Version of mesh file could not be recognized. Assuming it is %s.\n", TEM_CURRENT_VERSION_STRING);
 			file_version = TEM_CURRENT_VERSION;
 		}
 		else if(file_version != TEM_CURRENT_VERSION)
 		{
-			printf("WARNING: Version \"%s\" of is outdated. Use \"%s\" instead.\n",
-					version_string, TEM_CURRENT_VERSION_STRING);
+			printf("WARNING: Version of mesh file of is outdated. Only %s is supported\n", TEM_CURRENT_VERSION_STRING);
+			return false;
 		}
 	}
 
 	Create();
 
-	cur = cur->children;
+	cur = cur->first_node();
 
 	while(cur)
 	{
-		if(xmlStrcmp(cur->name, (const xmlChar *)"vertex") == 0)
+		char *name = cur->name();
+
+		if(strcmp(name, "vertex") == 0)
 			ParseVertexNode(cur);
-		if(xmlStrcmp(cur->name, (const xmlChar *)"material") == 0 && !no_material)
+		if(strcmp(name, "material") == 0 && !no_material)
 			ParseMaterialNode(cur, path);
-		if(xmlStrcmp(cur->name, (const xmlChar *)"triangle") == 0)
+		if(strcmp(name, "triangle") == 0)
 			ParseTriangleNode(cur);
-		if(xmlStrcmp(cur->name, (const xmlChar *)"pose") == 0 || xmlStrcmp(cur->name, (const xmlChar *)"position") == 0)
+		if(strcmp(name, "pose") == 0 || strcmp(name, "position") == 0)
 			ParsePoseNode(cur);
-		if(xmlStrcmp(cur->name, (const xmlChar *)"animation") == 0)
+		if(strcmp(name, "animation") == 0)
 			ParseAnimationNode(cur);
-		if(xmlStrcmp(cur->name, (const xmlChar *)"entity") == 0)
+		if(strcmp(name, "entity") == 0)
 			ParseEntityNode(cur);
 
-
-		//CallRefresh();
-
-		cur = cur->next;
+		cur = cur->next_sibling();
 	}
 
 
@@ -768,7 +778,7 @@ bool tMesh::LoadFromXML(xmlDocPtr doc, const char *path, int no_material)
 	return 1;
 }
 
-tVertex *tMesh::ParseVertexNode(xmlNodePtr cur)
+tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 {
 	int id;
 	tVector p;
@@ -776,19 +786,18 @@ tVertex *tMesh::ParseVertexNode(xmlNodePtr cur)
 	tVector2 uv;
 	tVertex *r;
 
-	id = atoi((const char *)xmlGetProp(cur, (const xmlChar *)"id"));
-	p.x = atof((const char *)xmlGetProp(cur, (const xmlChar *)"x"));
-	p.y = atof((const char *)xmlGetProp(cur, (const xmlChar *)"y"));
-	p.z = atof((const char *)xmlGetProp(cur, (const xmlChar *)"z"));
+	// TODO: check if attributes really are found
 
-	if(file_version >= TEM_VERSION_0_2)
-	{
-		uv.x = atof((const char *)xmlGetProp(cur, (const xmlChar *)"u"));
-		uv.y = atof((const char *)xmlGetProp(cur, (const xmlChar *)"v"));
-		normal.x = atof((const char *)xmlGetProp(cur, (const xmlChar *)"nx"));
-		normal.y = atof((const char *)xmlGetProp(cur, (const xmlChar *)"ny"));
-		normal.z = atof((const char *)xmlGetProp(cur, (const xmlChar *)"nz"));
-	}
+	id = atoi(cur->first_attribute("id")->value());
+	p.x = atof(cur->first_attribute("x")->value());
+	p.y = atof(cur->first_attribute("y")->value());
+	p.z = atof(cur->first_attribute("z")->value());
+
+	uv.x = atof(cur->first_attribute("u")->value());
+	uv.y = atof(cur->first_attribute("v")->value());
+	normal.x = atof(cur->first_attribute("nx")->value());
+	normal.y = atof(cur->first_attribute("ny")->value());
+	normal.z = atof(cur->first_attribute("nz")->value());
 
 	r = new tVertex(p, this);
 	SetVertexId(r, id);
@@ -798,13 +807,15 @@ tVertex *tMesh::ParseVertexNode(xmlNodePtr cur)
 	return r;
 }
 
+
 #define TEXTURE_DISABLED 0
 #define TEXTURE_FILE 1
 #define TEXTURE_DATA 2
 
-tMeshMaterial *tMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
+
+tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, const char *path)
 {
-	xmlNodePtr child;
+	xml_node<> *child;
 	int diffuse_mode, specular_mode, normal_mode, bump_mode;
 	string diffuse_file; tVector diffuse_color;
 	string specular_file; float exponent; tVector specular_color;
@@ -817,7 +828,7 @@ tMeshMaterial *tMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 	char *base64_temp;
 
 	string name;
-	xmlChar *temp;
+	xml_attribute<> *attr;
 	tMeshMaterial *r;
 
 	diffuse_mode = specular_mode = normal_mode = bump_mode = TEXTURE_DISABLED;
@@ -829,99 +840,120 @@ tMeshMaterial *tMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 	exponent = 8.0;
 	bump_depth = 0.0;
 
-	name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
+	if(!(attr = cur->first_attribute("name")))
+		return 0;
 
-	child = cur->children;
+	name = string(attr->value());
+
+	child = cur->first_node();
 	while(child)
 	{
-		if(!xmlStrcmp(child->name, (const xmlChar *)"diffuse"))
+		char *name_temp = child->name();
+
+		if(strcmp(name_temp, "diffuse") == 0)
 		{
-			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
+			if((attr = child->first_attribute("file")))
 			{
-				diffuse_file = string((const char *)temp);
+				diffuse_file = string(attr->value());
 				diffuse_mode = TEXTURE_FILE;
 			}
-			else if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			else if(child->value_size() > 0)
 			{
+				base64_temp = child->value();
+
 				Base64Decode(base64_temp, &diffuse_data, &diffuse_size);
-				if((temp = xmlGetProp(child, (const xmlChar *)"image-extension")))
-					diffuse_ext = (char *)temp;
+
+				attr = child->first_attribute("image-extension");
+				if(attr)
+					diffuse_ext = attr->value();
 				else
 					diffuse_ext = 0;
 				diffuse_mode = TEXTURE_DATA;
 			}
 
-			if((temp = xmlGetProp(child, (const xmlChar *)"r")))
-				diffuse_color.r = atof((const char *)temp);
-			if((temp = xmlGetProp(child, (const xmlChar *)"g")))
-				diffuse_color.g = atof((const char *)temp);
-			if((temp = xmlGetProp(child, (const xmlChar *)"b")))
-				diffuse_color.b = atof((const char *)temp);
+			if((attr = child->first_attribute("r")))
+				diffuse_color.r = atof(attr->value());
+			if((attr = child->first_attribute("g")))
+				diffuse_color.g = atof(attr->value());
+			if((attr = child->first_attribute("b")))
+				diffuse_color.b = atof(attr->value());
 		}
-		if(!xmlStrcmp(child->name, (const xmlChar *)"specular"))
+		if(strcmp(name_temp, "specular") == 0)
 		{
-			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
+			if((attr = child->first_attribute("file")))
 			{
-				specular_file = string((const char *)temp);
+				specular_file = string(attr->value());
 				specular_mode = TEXTURE_FILE;
 			}
-			else if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			else if(child->value_size() > 0)
 			{
+				base64_temp = child->value();
+
 				Base64Decode(base64_temp, &specular_data, &specular_size);
-				if((temp = xmlGetProp(child, (const xmlChar *)"image-extension")))
-					specular_ext = (char *)temp;
+
+				attr = child->first_attribute("image-extension");
+				if(attr)
+					specular_ext = attr->value();
 				else
 					specular_ext = 0;
 				specular_mode = TEXTURE_DATA;
 			}
-			if((temp = xmlGetProp(child, (const xmlChar *)"exponent")))
-				exponent = atof((const char *)temp);
-			if((temp = xmlGetProp(child, (const xmlChar *)"r")))
-				specular_color.r = atof((const char *)temp);
-			if((temp = xmlGetProp(child, (const xmlChar *)"g")))
-				specular_color.g = atof((const char *)temp);
-			if((temp = xmlGetProp(child, (const xmlChar *)"b")))
-				specular_color.b = atof((const char *)temp);
+			if((attr = child->first_attribute("exponent")))
+				exponent = atof(attr->value());
+			if((attr = child->first_attribute("r")))
+				specular_color.r = atof(attr->value());
+			if((attr = child->first_attribute("g")))
+				specular_color.g = atof(attr->value());
+			if((attr = child->first_attribute("b")))
+				specular_color.b = atof(attr->value());
 		}
-		if(!xmlStrcmp(child->name, (const xmlChar *)"normal"))
+		if(strcmp(name_temp, "normal") == 0)
 		{
-			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
+			if((attr = child->first_attribute("file")))
 			{
-				normal_file = string((const char *)temp);
+				normal_file = string(attr->value());
 				normal_mode = TEXTURE_FILE;
 			}
-			else if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			else if(child->value_size() > 0)
 			{
+				base64_temp = child->value();
+
 				Base64Decode(base64_temp, &normal_data, &normal_size);
-				if((temp = xmlGetProp(child, (const xmlChar *)"image-extension")))
-					normal_ext = (char *)temp;
+
+				attr = child->first_attribute("image-extension");
+				if(attr)
+					normal_ext = attr->value();
 				else
 					normal_ext = 0;
 				normal_mode = TEXTURE_DATA;
 			}
 
 		}
-		if(!xmlStrcmp(child->name, (const xmlChar *)"bump"))
+		if(strcmp(name_temp, "bump") == 0)
 		{
-			if((temp = xmlGetProp(child, (const xmlChar *)"file")))
+			if((attr = child->first_attribute("file")))
 			{
-				bump_file = string((const char *)temp);
+				bump_file = string(attr->value());
 				bump_mode = TEXTURE_FILE;
 			}
-			else if((base64_temp = (char *)xmlNodeListGetString(child->doc, child->children, 1)))
+			else if(child->value_size() > 0)
 			{
+				base64_temp = child->value();
+
 				Base64Decode(base64_temp, &bump_data, &bump_size);
-				if((temp = xmlGetProp(child, (const xmlChar *)"image-extension")))
-					bump_ext = (char *)temp;
+
+				attr = child->first_attribute("image-extension");
+				if(attr)
+					bump_ext = attr->value();
 				else
 					bump_ext = 0;
 				bump_mode = TEXTURE_DATA;
 			}
-			if((temp = xmlGetProp(child, (const xmlChar *)"depth")))
-				bump_depth = atof((const char *)temp);
+			if((attr = child->first_attribute("depth")))
+				bump_depth = atof(attr->value());
 		}
 
-		child = child->next;
+		child = child->next_sibling();
 	}
 
 	r = new tMeshMaterial(this, name);
@@ -931,9 +963,11 @@ tMeshMaterial *tMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 	r->SetSpecular(specular_color, exponent);
 	r->SetBump(bump_depth);
 
-
 	if(diffuse_mode == TEXTURE_FILE)
+	{
 		r->LoadDiffuseTextureURL(string(path) + diffuse_file);
+		printf("loading texture \"%s\"\n", (string(path) + diffuse_file).c_str());
+	}
 	else if(diffuse_mode == TEXTURE_DATA)
 		r->LoadDiffuseTextureBinary(diffuse_ext, diffuse_data, diffuse_size);
 
@@ -955,92 +989,70 @@ tMeshMaterial *tMesh::ParseMaterialNode(xmlNodePtr cur, const char *path)
 	return r;
 }
 
-tTriangle *tMesh::ParseTriangleNode(xmlNodePtr cur)
+tTriangle *tMesh::ParseTriangleNode(xml_node<> *cur)
 {
-	char *material;
+	char *material = 0;
 	int v[3];
 	int i;
 	tVector uv[3];
 	tVertex *vt[3];
 	tTriangle *r;
-	xmlNodePtr child;
+	xml_node<> *child;
+	xml_attribute<> *attr;
 
-	material = (char *)xmlGetProp(cur, (const xmlChar *)"mat");
 
-	child = cur->children;
-	i = 0;
-	for(i=0; i<3 && child; child=child->next)
+	if((attr = cur->first_attribute("mat")))
+		material = attr->value();
+
+	child = cur->first_node("vertex");
+	for(i=0; i<3 && child; child=child->next_sibling("vertex"))
 	{
-		if(xmlStrcmp(child->name, (const xmlChar *)"vertex"))
+		attr = child->first_attribute("id");
+		if(!attr)
 			continue;
 
-		v[i] = atoi((const char *)xmlGetProp(child, (const xmlChar *)"id"));
+		v[i] = atoi(attr->value());
 		vt[i] = GetVertexByID(v[i]);
 
-		if(file_version < TEM_VERSION_0_2)
-		{
-			uv[i].x = atof((const char *)xmlGetProp(child, (const xmlChar *)"u"));
-			uv[i].y = atof((const char *)xmlGetProp(child, (const xmlChar *)"v"));
-			uv[i].z = 0.0;
-
-			if(!vt[i]->uv_set)
-			{
-				vt[i]->uv = uv[i].xy();
-				vt[i]->uv_set = true;
-			}
-			else if(vt[i]->uv.x != uv[i].x || vt[i]->uv.y != uv[i].y)
-			{
-				vt[i] = CreateVertex(*vt[i]);
-				vt[i]->uv = uv[i].xy();
-				SetVertexId(vt[i], v[i]);
-			}
-		}
 		i++;
 	}
-	if(i<2)
-	{
-		printf("Warning: Triangle has less than 3 Vertices! Ignoring...\n");
+
+	if(i<2) // less than 3 vertices
 		return 0;
-	}
 
 	r = CreateTriangle(vt[0], vt[1], vt[2], Vec(1.0, 1.0, 1.0), material, uv[0], uv[1], uv[2]);
 	return r;
 }
 
-tMeshPose *tMesh::ParsePoseNode(xmlNodePtr cur)
+tMeshPose *tMesh::ParsePoseNode(xml_node<> *cur)
 {
 	char *name;
-	xmlNodePtr child;
+	xml_node<> *child;
 	int count;
 	int i;
 	int *vert;
 	tVector *vec;
 	tMeshPose *r;
 
-	name = (char *)xmlGetProp(cur, (const xmlChar *)"name");
+	name = cur->first_attribute("name")->value();
 
-	child = cur->children;
+	child = cur->first_node("vertex");
 	count = 0;
 	while(child)
 	{
-		if(xmlStrcmp(child->name, (const xmlChar *)"vertex") == 0)
-			count++;
-		child = child->next;
+		count++;
+		child = child->next_sibling("vertex");
 	}
 
 	vert = new int[count];
 	vec = new tVector[count];
 
-	child = cur->children;
-	for(child = cur->children, i=0; child && i<count; child = child->next)
+	for(child = cur->first_node("vertex"), i=0; child && i<count; child = child->next_sibling("vertex"))
 	{
-		if(xmlStrcmp(child->name, (const xmlChar *)"vertex"))
-			continue;
-
-		vert[i] = atoi((char *)xmlGetProp(child, (const xmlChar *)"id"));
-		vec[i].x = atof((char *)xmlGetProp(child, (const xmlChar *)"x"));
-		vec[i].y = atof((char *)xmlGetProp(child, (const xmlChar *)"y"));
-		vec[i].z = atof((char *)xmlGetProp(child, (const xmlChar *)"z"));
+		vert[i] = atoi(child->first_attribute("id")->value());
+		vec[i].x = atof(child->first_attribute("x")->value());
+		vec[i].y = atof(child->first_attribute("y")->value());
+		vec[i].z = atof(child->first_attribute("z")->value());
 
 		i++;
 	}
@@ -1051,63 +1063,65 @@ tMeshPose *tMesh::ParsePoseNode(xmlNodePtr cur)
 	return r;
 }
 
-tAnimation *tMesh::ParseAnimationNode(xmlNodePtr cur)
+tAnimation *tMesh::ParseAnimationNode(xml_node<> *cur)
 {
 	char *name;
 	float len;
-	xmlNodePtr child;
+	xml_node<> *child;
+	xml_attribute<> *attr;
 	tAnimation *r;
 
-	name = (char *)xmlGetProp(cur, (const xmlChar *)"name");
-	len = atof((char *)xmlGetProp(cur, (const xmlChar *)"len"));
+	if(!(attr = cur->first_attribute("name")))
+		return 0;
+
+	name = attr->value();
+
+	if(!(attr = cur->first_attribute("len")))
+		return 0;
+	len = atof(attr->value());
 
 	r = new tAnimation(this, name, len, 0);
 
-	for(child = cur->children; child; child = child->next)
+	for(child = cur->first_node("frame"); child; child = child->next_sibling("frame"))
 	{
-		if(xmlStrcmp(child->name, (const xmlChar *)"frame"))
-			continue;
 		ParseKeyFrameNode(child, r);
 	}
 
 	return r;
 }
 
-tKeyFrame *tMesh::ParseKeyFrameNode(xmlNodePtr cur, tAnimation *anim)
+tKeyFrame *tMesh::ParseKeyFrameNode(xml_node<> *cur, tAnimation *anim)
 {
 	float time;
-	xmlNodePtr child;
+	xml_node<> *child;
 	int count;
 	int i;
 	int *vert;
 	tVector *vec;
 	tKeyFrame *r;
+	xml_attribute<> *attr;
 
-	time = atof((char *)xmlGetProp(cur, (const xmlChar *)"time"));
+	if(!(attr = cur->first_attribute("time")))
+		return 0;
+	time = atof(attr->value());
 
-	child = cur->children;
+	child = cur->first_node("vertex");
 	count = 0;
 	while(child)
 	{
-		if(xmlStrcmp(child->name, (const xmlChar *)"vertex") == 0)
-			count++;
-		child = child->next;
+		count++;
+		child = child->next_sibling("vertex");
 	}
 
 	vert = new int[count];
 	vec = new tVector[count];
 
-
-	child = cur->children;
-	for(child = cur->children, i=0; child && i<count; child = child->next)
+	for(child = cur->first_node("vertex"), i=0; child && i<count; child = child->first_node("vertex"))
 	{
-		if(xmlStrcmp(child->name, (const xmlChar *)"vertex"))
-			continue;
-
-		vert[i] = atoi((char *)xmlGetProp(child, (const xmlChar *)"id"));
-		vec[i].x = atof((char *)xmlGetProp(child, (const xmlChar *)"x"));
-		vec[i].y = atof((char *)xmlGetProp(child, (const xmlChar *)"y"));
-		vec[i].z = atof((char *)xmlGetProp(child, (const xmlChar *)"z"));
+		vert[i] = atoi(child->first_attribute("id")->value());
+		vec[i].x = atof(child->first_attribute("x")->value());
+		vec[i].y = atof(child->first_attribute("y")->value());
+		vec[i].z = atof(child->first_attribute("z")->value());
 
 		i++;
 	}
@@ -1116,257 +1130,95 @@ tKeyFrame *tMesh::ParseKeyFrameNode(xmlNodePtr cur, tAnimation *anim)
 	return r;
 }
 
-int tMesh::SaveToFile(const char *file)
-{
-	printf("CMesh::SaveToFile does not do anything at the moment.\n");
-	return 0;
-	/*xmlDocPtr doc;
-	xmlNodePtr root;
-	xmlNodePtr cur;
-	xmlNodePtr child;
-	xmlNodePtr child2;
-	xmlChar *buf;
-	int buffer_size;
-	int i;
-	
-	vector<CMeshMaterial *>::iterator m;
-	vector<CVertex *>::iterator v;
-	CVertex *vt;
-	vector<CTriangle *>::iterator t;
-	map<string, CMeshPosition *>::iterator p;
-	map<CVertex *, CVector>::iterator vp;
-	CVertex *pv;
-	CVector pp;
-	vector<CAnimation *>::iterator a;
-	CKeyFrame *k;
-	vector<CEntity *>::iterator e;
-	map<string, CEntityAttribute *>::iterator ea;
 
-	SetIDs();
-	ChangePosition(idle_pose);
-
-	doc = xmlNewDoc((const xmlChar *)"1.0");
-	root = xmlNewNode(0, (const xmlChar *)"tmesh");
-	xmlNewProp(root, (const xmlChar *)"version", (const xmlChar *)TEM_CURRENT_VERSION_STRING);
-	xmlDocSetRootElement(doc, root);
-
-	for(m=materials.begin(); m!=materials.end(); m++)
-	{
-		if((*m)->GetName().length() == 0)
-			continue;
-
-		cur = xmlNewNode(0, (const xmlChar *)"material");
-		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)(*m)->GetName().c_str());
-
-
-		CMeshMaterial::Diffuse diffuse = (*m)->GetDiffuse();
-		CMeshMaterial::Specular specular = (*m)->GetSpecular();
-		CMeshMaterial::Normal normal = (*m)->GetNormal();
-		CMeshMaterial::Height height = (*m)->GetHeight();
-
-		if(diffuse.enabled)
-		{
-			child = xmlNewNode(0, (const xmlChar *)"diffuse");
-			xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)diffuse.filename.c_str());
-			xmlAddChild(cur, child);
-		}
-
-		if(specular.enabled)
-		{
-			child = xmlNewNode(0, (const xmlChar *)"specular");
-			xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)specular.filename.c_str());
-			xmlNewProp(child, (const xmlChar *)"exponent", (const xmlChar *)ftoa(specular.exponent));
-			xmlAddChild(cur, child);
-		}
-
-		if(normal.enabled)
-		{
-			child = xmlNewNode(0, (const xmlChar *)"normal");
-			xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)normal.filename.c_str());
-			xmlAddChild(cur, child);
-		}
-
-		if(height.enabled)
-		{
-			child = xmlNewNode(0, (const xmlChar *)"height");
-			xmlNewProp(child, (const xmlChar *)"file", (const xmlChar *)height.filename.c_str());
-			xmlNewProp(child, (const xmlChar *)"factor", (const xmlChar *)ftoa(height.factor));
-			xmlAddChild(cur, child);
-		}
-
-		xmlAddChild(root, cur);
-	}
-
-	for(v=vertices.begin(); v!=vertices.end(); v++)
-	{
-		vt = *v;
-		cur = xmlNewNode(0, (const xmlChar *)"vertex");
-		xmlNewProp(cur, (const xmlChar *)"id", (const xmlChar *)itoa(vt->id));
-		xmlNewProp(cur, (const xmlChar *)"x", (const xmlChar *)ftoa(vt->x));
-		xmlNewProp(cur, (const xmlChar *)"y", (const xmlChar *)ftoa(vt->y));
-		xmlNewProp(cur, (const xmlChar *)"z", (const xmlChar *)ftoa(vt->z));
-		xmlNewProp(cur, (const xmlChar *)"u", (const xmlChar *)ftoa(vt->uv.x));
-		xmlNewProp(cur, (const xmlChar *)"v", (const xmlChar *)ftoa(vt->uv.y));
-		xmlNewProp(cur, (const xmlChar *)"nx", (const xmlChar *)ftoa(vt->normal.x));
-		xmlNewProp(cur, (const xmlChar *)"ny", (const xmlChar *)ftoa(vt->normal.y));
-		xmlNewProp(cur, (const xmlChar *)"nz", (const xmlChar *)ftoa(vt->normal.z));
-		xmlAddChild(root, cur);
-	}
-
-    for(t=triangles.begin(); t!=triangles.end(); t++)
-	{
-		cur = xmlNewNode(0, (const xmlChar *)"triangle");
-		xmlNewProp(cur, (const xmlChar *)"mat", (const xmlChar *)(*t)->m_name);
-		for(i=0; i<3; i++)
-		{
-			child = xmlNewNode(0, (const xmlChar *)"vertex");
-			xmlNewProp(child, (const xmlChar *)"id", (const xmlChar *)itoa((*t)->v[i]->id));
-			//attr = xmlNewProp(child, (const xmlChar *)"u", (const xmlChar *)ftoa((*t)->tex_coord[i].x));
-			//attr = xmlNewProp(child, (const xmlChar *)"v", (const xmlChar *)ftoa((*t)->tex_coord[i].y));
-			xmlAddChild(cur, child);
-		}
-		xmlAddChild(root, cur);
-	}
-
-	for(p=custom_positions.begin(); p!=custom_positions.end(); p++)
-	{
-		cur = xmlNewNode(0, (const xmlChar *)"position");
-		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)p->first.c_str());
-		for(vp=p->second->vertices.begin(); vp!=p->second->vertices.end(); vp++)
-		{
-			child = xmlNewNode(0, (const xmlChar *)"vertex");
-			xmlNewProp(child, (const xmlChar *)"id", (const xmlChar *)itoa(vp->v->id));
-			xmlNewProp(child, (const xmlChar *)"x", (const xmlChar *)ftoa(vp->p.x));
-			xmlNewProp(child, (const xmlChar *)"y", (const xmlChar *)ftoa(vp->p.y));
-			xmlNewProp(child, (const xmlChar *)"z", (const xmlChar *)ftoa(vp->p.z));
-			xmlAddChild(cur, child);
-		}
-		xmlAddChild(root, cur);
-	}
-
-	for(a=animations.begin(); a!=animations.end(); a++)
-	{
-		cur = xmlNewNode(0, (const xmlChar *)"animation");
-		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)(*a)->GetName());
-		xmlNewProp(cur, (const xmlChar *)"len", (const xmlChar *)ftoa((*a)->GetLength()));
-		for(k=(*a)->key_first; k; k=k->chain_next)
-		{
-			child = xmlNewNode(0, (const xmlChar *)"frame");
-			xmlNewProp(child, (const xmlChar *)"time", (const xmlChar *)ftoa(k->time));
-			for(vp=k->pos_first; vp; vp=vp->chain_next)
-			{
-				child2 = xmlNewNode(0, (const xmlChar *)"vertex");
-				xmlNewProp(child2, (const xmlChar *)"id", (const xmlChar *)itoa(vp->v->id));
-				xmlNewProp(child2, (const xmlChar *)"x", (const xmlChar *)ftoa(vp->p.x));
-				xmlNewProp(child2, (const xmlChar *)"y", (const xmlChar *)ftoa(vp->p.y));
-				xmlNewProp(child2, (const xmlChar *)"z", (const xmlChar *)ftoa(vp->p.z));
-				xmlAddChild(child, child2);
-			}
-			xmlAddChild(cur, child);
-		}
-		xmlAddChild(root, cur);
-	}
-
-	for(e=entities.begin(); e!=entities.end(); e++)
-	{
-		cur = xmlNewNode(0, (const xmlChar *)"entity");
-		xmlNewProp(cur, (const xmlChar *)"name", (const xmlChar *)(*e)->name.c_str());
-		xmlNewProp(cur, (const xmlChar *)"group", (const xmlChar *)(*e)->group.c_str());
-		for(ea=(*e)->attributes.begin(); ea!=(*e)->attributes.end(); ea++)
-		{
-			switch(ea->second->type)
-			{
-			case CEntityAttribute::VECTOR:
-				child = xmlNewNode(0, (const xmlChar *)"vec3");
-				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
-				xmlNewProp(child, (const xmlChar *)"x", (const xmlChar *)ftoa(ea->second->vec_v.x));
-				xmlNewProp(child, (const xmlChar *)"y", (const xmlChar *)ftoa(ea->second->vec_v.y));
-				xmlNewProp(child, (const xmlChar *)"z", (const xmlChar *)ftoa(ea->second->vec_v.z));
-				break;
-			case CEntityAttribute::VECTOR2:
-				child = xmlNewNode(0, (const xmlChar *)"vec2");
-				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
-				xmlNewProp(child, (const xmlChar *)"x", (const xmlChar *)ftoa(ea->second->vec2_v.x));
-				xmlNewProp(child, (const xmlChar *)"y", (const xmlChar *)ftoa(ea->second->vec2_v.y));
-				break;
-			case CEntityAttribute::FLOAT:
-				child = xmlNewNode(0, (const xmlChar *)"float");
-				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
-				xmlNewProp(child, (const xmlChar *)"v", (const xmlChar *)ftoa(ea->second->float_v));
-				break;
-			case CEntityAttribute::INT:
-				child = xmlNewNode(0, (const xmlChar *)"int");
-				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
-				xmlNewProp(child, (const xmlChar *)"v", (const xmlChar *)itoa(ea->second->int_v));
-				break;
-			case CEntityAttribute::STRING:
-				child = xmlNewNode(0, (const xmlChar *)"string");
-				xmlNewProp(child, (const xmlChar *)"name", (const xmlChar *)ea->first.c_str());
-				xmlNewProp(child, (const xmlChar *)"v", (const xmlChar *)ea->second->string_v.c_str());
-				break;
-			}
-			xmlAddChild(cur, child);
-		}
-		xmlAddChild(root, cur);
-	}
-
-	xmlDocDumpFormatMemory(doc, &buf, &buffer_size, 1);
-	int r = xmlSaveFormatFile(file, doc, 1);
-	xmlFree(buf);
-	xmlFreeDoc(doc);
-	return r;*/
-}
-
-
-tEntity *tMesh::ParseEntityNode(xmlNodePtr root)
+tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 {
 	tEntity *e = new tEntity();
 	tEntityAttribute *a;
-	xmlNodePtr cur;
+	xml_node<> *cur;
+	xml_attribute<> *attr;
 	string a_type, a_name;
 
-	e->name = string((const char *)xmlGetProp(root, (const xmlChar *)"name"));
+
+	if(!(attr = root->first_attribute("name")))
+		return 0;
+
+	e->name = string(attr->value());
 	if(e->name.length() == 0)
 	{
 		delete e;
 		return 0;
 	}
 
-	e->group = string((const char *)xmlGetProp(root, (const xmlChar *)"group"));
+	if((attr = root->first_attribute("group")))
+		e->group = string(attr->value());
 
-	for(cur=root->children; cur; cur=cur->next)
+	for(cur=root->first_node(); cur; cur=cur->next_sibling())
 	{
-		a_type = string((const char *)cur->name);
+		a_type = string(cur->name());
 
 		a = new tEntityAttribute();
 
 		if(a_type.compare("vec3") == 0)
 		{
 			a->type = tEntityAttribute::VECTOR;
-			a->vec_v = Vec(atof((const char *)xmlGetProp(cur, (const xmlChar *)"x")),
-					atof((const char *)xmlGetProp(cur, (const xmlChar *)"y")),
-					atof((const char *)xmlGetProp(cur, (const xmlChar *)"z")));
+
+			tVector v;
+
+			if((attr = cur->first_attribute("x")))
+				v.x = atof(attr->value());
+			if((attr = cur->first_attribute("y")))
+				v.y = atof(attr->value());
+			if((attr = cur->first_attribute("z")))
+				v.z = atof(attr->value());
+
+			a->vec_v = v;
 		}
 		else if(a_type.compare("vec2") == 0)
 		{
 			a->type = tEntityAttribute::VECTOR2;
-			a->vec2_v = Vec(atof((const char *)xmlGetProp(cur, (const xmlChar *)"x")),
-					atof((const char *)xmlGetProp(cur, (const xmlChar *)"y")));
+
+			tVector2 v;
+
+			if((attr = cur->first_attribute("x")))
+				v.x = atof(attr->value());
+			if((attr = cur->first_attribute("y")))
+				v.y = atof(attr->value());
+
+			a->vec2_v = v;
 		}
 		else if(a_type.compare("float") == 0)
 		{
 			a->type = tEntityAttribute::FLOAT;
-			a->float_v = atof((const char *)xmlGetProp(cur, (const xmlChar *)"v"));
+
+			float v = 0.0;
+
+			if((attr = cur->first_attribute("v")))
+				v = atof(attr->value());
+
+			a->float_v = v;
 		}
 		else if(a_type.compare("int") == 0)
 		{
 			a->type = tEntityAttribute::INT;
-			a->int_v = atoi((const char *)xmlGetProp(cur, (const xmlChar *)"v"));
+
+			int v = 0;
+
+			if((attr = cur->first_attribute("v")))
+				v = atoi(attr->value());
+
+			a->int_v = v;
 		}
 		else if(a_type.compare("string") == 0)
 		{
 			a->type = tEntityAttribute::STRING;
-			a->string_v = string((const char *)xmlGetProp(cur, (const xmlChar *)"v"));
+
+			string v;
+
+			if((attr = cur->first_attribute("v")))
+				v = string(attr->value());
+
+			a->string_v = v;
 		}
 		else
 		{
@@ -1374,7 +1226,10 @@ tEntity *tMesh::ParseEntityNode(xmlNodePtr root)
 			continue;
 		}
 
-		a_name = string((const char *)xmlGetProp(cur, (const xmlChar *)"name"));
+		if(!(attr = cur->first_attribute("name")))
+			continue;
+
+		a_name = string(attr->value());
 
 		e->attributes.insert(pair<string, tEntityAttribute *>(a_name, a));
 	}
