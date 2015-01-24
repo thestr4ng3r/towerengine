@@ -31,7 +31,12 @@ void tEngine::Init(void)
 	printf("Support of %d combined texture image units\n", max_textures);
 
 	#ifdef _WIN32
-		glewInit();
+		GLenum glew_r = glewInit();
+		if(glew_r != GLEW_OK)
+		{
+			printf("Failed to initialize glew: %s\n", glewGetErrorString(glew_r));
+			return;
+		}
 	#endif
 
 	srand(time(0));

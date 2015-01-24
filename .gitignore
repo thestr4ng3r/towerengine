@@ -18,6 +18,7 @@
 
 # Build
 build/
+build_msvc/
 
 # PyDev
 .pydevproject

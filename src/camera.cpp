@@ -12,7 +12,7 @@ tCamera::tCamera(void)
 	far_clip = 300.0;
 }
 
-tVector *tCamera::GetRelativeFrustumCorners(float near, float far)
+tVector *tCamera::GetRelativeFrustumCorners(float near_clip, float far_clip)
 {
 	tVector *c = new tVector[8];
 	float vert, horz;
@@ -31,15 +31,15 @@ tVector *tCamera::GetRelativeFrustumCorners(float near, float far)
 	c[2] += -vert * vvec + hvec * horz;
 	c[3] += vert * vvec + hvec * horz;
 
-	c[4] = c[0] * far;
-	c[5] = c[1] * far;
-	c[6] = c[2] * far;
-	c[7] = c[3] * far;
+	c[4] = c[0] * far_clip;
+	c[5] = c[1] * far_clip;
+	c[6] = c[2] * far_clip;
+	c[7] = c[3] * far_clip;
 
-	c[0] *= near;
-	c[1] *= near;
-	c[2] *= near;
-	c[3] *= near;
+	c[0] *= near_clip;
+	c[1] *= near_clip;
+	c[2] *= near_clip;
+	c[3] *= near_clip;
 
 	return c;
 }

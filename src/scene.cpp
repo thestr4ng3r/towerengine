@@ -116,7 +116,7 @@ void tScene::ParseCubeMapAssetNode(xml_node<> *cur)
 {
 	xml_attribute<> *attr;
 	char *base64_temp;
-	unsigned long int file_size;
+	size_t file_size;
 	unsigned char *file_data = 0;
 	const char *file_ext = 0;
 	string name;

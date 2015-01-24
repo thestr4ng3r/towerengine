@@ -1,9 +1,11 @@
 #ifndef _INCLUDES_H
 #define _INCLUDES_H
 
-#include <math.h>
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <iostream>
 #include <algorithm>
 #include <vector>

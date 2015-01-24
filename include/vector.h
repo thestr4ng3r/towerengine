@@ -59,11 +59,11 @@ class tVector
 			tVector &operator=(Lib3dsVector o)      {x = o[0]; y = o[1]; z = o[2]; return *this;}
 		#endif
 
-		tVector &operator=(const btVector3 a)	{ x = a.x(); y = a.y(); z = a.z(); return *this; }
+		tVector &operator=(const btVector3 &a)	{ x = a.x(); y = a.y(); z = a.z(); return *this; }
 };
 
 tVector Vec(float x, float y, float z);
-tVector Vec(btVector3 v);
+tVector Vec(const btVector3 &v);
 #ifdef TMS_USE_LIB_3DS
 tVector Vec3ds(Lib3dsVector v);
 #endif

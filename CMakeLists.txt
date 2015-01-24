@@ -5,7 +5,7 @@ project(towerengine)
 set(CMAKE_BUILD_TYPE Release)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-FILE(GLOB towerengine_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB towerengine_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 
 set(towerengine_SRC 
 	src/animation.cpp 
@@ -59,13 +59,19 @@ set(towerengine_SRC
 
 add_definitions(-g -Wall)
 
-add_library(towerengine SHARED ${towerengine_SRC})
+add_library(towerengine STATIC ${towerengine_SRC} ${towerengine_INCLUDES})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/rapidxml)
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 target_link_libraries(towerengine ${OPENGL_LIBRARIES})
+
+if(WIN32)
+	find_package(GLEW REQUIRED)
+	include_directories(${GLEW_INCLUDE_DIR})
+	target_link_libraries(towerengine ${GLEW_LIBRARY})
+endif()
 
 find_package(DevIL REQUIRED)
 include_directories(${IL_INCLUDE_DIR})

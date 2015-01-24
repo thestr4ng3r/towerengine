@@ -32,7 +32,7 @@ class tMatrix3
 
 		static tMatrix3 GetIdentity(void)		{ return tMatrix3(); }
 		static tMatrix3 GetEuler(tVector rot)	{ tMatrix3 r; r.SetEuler(rot); return r; }
-		static tMatrix3 FromBtMatrix(btMatrix3x3 matrix);
+		static tMatrix3 FromBtMatrix(const btMatrix3x3 &matrix);
 };
 
 inline tVector operator*(tVector v, tMatrix3 m)		{ return m.ApplyToVector(v); }
@@ -69,7 +69,7 @@ class tTransform
 		btTransform ToBtTransform(void);
 
 		static tTransform GetIdentity(void)	{ return tTransform(); }
-		static tTransform FromBtTransform(btTransform trans);
+		static tTransform FromBtTransform(const btTransform &trans);
 };
 
 inline tVector operator*(tVector v, tTransform t)		{ return t.ApplyToVector(v); }

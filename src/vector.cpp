@@ -143,7 +143,7 @@ tVector Vec(float x, float y, float z)
 	return v;
 }
 
-tVector Vec(btVector3 v)
+tVector Vec(const btVector3 &v)
 {
 	return Vec(v.x(), v.y(), v.z());
 }

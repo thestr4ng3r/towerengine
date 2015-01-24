@@ -658,13 +658,13 @@ int tMesh::GetState(void)
 bool tMesh::LoadFromFile(const char *file, int no_material)
 {
 	bool r;
-	char *path;
+	const char *path;
 	struct stat s;
 	
 	if(stat(file, &s) != 0 && errno == ENOENT)
 	    return 0;
 	
-	path = PathOfFile(file);
+	path = PathOfFile(string(file)).c_str();
 
 	char *data = ReadFile(file);
 

@@ -40,9 +40,9 @@ void tDirectionalShadowShader::SetVertexMix(float m)
 	glUniform1f(vertex_mix_uniform, m);
 }
 
-void tDirectionalShadowShader::SetClip(float near, float far)
+void tDirectionalShadowShader::SetClip(float near_clip, float far_clip)
 {
-	glUniform2f(clip_uniform, near, far);
+	glUniform2f(clip_uniform, near_clip, far_clip);
 }
 
 void tDirectionalShadowShader::SetCamPos(tVector v)

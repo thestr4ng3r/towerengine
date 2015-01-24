@@ -5,7 +5,7 @@
 char *ftoa(float f, int len)
 {
 	char *buf = new char[len + 1];
-	snprintf(buf, len + 1, "%f", f);
+	sprintf_s(buf, len + 1, "%f", f);
 	int i;
 	for(i=0; i<(int)strlen(buf); i++)
 		buf[i] = buf[i] == ',' ? '.' : buf[i];
@@ -15,7 +15,7 @@ char *ftoa(float f, int len)
 char *itoa(int v, int len)
 {
 	char *buf = new char[len + 1];
-	snprintf(buf, len + 1, "%d", v);
+	sprintf_s(buf, len + 1, "%d", v);
 	return buf;
 }
 
@@ -23,7 +23,7 @@ char *cstr(const char *str)
 {
 	char *r;
 	r = new char[strlen(str) + 1];
-	snprintf(r, strlen(str)+1, "%s", str);
+	sprintf_s(r, strlen(str) + 1, "%s", str);
 	return r;
 }
 
@@ -72,29 +72,19 @@ void PaintAxes(void)
 }
 
 
-char *PathOfFile(const char *file)
+string PathOfFile(string file)
 {
     int i;
-    char *path = 0;
 
-    if(!file)
+    for(i = file.length()-1; i > 0; i--)
     {
-        path = new char[0];
-        return path;
+		char c = file.at(i);
+
+		if(c == '/' || c == '\\')
+			break;
     }
 
-    if(strlen(file) == 0)
-    	return cstr("");
-
-    for(i = strlen(file); i > 0; i--)
-    {
-        path = new char [i];
-        snprintf(path, i, "%s", file);
-        if(path[strlen(path) - 1] == '/' || path[strlen(path) - 1] == '\\')
-            break;
-    }
-
-    return path;
+	return file.substr(0, i);
 }
 
 

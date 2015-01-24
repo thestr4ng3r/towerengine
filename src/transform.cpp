@@ -59,7 +59,7 @@ btMatrix3x3 tMatrix3::ToBtMatrix(void)
 	//					x.z, y.z, z.z);
 }
 
-tMatrix3 tMatrix3::FromBtMatrix(btMatrix3x3 matrix)
+tMatrix3 tMatrix3::FromBtMatrix(const btMatrix3x3 &matrix)
 {
 	return tMatrix3(Vec(matrix.getRow(0)), Vec(matrix.getRow(1)), Vec(matrix.getRow(2)));
 }
@@ -126,7 +126,7 @@ btTransform tTransform::ToBtTransform(void)
 }
 
 
-tTransform tTransform::FromBtTransform(btTransform trans)
+tTransform tTransform::FromBtTransform(const btTransform &trans)
 {
 	return tTransform(tMatrix3::FromBtMatrix(trans.getBasis()), Vec(trans.getOrigin()));
 }
