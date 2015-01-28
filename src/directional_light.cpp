@@ -29,7 +29,7 @@ void tDirectionalLight::RenderShadow(tWorld *world)
 	shadow->Render(world);
 }
 
-void tDirectionalLight::RenderLighting(void)
+void tDirectionalLight::InitRenderLighting(void)
 {
 	GLuint shadow_map = 0;
 	tVector2 shadow_clip = Vec(0.0, 0.0);
@@ -56,6 +56,4 @@ void tDirectionalLight::RenderLighting(void)
 																	shadow_tex_matrix,
 																	shadow_splits_count,
 																	shadow_splits_z);
-
-	tRenderer::RenderScreenQuad();
 }

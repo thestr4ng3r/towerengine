@@ -2,13 +2,13 @@
 
 uniform mat4 gl_ModelViewProjectionMatrix;
 
-in vec4 gl_Vertex;
+in vec2 vertex_attr;
 
 out vec2 uv_coord_var;
 
 void main(void)
 {
-	uv_coord_var = gl_Vertex.xy;
+	uv_coord_var = vertex_attr;
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
 

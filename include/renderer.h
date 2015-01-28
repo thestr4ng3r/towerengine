@@ -15,6 +15,10 @@ class tRenderer
 		GLuint color_tex;
 		GLuint depth_tex;
 
+		tVBO<float> *screen_quad_vbo;
+		tVAO *screen_quad_vao;
+		//tIBO *screen_quad_ibo;
+
 		float projection_matrix[16];
 		float modelview_matrix[16];
 
@@ -50,7 +54,7 @@ class tRenderer
 		void Render(void);
 
 
-		static void RenderScreenQuad(void);
+		void RenderLightingScreenQuad(void);
 };
 
 

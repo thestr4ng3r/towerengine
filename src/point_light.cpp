@@ -30,7 +30,7 @@ void tPointLight::RenderShadow(tWorld *world)
 	shadow->Render(world);
 }
 
-void tPointLight::RenderLighting(void)
+void tPointLight::InitRenderLighting(void)
 {
 	GLuint shadow_map = 0;
 
@@ -38,6 +38,4 @@ void tPointLight::RenderLighting(void)
 		shadow_map = shadow->GetShadowMap();
 
 	tEngine::GetPointLightingShader()->SetPointLight(pos, color, distance, shadow_enabled ? 1 : 0, shadow_map);
-
-	tRenderer::RenderScreenQuad();
 }

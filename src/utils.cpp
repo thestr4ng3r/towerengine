@@ -2,10 +2,14 @@
 
 #include <fstream>
 
+#ifdef _MSC_VER
+#define snprintf sprintf_s
+#endif
+
 char *ftoa(float f, int len)
 {
 	char *buf = new char[len + 1];
-	sprintf_s(buf, len + 1, "%f", f);
+	snprintf(buf, len + 1, "%f", f);
 	int i;
 	for(i=0; i<(int)strlen(buf); i++)
 		buf[i] = buf[i] == ',' ? '.' : buf[i];
@@ -15,7 +19,7 @@ char *ftoa(float f, int len)
 char *itoa(int v, int len)
 {
 	char *buf = new char[len + 1];
-	sprintf_s(buf, len + 1, "%d", v);
+	snprintf(buf, len + 1, "%d", v);
 	return buf;
 }
 
@@ -23,7 +27,7 @@ char *cstr(const char *str)
 {
 	char *r;
 	r = new char[strlen(str) + 1];
-	sprintf_s(r, strlen(str) + 1, "%s", str);
+	snprintf(r, strlen(str) + 1, "%s", str);
 	return r;
 }
 

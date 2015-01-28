@@ -45,6 +45,18 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 1);
+
+	screen_quad_vao = new tVAO();
+	screen_quad_vbo = new tVBO<float>(2, screen_quad_vao, 4);
+
+	float *screen_quad_data = screen_quad_vbo->GetData();
+	screen_quad_data[0] = 0.0; screen_quad_data[1] = 1.0;
+	screen_quad_data[2] = 0.0; screen_quad_data[3] = 0.0;
+	screen_quad_data[4] = 1.0; screen_quad_data[5] = 0.0;
+	screen_quad_data[6] = 1.0; screen_quad_data[7] = 1.0;
+
+	screen_quad_vbo->AssignData();
+
 }
 
 tRenderer::~tRenderer(void)
@@ -231,7 +243,7 @@ void tRenderer::LightPass(void)
 	tEngine::GetAmbientLightingShader()->SetGBuffer(gbuffer);
 	tEngine::GetAmbientLightingShader()->SetAmbientLight(world->GetAmbientColor());
 
-	RenderScreenQuad();
+	RenderLightingScreenQuad();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
@@ -242,7 +254,10 @@ void tRenderer::LightPass(void)
 	tEngine::GetDirectionalLightingShader()->SetCameraPosition(camera->GetPosition());
 
 	for(i=0; i<world->GetDirectionalLightsCount(); i++)
-		world->GetDirectionalLight(i)->RenderLighting();
+	{
+		world->GetDirectionalLight(i)->InitRenderLighting();
+		RenderLightingScreenQuad();
+	}
 
 
 	tEngine::GetPointLightingShader()->Bind();
@@ -250,7 +265,10 @@ void tRenderer::LightPass(void)
 	tEngine::GetPointLightingShader()->SetCameraPosition(camera->GetPosition());
 
 	for(i=0; i<world->GetPointLightsCount(); i++)
-		world->GetPointLight(i)->RenderLighting();
+	{
+		world->GetPointLight(i)->InitRenderLighting();
+		RenderLightingScreenQuad();
+	}
 
 	if(ssao.enabled)
 	{
@@ -260,7 +278,7 @@ void tRenderer::LightPass(void)
 		tEngine::GetSSAOLightingShader()->SetGBuffer(gbuffer);
 		tEngine::GetSSAOLightingShader()->SetSSAOTexture(ssao.tex);
 
-		RenderScreenQuad();
+		RenderLightingScreenQuad();
 	}
 
 
@@ -371,14 +389,17 @@ void tRenderer::ChangeSize(int width, int height)
 }
 
 
-void tRenderer::RenderScreenQuad(void)
+void tRenderer::RenderLightingScreenQuad(void)
 {
-	glBegin(GL_QUADS); // TODO: Use VBO instead
+	/*glBegin(GL_QUADS);
 	glVertex2f(0.0, 1.0);
 	glVertex2f(0.0, 0.0);
 	glVertex2f(1.0, 0.0);
 	glVertex2f(1.0, 1.0);
-	glEnd();
+	glEnd();*/
+
+	screen_quad_vbo->SetAttribute(tLightingShader::vertex_attribute, GL_FLOAT);
+	screen_quad_vao->Draw(GL_QUADS, 0, 4);
 }
 
 

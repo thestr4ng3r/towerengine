@@ -4,8 +4,7 @@
 
 void tAmbientLightingShader::Init(void)
 {
-	InitShader(light_pass_shader_vert, ambient_lighting_shader_frag, "Ambient Lighting Shader");
-	LinkProgram();
+	InitLightingShader(ambient_lighting_shader_frag, "Ambient Lighting Shader");
 
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 

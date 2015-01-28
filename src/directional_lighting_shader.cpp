@@ -4,8 +4,7 @@
 
 void tDirectionalLightingShader::Init(void)
 {
-	InitShader(light_pass_shader_vert, directional_lighting_shader_frag, "Directional Light Shader");
-	LinkProgram();
+	InitLightingShader(directional_lighting_shader_frag, "Directional Lighting Shader");
 
 	position_tex_uniform = GetUniformLocation("position_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");

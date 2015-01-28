@@ -9,7 +9,6 @@
 extern const char *geometry_pass_shader_vert;
 extern const char *geometry_pass_shader_frag;
 extern const char *light_pass_shader_vert;
-extern const char *light_pass_shader_frag;
 extern const char *directional_lighting_shader_frag;
 extern const char *point_lighting_shader_frag;
 extern const char *ambient_lighting_shader_frag;
