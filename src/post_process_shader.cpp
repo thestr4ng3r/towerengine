@@ -9,6 +9,8 @@ void tPostProcessShader::Init(void)
 	color_tex_uniform = GetUniformLocation("color_tex_uni");
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	tex_pixel_uniform = GetUniformLocation("tex_pixel_uni");
+
+	fxaa_enabled_uniform = GetUniformLocation("fxaa_enabled_uni");
 }
 
 void tPostProcessShader::SetTextures(GLuint color, GLuint depth, int width, int height)
@@ -22,4 +24,9 @@ void tPostProcessShader::SetTextures(GLuint color, GLuint depth, int width, int 
 	glBindTexture(GL_TEXTURE_2D, depth);
 
 	glUniform2f(tex_pixel_uniform, 1.0 / (float)width, 1.0 / (float)height);
+}
+
+void tPostProcessShader::SetFXAA(bool enabled)
+{
+	glUniform1i(fxaa_enabled_uniform, enabled ? 1 : 0);
 }

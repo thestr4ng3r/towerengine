@@ -35,6 +35,8 @@ class tRenderer
 			GLenum draw_buffer;
 		} ssao;
 
+		bool fxaa_enabled;
+
 		void GeometryPass(void);
 		void LightPass(void);
 		void ForwardPass(void);
@@ -50,6 +52,7 @@ class tRenderer
 		void SetWorld(tWorld *world)	{ this->world = world; }
 
 		void InitSSAO(int kernel_size, float radius, int noise_tex_size = 4);
+		void SetFXAAEnabled(bool enabled)	{ fxaa_enabled = enabled; }
 
 		void Render(void);
 

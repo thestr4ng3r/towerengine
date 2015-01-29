@@ -60,7 +60,7 @@ set(towerengine_SRC
 
 add_definitions(-g -Wall)
 
-add_library(towerengine STATIC ${towerengine_SRC} ${towerengine_INCLUDES})
+add_library(towerengine SHARED ${towerengine_SRC} ${towerengine_INCLUDES})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/rapidxml)
 

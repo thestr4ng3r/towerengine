@@ -3,6 +3,8 @@
 uniform sampler2D color_tex_uni;
 uniform vec2 tex_pixel_uni;
 
+uniform bool fxaa_enabled_uni;
+
 in vec2 uv_coord_var;
 
 out vec4 gl_FragColor;
@@ -68,7 +70,10 @@ void main(void)
 	vec4 src_color = texture(color_tex_uni, uv_coord_var);
 	vec3 color = vec3(0.0, 0.0, 0.0);
 	
-	color = FXAA(src_color.rgb);	
+	if(fxaa_enabled_uni)
+		color = FXAA(src_color.rgb);
+	else
+		color = src_color.rgb;	
 		
 	
 	gl_FragColor = vec4(color, src_color.a);

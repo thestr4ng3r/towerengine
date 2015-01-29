@@ -16,6 +16,8 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	ssao.tex = 0;
 	ssao.radius = 0.0;
 
+	fxaa_enabled = false;
+
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -172,6 +174,7 @@ void tRenderer::Render(void)
 	glDisable(GL_BLEND);
 
 	tEngine::GetPostProcessShader()->Bind();
+	tEngine::GetPostProcessShader()->SetFXAA(fxaa_enabled);
 	tEngine::GetPostProcessShader()->SetTextures(color_tex, depth_tex, screen_width, screen_height);
 
 	glBegin(GL_QUADS);
@@ -391,13 +394,7 @@ void tRenderer::ChangeSize(int width, int height)
 
 void tRenderer::RenderLightingScreenQuad(void)
 {
-	/*glBegin(GL_QUADS);
-	glVertex2f(0.0, 1.0);
-	glVertex2f(0.0, 0.0);
-	glVertex2f(1.0, 0.0);
-	glVertex2f(1.0, 1.0);
-	glEnd();*/
-
+	screen_quad_vao->Bind();
 	screen_quad_vbo->SetAttribute(tLightingShader::vertex_attribute, GL_FLOAT);
 	screen_quad_vao->Draw(GL_QUADS, 0, 4);
 }
