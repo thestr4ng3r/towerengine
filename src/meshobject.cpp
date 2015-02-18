@@ -34,7 +34,7 @@ tMeshObject::tMeshObject(tMesh *mesh, float mass) : tTransformObject()
 	{
 		btCollisionShape *shape;
 		if(mesh->GetPhysicsMesh())
-			shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), false);
+			shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), true);
 		else
 			shape = new btEmptyShape();
 

@@ -3,6 +3,8 @@
 
 #define degtorad(x) (x * M_PI / 180.0)
 
+#define safe_delete(x) { delete x; x = 0; }
+
 char *ftoa(float f, int len = 50);
 char *itoa(int v, int len = 50);
 char *cstr(const char *);

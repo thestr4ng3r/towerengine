@@ -2,6 +2,8 @@
 
 #define SSAO_BLUR_SIZE 4
 
+uniform vec3 light_ambient_color_uni;
+
 uniform sampler2D ssao_tex_uni;
 uniform sampler2D diffuse_tex_uni;
 
@@ -11,9 +13,11 @@ out vec4 gl_FragColor;
 
 void main(void)
 {
-	if(texture(diffuse_tex_uni, uv_coord_var).a == 0.0)
+	vec4 diffuse = texture2D(diffuse_tex_uni, uv_coord_var).rgba;
+
+	if(diffuse.a == 0.0)
 		discard;
-	
+		
 	vec2 texel_size = 1.0 / textureSize(ssao_tex_uni, 0);
 	float result = 0.0;
 	
@@ -27,6 +31,10 @@ void main(void)
 			result += texture(ssao_tex_uni, uv_coord_var + offset).r;
 		}
 	}
- 
-	gl_FragColor = vec4(vec3(result / float(SSAO_BLUR_SIZE * SSAO_BLUR_SIZE)), 1.0);
+	
+	float occlusion = result / float(SSAO_BLUR_SIZE * SSAO_BLUR_SIZE);
+		
+	vec3 color = light_ambient_color_uni * diffuse.rgb * occlusion;
+	
+	gl_FragColor = vec4(color, 1.0);
 }

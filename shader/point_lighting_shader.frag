@@ -81,8 +81,8 @@ void main(void)
 
 	//specular
 	vec3 specular_color = specular.rgb * point_light_color_uni;
-	float specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0) * light_dist_attenuation;
-	color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow;
+	float specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0);
+	color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow * light_dist_attenuation;
 	
 	
 	gl_FragColor = vec4(color, 1.0);

@@ -57,7 +57,7 @@ class tRenderer
 		void Render(void);
 
 
-		void RenderLightingScreenQuad(void);
+		void RenderScreenQuad(void);
 };
 
 

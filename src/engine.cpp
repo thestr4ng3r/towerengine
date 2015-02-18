@@ -46,6 +46,8 @@ void tEngine::Init(void)
 	glFrontFace(GL_CCW);
 	glEnable(GL_CULL_FACE);
 
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	ilInit();
 	iluInit();
 

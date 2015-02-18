@@ -25,8 +25,6 @@ class tSSAOShader : public tShader
 		GLint cam_dir_uniform;
 
 	public:
-		static const int view_ray_attribute = 1;
-
 		void Init(void);
 
 		void SetKernel(int kernel_size, float *kernel);

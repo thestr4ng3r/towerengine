@@ -35,8 +35,9 @@ in vec3 cam_dir_var;
 layout (location = 0) out vec4 position_out;
 layout (location = 1) out vec4 diffuse_out;
 layout (location = 2) out vec4 normal_out;
-layout (location = 3) out vec4 specular_out; 
-layout (location = 4) out vec4 specular_exponent_out;
+layout (location = 3) out vec4 face_normal_out;
+layout (location = 4) out vec4 specular_out; 
+layout (location = 5) out vec4 specular_exponent_out;
 
 vec2 ParallaxUV(void);
 vec2 ParallaxOcclusionUV(mat3 tang_mat);
@@ -82,6 +83,8 @@ void main(void)
 		normal = normal_var;
 		
 	normal_out = vec4(normal * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
+	
+	face_normal_out = vec4(normal_var * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
 			
 	vec3 specular_color = specular_color_uni;
 	if(specular_tex_enabled_uni)

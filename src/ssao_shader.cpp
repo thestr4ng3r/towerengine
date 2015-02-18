@@ -5,7 +5,7 @@ void tSSAOShader::Init(void)
 {
 	InitShader(ssao_shader_vert, ssao_shader_frag, "SSAO Shader");
 
-	glBindAttribLocation(program, view_ray_attribute, "view_ray_attr");
+	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 
 	LinkProgram();
 

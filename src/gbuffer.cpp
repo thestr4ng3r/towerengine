@@ -41,6 +41,16 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	draw_buffers[NORMAL_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + NORMAL_TEX;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[NORMAL_TEX], GL_TEXTURE_2D, tex[NORMAL_TEX], 0);
 
+	glBindTexture(GL_TEXTURE_2D, tex[FACE_NORMAL_TEX]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	draw_buffers[FACE_NORMAL_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + FACE_NORMAL_TEX;
+	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[FACE_NORMAL_TEX], GL_TEXTURE_2D, tex[FACE_NORMAL_TEX], 0);
+
 	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_TEX]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -83,6 +93,9 @@ void tGBuffer::ChangeSize(int width, int height)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 	glBindTexture(GL_TEXTURE_2D, tex[NORMAL_TEX]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+	glBindTexture(GL_TEXTURE_2D, tex[FACE_NORMAL_TEX]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
 	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_TEX]);

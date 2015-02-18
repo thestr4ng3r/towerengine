@@ -27,6 +27,8 @@ class tShader : protected tShaderProgram
 		GLint GetUniformLocation(const char *uniform);
 	
 	public:
+		static const int vertex_attribute = 0;
+
 		void Bind(void);
 		static void Unbind(void);
 
