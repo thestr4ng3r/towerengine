@@ -81,6 +81,27 @@ tVector tCamera::GetScreenRay(float x, float y)
 
 }
 
+tVector2 tCamera::GetProjectedPoint(tVector point)
+{
+	tVector hvec = Cross(dir, up);
+	tVector vvec = Cross(hvec, dir);
+	hvec.Normalize();
+	vvec.Normalize();
+
+	float dist = Dot(dir, point - pos);
+	tVector proj_center = pos + dir * dist;
+
+	float tang = tan(degtorad(angle) * 0.5);
+	float height = dist * tang;
+	float width = height * aspect;
+
+	tVector2 proj;
+	proj.x = Dot(point - proj_center, hvec) / width;
+	proj.y = Dot(point - proj_center, vvec) / height;
+
+	return proj;
+}
+
 
 void tCamera::CalculateFrustumPlanes(void)
 {
