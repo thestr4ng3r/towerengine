@@ -40,7 +40,7 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, screen_width, screen_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
 
@@ -78,14 +78,20 @@ void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 
 	for(int i=0; i<ssao.kernel_size; i++)
 	{
-		v.x = RandomFloat(-1.0, 1.0);
-		v.y = RandomFloat(-1.0, 1.0);
-		v.z = RandomFloat(0.0, 1.0);
-		v.Normalize();
+		while(1)
+		{
+			v.x = RandomFloat(-1.0, 1.0);
+			v.y = RandomFloat(-1.0, 1.0);
+			v.z = RandomFloat(0.0, 1.0);
+			v.Normalize();
 
-		scale = (float)i / (float)ssao.kernel_size;
-		scale = Mix(0.1, 1.0, scale * scale);
-		v *= scale;
+			scale = (float)i / (float)ssao.kernel_size;
+			scale = Mix(0.1, 1.0, scale * scale);
+			v *= scale;
+
+			if(v.z > 0.04)
+				break;
+		}
 
 		memcpy(ssao.kernel + i*3, v.v, sizeof(float) * 3);
 	}
@@ -119,8 +125,8 @@ void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 	glGenTextures(1, &ssao.tex);
 
 	glBindTexture(GL_TEXTURE_2D, ssao.tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -133,7 +139,7 @@ void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 	ssao.enabled = true;
 }
 
-void tRenderer::Render(void)
+void tRenderer::Render(GLuint dst_fbo)
 {
 	tCamera *camera = world->GetCamera();
 
@@ -155,7 +161,7 @@ void tRenderer::Render(void)
 
 	ForwardPass();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, dst_fbo);
 
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -185,6 +191,9 @@ void tRenderer::Render(void)
 	glEnd();
 
 	tShader::Unbind();
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 

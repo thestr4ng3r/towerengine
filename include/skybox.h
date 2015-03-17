@@ -17,6 +17,7 @@ class tSkyBox
 		tSkyBox(GLuint cube_map = 0, float size = 50.0);
 
 		void SetCubeMap(GLuint cube_map)	{ this->cube_map = cube_map; }
+		GLuint GetCubeMap(void)				{ return cube_map; }
 
 		void Paint(tVector pos);
 };

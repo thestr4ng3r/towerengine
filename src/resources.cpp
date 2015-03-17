@@ -472,7 +472,7 @@ const char *ambient_lighting_shader_frag =
 const char *ssao_lighting_shader_frag = 
 "#version 330\n"
 "\n"
-"#define SSAO_BLUR_SIZE 4\n"
+"#define SSAO_BLUR_SIZE 2\n"
 "\n"
 "uniform vec3 light_ambient_color_uni;\n"
 "\n"
@@ -499,7 +499,7 @@ const char *ssao_lighting_shader_frag =
 "	{\n"
 "		for(int j=0; j<SSAO_BLUR_SIZE; j++)\n"
 "		{\n"
-"			vec2 offset = (hlim + vec2(float(i), float(j))) * texel_size;\n"
+"			vec2 offset = (hlim + vec2(float(i), float(j))) * texel_size * 2;\n"
 "			result += texture(ssao_tex_uni, uv_coord_var + offset).r;\n"
 "		}\n"
 "	}\n"

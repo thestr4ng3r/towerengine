@@ -1,6 +1,6 @@
 #version 330
 
-#define SSAO_BLUR_SIZE 4
+#define SSAO_BLUR_SIZE 2
 
 uniform vec3 light_ambient_color_uni;
 
@@ -27,7 +27,7 @@ void main(void)
 	{
 		for(int j=0; j<SSAO_BLUR_SIZE; j++)
 		{
-			vec2 offset = (hlim + vec2(float(i), float(j))) * texel_size;
+			vec2 offset = (hlim + vec2(float(i), float(j))) * texel_size * 2;
 			result += texture(ssao_tex_uni, uv_coord_var + offset).r;
 		}
 	}

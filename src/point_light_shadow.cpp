@@ -29,13 +29,13 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-	glGenFramebuffersEXT(1, &fbo);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-	glGenRenderbuffersEXT(1, &depth_rbo);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depth_rbo);
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, size, size);
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depth_rbo);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glGenRenderbuffers(1, &depth_rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
 	this->blur_enabled = blur_enabled;
@@ -57,10 +57,10 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-	glGenFramebuffersEXT(1, &blur_fbo);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, blur_fbo);
+	glGenFramebuffers(1, &blur_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, blur_fbo);
 	glDrawBuffers(6, blur_draw_buffers);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	blur_vao = new tVAO();
 
@@ -86,7 +86,7 @@ void tPointLightShadow::Render(tWorld *world)
 
 	glEnable(GL_DEPTH_TEST);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glViewport(0, 0, size, size);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -102,7 +102,7 @@ void tPointLightShadow::Render(tWorld *world)
 
 	for(s=0; s<6; s++)
 	{
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glMatrixMode(GL_MODELVIEW);
@@ -119,7 +119,7 @@ void tPointLightShadow::Render(tWorld *world)
 		render_space->GeometryPass();
 	}
 	tShader::Unbind();
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
 	if(!blur_enabled)
@@ -127,7 +127,7 @@ void tPointLightShadow::Render(tWorld *world)
 
 	glDisable(GL_DEPTH_TEST);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, blur_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, blur_fbo);
 	glViewport(0, 0, size, size);
 
 	glMatrixMode(GL_PROJECTION);
@@ -138,7 +138,7 @@ void tPointLightShadow::Render(tWorld *world)
 	tEngine::GetPointShadowBlurShader()->SetTexture(tex);
 
 	for(s=0; s<6; s++)
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, blur_tex, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, blur_tex, 0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -154,7 +154,7 @@ void tPointLightShadow::Render(tWorld *world)
 	tEngine::GetPointShadowBlurShader()->SetTexture(blur_tex);
 
 	for(s=0; s<6; s++)
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -164,7 +164,7 @@ void tPointLightShadow::Render(tWorld *world)
 
 	tShader::Unbind();
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 
