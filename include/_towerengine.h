@@ -19,8 +19,6 @@ class tDirectionalLight;
 class tDirectionalLightShadow;
 class tRenderer;
 
-#include "tresources.h"
-
 #include "vector2.h"
 #include "vector.h"
 #include "boundingbox.h"
@@ -43,6 +41,7 @@ class tRenderer;
 #include "directional_shadow_shader.h"
 #include "post_process_shader.h"
 #include "ssao_shader.h"
+#include "ssao_blur_shader.h"
 #include "color_shader.h"
 #include "skybox.h"
 #include "vertex.h"
@@ -70,6 +69,7 @@ class tRenderer;
 #include "world.h"
 #include "scene_object.h"
 #include "scene.h"
+#include "ssao.h"
 #include "renderer.h"
 
 #endif

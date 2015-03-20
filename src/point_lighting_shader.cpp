@@ -1,5 +1,6 @@
 
 #include "towerengine.h"
+#include "tresources.h"
 
 void tPointLightingShader::Init(void)
 {

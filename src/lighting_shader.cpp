@@ -1,5 +1,6 @@
 
 #include "towerengine.h"
+#include "tresources.h"
 
 void tLightingShader::InitLightingShader(const char *frag_src, const char *shader_name)
 {

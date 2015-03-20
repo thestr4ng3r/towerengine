@@ -27,6 +27,8 @@ extern const char *post_process_shader_vert;
 extern const char *post_process_shader_frag;
 extern const char *ssao_shader_vert;
 extern const char *ssao_shader_frag;
+extern const char *ssao_blur_shader_vert;
+extern const char *ssao_blur_shader_frag;
 extern const char *color_shader_vert;
 extern const char *color_shader_frag;
 

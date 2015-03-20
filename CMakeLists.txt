@@ -56,7 +56,9 @@ set(towerengine_SRC
 	src/color_shader.cpp
 	src/scene.cpp
 	src/scene_object.cpp
-	src/asset.cpp)
+	src/asset.cpp
+	src/ssao.cpp
+	src/ssao_blur_shader.cpp)
 
 add_definitions(-g -Wall)
 

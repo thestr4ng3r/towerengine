@@ -22,26 +22,13 @@ class tRenderer
 		float projection_matrix[16];
 		float modelview_matrix[16];
 
-		struct ssao
-		{
-			bool enabled;
-			float *kernel;
-			int kernel_size;
-			GLuint noise_tex;
-			int noise_tex_size;
-			float radius;
-
-			GLuint tex;
-			GLenum draw_buffer;
-		} ssao;
-
 		bool fxaa_enabled;
+
+		tSSAO *ssao;
 
 		void GeometryPass(void);
 		void LightPass(void);
 		void ForwardPass(void);
-
-		void RenderSSAO(void);
 
 	public:
 		tRenderer(int width, int height, tWorld *world = 0);
@@ -55,9 +42,19 @@ class tRenderer
 		void SetFXAAEnabled(bool enabled)	{ fxaa_enabled = enabled; }
 
 		void Render(GLuint dst_fbo = 0);
-
-
 		void RenderScreenQuad(void);
+
+		int GetScreenWidth(void)	{ return screen_width; }
+		int GetScreenHeight(void)	{ return screen_height; }
+
+		tWorld *GetWorld(void)		{ return world; }
+
+		float *GetProjectionMatrix(void)	{ return projection_matrix; }
+		float *GetModelViewMatrix(void)		{ return modelview_matrix; }
+
+		tGBuffer *GetGBuffer(void)			{ return gbuffer; }
+
+		GLuint GetDepthTexture(void)		{ return depth_tex; }
 };
 
 

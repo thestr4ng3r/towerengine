@@ -1,4 +1,5 @@
 #include "towerengine.h"
+#include "tresources.h"
 
 void tSkyBoxShader::Init(void)
 {

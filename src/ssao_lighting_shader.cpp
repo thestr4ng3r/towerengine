@@ -1,5 +1,6 @@
 
 #include "towerengine.h"
+#include "tresources.h"
 
 void tSSAOLightingShader::Init(void)
 {
