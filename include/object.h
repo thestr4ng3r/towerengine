@@ -8,8 +8,8 @@ class tObject
 		tObject(void);
 		virtual ~tObject(void) {}
 
-		virtual void GeometryPass(void) {};
-		virtual void ForwardPass(void) {};
+		virtual void GeometryPass(tRenderer *) {};
+		virtual void ForwardPass(tRenderer *) {};
 		virtual tBoundingBox GetBoundingBox(void) = 0;
 
 		virtual void AddedToWorld(tWorld *world) {};

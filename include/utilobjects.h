@@ -18,7 +18,7 @@ class tCoordinateSystemObject : public tObject
 		void SetPosition(tVector pos)	{ this->pos = pos; }
 		void SetSize(tVector size)		{ this->size = size; }
 
-		void ForwardPass(void);
+		void ForwardPass(tRenderer *renderer);
 
 		tBoundingBox GetBoundingBox(void);
 };

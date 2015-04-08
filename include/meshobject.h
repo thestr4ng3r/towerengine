@@ -45,8 +45,8 @@ class tMeshObject : public tTransformObject
 
 		void UpdateRigidBodyTransformation(void);
 
-		void GeometryPass(void);
-		void ForwardPass(void);
+		void GeometryPass(tRenderer *renderer);
+		void ForwardPass(tRenderer *renderer);
 		tBoundingBox GetBoundingBox(void);
 
 		void AddedToWorld(tWorld *world);

@@ -37,12 +37,12 @@ tSkyBox::tSkyBox(GLuint cube_map, float size)
 	SetCubeMap(cube_map);
 }
 
-void tSkyBox::Paint(tVector pos)
+void tSkyBox::Paint(tRenderer *renderer, tVector pos)
 {
 	glDisable(GL_DEPTH_TEST);
 
-	tEngine::GetSkyBoxShader()->Bind();
-	tEngine::GetSkyBoxShader()->SetCubeMap(cube_map);
+	renderer->GetSkyBoxShader()->Bind();
+	renderer->GetSkyBoxShader()->SetCubeMap(cube_map);
 
 	vbo->SetAttribute(tSkyBoxShader::vertex_attribute, GL_FLOAT);
 

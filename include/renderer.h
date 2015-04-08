@@ -6,6 +6,24 @@
 class tRenderer
 {
 	private:
+		tGeometryPassShader *geometry_pass_shader;
+		tAmbientLightingShader *ambient_lighting_shader;
+		tDirectionalLightingShader *directional_lighting_shader;
+		tPointLightingShader *point_lighting_shader;
+		tSSAOLightingShader *ssao_lighting_shader;
+
+		tSkyBoxShader *skybox_shader;
+		tPointShadowShader *point_shadow_shader;
+		tPointShadowBlurShader *point_shadow_blur_shader;
+		tDirectionalShadowShader *directional_shadow_shader;
+		tDirectionalShadowBlurShader *directional_shadow_blur_shader;
+		tColorShader *color_shader;
+		tPostProcessShader *post_process_shader;
+
+		tSSAOShader *ssao_shader;
+
+		tFaceShader *current_face_shader;
+
 		tWorld *world;
 
 		tGBuffer *gbuffer;
@@ -45,6 +63,18 @@ class tRenderer
 
 		void Render(GLuint dst_fbo = 0);
 		void RenderScreenQuad(void);
+
+		tFaceShader *GetCurrentFaceShader(void)		{ return current_face_shader; }
+		void BindCurrentFaceShader(void)			{ current_face_shader->Bind(); }
+		void SetCurrentFaceShader(tFaceShader *s)	{ current_face_shader = s; }
+
+		tPointShadowShader *GetPointShadowShader(void)						{ return point_shadow_shader; }
+		tPointShadowBlurShader *GetPointShadowBlurShader(void)				{ return point_shadow_blur_shader; }
+		tDirectionalShadowShader *GetDirectionalShadowShader(void)			{ return directional_shadow_shader; }
+		tDirectionalShadowBlurShader *GetDirectionalShadowBlurShader(void)	{ return directional_shadow_blur_shader; }
+		tSkyBoxShader *GetSkyBoxShader(void)								{ return skybox_shader; }
+		tColorShader *GetColorShader(void)									{ return color_shader; }
+		tSSAOShader *GetSSAOShader(void)									{ return ssao_shader; }
 
 		int GetScreenWidth(void)	{ return screen_width; }
 		int GetScreenHeight(void)	{ return screen_height; }

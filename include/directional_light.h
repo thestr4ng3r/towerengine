@@ -23,12 +23,12 @@ class tDirectionalLight
 		tDirectionalLightShadow *GetShadow(void)	{ return shadow; }
 
 		void InitShadow(int size, int splits = 4, bool blur_enabled = false, float blur_size = 0.003);
-		void RenderShadow(tWorld *world);
+		void RenderShadow(tRenderer *renderer);
 
 		/*
 		 * tDirectionalLightShader must be bound and its GBuffer Uniform set before!
 		 */
-		void InitRenderLighting(void);
+		void InitRenderLighting(tDirectionalLightingShader *shader);
 };
 
 #endif

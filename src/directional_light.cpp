@@ -18,7 +18,7 @@ void tDirectionalLight::InitShadow(int size, int splits, bool blur_enabled, floa
 	shadow_enabled = true;
 }
 
-void tDirectionalLight::RenderShadow(tWorld *world)
+void tDirectionalLight::RenderShadow(tRenderer *renderer)
 {
 	if(!shadow_enabled)
 		return;
@@ -26,10 +26,10 @@ void tDirectionalLight::RenderShadow(tWorld *world)
 	if(!shadow)
 		return;
 
-	shadow->Render(world);
+	shadow->Render(renderer);
 }
 
-void tDirectionalLight::InitRenderLighting(void)
+void tDirectionalLight::InitRenderLighting(tDirectionalLightingShader *shader)
 {
 	GLuint shadow_map = 0;
 	tVector2 shadow_clip = Vec(0.0, 0.0);
@@ -48,12 +48,12 @@ void tDirectionalLight::InitRenderLighting(void)
 		shadow_splits_z = shadow->GetSplitsZ();
 	}
 
-	tEngine::GetDirectionalLightingShader()->SetDirectionalLight(	dir,
-																	color,
-																	shadow_enabled ? 1 : 0,
-																	shadow_map,
-																	shadow_clip,
-																	shadow_tex_matrix,
-																	shadow_splits_count,
-																	shadow_splits_z);
+	shader->SetDirectionalLight(	dir,
+									color,
+									shadow_enabled ? 1 : 0,
+									shadow_map,
+									shadow_clip,
+									shadow_tex_matrix,
+									shadow_splits_count,
+									shadow_splits_z);
 }

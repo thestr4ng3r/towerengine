@@ -60,7 +60,7 @@ public:
 	void Step(float time);
 
 	void FillRenderSpaces(int point_light_shadow_limit);
-	void RenderShadowMaps(void);
+	void RenderShadowMaps(tRenderer *renderer); // TODO: move to tRenderer
 	tRenderSpace *GetCameraRenderSpace(void)	{ return camera_render_space; }
 	tSkyBox *GetSkyBox(void)					{ return sky_box; }
 };

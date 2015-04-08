@@ -5,18 +5,18 @@ void tRenderSpace::ClearObjects(void)
 	objects.clear();
 }
 
-void tRenderSpace::GeometryPass(void)
+void tRenderSpace::GeometryPass(tRenderer *renderer)
 {
 	set<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
-		(*i)->GeometryPass();
+		(*i)->GeometryPass(renderer);
 }
 
-void tRenderSpace::ForwardPass(void)
+void tRenderSpace::ForwardPass(tRenderer *renderer)
 {
 	set<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
-		(*i)->ForwardPass();
+		(*i)->ForwardPass(renderer);
 }

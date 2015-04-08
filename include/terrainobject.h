@@ -12,7 +12,7 @@ class tTerrainObject : public tObject
 	public:
 		tTerrainObject(tTerrain *terrain);
 
-		void GeometryPass(void);
+		void GeometryPass(tRenderer *renderer);
 		tBoundingBox GetBoundingBox(void);
 
 		void AddedToWorld(tWorld *world);

@@ -19,7 +19,7 @@ void tPointLight::InitShadow(int size, bool blur_enabled, float blur_size)
 	shadow_enabled = true;
 }
 
-void tPointLight::RenderShadow(tWorld *world)
+void tPointLight::RenderShadow(tRenderer *renderer)
 {
 	if(!shadow_enabled)
 		return;
@@ -27,16 +27,16 @@ void tPointLight::RenderShadow(tWorld *world)
 	if(!shadow)
 		return;
 
-	shadow->Render(world);
+	shadow->Render(renderer);
 	shadow_invalid = false;
 }
 
-void tPointLight::InitRenderLighting(void)
+void tPointLight::InitRenderLighting(tPointLightingShader *shader)
 {
 	GLuint shadow_map = 0;
 
 	if(shadow_enabled)
 		shadow_map = shadow->GetShadowMap();
 
-	tEngine::GetPointLightingShader()->SetPointLight(pos, color, distance, shadow_enabled ? 1 : 0, shadow_map);
+	shader->SetPointLight(pos, color, distance, shadow_enabled ? 1 : 0, shadow_map);
 }

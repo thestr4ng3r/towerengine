@@ -3,12 +3,48 @@
 
 tRenderer::tRenderer(int width, int height, tWorld *world)
 {
+	geometry_pass_shader = new tGeometryPassShader();
+	geometry_pass_shader->Init();
+	//SetCurrentFaceShader(geometry_pass_shader);
+
+	directional_lighting_shader = new tDirectionalLightingShader();
+	directional_lighting_shader->Init();
+
+	point_lighting_shader = new tPointLightingShader();
+	point_lighting_shader->Init();
+
+	ambient_lighting_shader = new tAmbientLightingShader();
+	ambient_lighting_shader->Init();
+
+	skybox_shader = new tSkyBoxShader();
+	skybox_shader->Init();
+
+	point_shadow_shader = new tPointShadowShader();
+	point_shadow_shader->Init();
+
+	point_shadow_blur_shader = new tPointShadowBlurShader();
+	point_shadow_blur_shader->Init();
+
+	directional_shadow_shader = new tDirectionalShadowShader();
+	directional_shadow_shader->Init();
+
+	directional_shadow_blur_shader = new tDirectionalShadowBlurShader();
+	directional_shadow_blur_shader->Init();
+
+	color_shader = new tColorShader();
+	color_shader->Init();
+
+	post_process_shader = new tPostProcessShader();
+	post_process_shader->Init();
+
 	this->screen_width = width;
 	this->screen_height = height;
 
 	this->world = world;
 
 	ssao = 0;
+	ssao_lighting_shader = 0;
+	ssao_shader = 0;
 
 	fxaa_enabled = false;
 
@@ -61,10 +97,37 @@ tRenderer::~tRenderer(void)
 {
 	delete ssao;
 	delete gbuffer;
+
+	delete geometry_pass_shader;
+	delete ambient_lighting_shader;
+	delete directional_lighting_shader;
+	delete point_lighting_shader;
+	delete ssao_lighting_shader;
+	delete ssao_shader;
+
+	delete skybox_shader;
+	delete point_shadow_shader;
+	delete point_shadow_blur_shader;
+	delete directional_shadow_shader;
+	delete directional_shadow_blur_shader;
+	delete color_shader;
+	delete post_process_shader;
 }
 
 void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 {
+	if(!ssao_lighting_shader)
+	{
+		ssao_lighting_shader = new tSSAOLightingShader();
+		ssao_lighting_shader->Init();
+	}
+
+	if(!ssao_shader)
+	{
+		ssao_shader = new tSSAOShader();
+		ssao_shader->Init();
+	}
+
 	delete ssao;
 	ssao = new tSSAO(this, kernel_size, radius, noise_tex_size);
 }
@@ -77,7 +140,7 @@ void tRenderer::Render(GLuint dst_fbo)
 
 	world->FillRenderSpaces(point_light_shadow_limit);
 
-	world->RenderShadowMaps();
+	world->RenderShadowMaps(this);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -110,9 +173,9 @@ void tRenderer::Render(GLuint dst_fbo)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	tEngine::GetPostProcessShader()->Bind();
-	tEngine::GetPostProcessShader()->SetFXAA(fxaa_enabled);
-	tEngine::GetPostProcessShader()->SetTextures(color_tex, depth_tex, screen_width, screen_height);
+	post_process_shader->Bind();
+	post_process_shader->SetFXAA(fxaa_enabled);
+	post_process_shader->SetTextures(color_tex, depth_tex, screen_width, screen_height);
 
 	glBegin(GL_QUADS);
 	glVertex2f(0.0, 1.0);
@@ -146,10 +209,10 @@ void tRenderer::GeometryPass(void)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	tEngine::SetCurrentFaceShader(tEngine::GetGeometryPassShader());
-	tEngine::BindCurrentFaceShader();
+	SetCurrentFaceShader(geometry_pass_shader);
+	BindCurrentFaceShader();
 
-	world->GetCameraRenderSpace()->GeometryPass();
+	world->GetCameraRenderSpace()->GeometryPass(this);
 }
 
 void tRenderer::LightPass(void)
@@ -168,7 +231,7 @@ void tRenderer::LightPass(void)
 	camera->SetModelviewProjectionMatrix();
 
 	if(sky_box)
-		sky_box->Paint(camera->GetPosition());
+		sky_box->Paint(this, camera->GetPosition());
 
 
 	glMatrixMode(GL_PROJECTION);
@@ -184,16 +247,16 @@ void tRenderer::LightPass(void)
 
 	if(ssao)
 	{
-		tEngine::GetSSAOLightingShader()->Bind();
-		tEngine::GetSSAOLightingShader()->SetGBuffer(gbuffer);
-		tEngine::GetSSAOLightingShader()->SetSSAOTexture(ssao->GetSSAOTexture());
-		tEngine::GetAmbientLightingShader()->SetAmbientLight(world->GetAmbientColor());
+		ssao_lighting_shader->Bind();
+		ssao_lighting_shader->SetGBuffer(gbuffer);
+		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
+		ssao_lighting_shader->SetAmbientLight(world->GetAmbientColor());
 	}
 	else
 	{
-		tEngine::GetAmbientLightingShader()->Bind();
-		tEngine::GetAmbientLightingShader()->SetGBuffer(gbuffer);
-		tEngine::GetAmbientLightingShader()->SetAmbientLight(world->GetAmbientColor());
+		ambient_lighting_shader->Bind();
+		ambient_lighting_shader->SetGBuffer(gbuffer);
+		ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
 	}
 
 	RenderScreenQuad();
@@ -202,24 +265,24 @@ void tRenderer::LightPass(void)
 	glBlendFunc(GL_ONE, GL_ONE);
 
 
-	tEngine::GetDirectionalLightingShader()->Bind();
-	tEngine::GetDirectionalLightingShader()->SetGBuffer(gbuffer);
-	tEngine::GetDirectionalLightingShader()->SetCameraPosition(camera->GetPosition());
+	directional_lighting_shader->Bind();
+	directional_lighting_shader->SetGBuffer(gbuffer);
+	directional_lighting_shader->SetCameraPosition(camera->GetPosition());
 
 	for(i=0; i<world->GetDirectionalLightsCount(); i++)
 	{
-		world->GetDirectionalLight(i)->InitRenderLighting();
+		world->GetDirectionalLight(i)->InitRenderLighting(directional_lighting_shader);
 		RenderScreenQuad();
 	}
 
 
-	tEngine::GetPointLightingShader()->Bind();
-	tEngine::GetPointLightingShader()->SetGBuffer(gbuffer);
-	tEngine::GetPointLightingShader()->SetCameraPosition(camera->GetPosition());
+	point_lighting_shader->Bind();
+	point_lighting_shader->SetGBuffer(gbuffer);
+	point_lighting_shader->SetCameraPosition(camera->GetPosition());
 
 	for(i=0; i<world->GetPointLightsCount(); i++)
 	{
-		world->GetPointLight(i)->InitRenderLighting();
+		world->GetPointLight(i)->InitRenderLighting(point_lighting_shader);
 		RenderScreenQuad();
 	}
 
@@ -230,7 +293,7 @@ void tRenderer::ForwardPass(void)
 {
 	world->GetCamera()->SetModelviewProjectionMatrix();
 
-	world->GetCameraRenderSpace()->ForwardPass();
+	world->GetCameraRenderSpace()->ForwardPass(this);
 }
 
 

@@ -9,9 +9,9 @@ tTerrainObject::tTerrainObject(tTerrain *terrain)
 	rigid_body->setRestitution(0.0);
 }
 
-void tTerrainObject::GeometryPass(void)
+void tTerrainObject::GeometryPass(tRenderer *renderer)
 {
-	terrain->Paint();
+	terrain->Paint(renderer);
 }
 
 tBoundingBox tTerrainObject::GetBoundingBox(void)

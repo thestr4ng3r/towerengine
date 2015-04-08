@@ -30,7 +30,7 @@ class tPointLightShadow
 	public:
 		tPointLightShadow(tPointLight *light, int size, bool blur_enabled = false, float blur_size = 0.003);
 
-		void Render(tWorld *world);
+		void Render(tRenderer *renderer);
 
 		GLuint GetShadowMap(void)			{ return tex; }
 

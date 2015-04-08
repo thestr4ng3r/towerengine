@@ -569,7 +569,7 @@ void tMesh::RefreshIBOs(void)
 	refresh_ibos = false;
 }
 
-void tMesh::PutToGL(void)
+void tMesh::PutToGL(tRenderer *renderer)
 {
 	vector<tMeshMaterial *>::iterator i;
 	tVBO<float> *vertex_vbo, *vertex2_vbo;
@@ -620,11 +620,11 @@ void tMesh::PutToGL(void)
 	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
 	if(vertex2_vbo)
 	{
-		tEngine::GetCurrentFaceShader()->SetVertexMix(mix);
+		renderer->GetCurrentFaceShader()->SetVertexMix(mix);
 		vertex2_vbo->SetAttribute(tFaceShader::vertex2_attribute, GL_FLOAT);
 	}
 	else
-		tEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
+		renderer->GetCurrentFaceShader()->SetVertexMix(0.0);
 
 	normal_vbo->SetAttribute(tFaceShader::normal_attribute, GL_FLOAT);
 	tang_vbo->SetAttribute(tFaceShader::tang_attribute, GL_FLOAT);
@@ -635,13 +635,13 @@ void tMesh::PutToGL(void)
 		RefreshIBOs();
 
 	//CEngine::GetFaceShader()->BindShader();
-	tEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
+	renderer->GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for(i=materials.begin(); i!=materials.end(); i++)
 	{
-		(*i)->PutToGL();
+		(*i)->PutToGL(renderer);
 
 		if(this->wireframe)
 			(*i)->ibo->Draw(GL_LINE_STRIP);

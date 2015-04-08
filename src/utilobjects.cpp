@@ -14,32 +14,32 @@ tCoordinateSystemObject::~tCoordinateSystemObject(void)
 
 }
 
-void tCoordinateSystemObject::ForwardPass(void)
+void tCoordinateSystemObject::ForwardPass(tRenderer *renderer)
 {
 	if(depth_test)
 		glEnable(GL_DEPTH_TEST);
 	else
 		glDisable(GL_DEPTH_TEST);
 
-	tEngine::GetColorShader()->Bind();
-	tEngine::GetColorShader()->SetTransformation(tEngine::identity_matrix4);
+	renderer->GetColorShader()->Bind();
+	renderer->GetColorShader()->SetTransformation(tEngine::identity_matrix4);
 
 	glLineWidth(3.0);
 
-	tEngine::GetColorShader()->SetDiffuseColor(Vec(1.0, 0.0, 0.0));
+	renderer->GetColorShader()->SetDiffuseColor(Vec(1.0, 0.0, 0.0));
 	glBegin(GL_LINES);
 	pos.AttrToGL(tFaceShader::vertex_attribute);
 	(pos + size * Vec(1.0, 0.0, 0.0)).AttrToGL(tFaceShader::vertex_attribute);
 	glEnd();
 
-	tEngine::GetColorShader()->SetDiffuseColor(Vec(0.0, 1.0, 0.0));
+	renderer->GetColorShader()->SetDiffuseColor(Vec(0.0, 1.0, 0.0));
 	glBegin(GL_LINES);
 	glColor4f(0.0, 1.0, 0.0, 1.0);
 	pos.AttrToGL(tFaceShader::vertex_attribute);
 	(pos + size * Vec(0.0, 1.0, 0.0)).AttrToGL(tFaceShader::vertex_attribute);
 	glEnd();
 
-	tEngine::GetColorShader()->SetDiffuseColor(Vec(0.0, 0.0, 1.0));
+	renderer->GetColorShader()->SetDiffuseColor(Vec(0.0, 0.0, 1.0));
 	glBegin(GL_LINES);
 	glColor4f(0.0, 0.0, 1.0, 1.0);
 	pos.AttrToGL(tFaceShader::vertex_attribute);

@@ -11,8 +11,8 @@ class tRenderSpace
 	public:
 		void ClearObjects(void);
 
-		void GeometryPass(void);
-		void ForwardPass(void);
+		void GeometryPass(tRenderer *renderer);
+		void ForwardPass(tRenderer *renderer);
 };
 
 

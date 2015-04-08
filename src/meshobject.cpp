@@ -122,14 +122,14 @@ tBoundingBox tMeshObject::GetBoundingBox(void)
 	return b;
 }
 
-void tMeshObject::GeometryPass(void)
+void tMeshObject::GeometryPass(tRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
 
 	float *temp = transform.GetMatrix(transform_matrix);
 
-	tEngine::GetCurrentFaceShader()->SetTransformation(temp);
+	renderer->GetCurrentFaceShader()->SetTransformation(temp);
 
 	tMesh::Color(color, alpha);
 
@@ -146,10 +146,10 @@ void tMeshObject::GeometryPass(void)
 		else
 			mesh->ChangePose("Idle");
 	}
-	mesh->PutToGL();
+	mesh->PutToGL(renderer);
 }
 
-void tMeshObject::ForwardPass(void)
+void tMeshObject::ForwardPass(tRenderer *renderer)
 {
 
 }

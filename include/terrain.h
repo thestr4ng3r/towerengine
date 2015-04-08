@@ -36,7 +36,7 @@ class tTerrain
 
 		btCollisionShape *GetCollisionShape(void)	{ return collision_shape; }
 
-		void Paint(void);
+		void Paint(tRenderer *renderer);
 
 };
 

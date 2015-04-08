@@ -95,17 +95,17 @@ void tWorld::Clear(void)
 	objects.clear();
 }
 
-void tWorld::RenderShadowMaps(void)
+void tWorld::RenderShadowMaps(tRenderer *renderer)  // TODO: move to tRenderer
 {
 	list<tPointLight *>::iterator pi;
 
 	for(pi=render_point_light_shadows.begin(); pi!=render_point_light_shadows.end(); pi++)
-		(*pi)->RenderShadow(this);
+		(*pi)->RenderShadow(renderer);
 
 	set<tDirectionalLight *>::iterator di;
 
 	for(di=camera_render_dir_lights.begin(); di!=camera_render_dir_lights.end(); di++)
-		(*di)->RenderShadow(this);
+		(*di)->RenderShadow(renderer);
 }
 
 bool CompareFloatComparable(tComparable<float> *a, tComparable<float> *b)

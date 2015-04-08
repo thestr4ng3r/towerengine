@@ -110,14 +110,14 @@ void tMaterial::LoadBumpTextureBinary(const char *extension, const void *data, u
 	bump.enabled = bump.tex ? 1 : 0;
 }
 
-void tMaterial::PutToGL(void)
+void tMaterial::PutToGL(tRenderer *renderer)
 {
-	tEngine::GetCurrentFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse.tex);
-	tEngine::GetCurrentFaceShader()->SetSpecularTexture(specular.enabled, specular.tex);
-	tEngine::GetCurrentFaceShader()->SetNormalTexture(normal.enabled, normal.tex);
-	tEngine::GetCurrentFaceShader()->SetBumpTexture(bump.enabled, bump.tex);
-	tEngine::GetCurrentFaceShader()->SetDiffuseColor(diffuse.color);
-	tEngine::GetCurrentFaceShader()->SetSpecularColor(specular.color);
-	tEngine::GetCurrentFaceShader()->SetSpecular(specular.exponent);
-	tEngine::GetCurrentFaceShader()->SetBumpDepth(bump.depth);
+	renderer->GetCurrentFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse.tex);
+	renderer->GetCurrentFaceShader()->SetSpecularTexture(specular.enabled, specular.tex);
+	renderer->GetCurrentFaceShader()->SetNormalTexture(normal.enabled, normal.tex);
+	renderer->GetCurrentFaceShader()->SetBumpTexture(bump.enabled, bump.tex);
+	renderer->GetCurrentFaceShader()->SetDiffuseColor(diffuse.color);
+	renderer->GetCurrentFaceShader()->SetSpecularColor(specular.color);
+	renderer->GetCurrentFaceShader()->SetSpecular(specular.exponent);
+	renderer->GetCurrentFaceShader()->SetBumpDepth(bump.depth);
 }

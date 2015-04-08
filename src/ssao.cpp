@@ -114,7 +114,7 @@ void tSSAO::ChangeScreenSize(int screen_width, int screen_height)
 
 void tSSAO::Render(void)
 {
-	tSSAOShader *ssao_shader = tEngine::GetSSAOShader();
+	tSSAOShader *ssao_shader = renderer->GetSSAOShader();
 	tVector2 noise_tex_scale;
 
 	tGBuffer *gbuffer = renderer->GetGBuffer();

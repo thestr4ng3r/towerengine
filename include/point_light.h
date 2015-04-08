@@ -29,9 +29,9 @@ class tPointLight: public tComparable<float>
 		tPointLightShadow *GetShadow(void)	{ return shadow; }
 
 		void InitShadow(int size, bool blur_enabled = false, float blur_size = 0.003);
-		void RenderShadow(tWorld *world);
+		void RenderShadow(tRenderer *renderer);
 
-		void InitRenderLighting(void);
+		void InitRenderLighting(tPointLightingShader *shader);
 
 		void SetSortingValue(float v)	{ sorting_value = v; }
 		float GetSortingValue(void)		{ return sorting_value; }

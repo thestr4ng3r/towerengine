@@ -158,30 +158,30 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 
 }
 
-void tTerrain::Paint(void)
+void tTerrain::Paint(tRenderer *renderer)
 {
 	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
 	normal_vbo->SetAttribute(tFaceShader::normal_attribute, GL_FLOAT);
 	tang_vbo->SetAttribute(tFaceShader::tang_attribute, GL_FLOAT);
 	bitang_vbo->SetAttribute(tFaceShader::bitang_attribute, GL_FLOAT);
 	uvcoord_vbo->SetAttribute(tFaceShader::uvcoord_attribute, GL_FLOAT);
-	tEngine::GetCurrentFaceShader()->SetVertexMix(0.0);
+	renderer->GetCurrentFaceShader()->SetVertexMix(0.0);
 
-	tEngine::GetCurrentFaceShader()->SetTransformation(tEngine::identity_matrix4);
+	renderer->GetCurrentFaceShader()->SetTransformation(tEngine::identity_matrix4);
 
-	tEngine::GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
+	renderer->GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
 
 	if(material)
-		material->PutToGL();
+		material->PutToGL(renderer);
 	else
 	{
-		tEngine::GetCurrentFaceShader()->SetDiffuseTexture(true, height_map->GetHeightTex());
-		tEngine::GetCurrentFaceShader()->SetSpecularTexture(false);
-		tEngine::GetCurrentFaceShader()->SetNormalTexture(false);
+		renderer->GetCurrentFaceShader()->SetDiffuseTexture(true, height_map->GetHeightTex());
+		renderer->GetCurrentFaceShader()->SetSpecularTexture(false);
+		renderer->GetCurrentFaceShader()->SetNormalTexture(false);
 		//CEngine::GetCurrentFaceShader()->SetHeightTexture(false);
-		tEngine::GetCurrentFaceShader()->SetDiffuseColor(Vec(1.0, 1.0, 1.0));
-		tEngine::GetCurrentFaceShader()->SetSpecularColor(Vec(0.0, 0.0, 0.0));
-		tEngine::GetCurrentFaceShader()->SetSpecular(0.0);
+		renderer->GetCurrentFaceShader()->SetDiffuseColor(Vec(1.0, 1.0, 1.0));
+		renderer->GetCurrentFaceShader()->SetSpecularColor(Vec(0.0, 0.0, 0.0));
+		renderer->GetCurrentFaceShader()->SetSpecular(0.0);
 		//CEngine::GetCurrentFaceShader()->SetHeightFactor(Vec(0.0, 0.0, 0.0));
 	}
 

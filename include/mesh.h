@@ -101,7 +101,7 @@ class tMesh
         //int LoadFromFile_0_0(const char *file) { printf("LoadFromFile_0_0 function was removed.\n"); return 0; };
 		//void SetOrientation(CVector o);
 		//CVector ApplyOrientation(CVector v) { return Orientation(v, orient_x, orient_y, orient_z); };
-		void PutToGL(void);
+		void PutToGL(tRenderer *renderer);
 		int GetState(void);
 		void Create(void);
 		void Delete(void);

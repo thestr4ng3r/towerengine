@@ -77,12 +77,14 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 	blur_vao->UnBind();
 }
 
-void tPointLightShadow::Render(tWorld *world)
+void tPointLightShadow::Render(tRenderer *renderer)
 {
 	int s;
 	tVector pos = light->GetPosition();
 	tVector cam_dir, cam_to;
 	tVector v_vec;
+
+	tWorld *world = renderer->GetWorld();
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -95,10 +97,10 @@ void tPointLightShadow::Render(tWorld *world)
 	glLoadIdentity();
 	gluPerspective(90.0, 1.0, 0.001, light->GetDistance());
 
-	tEngine::SetCurrentFaceShader(tEngine::GetPointShadowShader());
-	tEngine::BindCurrentFaceShader();
-	tEngine::GetPointShadowShader()->SetLightPos(pos);
-	tEngine::GetPointShadowShader()->SetLightDist(light->GetDistance());
+	renderer->SetCurrentFaceShader(renderer->GetPointShadowShader()); // TODO: bind once in tRenderer before rendering all pointlights
+	renderer->BindCurrentFaceShader();
+	renderer->GetPointShadowShader()->SetLightPos(pos);
+	renderer->GetPointShadowShader()->SetLightDist(light->GetDistance());
 
 	for(s=0; s<6; s++)
 	{
@@ -116,9 +118,9 @@ void tPointLightShadow::Render(tWorld *world)
 			v_vec = Vec(0.0, 0.0, -1.0);
 		gluLookAt(pos.x, pos.y, pos.z, cam_to.x, cam_to.y, cam_to.z, v_vec.x, v_vec.y, v_vec.z);
 
-		render_space->GeometryPass();
+		render_space->GeometryPass(renderer);
 	}
-	tShader::Unbind();
+	tShader::Unbind(); // TODO: remove this if possible
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
@@ -134,8 +136,8 @@ void tPointLightShadow::Render(tWorld *world)
 	glLoadIdentity();
 	gluPerspective(90.0, 1.0, 0.001, 5.0);
 
-	tEngine::GetPointShadowBlurShader()->Bind();
-	tEngine::GetPointShadowBlurShader()->SetTexture(tex);
+	renderer->GetPointShadowBlurShader()->Bind();
+	renderer->GetPointShadowBlurShader()->SetTexture(tex);
 
 	for(s=0; s<6; s++)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, blur_tex, 0);
@@ -146,19 +148,19 @@ void tPointLightShadow::Render(tWorld *world)
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
 
-	tEngine::GetPointShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0, 0.0) * blur_size);
+	renderer->GetPointShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0, 0.0) * blur_size);
 
 	blur_vao->Draw(GL_QUADS, 0, 4);
 
 
-	tEngine::GetPointShadowBlurShader()->SetTexture(blur_tex);
+	renderer->GetPointShadowBlurShader()->SetTexture(blur_tex);
 
 	for(s=0; s<6; s++)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	tEngine::GetPointShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0, 0.0) * blur_size);
+	renderer->GetPointShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0, 0.0) * blur_size);
 
 	blur_vao->Draw(GL_QUADS, 0, 4);
 

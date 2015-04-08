@@ -54,7 +54,7 @@ class tMaterial
 		void LoadNormalTextureBinary(const char *extension, const void *data, unsigned int size);
 		void LoadBumpTextureBinary(const char *extension, const void *data, unsigned int size);
 
-		void PutToGL(void);
+		void PutToGL(tRenderer *renderer);
 };
 
 #endif
