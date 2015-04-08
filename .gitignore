@@ -15,6 +15,7 @@
 .project
 .settings/
 .dep/
+.externalToolBuilders/
 
 # Build
 build/
