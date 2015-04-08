@@ -29,6 +29,7 @@ class tRenderer;
 #include "face_shader.h"
 #include "geometry_pass_shader.h"
 #include "gbuffer.h"
+#include "comparable.h"
 
 #include "lighting_shader.h"
 #include "ambient_lighting_shader.h"

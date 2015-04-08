@@ -14,6 +14,7 @@ private:
 	tRenderSpace *camera_render_space;
 	set<tPointLight *> camera_render_point_lights;
 	set<tDirectionalLight *> camera_render_dir_lights;
+	list<tPointLight *> render_point_light_shadows;
 
 	tVector ambient_color;
 
@@ -58,7 +59,7 @@ public:
 
 	void Step(float time);
 
-	void FillRenderSpaces(void);
+	void FillRenderSpaces(int point_light_shadow_limit);
 	void RenderShadowMaps(void);
 	tRenderSpace *GetCameraRenderSpace(void)	{ return camera_render_space; }
 	tSkyBox *GetSkyBox(void)					{ return sky_box; }

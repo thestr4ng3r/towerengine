@@ -81,6 +81,7 @@ void tScene::ParseAssetsNode(xml_node<> *cur)
 void tScene::ParseMeshAssetNode(xml_node<> *cur)
 {
 	char *file_data = 0;
+	string file;
 	xml_attribute<> *attr;
 	string name;
 
@@ -93,7 +94,12 @@ void tScene::ParseMeshAssetNode(xml_node<> *cur)
 	{
 		if(strcmp(child->name(), "data") == 0)
 		{
-			if(child->value_size() > 0)
+			if((attr = child->first_attribute("file")))
+			{
+				file = string(attr->value());
+				break; // remove this break if other things should be loaded
+			}
+			else if(child->value_size() > 0)
 			{
 				file_data = child->value();
 				break; // remove this break if other things should be loaded
@@ -102,12 +108,20 @@ void tScene::ParseMeshAssetNode(xml_node<> *cur)
 		child = child->next_sibling();
 	}
 
-	if(!file_data)
+
+	tMesh *mesh;
+	if(file_data)
+	{
+		mesh = new tMesh();
+		mesh->LoadFromData(file_data, "");
+	}
+	else if(file.size() > 0)
+	{
+		mesh = new tMesh();
+		mesh->LoadFromFile(file.c_str());
+	}
+	else
 		return;
-
-
-	tMesh *mesh = new tMesh();
-	mesh->LoadFromData(file_data, "");
 
 	assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tMeshAsset(mesh))));
 }
@@ -120,6 +134,7 @@ void tScene::ParseCubeMapAssetNode(xml_node<> *cur)
 	unsigned char *file_data = 0;
 	const char *file_ext = 0;
 	string name;
+	string file;
 
 	if(!(attr = cur->first_attribute("name")))
 			return;
@@ -130,7 +145,12 @@ void tScene::ParseCubeMapAssetNode(xml_node<> *cur)
 	{
 		if(strcmp(child->name(), "data") == 0)
 		{
-			if(child->value_size() > 0)
+			if((attr = child->first_attribute("file")))
+			{
+				file = string(attr->value());
+				break; // remove this break if other things should be loaded
+			}
+			else if(child->value_size() > 0)
 			{
 				base64_temp = child->value();
 				Base64Decode(base64_temp, &file_data, &file_size);
@@ -144,10 +164,14 @@ void tScene::ParseCubeMapAssetNode(xml_node<> *cur)
 		child = child->next_sibling();
 	}
 
-	if(!file_data)
-		return;
+	GLuint cubemap;
 
-	GLuint cubemap = LoadGLCubeMapBinary(file_ext, file_data, file_size);
+	if(file_data)
+		cubemap = LoadGLCubeMapBinary(file_ext, file_data, file_size);
+	else
+	{
+		cubemap = LoadGLCubeMap(file.c_str());
+	}
 	assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tCubeMapAsset(cubemap))));
 }
 
@@ -263,7 +287,6 @@ void tScene::ParseSceneNode(xml_node<> *cur)
 	map<string, tAsset *>::iterator asset_i;
 	string asset_name;
 	xml_attribute<> *attr;
-
 
 	if((attr = cur->first_attribute("sky_cubemap")))
 	{

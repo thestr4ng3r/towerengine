@@ -53,6 +53,8 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 
 	screen_quad_vbo->AssignData();
 
+	point_light_shadow_limit = -1;
+
 }
 
 tRenderer::~tRenderer(void)
@@ -73,7 +75,7 @@ void tRenderer::Render(GLuint dst_fbo)
 
 	camera->SetAspect((float)screen_width / (float)screen_height);
 
-	world->FillRenderSpaces();
+	world->FillRenderSpaces(point_light_shadow_limit);
 
 	world->RenderShadowMaps();
 

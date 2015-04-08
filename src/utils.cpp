@@ -88,7 +88,7 @@ string PathOfFile(string file)
 			break;
     }
 
-	return file.substr(0, i);
+	return file.substr(0, i+1);
 }
 
 

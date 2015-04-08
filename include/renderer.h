@@ -26,6 +26,8 @@ class tRenderer
 
 		tSSAO *ssao;
 
+		int point_light_shadow_limit;
+
 		void GeometryPass(void);
 		void LightPass(void);
 		void ForwardPass(void);
@@ -55,6 +57,8 @@ class tRenderer
 		tGBuffer *GetGBuffer(void)			{ return gbuffer; }
 
 		GLuint GetDepthTexture(void)		{ return depth_tex; }
+
+		void SetPointLightShadowRenderLimit(int limit)	{ this->point_light_shadow_limit = limit; }
 };
 
 

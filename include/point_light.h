@@ -2,7 +2,7 @@
 #ifndef _POINT_LIGHT_H
 #define _POINT_LIGHT_H
 
-class tPointLight
+class tPointLight: public tComparable<float>
 {
 	private:
 		tVector pos;
@@ -11,6 +11,9 @@ class tPointLight
 
 		bool shadow_enabled;
 		tPointLightShadow *shadow;
+		bool shadow_invalid;
+
+		float sorting_value;
 
 	public:
 		tPointLight(tVector pos, tVector color, float distance);
@@ -29,6 +32,12 @@ class tPointLight
 		void RenderShadow(tWorld *world);
 
 		void InitRenderLighting(void);
+
+		void SetSortingValue(float v)	{ sorting_value = v; }
+		float GetSortingValue(void)		{ return sorting_value; }
+
+		void InvalidateShadow(void)		{ shadow_invalid = true; }
+		bool GetShadowInvalid(void)		{ return shadow_invalid; }
 };
 
 #endif

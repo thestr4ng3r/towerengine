@@ -97,9 +97,9 @@ void tWorld::Clear(void)
 
 void tWorld::RenderShadowMaps(void)
 {
-	set<tPointLight *>::iterator pi;
+	list<tPointLight *>::iterator pi;
 
-	for(pi=camera_render_point_lights.begin(); pi!=camera_render_point_lights.end(); pi++)
+	for(pi=render_point_light_shadows.begin(); pi!=render_point_light_shadows.end(); pi++)
 		(*pi)->RenderShadow(this);
 
 	set<tDirectionalLight *>::iterator di;
@@ -108,7 +108,13 @@ void tWorld::RenderShadowMaps(void)
 		(*di)->RenderShadow(this);
 }
 
-void tWorld::FillRenderSpaces(void)
+bool CompareFloatComparable(tComparable<float> *a, tComparable<float> *b)
+{
+	return a->GetCompareValue() < b->GetCompareValue();
+}
+
+
+void tWorld::FillRenderSpaces(int point_light_shadow_limit)
 {
 	tBoundingBox b;
 	tVector minv, maxv;
@@ -121,6 +127,7 @@ void tWorld::FillRenderSpaces(void)
 	camera_render_space->ClearObjects();
 	camera_render_point_lights.clear();
 	camera_render_dir_lights.clear();
+	render_point_light_shadows.clear();
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 	{
@@ -141,8 +148,39 @@ void tWorld::FillRenderSpaces(void)
 
 		camera_render_point_lights.insert(*pi);
 
-		if(!(*pi)->GetShadowEnabled())
+		if((*pi)->GetShadowEnabled())
+		{
+			render_point_light_shadows.push_back(*pi);
+			(*pi)->SetCompareValue((light_pos - camera->GetPosition()).SquaredLen());
+		}
+	}
+
+	if(point_light_shadow_limit == 0)
+		render_point_light_shadows.clear();
+	else if(point_light_shadow_limit > 0)
+	{
+		render_point_light_shadows.sort(CompareFloatComparable);
+
+		while((int)render_point_light_shadows.size() > point_light_shadow_limit)
+			render_point_light_shadows.pop_back();
+	}
+
+
+	for(pi=point_lights.begin(); pi!=point_lights.end(); pi++)
+	{
+		if(!(*pi)->GetShadowInvalid())
 			continue;
+		render_point_light_shadows.push_back(*pi);
+	}
+	render_point_light_shadows.unique();
+
+
+	list<tPointLight *>::iterator pli;
+
+	for(pli=render_point_light_shadows.begin(); pli!=render_point_light_shadows.end(); pli++)
+	{
+		light_pos = (*pli)->GetPosition();
+		light_dist = (*pli)->GetDistance();
 
 		for(i=objects.begin(); i!=objects.end(); i++)
 		{
@@ -162,7 +200,7 @@ void tWorld::FillRenderSpaces(void)
 			if(maxv.z < light_pos.z - light_dist)
 				continue;
 
-			(*pi)->GetShadow()->GetRenderSpace()->objects.insert((*i));
+			(*pli)->GetShadow()->GetRenderSpace()->objects.insert((*i));
 		}
 	}
 

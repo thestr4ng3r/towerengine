@@ -658,13 +658,15 @@ int tMesh::GetState(void)
 bool tMesh::LoadFromFile(const char *file, int no_material)
 {
 	bool r;
-	const char *path;
+	string path;
 	struct stat s;
 	
 	if(stat(file, &s) != 0 && errno == ENOENT)
 	    return 0;
 	
-	path = PathOfFile(string(file)).c_str();
+	path = PathOfFile(string(file));
+
+	//printf("Path \"%s\"\n", path);
 
 	char *data = ReadFile(file);
 
@@ -680,7 +682,7 @@ bool tMesh::LoadFromFile(const char *file, int no_material)
 	return r;
 }
 
-bool tMesh::LoadFromData(char *data, const char *path)
+bool tMesh::LoadFromData(char *data, string path)
 {
 	bool r;
 
@@ -706,7 +708,7 @@ int TEMVersionFromString(const char *s)
 	return -1;
 }
 
-bool tMesh::LoadFromXML(xml_document<> *doc, const char *path, int no_material)
+bool tMesh::LoadFromXML(xml_document<> *doc, string path, int no_material)
 {
 	xml_node<> *cur;
 	xml_attribute<> *attr;
@@ -745,6 +747,8 @@ bool tMesh::LoadFromXML(xml_document<> *doc, const char *path, int no_material)
 	Create();
 
 	cur = cur->first_node();
+
+	//printf("Path xml \"%s\"\n", path);
 
 	while(cur)
 	{
@@ -813,7 +817,7 @@ tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 #define TEXTURE_DATA 2
 
 
-tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, const char *path)
+tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 {
 	xml_node<> *child;
 	int diffuse_mode, specular_mode, normal_mode, bump_mode;
@@ -844,6 +848,8 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, const char *path)
 		return 0;
 
 	name = string(attr->value());
+
+	//printf("Material with path \"%s\"\n", path);
 
 	child = cur->first_node();
 	while(child)
@@ -965,24 +971,24 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, const char *path)
 
 	if(diffuse_mode == TEXTURE_FILE)
 	{
-		r->LoadDiffuseTextureURL(string(path) + diffuse_file);
-		printf("loading texture \"%s\"\n", (string(path) + diffuse_file).c_str());
+		r->LoadDiffuseTextureURL(path + diffuse_file);
+		//printf("loading texture \"%s\"\n", (path + diffuse_file).c_str());
 	}
 	else if(diffuse_mode == TEXTURE_DATA)
 		r->LoadDiffuseTextureBinary(diffuse_ext, diffuse_data, diffuse_size);
 
 	if(specular_mode == TEXTURE_FILE)
-		r->LoadSpecularTextureURL(string(path) + specular_file);
+		r->LoadSpecularTextureURL(path + specular_file);
 	else if(specular_mode == TEXTURE_DATA)
 		r->LoadSpecularTextureBinary(specular_ext, specular_data, specular_size);
 
 	if(normal_mode == TEXTURE_FILE)
-		r->LoadNormalTextureURL(string(path) + normal_file);
+		r->LoadNormalTextureURL(path + normal_file);
 	else if(normal_mode == TEXTURE_DATA)
 		r->LoadNormalTextureBinary(normal_ext, normal_data, normal_size);
 
 	if(bump_mode == TEXTURE_FILE)
-		r->LoadBumpTextureURL(string(path) + bump_file);
+		r->LoadBumpTextureURL(path + bump_file);
 	else if(bump_mode == TEXTURE_DATA)
 		r->LoadBumpTextureBinary(bump_ext, bump_data, bump_size);
 

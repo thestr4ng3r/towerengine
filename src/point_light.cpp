@@ -28,6 +28,7 @@ void tPointLight::RenderShadow(tWorld *world)
 		return;
 
 	shadow->Render(world);
+	shadow_invalid = false;
 }
 
 void tPointLight::InitRenderLighting(void)
