@@ -43,9 +43,14 @@ void tGeometryPassShader::Init(void)
 	clip_uniform = GetUniformLocation("clip_vec_uni");
 	clip_dist_uniform = GetUniformLocation("clib_dist_uni");
 
+
 	Bind();
+	glUniform1i(diffuse_tex_uniform, diffuse_tex_unit);
+	glUniform1i(specular_tex_uniform, specular_tex_unit);
+	glUniform1i(normal_tex_uniform, normal_tex_unit);
+	glUniform1i(bump_tex_uniform, bump_tex_unit);
+
 	ResetUniforms();
-	Unbind();
 }
 
 void tGeometryPassShader::SetTransformation(const float m[16])
@@ -87,7 +92,6 @@ void tGeometryPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glUniform1i(diffuse_tex_uniform, diffuse_tex_unit);
 		glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
@@ -99,7 +103,6 @@ void tGeometryPassShader::SetSpecularTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glUniform1i(specular_tex_uniform, specular_tex_unit);
 		glActiveTexture(GL_TEXTURE0 + specular_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
@@ -112,7 +115,6 @@ void tGeometryPassShader::SetNormalTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glUniform1i(normal_tex_uniform, normal_tex_unit);
 		glActiveTexture(GL_TEXTURE0 + normal_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
@@ -130,7 +132,6 @@ void tGeometryPassShader::SetBumpTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glUniform1i(bump_tex_uniform, bump_tex_unit);
 		glActiveTexture(GL_TEXTURE0 + bump_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
@@ -145,8 +146,6 @@ void tGeometryPassShader::SetTexCoord(tVector2 coord)
 
 void tGeometryPassShader::SetVectors(tVector normal, tVector tangx, tVector tangy, tVector fnormal)
 {
-	if(normal.SquaredLen() < 0.5)
-		printf("%f, %f, %f\n", pvec(normal));
 	normal.AttrToGL(normal_attribute);
 
 	if(fnormal.SquaredLen() > 0.0)

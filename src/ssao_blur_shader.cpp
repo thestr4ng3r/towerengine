@@ -11,11 +11,13 @@ void tSSAOBlurShader::Init(void)
 	tex_uniform = GetUniformLocation("tex_uni");
 
 	blur_vertical_uniform = GetUniformLocation("blur_vertical_uni");
+
+	Bind();
+	glUniform1i(tex_uniform, 0);
 }
 
 void tSSAOBlurShader::SetTexture(GLuint tex)
 {
-	glUniform1i(tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
 }

@@ -9,13 +9,12 @@ void tSkyBoxShader::Init(void)
 
 	tex_uniform = GetUniformLocation("cube_map_uni");
 
-	Unbind();
+	Bind();
+	glUniform1i(tex_uniform, 0);
 }
 
 void tSkyBoxShader::SetCubeMap(GLuint tex)
 {
-	glUniform1i(tex_uniform, 0);
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 }

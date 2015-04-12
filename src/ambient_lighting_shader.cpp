@@ -10,11 +10,13 @@ void tAmbientLightingShader::Init(void)
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 
 	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
+
+	Bind();
+	glUniform1i(diffuse_tex_uniform, 0);
 }
 
 void tAmbientLightingShader::SetGBuffer(tGBuffer *gbuffer)
 {
-	glUniform1i(diffuse_tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::DIFFUSE_TEX));
 }

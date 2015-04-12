@@ -12,15 +12,19 @@ void tPostProcessShader::Init(void)
 	tex_pixel_uniform = GetUniformLocation("tex_pixel_uni");
 
 	fxaa_enabled_uniform = GetUniformLocation("fxaa_enabled_uni");
+
+	Bind();
+	glUniform1i(color_tex_uniform, 0);
+	glUniform1i(depth_tex_uniform, 1);
+
+	glUniform1i(depth_tex_uniform, 1);
 }
 
 void tPostProcessShader::SetTextures(GLuint color, GLuint depth, int width, int height)
 {
-	glUniform1i(color_tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, color);
 
-	glUniform1i(depth_tex_uniform, 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depth);
 

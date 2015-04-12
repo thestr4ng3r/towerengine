@@ -10,18 +10,20 @@ void tSSAOLightingShader::Init(void)
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 
 	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
+
+	Bind();
+	glUniform1i(ssao_tex_uniform, 0);
+	glUniform1i(diffuse_tex_uniform, 1);
 }
 
 void tSSAOLightingShader::SetSSAOTexture(GLuint tex)
 {
-	glUniform1i(ssao_tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
 void tSSAOLightingShader::SetGBuffer(tGBuffer *gbuffer)
 {
-	glUniform1i(diffuse_tex_uniform, 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::DIFFUSE_TEX));
 }

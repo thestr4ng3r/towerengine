@@ -16,8 +16,6 @@ void tPointShadowShader::Init(void)
 	light_dist_uniform = GetUniformLocation("light_dist_uni");
 	transformation_uniform = GetUniformLocation("transformation_uni");
 	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
-
-	Unbind();
 }
 
 void tPointShadowShader::SetLightPos(tVector v)
@@ -57,14 +55,15 @@ void tPointShadowBlurShader::Init(void)
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 
 	tex_uniform = GetUniformLocation("tex_uni");
+
 	blur_dir_uniform = GetUniformLocation("blur_dir_uni");
 
-	Unbind();
+	Bind();
+	glUniform1i(tex_uniform, 0);
 }
 
 void tPointShadowBlurShader::SetTexture(GLuint tex)
 {
-	glUniform1i(tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 }

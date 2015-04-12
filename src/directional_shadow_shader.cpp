@@ -22,7 +22,8 @@ void tDirectionalShadowShader::Init(void)
 	diffuse_tex_enabled_uniform = GetUniformLocation("diffuse_tex_enabled_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 
-	Unbind();
+	Bind();
+	glUniform1i(diffuse_tex_uniform, 0);
 }
 
 void tDirectionalShadowShader::SetLightDir(tVector v)
@@ -59,7 +60,6 @@ void tDirectionalShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glUniform1i(diffuse_tex_uniform, 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
@@ -82,12 +82,12 @@ void tDirectionalShadowBlurShader::Init(void)
 	blur_dir_uniform = GetUniformLocation("blur_dir_uni");
 	blur_factors_uniform = GetUniformLocation("blur_factors_uni");
 
-	Unbind();
+	Bind();
+	glUniform1i(tex_uniform, 0);
 }
 
 void tDirectionalShadowBlurShader::SetTexture(GLuint tex)
 {
-	glUniform1i(tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
 }

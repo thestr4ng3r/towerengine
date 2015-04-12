@@ -26,6 +26,12 @@ void tSSAOShader::Init(void)
 
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 	cam_dir_uniform = GetUniformLocation("cam_dir_uni");
+
+	Bind();
+	glUniform1i(noise_tex_uniform, 0);
+	glUniform1i(depth_tex_uniform, 1);
+	glUniform1i(position_tex_uniform, 2);
+	glUniform1i(normal_tex_uniform, 3);
 }
 
 void tSSAOShader::SetKernel(int kernel_size, float *kernel)
@@ -40,22 +46,18 @@ void tSSAOShader::SetNoiseTex(GLuint tex, tVector2 tex_scale)
 {
 	glUniform2f(noise_tex_scale_uniform, tex_scale.x, tex_scale.y);
 
-	glUniform1i(noise_tex_uniform, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
 void tSSAOShader::SetTextures(GLuint depth, GLuint pos, GLuint normal)
 {
-	glUniform1i(depth_tex_uniform, 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depth);
 
-	glUniform1i(position_tex_uniform, 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, pos);
 
-	glUniform1i(normal_tex_uniform, 3);
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, normal);
 }
