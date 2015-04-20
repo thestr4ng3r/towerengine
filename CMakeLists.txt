@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.6)
 
 project(towerengine)
 
+set(towerengine_VERSION 1.0.0)
+
 set(CMAKE_BUILD_TYPE Release)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -85,9 +87,57 @@ find_package(Bullet REQUIRED)
 include_directories(${BULLET_INCLUDE_DIRS})
 target_link_libraries(towerengine ${BULLET_LIBRARIES})
 
-install(TARGETS towerengine DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
-INSTALL(FILES ${towerengine_INCLUDES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/towerengine)
+include(GenerateExportHeader)
+generate_export_header(towerengine)
+set_property(TARGET towerengine PROPERTY VERSION ${towerengine_VERSION})
+#set_property(TARGET towerengine PROPERTY SOVERSION 3)
+#set_property(TARGET towerengine PROPERTY INTERFACE_towerengine_MAJOR_VERSION 3)
+set_property(TARGET towerengine APPEND PROPERTY COMPATIBLE_INTERFACE_STRING towerengine_MAJOR_VERSION)
+
+
+
+install(TARGETS towerengine EXPORT towerengine_targets
+	LIBRARY DESTINATION lib
+	INCLUDES DESTINATION include/towerengine)
+
+install(FILES ${towerengine_INCLUDES} DESTINATION include/towerengine)
+
+#config
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/towerengine/towerengine-config-version.cmake"
+  VERSION ${towerengine_VERSION}
+  COMPATIBILITY AnyNewerVersion
+)
+
+
+
+export(TARGETS towerengine FILE "${CMAKE_CURRENT_BINARY_DIR}/towerengine/towerengine-targets.cmake")
+
+configure_file(towerengine-config.cmake
+  "${CMAKE_CURRENT_BINARY_DIR}/towerengine/towerengine-config.cmake"
+  COPYONLY
+)
+
+set(ConfigPackageLocation lib/cmake/towerengine)
+install(EXPORT towerengine_targets
+  FILE
+    towerengine-targets.cmake
+  NAMESPACE
+    Upstream::
+  DESTINATION
+    ${ConfigPackageLocation}
+)
+install(
+  FILES
+    towerengine-config.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/towerengine/towerengine-config-version.cmake"
+  DESTINATION
+    ${ConfigPackageLocation}
+  COMPONENT
+    Devel
+)
 
 # uninstall target
 configure_file(

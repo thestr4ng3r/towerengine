@@ -38,7 +38,6 @@ void tWorld::AddObject(tObject *o)
 
 	objects.push_back(o);
 	o->AddedToWorld(this);
-
 }
 
 void tWorld::RemoveObject(tObject *o)
@@ -140,6 +139,9 @@ void tWorld::FillRenderSpaces(int point_light_shadow_limit)
 
 	for(pi=point_lights.begin(); pi!=point_lights.end(); pi++)
 	{
+		if(!(*pi)->GetEnabled())
+			continue;
+
 		light_pos = (*pi)->GetPosition();
 		light_dist = (*pi)->GetDistance();
 
@@ -223,7 +225,6 @@ void tWorld::Step(float time)
 {
 	physics.dynamics_world->stepSimulation(time, 10);
 }
-
 
 
 

@@ -9,13 +9,20 @@
 
 class tSceneObject
 {
+	private:
+		string tag;
+
 	public:
+		tSceneObject(void)			{ tag = ""; }
 		virtual ~tSceneObject(void) {};
 
 		virtual void AddToWorld(tWorld *world) =0;
 		virtual void RemoveFromWorld(tWorld *world) =0;
 
 		virtual int GetType(void) =0;
+
+		void SetTag(string tag)		{ this->tag = tag; }
+		string GetTag(void)			{ return tag; }
 };
 
 class tObjectSceneObject : public tSceneObject
@@ -32,6 +39,8 @@ class tObjectSceneObject : public tSceneObject
 
 		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_OBJECT; }
 
+		tObject *GetObject(void)	{ return object; }
+
 };
 
 class tDirectionalLightSceneObject : public tSceneObject
@@ -47,6 +56,8 @@ class tDirectionalLightSceneObject : public tSceneObject
 		void RemoveFromWorld(tWorld *world);
 
 		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_DIRECTIONAL_LIGHT; }
+
+		tDirectionalLight *GetLight(void)	{ return light; }
 };
 
 class tPointLightSceneObject : public tSceneObject
@@ -62,6 +73,8 @@ class tPointLightSceneObject : public tSceneObject
 		void RemoveFromWorld(tWorld *world);
 
 		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_POINT_LIGHT; }
+
+		tPointLight *GetLight(void)		{ return light; }
 };
 
 

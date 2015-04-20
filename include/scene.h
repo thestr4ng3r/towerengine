@@ -17,6 +17,8 @@ class tScene
 	private:
 		tWorld *world;
 
+		string load_path;
+
 		map<string, tAsset *> assets;
 		map<string, tSceneObject *> objects;
 
@@ -50,6 +52,11 @@ class tScene
 
 		void AddToWorld(void);
 		void RemoveFromWorld(void);
+
+		tSceneObject *GetObjectByTag(string tag);
+		list<tSceneObject *> *GetObjectsByTag(string tag);
+		tSceneObject *GetObjectWhereTagStartsWith(string start);
+		list<tSceneObject *> *GetObjectsWhereTagStartsWith(string start);
 };
 
 

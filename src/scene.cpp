@@ -40,6 +40,7 @@ bool tScene::LoadFromFile(string file)
 	if(strcmp(cur->name(), "tscene") != 0)
 		return false;
 
+	load_path = PathOfFile(file);
 
 	cur = cur->first_node();
 
@@ -118,7 +119,7 @@ void tScene::ParseMeshAssetNode(xml_node<> *cur)
 	else if(file.size() > 0)
 	{
 		mesh = new tMesh();
-		mesh->LoadFromFile(file.c_str());
+		mesh->LoadFromFile((load_path + "/" + file).c_str());
 	}
 	else
 		return;
@@ -170,7 +171,7 @@ void tScene::ParseCubeMapAssetNode(xml_node<> *cur)
 		cubemap = LoadGLCubeMapBinary(file_ext, file_data, file_size);
 	else
 	{
-		cubemap = LoadGLCubeMap(file.c_str());
+		cubemap = LoadGLCubeMap((load_path + "/" + file).c_str());
 	}
 	assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tCubeMapAsset(cubemap))));
 }
@@ -191,6 +192,7 @@ void tScene::ParseObjectsNode(xml_node<> *cur)
 void tScene::ParseMeshObjectNode(xml_node<> *cur)
 {
 	string name;
+	string tag;
 	string mesh_asset_name;
 	tTransform transform;
 	xml_attribute<> *attr;
@@ -199,6 +201,11 @@ void tScene::ParseMeshObjectNode(xml_node<> *cur)
 	if(!(attr = cur->first_attribute("name")))
 		return;
 	name = string(attr->value());
+
+	if((attr = cur->first_attribute("tag")))
+		tag = string(attr->value());
+	else
+		tag = "";
 
 
 	xml_node<> *child = cur->first_node();
@@ -226,15 +233,18 @@ void tScene::ParseMeshObjectNode(xml_node<> *cur)
 		return;
 
 	tMeshObject *object = new tMeshObject(((tMeshAsset *)asset)->GetMesh());
+	//object->SetTag(tag);
 	object->SetTransform(transform);
 	object->UpdateRigidBodyTransformation();
 	tObjectSceneObject *scene_object = new tObjectSceneObject(object);
+	scene_object->SetTag(tag);
 	AddObject(name, scene_object);
 }
 
 void tScene::ParseDirectionalLightObjectNode(xml_node<> *cur)
 {
 	string name;
+	string tag;
 	tVector direction, color;
 	xml_attribute<> *attr;
 
@@ -242,6 +252,10 @@ void tScene::ParseDirectionalLightObjectNode(xml_node<> *cur)
 		return;
 	name = string(attr->value());
 
+	if((attr = cur->first_attribute("tag")))
+		tag = string(attr->value());
+	else
+		tag = "";
 
 	for(xml_node<> *child=cur->first_node(); child; child=child->next_sibling())
 	{
@@ -253,12 +267,14 @@ void tScene::ParseDirectionalLightObjectNode(xml_node<> *cur)
 
 	tDirectionalLight *dir_light = new tDirectionalLight(direction, color);
 	tDirectionalLightSceneObject *scene_object = new tDirectionalLightSceneObject(dir_light);
+	scene_object->SetTag(tag);
 	AddObject(name, scene_object);
 }
 
 void tScene::ParsePointLightObjectNode(xml_node<> *cur)
 {
 	string name;
+	string tag;
 	tVector position, color;
 	float distance = 5.0;
 	xml_attribute<> *attr;
@@ -266,6 +282,11 @@ void tScene::ParsePointLightObjectNode(xml_node<> *cur)
 	if(!(attr = cur->first_attribute("name")))
 		return;
 	name = string(attr->value());
+
+	if((attr = cur->first_attribute("tag")))
+		tag = string(attr->value());
+	else
+		tag = "";
 
 	for(xml_node<> *child=cur->first_node(); child; child=child->next_sibling())
 	{
@@ -279,6 +300,7 @@ void tScene::ParsePointLightObjectNode(xml_node<> *cur)
 
 	tPointLight *point_light = new tPointLight(position, color, distance);
 	tPointLightSceneObject *scene_object = new tPointLightSceneObject(point_light);
+	scene_object->SetTag(tag);
 	AddObject(name, scene_object);
 }
 
@@ -381,5 +403,56 @@ void tScene::RemoveFromWorld(void)
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		i->second->RemoveFromWorld(world);
+}
+
+
+tSceneObject *tScene::GetObjectByTag(string tag)
+{
+	map<string, tSceneObject *>::iterator i;
+
+	for(i=objects.begin(); i!=objects.end(); i++)
+		if(i->second->GetTag().compare(tag) == 0)
+			return i->second;
+
+	return 0;
+}
+
+list<tSceneObject *> *tScene::GetObjectsByTag(string tag)
+{
+	list<tSceneObject *> *r = new list<tSceneObject *>();
+
+	map<string, tSceneObject *>::iterator i;
+
+	for(i=objects.begin(); i!=objects.end(); i++)
+		if(i->second->GetTag().compare(tag) == 0)
+			r->push_back(i->second);
+
+	return r;
+}
+
+
+tSceneObject *tScene::GetObjectWhereTagStartsWith(string start)
+{
+	map<string, tSceneObject *>::iterator i;
+
+	for(i=objects.begin(); i!=objects.end(); i++)
+		if(i->second->GetTag().substr(0, start.size()).compare(start) == 0)
+			return i->second;
+
+	return 0;
+}
+
+
+list<tSceneObject *> *tScene::GetObjectsWhereTagStartsWith(string start)
+{
+	list<tSceneObject *> *r = new list<tSceneObject *>();
+
+	map<string, tSceneObject *>::iterator i;
+
+	for(i=objects.begin(); i!=objects.end(); i++)
+		if(i->second->GetTag().substr(0, start.size()).compare(start) == 0)
+			r->push_back(i->second);
+
+	return r;
 }
 

@@ -4,6 +4,9 @@
 
 class tObject
 {
+	//private:
+	//	string tag;
+
 	public:
 		tObject(void);
 		virtual ~tObject(void) {}
@@ -14,6 +17,10 @@ class tObject
 
 		virtual void AddedToWorld(tWorld *world) {};
 		virtual void RemovedFromWorld(tWorld *world) {};
+
+
+		//void SetTag(string tag)		{ this->tag = tag; }
+		//string GetTag(void)			{ return tag; }
 };
 
 class tTransformObject : public tObject

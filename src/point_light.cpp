@@ -8,6 +8,8 @@ tPointLight::tPointLight(tVector pos, tVector color, float distance)
 	this->distance = distance;
 	shadow_enabled = false;
 	shadow = 0;
+	enabled = true;
+	shadow_invalid = false;
 }
 
 void tPointLight::InitShadow(int size, bool blur_enabled, float blur_size)
@@ -17,6 +19,7 @@ void tPointLight::InitShadow(int size, bool blur_enabled, float blur_size)
 
 	shadow = new tPointLightShadow(this, size, blur_enabled, blur_size);
 	shadow_enabled = true;
+	shadow_invalid = true;
 }
 
 void tPointLight::RenderShadow(tRenderer *renderer)
@@ -25,6 +28,9 @@ void tPointLight::RenderShadow(tRenderer *renderer)
 		return;
 
 	if(!shadow)
+		return;
+
+	if(!enabled)
 		return;
 
 	shadow->Render(renderer);

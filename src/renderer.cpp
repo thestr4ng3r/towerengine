@@ -282,7 +282,10 @@ void tRenderer::LightPass(void)
 
 	for(i=0; i<world->GetPointLightsCount(); i++)
 	{
-		world->GetPointLight(i)->InitRenderLighting(point_lighting_shader);
+		tPointLight *light = world->GetPointLight(i);
+		if(!light->GetEnabled())
+			continue;
+		light->InitRenderLighting(point_lighting_shader);
 		RenderScreenQuad();
 	}
 

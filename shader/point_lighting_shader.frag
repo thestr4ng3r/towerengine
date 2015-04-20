@@ -67,7 +67,7 @@ void main(void)
 			float p = smoothstep(light_depth-0.00005, light_depth, moments.x);
 		    float variance = max(moments.y - moments.x*moments.x, -0.001);
 		    float d = light_depth - moments.x;
-		    float p_max = linstep(0.05, 1.0, variance / (variance + d*d));
+		    float p_max = linstep(0.3, 1.0, variance / (variance + d*d));
 		    
 		    shadow = p_max;//clamp(max(p, p_max), 0.0, 1.0);
 		}

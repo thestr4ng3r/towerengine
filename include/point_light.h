@@ -9,6 +9,8 @@ class tPointLight: public tComparable<float>
 		tVector color;
 		float distance;
 
+		bool enabled;
+
 		bool shadow_enabled;
 		tPointLightShadow *shadow;
 		bool shadow_invalid;
@@ -19,14 +21,16 @@ class tPointLight: public tComparable<float>
 		tPointLight(tVector pos, tVector color, float distance);
 
 		void SetPosition(tVector pos)		{ this->pos = pos; }
-		void SetColor(tVector color)	{ this->color = color; }
-		void SetDistance(float dist)	{ this->distance = dist; }
+		void SetColor(tVector color)		{ this->color = color; }
+		void SetDistance(float dist)		{ this->distance = dist; }
+		void SetEnabled(bool enabled)		{ this->enabled = enabled; }
 
 		tVector GetPosition(void)			{ return pos; }
 		tVector GetColor(void)				{ return color; }
 		float GetDistance(void)				{ return distance; }
 		bool GetShadowEnabled(void)			{ return shadow_enabled; }
 		tPointLightShadow *GetShadow(void)	{ return shadow; }
+		bool GetEnabled(void)				{ return enabled; }
 
 		void InitShadow(int size, bool blur_enabled = false, float blur_size = 0.003);
 		void RenderShadow(tRenderer *renderer);

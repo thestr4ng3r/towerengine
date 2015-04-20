@@ -3,6 +3,7 @@
 
 tObject::tObject(void)
 {
+	//tag = "";
 }
 
 void tTransformObject::SetTransform(tTransform transform)
