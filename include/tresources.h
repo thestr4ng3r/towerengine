@@ -31,5 +31,7 @@ extern const char *ssao_blur_shader_vert;
 extern const char *ssao_blur_shader_frag;
 extern const char *color_shader_vert;
 extern const char *color_shader_frag;
+extern const char *fog_shader_vert;
+extern const char *fog_shader_frag;
 
 #endif

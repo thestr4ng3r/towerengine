@@ -46,21 +46,34 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	ssao_lighting_shader = 0;
 	ssao_shader = 0;
 
+	fog_shader = 0;
+	fog_enabled = false;
+
 	fxaa_enabled = false;
 
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	glGenTextures(1, &color_tex);
+	color_tex = new GLuint[2];
+	glGenTextures(2, color_tex);
 
-	glBindTexture(GL_TEXTURE_2D, color_tex);
+	glBindTexture(GL_TEXTURE_2D, color_tex[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_tex, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_tex[0], 0);
+
+	glBindTexture(GL_TEXTURE_2D, color_tex[1]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, color_tex[1], 0);
 
 	glGenTextures(1, &depth_tex);
 	glBindTexture(GL_TEXTURE_2D, depth_tex);
@@ -71,12 +84,11 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, screen_width, screen_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 1);
+	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 2);
 
 	screen_quad_vao = new tVAO();
 	screen_quad_vbo = new tVBO<float>(2, screen_quad_vao, 4);
@@ -112,6 +124,7 @@ tRenderer::~tRenderer(void)
 	delete directional_shadow_blur_shader;
 	delete color_shader;
 	delete post_process_shader;
+	delete fog_shader;
 }
 
 void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
@@ -130,6 +143,26 @@ void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 
 	delete ssao;
 	ssao = new tSSAO(this, kernel_size, radius, noise_tex_size);
+}
+
+void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp)
+{
+	fog_enabled = enabled;
+	fog_start = start_dist;
+	fog_end = end_dist;
+	fog_exp = exp;
+
+	if(!fog_enabled)
+		return;
+
+	if(!fog_shader)
+	{
+		fog_shader = new tFogShader();
+		fog_shader->Init();
+	}
+
+	fog_shader->Bind();
+	fog_shader->SetFog(start_dist, end_dist, exp);
 }
 
 void tRenderer::Render(GLuint dst_fbo)
@@ -155,12 +188,6 @@ void tRenderer::Render(GLuint dst_fbo)
 
 	ForwardPass();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, dst_fbo);
-
-
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, screen_width, screen_height);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -173,16 +200,29 @@ void tRenderer::Render(GLuint dst_fbo)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
+	int current_read_color_tex = 0;
+
+	if(fog_enabled)
+	{
+		glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
+
+		fog_shader->Bind();
+		fog_shader->SetTextures(gbuffer->GetTexture(tGBuffer::POSITION_TEX), color_tex[current_read_color_tex]);
+		fog_shader->SetCameraPosition(camera->GetPosition());
+
+		RenderScreenQuad();
+
+		current_read_color_tex = 1 - current_read_color_tex;
+	}
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, dst_fbo);
+
 	post_process_shader->Bind();
 	post_process_shader->SetFXAA(fxaa_enabled);
-	post_process_shader->SetTextures(color_tex, depth_tex, screen_width, screen_height);
+	post_process_shader->SetTextures(color_tex[current_read_color_tex], screen_width, screen_height);
 
-	glBegin(GL_QUADS);
-	glVertex2f(0.0, 1.0);
-	glVertex2f(0.0, 0.0);
-	glVertex2f(1.0, 0.0);
-	glVertex2f(1.0, 1.0);
-	glEnd();
+	RenderScreenQuad();
 
 	tShader::Unbind();
 
@@ -308,7 +348,10 @@ void tRenderer::ChangeSize(int width, int height)
 	screen_width = width;
 	screen_height = height;
 
-	glBindTexture(GL_TEXTURE_2D, color_tex);
+	glBindTexture(GL_TEXTURE_2D, color_tex[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+	glBindTexture(GL_TEXTURE_2D, color_tex[1]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 	glBindTexture(GL_TEXTURE_2D, depth_tex);

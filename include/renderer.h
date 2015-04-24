@@ -22,6 +22,10 @@ class tRenderer
 
 		tSSAOShader *ssao_shader;
 
+		tFogShader *fog_shader;
+		bool fog_enabled;
+		float fog_start, fog_end, fog_exp;
+
 		tFaceShader *current_face_shader;
 
 		tWorld *world;
@@ -30,7 +34,7 @@ class tRenderer
 		int screen_width, screen_height;
 
 		GLuint fbo;
-		GLuint color_tex;
+		GLuint *color_tex;
 		GLuint depth_tex;
 
 		tVBO<float> *screen_quad_vbo;
@@ -60,6 +64,8 @@ class tRenderer
 
 		void InitSSAO(int kernel_size, float radius, int noise_tex_size = 4);
 		void SetFXAAEnabled(bool enabled)	{ fxaa_enabled = enabled; }
+
+		void SetFog(bool enabled, float start_dist = 0.0, float end_dist = 100.0, float exp = 1.0);
 
 		void Render(GLuint dst_fbo = 0);
 		void RenderScreenQuad(void);

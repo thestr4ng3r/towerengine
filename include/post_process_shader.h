@@ -7,7 +7,6 @@ class tPostProcessShader : public tShader
 {
 	private:
 		GLint color_tex_uniform;
-		GLint depth_tex_uniform;
 		GLint tex_pixel_uniform;
 
 		GLint fxaa_enabled_uniform;
@@ -16,7 +15,7 @@ class tPostProcessShader : public tShader
 	public:
 		void Init(void);
 
-		void SetTextures(GLuint color, GLuint depth, int width, int height);
+		void SetTextures(GLuint color, int width, int height);
 		void SetFXAA(bool enabled);
 };
 

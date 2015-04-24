@@ -41,6 +41,7 @@ class tRenderer;
 #include "point_shadow_shader.h"
 #include "directional_shadow_shader.h"
 #include "post_process_shader.h"
+#include "fog_shader.h"
 #include "ssao_shader.h"
 #include "ssao_blur_shader.h"
 #include "color_shader.h"
