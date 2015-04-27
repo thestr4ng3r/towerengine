@@ -65,7 +65,7 @@ class tRenderer
 		void InitSSAO(int kernel_size, float radius, int noise_tex_size = 4);
 		void SetFXAAEnabled(bool enabled)	{ fxaa_enabled = enabled; }
 
-		void SetFog(bool enabled, float start_dist = 0.0, float end_dist = 100.0, float exp = 1.0);
+		void SetFog(bool enabled, float start_dist = 0.0, float end_dist = 100.0, float exp = 1.0, tVector color = Vec(0.0, 0.0, 0.0));
 
 		void Render(GLuint dst_fbo = 0);
 		void RenderScreenQuad(void);

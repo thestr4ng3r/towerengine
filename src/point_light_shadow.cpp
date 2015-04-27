@@ -4,7 +4,7 @@
 const GLenum tPointLightShadow::blur_draw_buffers[6] = {	GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
 																GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
 
-tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_enabled, float blur_size)
+tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_enabled)
 {
 	int i;
 
@@ -39,7 +39,7 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 
 	this->blur_enabled = blur_enabled;
-	this->blur_size = blur_size;
+	this->blur_size = 1.0 / (float)size;
 
 	if(!blur_enabled)
 		return;

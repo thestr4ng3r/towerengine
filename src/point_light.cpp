@@ -12,12 +12,12 @@ tPointLight::tPointLight(tVector pos, tVector color, float distance)
 	shadow_invalid = false;
 }
 
-void tPointLight::InitShadow(int size, bool blur_enabled, float blur_size)
+void tPointLight::InitShadow(int size, bool blur_enabled)
 {
 	if(shadow)
 		delete shadow;
 
-	shadow = new tPointLightShadow(this, size, blur_enabled, blur_size);
+	shadow = new tPointLightShadow(this, size, blur_enabled);
 	shadow_enabled = true;
 	shadow_invalid = true;
 }

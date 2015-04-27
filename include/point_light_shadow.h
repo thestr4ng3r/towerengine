@@ -28,7 +28,7 @@ class tPointLightShadow
 		bool culled;
 
 	public:
-		tPointLightShadow(tPointLight *light, int size, bool blur_enabled = false, float blur_size = 0.003);
+		tPointLightShadow(tPointLight *light, int size, bool blur_enabled = false);
 
 		void Render(tRenderer *renderer);
 

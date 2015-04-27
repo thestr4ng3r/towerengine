@@ -145,7 +145,7 @@ void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 	ssao = new tSSAO(this, kernel_size, radius, noise_tex_size);
 }
 
-void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp)
+void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp, tVector color)
 {
 	fog_enabled = enabled;
 	fog_start = start_dist;
@@ -162,7 +162,7 @@ void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp
 	}
 
 	fog_shader->Bind();
-	fog_shader->SetFog(start_dist, end_dist, exp);
+	fog_shader->SetFog(start_dist, end_dist, exp, color);
 }
 
 void tRenderer::Render(GLuint dst_fbo)

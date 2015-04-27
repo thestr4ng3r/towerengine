@@ -32,7 +32,7 @@ class tPointLight: public tComparable<float>
 		tPointLightShadow *GetShadow(void)	{ return shadow; }
 		bool GetEnabled(void)				{ return enabled; }
 
-		void InitShadow(int size, bool blur_enabled = false, float blur_size = 0.003);
+		void InitShadow(int size, bool blur_enabled = false);
 		void RenderShadow(tRenderer *renderer);
 
 		void InitRenderLighting(tPointLightingShader *shader);
