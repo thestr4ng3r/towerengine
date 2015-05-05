@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "tresources.h"
 
-void tSSAOLightingShader::Init(void)
+void tSSAOLightingShader::Init(tGBuffer *gbuffer)
 {
 	InitLightingShader(ssao_lighting_shader_frag, "SSAO Lighting Shader");
 
@@ -12,20 +12,16 @@ void tSSAOLightingShader::Init(void)
 	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
 
 	Bind();
-	glUniform1i(ssao_tex_uniform, 0);
-	glUniform1i(diffuse_tex_uniform, 1);
+	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
+
+	ssao_tex_unit = gbuffer->GetLastTextureUnit();
+	glUniform1i(ssao_tex_uniform, ssao_tex_unit);
 }
 
 void tSSAOLightingShader::SetSSAOTexture(GLuint tex)
 {
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0 + ssao_tex_unit);
 	glBindTexture(GL_TEXTURE_2D, tex);
-}
-
-void tSSAOLightingShader::SetGBuffer(tGBuffer *gbuffer)
-{
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::DIFFUSE_TEX));
 }
 
 void tSSAOLightingShader::SetAmbientLight(tVector color)

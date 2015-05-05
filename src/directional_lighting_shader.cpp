@@ -3,7 +3,7 @@
 #include "tresources.h"
 
 
-void tDirectionalLightingShader::Init(void)
+void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 {
 	InitLightingShader(directional_lighting_shader_frag, "Directional Lighting Shader");
 
@@ -25,31 +25,14 @@ void tDirectionalLightingShader::Init(void)
 	directional_light_shadow_map_uniform = GetUniformLocation("directional_light_shadow_map_uni");
 
 	Bind();
-	glUniform1i(position_tex_uniform, 0);
-	glUniform1i(diffuse_tex_uniform, 1);
-	glUniform1i(normal_tex_uniform, 2);
-	glUniform1i(specular_tex_uniform, 3);
-	glUniform1i(specular_exponent_tex_uniform, 4);
+	glUniform1i(position_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::POSITION_TEX));
+	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
+	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
+	glUniform1i(specular_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_TEX));
+	glUniform1i(specular_exponent_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_EXPONENT_TEX));
 
+	directional_light_shadow_tex_unit = gbuffer->GetLastTextureUnit() + 1;
 	glUniform1i(directional_light_shadow_map_uniform, directional_light_shadow_tex_unit);
-}
-
-void tDirectionalLightingShader::SetGBuffer(tGBuffer *gbuffer)
-{
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::POSITION_TEX));
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::DIFFUSE_TEX));
-
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::NORMAL_TEX));
-
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::SPECULAR_TEX));
-
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::SPECULAR_EXPONENT_TEX));
 }
 
 void tDirectionalLightingShader::SetDirectionalLight(tVector dir, tVector color, int shadow_enabled, GLuint shadow_map, tVector2 shadow_clip, float *shadow_tex_matrix, int shadow_splits_count, float *shadow_splits_z)

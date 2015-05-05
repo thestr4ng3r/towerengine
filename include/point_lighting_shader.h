@@ -20,12 +20,11 @@ class tPointLightingShader : public tLightingShader
 		GLint specular_tex_uniform;
 		GLint specular_exponent_tex_uniform;
 
+		int point_light_shadow_tex_unit;
+
 	public:
-		static const unsigned int point_light_shadow_tex_unit = 6;
+		void Init(tGBuffer *gbuffer);
 
-		void Init(void);
-
-		void SetGBuffer(tGBuffer *gbuffer);
 		void SetPointLight(tVector pos, tVector color, float dist, int shadow_enabled, GLuint shadow_map);
 		void SetCameraPosition(tVector pos);
 

@@ -28,8 +28,11 @@ class tMeshObject : public tTransformObject
 	protected:
 		void TransformChanged(void);
 
+		void AddedToWorld(tWorld *world);
+		void RemovedFromWorld(tWorld *world);
+
 	public:
-		tMeshObject(tMesh *mesh, float mass = 0.0);
+		tMeshObject(tMesh *mesh);
 
 		void SetAnimation(const char *animation);
 		void Play(float time);
@@ -43,14 +46,13 @@ class tMeshObject : public tTransformObject
 		void SetColor(tVector c, float a)				{ SetColor(c); SetAlpha(a); }
 		void SetVisible(bool visible)					{ this->visible = visible; }
 
+		void DeleteRigidBody(void);
+		void InitMeshRigidBody(float mass);
 		void UpdateRigidBodyTransformation(void);
 
 		void GeometryPass(tRenderer *renderer);
 		void ForwardPass(tRenderer *renderer);
 		tBoundingBox GetBoundingBox(void);
-
-		void AddedToWorld(tWorld *world);
-		void RemovedFromWorld(tWorld *world);
 
 		btRigidBody *GetRigidBody(void)		{ return rigid_body; }
 

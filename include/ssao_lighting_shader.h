@@ -11,11 +11,12 @@ class tSSAOLightingShader : public tLightingShader
 
 		GLint light_ambient_color_uniform;
 
+		int ssao_tex_unit;
+
 	public:
-		void Init(void);
+		void Init(tGBuffer *gbuffer);
 
 		void SetSSAOTexture(GLuint tex);
-		void SetGBuffer(tGBuffer *gbuffer);
 		void SetAmbientLight(tVector color);
 };
 

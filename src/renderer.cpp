@@ -7,14 +7,21 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	geometry_pass_shader->Init();
 	//SetCurrentFaceShader(geometry_pass_shader);
 
+	this->screen_width = width;
+	this->screen_height = height;
+
+	glGenFramebuffers(1, &fbo);
+
+	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 2);
+
 	directional_lighting_shader = new tDirectionalLightingShader();
-	directional_lighting_shader->Init();
+	directional_lighting_shader->Init(gbuffer);
 
 	point_lighting_shader = new tPointLightingShader();
-	point_lighting_shader->Init();
+	point_lighting_shader->Init(gbuffer);
 
 	ambient_lighting_shader = new tAmbientLightingShader();
-	ambient_lighting_shader->Init();
+	ambient_lighting_shader->Init(gbuffer);
 
 	skybox_shader = new tSkyBoxShader();
 	skybox_shader->Init();
@@ -37,9 +44,6 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	post_process_shader = new tPostProcessShader();
 	post_process_shader->Init();
 
-	this->screen_width = width;
-	this->screen_height = height;
-
 	this->world = world;
 
 	ssao = 0;
@@ -51,7 +55,6 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 
 	fxaa_enabled = false;
 
-	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	color_tex = new GLuint[2];
@@ -88,7 +91,6 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 2);
 
 	screen_quad_vao = new tVAO();
 	screen_quad_vbo = new tVBO<float>(2, screen_quad_vao, 4);
@@ -132,7 +134,7 @@ void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
 	if(!ssao_lighting_shader)
 	{
 		ssao_lighting_shader = new tSSAOLightingShader();
-		ssao_lighting_shader->Init();
+		ssao_lighting_shader->Init(gbuffer);
 	}
 
 	if(!ssao_shader)
@@ -235,7 +237,7 @@ void tRenderer::GeometryPass(void)
 {
 	tCamera *camera = world->GetCamera();
 
-	gbuffer->Bind();
+	gbuffer->BindDrawBuffers();
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -285,17 +287,19 @@ void tRenderer::LightPass(void)
 	glDisable(GL_DEPTH_TEST);
 
 
+	gbuffer->BindTextures();
+
 	if(ssao)
 	{
 		ssao_lighting_shader->Bind();
-		ssao_lighting_shader->SetGBuffer(gbuffer);
+		//ssao_lighting_shader->SetGBuffer(gbuffer);
 		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
 		ssao_lighting_shader->SetAmbientLight(world->GetAmbientColor());
 	}
 	else
 	{
 		ambient_lighting_shader->Bind();
-		ambient_lighting_shader->SetGBuffer(gbuffer);
+		//ambient_lighting_shader->SetGBuffer(gbuffer);
 		ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
 	}
 
@@ -306,7 +310,7 @@ void tRenderer::LightPass(void)
 
 
 	directional_lighting_shader->Bind();
-	directional_lighting_shader->SetGBuffer(gbuffer);
+	//directional_lighting_shader->SetGBuffer(gbuffer);
 	directional_lighting_shader->SetCameraPosition(camera->GetPosition());
 
 	for(i=0; i<world->GetDirectionalLightsCount(); i++)
@@ -317,7 +321,7 @@ void tRenderer::LightPass(void)
 
 
 	point_lighting_shader->Bind();
-	point_lighting_shader->SetGBuffer(gbuffer);
+	//point_lighting_shader->SetGBuffer(gbuffer);
 	point_lighting_shader->SetCameraPosition(camera->GetPosition());
 
 	for(i=0; i<world->GetPointLightsCount(); i++)

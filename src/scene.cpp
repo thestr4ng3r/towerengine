@@ -196,6 +196,8 @@ void tScene::ParseMeshObjectNode(xml_node<> *cur)
 	string mesh_asset_name;
 	tTransform transform;
 	xml_attribute<> *attr;
+	bool rigid_body_enabled = false;
+	float rigid_body_mass = 0.0;
 
 
 	if(!(attr = cur->first_attribute("name")))
@@ -209,7 +211,7 @@ void tScene::ParseMeshObjectNode(xml_node<> *cur)
 
 
 	xml_node<> *child = cur->first_node();
-	while(child)
+	for(; child; child = child->next_sibling())
 	{
 		if(strcmp(child->name(), "mesh_asset") == 0)
 		{
@@ -218,8 +220,15 @@ void tScene::ParseMeshObjectNode(xml_node<> *cur)
 		}
 		else if(strcmp(child->name(), "transform") == 0)
 			transform = ParseTransformNode(child);
+		else if(strcmp(child->name(), "rigid_body") == 0)
+		{
+			if((attr = child->first_attribute("mass")))
+				rigid_body_mass = atof(attr->value());
+			else
+				continue;
 
-		child = child->next_sibling();
+			rigid_body_enabled = true;
+		}
 	}
 
 	map<string, tAsset *>::iterator asset_i;
@@ -235,7 +244,11 @@ void tScene::ParseMeshObjectNode(xml_node<> *cur)
 	tMeshObject *object = new tMeshObject(((tMeshAsset *)asset)->GetMesh());
 	//object->SetTag(tag);
 	object->SetTransform(transform);
-	object->UpdateRigidBodyTransformation();
+	if(rigid_body_enabled)
+	{
+		object->InitMeshRigidBody(rigid_body_mass);
+		object->UpdateRigidBodyTransformation();
+	}
 	tObjectSceneObject *scene_object = new tObjectSceneObject(object);
 	scene_object->SetTag(tag);
 	AddObject(name, scene_object);

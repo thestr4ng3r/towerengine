@@ -37,7 +37,7 @@ void tWorld::AddObject(tObject *o)
 			return;
 
 	objects.push_back(o);
-	o->AddedToWorld(this);
+	o->AddedObjectToWorld(this);
 }
 
 void tWorld::RemoveObject(tObject *o)
@@ -48,7 +48,7 @@ void tWorld::RemoveObject(tObject *o)
 		if(*i == o)
 		{
 			objects.erase(i);
-			o->RemovedFromWorld(this);
+			o->RemovedObjectFromWorld(this);
 			return;
 		}
 }

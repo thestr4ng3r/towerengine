@@ -23,15 +23,14 @@ class tDirectionalLightingShader : public tLightingShader
 		GLint specular_tex_uniform;
 		GLint specular_exponent_tex_uniform;
 
+		int directional_light_shadow_tex_unit;
+
 	public:
 		static const GLint max_directional_light_splits = 8;
 
-		static const unsigned int directional_light_shadow_tex_unit = 6;
 
+		void Init(tGBuffer *gbuffer);
 
-		void Init(void);
-
-		void SetGBuffer(tGBuffer *gbuffer);
 		void SetDirectionalLight(tVector dir, tVector color, int shadow_enabled, GLuint shadow_map, tVector2 shadow_clip, float *shadow_tex_matrix, int shadow_splits_count, float *shadow_splits_z);
 		void SetCameraPosition(tVector pos);
 

@@ -11,9 +11,8 @@ class tAmbientLightingShader : public tLightingShader
 		GLint light_ambient_color_uniform;
 
 	public:
-		void Init(void);
+		void Init(tGBuffer *gbuffer);
 
-		void SetGBuffer(tGBuffer *gbuffer);
 		void SetAmbientLight(tVector color);
 };
 

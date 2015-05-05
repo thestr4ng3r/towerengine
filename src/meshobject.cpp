@@ -4,7 +4,7 @@
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 
 
-tMeshObject::tMeshObject(tMesh *mesh, float mass) : tTransformObject()
+tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 {
 	this->mesh = mesh;
 	rigid_body = 0;
@@ -19,34 +19,8 @@ tMeshObject::tMeshObject(tMesh *mesh, float mass) : tTransformObject()
 	time = 0.0;
 	transform_matrix = new float[16];
 	motion_state = new tMeshObjectMotionState(this);
-	if(mass > 0.0)
-	{
-		btVector3 inertia;
-		//btBoxShape *shape = new btBoxShape(btVector3(1.0, 1.0, 1.0));
 
-		btConvexTriangleMeshShape *shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
-
-		shape->calculateLocalInertia(mass, inertia);
-		rigid_body = new btRigidBody(mass, motion_state, shape, inertia);
-		//rigid_body->setActivationState(DISABLE_DEACTIVATION);
-	}
-	else if(mass == 0.0)
-	{
-		btCollisionShape *shape;
-		if(mesh->GetPhysicsMesh())
-			shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), true);
-		else
-			shape = new btEmptyShape();
-
-		rigid_body = new btRigidBody(0.0, motion_state, shape, btVector3(0.0, 0.0, 0.0));
-	}
-	else
-	{
-		rigid_body = 0;
-	}
-
-	if(rigid_body)
-		rigid_body->setUserPointer(this);
+	rigid_body = 0;
 }
 
 void tMeshObject::TransformChanged(void)
@@ -154,8 +128,58 @@ void tMeshObject::ForwardPass(tRenderer *renderer)
 
 }
 
+
+void tMeshObject::InitMeshRigidBody(float mass)
+{
+	DeleteRigidBody();
+
+	if(mass > 0.0)
+	{
+		btVector3 inertia;
+		//btBoxShape *shape = new btBoxShape(btVector3(1.0, 1.0, 1.0));
+
+		btConvexTriangleMeshShape *shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
+
+		shape->calculateLocalInertia(mass, inertia);
+		rigid_body = new btRigidBody(mass, motion_state, shape, inertia);
+		//rigid_body->setActivationState(DISABLE_DEACTIVATION);
+	}
+	else if(mass == 0.0)
+	{
+		btCollisionShape *shape;
+		if(mesh->GetPhysicsMesh())
+			shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), true);
+		else
+			shape = new btEmptyShape();
+
+		rigid_body = new btRigidBody(0.0, motion_state, shape, btVector3(0.0, 0.0, 0.0));
+	}
+
+	rigid_body->setUserPointer(this);
+
+	tWorld *world = GetWorld();
+	if(world)
+		world->GetDynamicsWorld()->addRigidBody(rigid_body);
+}
+
+void tMeshObject::DeleteRigidBody(void)
+{
+	if(!rigid_body)
+		return;
+
+	tWorld *world = GetWorld();
+	if(world)
+		world->GetDynamicsWorld()->removeRigidBody(rigid_body);
+
+	delete rigid_body;
+	rigid_body = 0;
+}
+
 void tMeshObject::UpdateRigidBodyTransformation(void)
 {
+	if(!rigid_body)
+		return;
+
 	btTransform trans;
 
 	motion_state->getWorldTransform(trans);

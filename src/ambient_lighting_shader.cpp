@@ -3,7 +3,7 @@
 #include "tresources.h"
 
 
-void tAmbientLightingShader::Init(void)
+void tAmbientLightingShader::Init(tGBuffer *gbuffer)
 {
 	InitLightingShader(ambient_lighting_shader_frag, "Ambient Lighting Shader");
 
@@ -12,13 +12,7 @@ void tAmbientLightingShader::Init(void)
 	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
 
 	Bind();
-	glUniform1i(diffuse_tex_uniform, 0);
-}
-
-void tAmbientLightingShader::SetGBuffer(tGBuffer *gbuffer)
-{
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gbuffer->GetTexture(tGBuffer::DIFFUSE_TEX));
+	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
 }
 
 void tAmbientLightingShader::SetAmbientLight(tVector color)

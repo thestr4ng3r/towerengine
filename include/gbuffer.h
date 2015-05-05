@@ -25,6 +25,7 @@ class tGBuffer
 		int first_attachment;
 
 		GLenum *draw_buffers;
+		int *tex_units;
 
 
 	public:
@@ -33,9 +34,12 @@ class tGBuffer
 
 		void ChangeSize(int width, int height);
 
-		void Bind(void);
+		void BindDrawBuffers(void);
+		void BindTextures(void);
 
 		GLuint GetTexture(GBUFFER_TEXTURE_TYPE type)	{ return tex[type]; }
+		int GetTextureUnit(GBUFFER_TEXTURE_TYPE type)	{ return tex_units[type]; }
+		int GetLastTextureUnit(void)					{ return tex_count-1; }
 
 		static int GetTexCount(void)					{ return tex_count; }
 };

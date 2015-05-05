@@ -8,6 +8,7 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	draw_buffers = new GLenum[tex_count];
+	tex_units = new int[tex_count];
 
 	glGenTextures(tex_count, tex);
 
@@ -20,6 +21,7 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, 0);
 	draw_buffers[POSITION_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + POSITION_TEX;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[POSITION_TEX], GL_TEXTURE_2D, tex[POSITION_TEX], 0);
+	tex_units[POSITION_TEX] = 0;
 
 	glBindTexture(GL_TEXTURE_2D, tex[DIFFUSE_TEX]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -30,6 +32,7 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	draw_buffers[DIFFUSE_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + DIFFUSE_TEX;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[DIFFUSE_TEX], GL_TEXTURE_2D, tex[DIFFUSE_TEX], 0);
+	tex_units[DIFFUSE_TEX] = 1;
 
 	glBindTexture(GL_TEXTURE_2D, tex[NORMAL_TEX]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -40,6 +43,7 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 	draw_buffers[NORMAL_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + NORMAL_TEX;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[NORMAL_TEX], GL_TEXTURE_2D, tex[NORMAL_TEX], 0);
+	tex_units[NORMAL_TEX] = 2;
 
 	glBindTexture(GL_TEXTURE_2D, tex[FACE_NORMAL_TEX]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -50,6 +54,7 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 	draw_buffers[FACE_NORMAL_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + FACE_NORMAL_TEX;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[FACE_NORMAL_TEX], GL_TEXTURE_2D, tex[FACE_NORMAL_TEX], 0);
+	tex_units[FACE_NORMAL_TEX] = 3;
 
 	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_TEX]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -60,6 +65,7 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 	draw_buffers[SPECULAR_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + SPECULAR_TEX;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[SPECULAR_TEX], GL_TEXTURE_2D, tex[SPECULAR_TEX], 0);
+	tex_units[SPECULAR_TEX] = 4;
 
 	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_EXPONENT_TEX]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -70,6 +76,7 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, 0);
 	draw_buffers[SPECULAR_EXPONENT_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + SPECULAR_EXPONENT_TEX;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[SPECULAR_EXPONENT_TEX], GL_TEXTURE_2D, tex[SPECULAR_EXPONENT_TEX], 0);
+	tex_units[SPECULAR_EXPONENT_TEX] = 5;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -79,9 +86,30 @@ tGBuffer::~tGBuffer(void)
 }
 
 
-void tGBuffer::Bind(void)
+void tGBuffer::BindDrawBuffers(void)
 {
 	glDrawBuffers(tex_count, draw_buffers);
+}
+
+void tGBuffer::BindTextures(void)
+{
+	glActiveTexture(GL_TEXTURE0 + tex_units[POSITION_TEX]);
+	glBindTexture(GL_TEXTURE_2D, tex[POSITION_TEX]);
+
+	glActiveTexture(GL_TEXTURE0 + tex_units[DIFFUSE_TEX]);
+	glBindTexture(GL_TEXTURE_2D, tex[DIFFUSE_TEX]);
+
+	glActiveTexture(GL_TEXTURE0 + tex_units[NORMAL_TEX]);
+	glBindTexture(GL_TEXTURE_2D, tex[NORMAL_TEX]);
+
+	glActiveTexture(GL_TEXTURE0 + tex_units[FACE_NORMAL_TEX]);
+	glBindTexture(GL_TEXTURE_2D, tex[FACE_NORMAL_TEX]);
+
+	glActiveTexture(GL_TEXTURE0 + tex_units[SPECULAR_TEX]);
+	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_TEX]);
+
+	glActiveTexture(GL_TEXTURE0 + tex_units[SPECULAR_EXPONENT_TEX]);
+	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_EXPONENT_TEX]);
 }
 
 void tGBuffer::ChangeSize(int width, int height)

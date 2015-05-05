@@ -4,8 +4,13 @@
 
 class tObject
 {
-	//private:
+	private:
 	//	string tag;
+		tWorld *world;
+
+	protected:
+		virtual void AddedToWorld(tWorld *world) {};
+		virtual void RemovedFromWorld(tWorld *world) {};
 
 	public:
 		tObject(void);
@@ -15,8 +20,11 @@ class tObject
 		virtual void ForwardPass(tRenderer *) {};
 		virtual tBoundingBox GetBoundingBox(void) = 0;
 
-		virtual void AddedToWorld(tWorld *world) {};
-		virtual void RemovedFromWorld(tWorld *world) {};
+		void AddedObjectToWorld(tWorld *world);
+		void RemovedObjectFromWorld(tWorld *world);
+
+		tWorld *GetWorld(void)	{ return world; }
+
 
 
 		//void SetTag(string tag)		{ this->tag = tag; }
