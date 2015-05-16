@@ -62,21 +62,21 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, 0);
 	draw_buffers[SPECULAR_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + SPECULAR_TEX;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[SPECULAR_TEX], GL_TEXTURE_2D, tex[SPECULAR_TEX], 0);
 	tex_units[SPECULAR_TEX] = 4;
 
-	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_EXPONENT_TEX]);
+	glBindTexture(GL_TEXTURE_2D, tex[SELF_ILLUMINATION_TEX]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, 0);
-	draw_buffers[SPECULAR_EXPONENT_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + SPECULAR_EXPONENT_TEX;
-	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[SPECULAR_EXPONENT_TEX], GL_TEXTURE_2D, tex[SPECULAR_EXPONENT_TEX], 0);
-	tex_units[SPECULAR_EXPONENT_TEX] = 5;
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, 0);
+	draw_buffers[SELF_ILLUMINATION_TEX] = GL_COLOR_ATTACHMENT0 + first_attachment + SELF_ILLUMINATION_TEX;
+	glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[SELF_ILLUMINATION_TEX], GL_TEXTURE_2D, tex[SELF_ILLUMINATION_TEX], 0);
+	tex_units[SELF_ILLUMINATION_TEX] = 5;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -108,8 +108,8 @@ void tGBuffer::BindTextures(void)
 	glActiveTexture(GL_TEXTURE0 + tex_units[SPECULAR_TEX]);
 	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_TEX]);
 
-	glActiveTexture(GL_TEXTURE0 + tex_units[SPECULAR_EXPONENT_TEX]);
-	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_EXPONENT_TEX]);
+	glActiveTexture(GL_TEXTURE0 + tex_units[SELF_ILLUMINATION_TEX]);
+	glBindTexture(GL_TEXTURE_2D, tex[SELF_ILLUMINATION_TEX]);
 }
 
 void tGBuffer::ChangeSize(int width, int height)
@@ -127,10 +127,10 @@ void tGBuffer::ChangeSize(int width, int height)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
 	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_TEX]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, 0);
 
-	glBindTexture(GL_TEXTURE_2D, tex[SPECULAR_EXPONENT_TEX]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, 0);
+	glBindTexture(GL_TEXTURE_2D, tex[SELF_ILLUMINATION_TEX]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, 0);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

@@ -7,6 +7,7 @@ class tAmbientLightingShader : public tLightingShader
 {
 	private:
 		GLint diffuse_tex_uniform;
+		GLint self_illumination_tex_uniform;
 
 		GLint light_ambient_color_uniform;
 

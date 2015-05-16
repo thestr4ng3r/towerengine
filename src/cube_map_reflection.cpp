@@ -97,6 +97,7 @@ void tCubeMapReflection::GeometryPass(int side, tWorld *world, tRenderer *render
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 
 	renderer->SetCurrentFaceShader(renderer->GetGeometryPassShader());
 	renderer->BindCurrentFaceShader();

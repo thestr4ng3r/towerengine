@@ -18,7 +18,6 @@ class tPointLightingShader : public tLightingShader
 		GLint diffuse_tex_uniform;
 		GLint normal_tex_uniform;
 		GLint specular_tex_uniform;
-		GLint specular_exponent_tex_uniform;
 
 		int point_light_shadow_tex_unit;
 

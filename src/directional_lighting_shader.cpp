@@ -11,7 +11,6 @@ void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
 	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
-	specular_exponent_tex_uniform = GetUniformLocation("specular_exponent_tex_uni");
 
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
@@ -29,7 +28,6 @@ void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
 	glUniform1i(specular_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_TEX));
-	glUniform1i(specular_exponent_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_EXPONENT_TEX));
 
 	directional_light_shadow_tex_unit = gbuffer->GetLastTextureUnit() + 1;
 	glUniform1i(directional_light_shadow_map_uniform, directional_light_shadow_tex_unit);

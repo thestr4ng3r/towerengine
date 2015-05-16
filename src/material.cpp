@@ -2,22 +2,22 @@
 
 tMaterial::tMaterial(void)
 {
-	diffuse.enabled = false;
 	diffuse.color.Set(1.0, 1.0, 1.0);
     diffuse.tex = 0;
     transparent = false;
 
-	specular.enabled = false;
 	specular.color.Set(1.0, 1.0, 1.0);
 	specular.exponent = 64.0;
 	specular.tex = 0;
 
-	normal.enabled = false;
 	normal.tex = 0;
 
 	bump.enabled = false;
 	bump.tex = 0;
 	bump.depth = 0;
+
+	self_illum.color.Set(0.0, 0.0, 0.0);
+	self_illum.tex = 0;
 
 	cube_map_reflection.enabled = false;
 	cube_map_reflection.color = Vec(0.0, 0.0, 0.0);
@@ -31,6 +31,8 @@ tMaterial::~tMaterial(void)
 		glDeleteTextures(1, &specular.tex);
 	if(normal.tex != 0)
 		glDeleteTextures(1, &normal.tex);
+	if(bump.tex != 0)
+		glDeleteTextures(1, &bump.tex);
 }
 
 void tMaterial::SetDiffuse(tVector color)
@@ -55,80 +57,73 @@ void tMaterial::SetCubeMapReflection(bool enabled, tVector color)
 	cube_map_reflection.color = color;
 }
 
-void tMaterial::LoadDiffuseTextureURL(string file)
+void tMaterial::SetSelfIlluminationColor(tVector color)
 {
-	struct stat s;
-	if(stat(file.c_str(), &s) == 0)
-	{
-		diffuse.enabled = true;
-		diffuse.tex = LoadGLTexture(file.c_str(), &transparent, 3);
-	}
+	self_illum.color = color;
 }
 
-void tMaterial::LoadSpecularTextureURL(string file)
+void tMaterial::LoadDiffuseTexture(string file)
 {
-	struct stat s;
-	if(stat(file.c_str(), &s) == 0)
-	{
-		specular.enabled = true;
-		specular.tex = LoadGLTexture(file.c_str());
-	}
+	diffuse.tex = LoadGLTexture(file.c_str(), &transparent, 3);
 }
 
-void tMaterial::LoadNormalTextureURL(string file)
+void tMaterial::LoadSpecularTexture(string file)
 {
-	struct stat s;
-	if(stat(file.c_str(), &s) == 0)
-	{
-		normal.enabled = true;
-		normal.tex = LoadGLTexture(file.c_str());
-	}
+	specular.tex = LoadGLTexture(file.c_str());
 }
 
-void tMaterial::LoadBumpTextureURL(string file)
+void tMaterial::LoadNormalTexture(string file)
 {
-	struct stat s;
-	if(stat(file.c_str(), &s) == 0)
-	{
-		bump.enabled = true;
-		bump.tex = LoadGLTexture(file.c_str());
-	}
+	normal.tex = LoadGLTexture(file.c_str());
 }
 
-void tMaterial::LoadDiffuseTextureBinary(const char *extension, const void *data, unsigned int size)
+void tMaterial::LoadBumpTexture(string file)
+{
+	bump.tex = LoadGLTexture(file.c_str());
+}
+
+void tMaterial::LoadSelfIlluminationTexture(string file)
+{
+	self_illum.tex = LoadGLTexture(file.c_str());
+}
+
+void tMaterial::LoadDiffuseTexture(const char *extension, const void *data, unsigned int size)
 {
 	diffuse.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
-	diffuse.enabled = diffuse.tex ? 1 : 0;
 }
 
-void tMaterial::LoadSpecularTextureBinary(const char *extension, const void *data, unsigned int size)
+void tMaterial::LoadSpecularTexture(const char *extension, const void *data, unsigned int size)
 {
-	specular.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
-	specular.enabled = specular.tex ? 1 : 0;
+	specular.tex = LoadGLTextureBinary(extension, data, size);
 }
 
-void tMaterial::LoadNormalTextureBinary(const char *extension, const void *data, unsigned int size)
+void tMaterial::LoadNormalTexture(const char *extension, const void *data, unsigned int size)
 {
-	normal.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
-	normal.enabled = normal.tex ? 1 : 0;
+	normal.tex = LoadGLTextureBinary(extension, data, size);
 }
 
-void tMaterial::LoadBumpTextureBinary(const char *extension, const void *data, unsigned int size)
+void tMaterial::LoadBumpTexture(const char *extension, const void *data, unsigned int size)
 {
-	bump.tex = LoadGLTextureBinary(extension, data, size, &transparent, 3);
-	bump.enabled = bump.tex ? 1 : 0;
+	bump.tex = LoadGLTextureBinary(extension, data, size);
+}
+
+void tMaterial::LoadSelfIlluminationTexture(const char *extension, const void *data, unsigned int size)
+{
+	self_illum.tex = LoadGLTextureBinary(extension, data, size);
 }
 
 void tMaterial::InitGeometryPass(tRenderer *renderer)
 {
-	renderer->GetCurrentFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse.tex);
-	renderer->GetCurrentFaceShader()->SetSpecularTexture(specular.enabled, specular.tex);
-	renderer->GetCurrentFaceShader()->SetNormalTexture(normal.enabled, normal.tex);
-	renderer->GetCurrentFaceShader()->SetBumpTexture(bump.enabled, bump.tex);
+	renderer->GetCurrentFaceShader()->SetDiffuseTexture(diffuse.tex != 0, diffuse.tex);
+	renderer->GetCurrentFaceShader()->SetSpecularTexture(specular.tex != 0, specular.tex);
+	renderer->GetCurrentFaceShader()->SetNormalTexture(normal.tex != 0, normal.tex);
+	renderer->GetCurrentFaceShader()->SetBumpTexture(bump.tex != 0, bump.tex);
 	renderer->GetCurrentFaceShader()->SetDiffuseColor(diffuse.color);
 	renderer->GetCurrentFaceShader()->SetSpecularColor(specular.color);
 	renderer->GetCurrentFaceShader()->SetSpecular(specular.exponent);
 	renderer->GetCurrentFaceShader()->SetBumpDepth(bump.depth);
+	renderer->GetCurrentFaceShader()->SetSelfIlluminationColor(self_illum.color);
+	renderer->GetCurrentFaceShader()->SetSelfIlluminationTexture(self_illum.tex != 0, self_illum.tex);
 }
 
 void tMaterial::InitCubeMapReflectionPass(tRenderer *renderer)

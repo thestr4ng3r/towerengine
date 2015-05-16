@@ -565,26 +565,8 @@ void tMesh::GeometryPass(tRenderer *renderer)
 		vertex_vbo = current_pose->vbo;
 	}
 
-	//Sort(cam);
-
 	if(refresh_vbos)
 		RefreshAllVBOs();
-
-
-/*	glColor4f(1.0, 1.0, 1.0, 1.0);
-	vector<CTriangle *>::iterator ti;
-	for(ti=triangles.begin(); ti!=triangles.end(); ti++)
-	{
-		glBegin(GL_LINES);
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(1.0, 1.0, 1.0);
-		for(int j=0; j<3; j++)
-		{
-			(*ti)->v[j]->PutToGL();
-			(*((*ti)->v[j]) + (*ti)->v[j]->normal * 0.1).PutToGL();
-		}
-		glEnd();
-	}*/
 
 	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
 	if(vertex2_vbo)
@@ -606,8 +588,6 @@ void tMesh::GeometryPass(tRenderer *renderer)
 	//CEngine::GetFaceShader()->BindShader();
 	renderer->GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
-	glEnable(GL_BLEND); // TODO: remove here!!
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for(i=materials.begin(); i!=materials.end(); i++)
 	{
 		(*i)->InitGeometryPass(renderer);
@@ -665,8 +645,6 @@ bool tMesh::LoadFromFile(const char *file, int no_material)
 	    return 0;
 	
 	path = PathOfFile(string(file));
-
-	//printf("Path \"%s\"\n", path);
 
 	char *data = ReadFile(file);
 
@@ -820,7 +798,7 @@ tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 {
 	xml_node<> *child;
-	int diffuse_mode, specular_mode, normal_mode, bump_mode;
+	int diffuse_mode, specular_mode, normal_mode, bump_mode, self_illum_mode;
 	string diffuse_file; tVector diffuse_color;
 	string specular_file; float exponent; tVector specular_color;
 	string normal_file;
@@ -829,19 +807,22 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 	bool cube_map_reflection_enabled = false;
 	tVector cube_map_reflection_color = Vec(0.0, 0.0, 0.0);
 
-	unsigned char *diffuse_data, *specular_data, *normal_data, *bump_data;
-	size_t diffuse_size, specular_size, normal_size, bump_size;
-	char *diffuse_ext, *specular_ext, *normal_ext, *bump_ext;
+	tVector self_illum_color = Vec(0.0, 0.0, 0.0);
+	string self_illum_file;
+
+	unsigned char *diffuse_data, *specular_data, *normal_data, *bump_data, *self_illum_data;
+	size_t diffuse_size, specular_size, normal_size, bump_size, self_illum_size;
+	char *diffuse_ext, *specular_ext, *normal_ext, *bump_ext, *self_illum_ext;
 	char *base64_temp;
 
 	string name;
 	xml_attribute<> *attr;
 	tMeshMaterial *r;
 
-	diffuse_mode = specular_mode = normal_mode = bump_mode = TEXTURE_DISABLED;
-	diffuse_ext = specular_ext = normal_ext = bump_ext = 0;
-	diffuse_size = specular_size = normal_size = bump_size = 0;
-	diffuse_data = specular_data = normal_data = bump_data = 0;
+	diffuse_mode = specular_mode = normal_mode = bump_mode = self_illum_mode = TEXTURE_DISABLED;
+	diffuse_ext = specular_ext = normal_ext = bump_ext = self_illum_ext = 0;
+	diffuse_size = specular_size = normal_size = bump_size = self_illum_size = 0;
+	diffuse_data = specular_data = normal_data = bump_data = self_illum_data = 0;
 	diffuse_color = Vec(1.0, 1.0, 1.0);
 	specular_color = Vec(0.0, 0.0, 0.0);
 	exponent = 8.0;
@@ -936,7 +917,33 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 					normal_ext = 0;
 				normal_mode = TEXTURE_DATA;
 			}
+		}
+		else if(strcmp(name_temp, "self_illumination") == 0)
+		{
+			if((attr = child->first_attribute("file")))
+			{
+				self_illum_file = string(attr->value());
+				self_illum_mode = TEXTURE_FILE;
+			}
+			else if(child->value_size() > 0)
+			{
+				base64_temp = child->value();
 
+				Base64Decode(base64_temp, &self_illum_data, &self_illum_size);
+
+				attr = child->first_attribute("image-extension");
+				if(attr)
+					self_illum_ext = attr->value();
+				else
+					self_illum_ext = 0;
+				self_illum_mode = TEXTURE_DATA;
+			}
+			if((attr = child->first_attribute("r")))
+				self_illum_color.r = atof(attr->value());
+			if((attr = child->first_attribute("g")))
+				self_illum_color.g = atof(attr->value());
+			if((attr = child->first_attribute("b")))
+				self_illum_color.b = atof(attr->value());
 		}
 		else if(strcmp(name_temp, "bump") == 0)
 		{
@@ -983,29 +990,35 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 	r->SetSpecular(specular_color, exponent);
 	r->SetBump(bump_depth);
 	r->SetCubeMapReflection(cube_map_reflection_enabled, cube_map_reflection_color);
+	r->SetSelfIlluminationColor(self_illum_color);
 
 	if(diffuse_mode == TEXTURE_FILE)
 	{
-		r->LoadDiffuseTextureURL(path + diffuse_file);
+		r->LoadDiffuseTexture(path + diffuse_file);
 		//printf("loading texture \"%s\"\n", (path + diffuse_file).c_str());
 	}
 	else if(diffuse_mode == TEXTURE_DATA)
-		r->LoadDiffuseTextureBinary(diffuse_ext, diffuse_data, diffuse_size);
+		r->LoadDiffuseTexture(diffuse_ext, diffuse_data, diffuse_size);
 
 	if(specular_mode == TEXTURE_FILE)
-		r->LoadSpecularTextureURL(path + specular_file);
+		r->LoadSpecularTexture(path + specular_file);
 	else if(specular_mode == TEXTURE_DATA)
-		r->LoadSpecularTextureBinary(specular_ext, specular_data, specular_size);
+		r->LoadSpecularTexture(specular_ext, specular_data, specular_size);
 
 	if(normal_mode == TEXTURE_FILE)
-		r->LoadNormalTextureURL(path + normal_file);
+		r->LoadNormalTexture(path + normal_file);
 	else if(normal_mode == TEXTURE_DATA)
-		r->LoadNormalTextureBinary(normal_ext, normal_data, normal_size);
+		r->LoadNormalTexture(normal_ext, normal_data, normal_size);
 
 	if(bump_mode == TEXTURE_FILE)
-		r->LoadBumpTextureURL(path + bump_file);
+		r->LoadBumpTexture(path + bump_file);
 	else if(bump_mode == TEXTURE_DATA)
-		r->LoadBumpTextureBinary(bump_ext, bump_data, bump_size);
+		r->LoadBumpTexture(bump_ext, bump_data, bump_size);
+
+	if(self_illum_mode == TEXTURE_FILE)
+		r->LoadSelfIlluminationTexture(path + self_illum_file);
+	else if(self_illum_mode == TEXTURE_DATA)
+		r->LoadSelfIlluminationTexture(self_illum_ext, self_illum_data, self_illum_size);
 
 	return r;
 }

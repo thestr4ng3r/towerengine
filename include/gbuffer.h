@@ -13,7 +13,7 @@ class tGBuffer
 			NORMAL_TEX,
 			FACE_NORMAL_TEX,
 			SPECULAR_TEX,
-			SPECULAR_EXPONENT_TEX
+			SELF_ILLUMINATION_TEX
 		};
 
 		static const int tex_count = 6;

@@ -7,16 +7,19 @@ uniform vec4 diffuse_color2_uni;
 uniform vec3 specular_color_uni;
 uniform float specular_size_uni;
 uniform float bump_depth_uni;
+uniform vec3 self_illumination_color_uni;
 
 uniform bool diffuse_tex_enabled_uni;
 uniform bool specular_tex_enabled_uni;
 uniform bool normal_tex_enabled_uni;
 uniform bool bump_tex_enabled_uni;
+uniform bool self_illumination_tex_enabled_uni;
 
 uniform sampler2D diffuse_tex_uni;
 uniform sampler2D normal_tex_uni;
 uniform sampler2D specular_tex_uni;
 uniform sampler2D bump_tex_uni;
+uniform sampler2D self_illumination_tex_uni;
 
 
 uniform vec3 clip_vec_uni;
@@ -37,7 +40,7 @@ layout (location = 1) out vec4 diffuse_out;
 layout (location = 2) out vec4 normal_out;
 layout (location = 3) out vec4 face_normal_out;
 layout (location = 4) out vec4 specular_out; 
-layout (location = 5) out vec4 specular_exponent_out;
+layout (location = 5) out vec4 self_illumination_out;
 
 vec2 ParallaxUV(void);
 vec2 ParallaxOcclusionUV(mat3 tang_mat);
@@ -63,6 +66,9 @@ void main(void)
 	else
 		uv = uv_var;
 				
+	
+	// diffuse
+	
 	vec4 diffuse_color = vec4(1.0, 1.0, 1.0, 1.0);
 	
 	if(diffuse_tex_enabled_uni)
@@ -72,6 +78,9 @@ void main(void)
 		discard;
 		
 	diffuse_color *= vec4(diffuse_color_uni.rgb, 1.0) * diffuse_color2_uni;
+	
+	
+	//normal
 	
 	vec3 normal;
 	if(normal_tex_enabled_uni)
@@ -85,15 +94,29 @@ void main(void)
 	normal_out = vec4(normal * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
 	
 	face_normal_out = vec4(normal_var * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
+	
+	
+	// specular
 			
 	vec3 specular_color = specular_color_uni;
 	if(specular_tex_enabled_uni)
 		specular_color *= texture2D(specular_tex_uni, uv).rgb;
 	
+		
+	// self illumination
+	
+	vec3 self_illumination = self_illumination_color_uni;
+	
+	if(self_illumination_tex_enabled_uni)
+		self_illumination *= texture2D(self_illumination_tex_uni, uv).rgb;
+		
+	
+	// out
+	
 	position_out = vec4(pos_var, 1.0);
 	diffuse_out = diffuse_color;
-	specular_out = vec4(specular_color, 1.0);
-	specular_exponent_out = vec4(specular_size_uni, 0.0, 0.0, 1.0);
+	specular_out = vec4(specular_color, specular_size_uni);
+	self_illumination_out = vec4(self_illumination, 1.0);
 }
 
 

@@ -32,8 +32,6 @@ class tShader : protected tShaderProgram
 		void Bind(void);
 		static void Unbind(void);
 
-		virtual void ResetUniforms(void) {};
-
 		virtual ~tShader(void) {};
 };
 

@@ -11,8 +11,8 @@ class tGeometryPassShader : public tFaceShader
 		GLint diffuse_color_uniform;
 		GLint diffuse_color2_uniform;
 		GLint specular_color_uniform;
-
 		GLint specular_size_uniform; // TODO: in exponent umbenennen
+		GLint self_illumination_color_uniform;
 
 		GLint bump_depth_uniform;
 
@@ -20,11 +20,13 @@ class tGeometryPassShader : public tFaceShader
 		GLint normal_tex_enabled_uniform;
 		GLint specular_tex_enabled_uniform;
 		GLint bump_tex_enabled_uniform;
+		GLint self_illumination_tex_enabled_uniform;
 
 		GLint diffuse_tex_uniform;
 		GLint normal_tex_uniform;
 		GLint specular_tex_uniform;
 		GLint bump_tex_uniform;
+		GLint self_illumination_tex_uniform;
 
 		GLint clip_uniform;
 		GLint clip_dist_uniform;
@@ -48,7 +50,8 @@ class tGeometryPassShader : public tFaceShader
 		void SetBumpDepth(float depth);
 		void SetTransformation(const float m[16]);
 		void SetVertexMix(float m = 0.0);
-		void ResetUniforms(void);
+		void SetSelfIlluminationColor(tVector color);
+		void SetSelfIlluminationTexture(bool enabled, GLuint tex =0);
 };
 
 

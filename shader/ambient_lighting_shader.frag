@@ -3,6 +3,7 @@
 uniform vec3 light_ambient_color_uni;
 
 uniform sampler2D diffuse_tex_uni;
+uniform sampler2D self_illumination_tex_uni;
 
 in vec2 uv_coord_var;
 
@@ -16,7 +17,9 @@ void main(void)
 	if(diffuse.a == 0.0)
 		discard;
 		
-	vec3 color = light_ambient_color_uni * diffuse.rgb; // ambient
+	vec3 self_illumination = texture2D(self_illumination_tex_uni, uv_coord_var).rgb;
+		
+	vec3 color = light_ambient_color_uni * diffuse.rgb + self_illumination;
 	
 	gl_FragColor = vec4(color, 1.0);
 }

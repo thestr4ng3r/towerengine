@@ -8,13 +8,15 @@ void tSSAOLightingShader::Init(tGBuffer *gbuffer)
 
 	ssao_tex_uniform = GetUniformLocation("ssao_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
+	self_illumination_tex_uniform = GetUniformLocation("self_illumination_tex_uni");
 
 	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
 
 	Bind();
 	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
+	glUniform1i(self_illumination_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SELF_ILLUMINATION_TEX));
 
-	ssao_tex_unit = gbuffer->GetLastTextureUnit();
+	ssao_tex_unit = gbuffer->GetLastTextureUnit() + 1;
 	glUniform1i(ssao_tex_uniform, ssao_tex_unit);
 }
 

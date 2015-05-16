@@ -13,7 +13,6 @@ uniform sampler2D position_tex_uni;
 uniform sampler2D diffuse_tex_uni;
 uniform sampler2D normal_tex_uni;
 uniform sampler2D specular_tex_uni;
-uniform sampler2D specular_exponent_tex_uni;
 
 
 in vec2 uv_coord_var;
@@ -35,7 +34,7 @@ void main(void)
 		
 	vec3 position = texture2D(position_tex_uni, uv_coord_var).rgb; 	
 	vec3 normal = normalize(texture2D(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
-	vec4 specular = vec4(texture2D(specular_tex_uni, uv_coord_var).rgb, texture2D(specular_exponent_tex_uni, uv_coord_var).r);
+	vec4 specular = texture2D(specular_tex_uni, uv_coord_var).rgba;
 	
 	
 	

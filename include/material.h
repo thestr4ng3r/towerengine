@@ -6,14 +6,12 @@ class tMaterial
 	protected:
 		struct Diffuse
 		{
-			bool enabled;
 			GLuint tex;
 			tVector color;
 		} diffuse;
 
 		struct Specular
 		{
-			bool enabled;
 			GLuint tex;
 			float exponent;
 			tVector color;
@@ -21,9 +19,14 @@ class tMaterial
 
 		struct Normal
 		{
-			bool enabled;
 			GLuint tex;
 		} normal;
+
+		struct SelfIllumination
+		{
+			tVector color;
+			GLuint tex;
+		} self_illum;
 
 		struct Bump
 		{
@@ -47,17 +50,20 @@ class tMaterial
 		void SetDiffuse(tVector color);
 		void SetSpecular(tVector color, float exponent);
 		void SetBump(float depth);
+		void SetSelfIlluminationColor(tVector color);
 		void SetCubeMapReflection(bool enabled, tVector color);
 
-		void LoadDiffuseTextureURL(string file);
-		void LoadSpecularTextureURL(string file);
-		void LoadNormalTextureURL(string file);
-		void LoadBumpTextureURL(string file);
+		void LoadDiffuseTexture(string file);
+		void LoadSpecularTexture(string file);
+		void LoadNormalTexture(string file);
+		void LoadBumpTexture(string file);
+		void LoadSelfIlluminationTexture(string file);
 
-		void LoadDiffuseTextureBinary(const char *extension, const void *data, unsigned int size);
-		void LoadSpecularTextureBinary(const char *extension, const void *data, unsigned int size);
-		void LoadNormalTextureBinary(const char *extension, const void *data, unsigned int size);
-		void LoadBumpTextureBinary(const char *extension, const void *data, unsigned int size);
+		void LoadDiffuseTexture(const char *extension, const void *data, unsigned int size);
+		void LoadSpecularTexture(const char *extension, const void *data, unsigned int size);
+		void LoadNormalTexture(const char *extension, const void *data, unsigned int size);
+		void LoadBumpTexture(const char *extension, const void *data, unsigned int size);
+		void LoadSelfIlluminationTexture(const char *extension, const void *data, unsigned int size);
 
 		void InitGeometryPass(tRenderer *renderer);
 		void InitCubeMapReflectionPass(tRenderer *renderer);
