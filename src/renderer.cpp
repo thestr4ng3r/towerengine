@@ -10,6 +10,9 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	this->screen_width = width;
 	this->screen_height = height;
 
+	camera = new tCamera();
+	camera_render_space = new tRenderSpace();
+
 	glGenFramebuffers(1, &fbo);
 
 	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 2);
@@ -22,6 +25,9 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 
 	ambient_lighting_shader = new tAmbientLightingShader();
 	ambient_lighting_shader->Init(gbuffer);
+
+	cube_map_reflection_shader = new tCubeMapReflectionShader();
+	cube_map_reflection_shader->Init(gbuffer);
 
 	skybox_shader = new tSkyBoxShader();
 	skybox_shader->Init();
@@ -105,6 +111,8 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 
 	point_light_shadow_limit = -1;
 
+	test_reflection = new tCubeMapReflection(256, Vec(15.78722, 1.31274, 11.01917));
+
 }
 
 tRenderer::~tRenderer(void)
@@ -127,6 +135,11 @@ tRenderer::~tRenderer(void)
 	delete color_shader;
 	delete post_process_shader;
 	delete fog_shader;
+
+	delete camera;
+	delete camera_render_space;
+
+	delete test_reflection;
 }
 
 void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
@@ -169,17 +182,18 @@ void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp
 
 void tRenderer::Render(GLuint dst_fbo)
 {
-	tCamera *camera = world->GetCamera();
+	test_reflection->Render(this);
 
 	camera->SetAspect((float)screen_width / (float)screen_height);
 
-	world->FillRenderSpaces(point_light_shadow_limit);
+	world->FillRenderSpace(camera_render_space, camera);
 
-	world->RenderShadowMaps(this);
+	RenderShadowMaps();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	GeometryPass();
+
 
 	if(ssao)
 		ssao->Render(); // binds its own fbo
@@ -233,17 +247,79 @@ void tRenderer::Render(GLuint dst_fbo)
 }
 
 
+
+
+bool CompareFloatComparable(tComparable<float> *a, tComparable<float> *b)
+{
+	return a->GetCompareValue() < b->GetCompareValue();
+}
+
+void tRenderer::RenderShadowMaps(void)
+{
+	// fill render spaces
+
+	render_point_light_shadows.clear();
+
+	set<tPointLight *>::iterator pi;
+	set<tDirectionalLight *>::iterator di;
+	list<tPointLight *>::iterator pli;
+
+	for(pi=camera_render_space->point_lights.begin(); pi!=camera_render_space->point_lights.end(); pi++)
+	{
+		if(!(*pi)->GetShadowEnabled())
+			continue;
+
+		render_point_light_shadows.push_back(*pi);
+		(*pi)->SetCompareValue(((*pi)->GetPosition() - camera->GetPosition()).SquaredLen());
+	}
+
+
+	if(point_light_shadow_limit == 0)
+		render_point_light_shadows.clear();
+	else if(point_light_shadow_limit > 0)
+	{
+		render_point_light_shadows.sort(CompareFloatComparable);
+
+		while((int)render_point_light_shadows.size() > point_light_shadow_limit)
+			render_point_light_shadows.pop_back();
+	} // < 0 renders all point lights
+
+	// add all point light shadows which have not been rendered at all yet
+	for(pi=camera_render_space->point_lights.begin(); pi!=camera_render_space->point_lights.end(); pi++)
+	{
+		if(!(*pi)->GetShadowInvalid())
+			continue;
+		render_point_light_shadows.push_back(*pi);
+	}
+	render_point_light_shadows.unique();
+
+
+
+	for(pli=render_point_light_shadows.begin(); pli!=render_point_light_shadows.end(); pli++)
+		world->FillRenderObjectSpace((*pli)->GetShadow()->GetRenderObjectSpace(), *pli);
+
+
+
+	// finally render shadows
+
+	for(pli=render_point_light_shadows.begin(); pli!=render_point_light_shadows.end(); pli++)
+		(*pli)->RenderShadow(this);
+
+
+	for(di=camera_render_space->dir_lights.begin(); di!=camera_render_space->dir_lights.end(); di++)
+		(*di)->RenderShadow(camera, this);
+}
+
+
 void tRenderer::GeometryPass(void)
 {
-	tCamera *camera = world->GetCamera();
-
 	gbuffer->BindDrawBuffers();
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, screen_width, screen_height);
 
-	camera->SetModelviewProjectionMatrix();
+	camera->SetModelViewProjectionMatrix();
 
 	glGetFloatv(GL_PROJECTION_MATRIX, projection_matrix);
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
@@ -254,14 +330,28 @@ void tRenderer::GeometryPass(void)
 	SetCurrentFaceShader(geometry_pass_shader);
 	BindCurrentFaceShader();
 
-	world->GetCameraRenderSpace()->GeometryPass(this);
+	camera_render_space->GeometryPass(this);
 }
+
+void tRenderer::ReflectionPass(void)
+{
+	camera->SetModelViewProjectionMatrix();
+
+	cube_map_reflection_shader->Bind();
+	cube_map_reflection_shader->SetCameraPosition(camera->GetPosition());
+	cube_map_reflection_shader->SetCubeMapTexture(test_reflection->GetCubeMapTexture());
+
+	set<tObject *>::iterator i;
+	for(i=camera_render_space->objects.begin(); i!=camera_render_space->objects.end(); i++)
+	{
+		if((*i)->GetCubeMapReflectionEnabled())
+			(*i)->CubeMapReflectionPass(this);
+	}
+}
+
 
 void tRenderer::LightPass(void)
 {
-	int i;
-
-	tCamera *camera = world->GetCamera();
 	tSkyBox *sky_box = world->GetSkyBox();
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -269,8 +359,9 @@ void tRenderer::LightPass(void)
 	glViewport(0, 0, screen_width, screen_height);
 
 	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
 
-	camera->SetModelviewProjectionMatrix();
+	camera->SetModelViewProjectionMatrix();
 
 	if(sky_box)
 		sky_box->Paint(this, camera->GetPosition());
@@ -278,13 +369,11 @@ void tRenderer::LightPass(void)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, 0.1, 2.0);
+	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0); //pos x, y, z, to x, y, z
 
-	glDisable(GL_DEPTH_TEST);
 
 
 	gbuffer->BindTextures();
@@ -292,14 +381,12 @@ void tRenderer::LightPass(void)
 	if(ssao)
 	{
 		ssao_lighting_shader->Bind();
-		//ssao_lighting_shader->SetGBuffer(gbuffer);
 		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
 		ssao_lighting_shader->SetAmbientLight(world->GetAmbientColor());
 	}
 	else
 	{
 		ambient_lighting_shader->Bind();
-		//ambient_lighting_shader->SetGBuffer(gbuffer);
 		ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
 	}
 
@@ -308,25 +395,35 @@ void tRenderer::LightPass(void)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 
+	ReflectionPass();
+
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 
 	directional_lighting_shader->Bind();
-	//directional_lighting_shader->SetGBuffer(gbuffer);
 	directional_lighting_shader->SetCameraPosition(camera->GetPosition());
 
-	for(i=0; i<world->GetDirectionalLightsCount(); i++)
+	set<tDirectionalLight *>::iterator dir_light_it;
+	for(dir_light_it=camera_render_space->dir_lights.begin(); dir_light_it!=camera_render_space->dir_lights.end(); dir_light_it++)
 	{
-		world->GetDirectionalLight(i)->InitRenderLighting(directional_lighting_shader);
+		(*dir_light_it)->InitRenderLighting(directional_lighting_shader);
 		RenderScreenQuad();
 	}
 
 
 	point_lighting_shader->Bind();
-	//point_lighting_shader->SetGBuffer(gbuffer);
 	point_lighting_shader->SetCameraPosition(camera->GetPosition());
 
-	for(i=0; i<world->GetPointLightsCount(); i++)
+	set<tPointLight *>::iterator point_light_it;
+	for(point_light_it=camera_render_space->point_lights.begin(); point_light_it!=camera_render_space->point_lights.end(); point_light_it++)
 	{
-		tPointLight *light = world->GetPointLight(i);
+		tPointLight *light = *point_light_it;
 		if(!light->GetEnabled())
 			continue;
 		light->InitRenderLighting(point_lighting_shader);
@@ -338,9 +435,8 @@ void tRenderer::LightPass(void)
 
 void tRenderer::ForwardPass(void)
 {
-	world->GetCamera()->SetModelviewProjectionMatrix();
-
-	world->GetCameraRenderSpace()->ForwardPass(this);
+	camera->SetModelViewProjectionMatrix();
+	camera_render_space->ForwardPass(this);
 }
 
 

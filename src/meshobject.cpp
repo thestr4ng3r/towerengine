@@ -120,7 +120,13 @@ void tMeshObject::GeometryPass(tRenderer *renderer)
 		else
 			mesh->ChangePose("Idle");
 	}
-	mesh->PutToGL(renderer);
+	mesh->GeometryPass(renderer);
+}
+
+void tMeshObject::CubeMapReflectionPass(tRenderer *renderer)
+{
+	renderer->GetCubeMapReflectionShader()->SetTransformation(transform.GetMatrix(transform_matrix));
+	mesh->CubeMapReflectionPass(renderer);
 }
 
 void tMeshObject::ForwardPass(tRenderer *renderer)

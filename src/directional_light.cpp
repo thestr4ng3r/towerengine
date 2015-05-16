@@ -18,7 +18,7 @@ void tDirectionalLight::InitShadow(int size, int splits, bool blur_enabled, floa
 	shadow_enabled = true;
 }
 
-void tDirectionalLight::RenderShadow(tRenderer *renderer)
+void tDirectionalLight::RenderShadow(tCamera *camera, tRenderer *renderer)
 {
 	if(!shadow_enabled)
 		return;
@@ -26,7 +26,7 @@ void tDirectionalLight::RenderShadow(tRenderer *renderer)
 	if(!shadow)
 		return;
 
-	shadow->Render(renderer);
+	shadow->Render(camera, renderer);
 }
 
 void tDirectionalLight::InitRenderLighting(tDirectionalLightingShader *shader)

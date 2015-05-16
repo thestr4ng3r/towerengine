@@ -146,6 +146,11 @@ void tCamera::CalculateFrustumPlanes(void)
 	points[5] = points[0] + hvec*nw;
 }
 
+void tCamera::InitCulling(void)
+{
+	CalculateFrustumPlanes();
+}
+
 bool tCamera::TestPointCulling(tVector point)
 {
 	for(int i=0; i<6; i++)
@@ -198,16 +203,26 @@ bool tCamera::TestBoundingBoxCulling(tBoundingBox b)
 	return false;
 }
 
-void tCamera::SetModelviewProjectionMatrix(void)
+
+void tCamera::SetProjectionMatrix(void)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(angle, aspect, near_clip, far_clip);
+}
 
+void tCamera::SetModelViewMatrix(void)
+{
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	tVector to = pos + dir;
-	gluLookAt(pos.x, pos.y, pos.z, to.x, to.y, to.z, 0.0, 1.0, 0.0);
+	gluLookAt(pos.x, pos.y, pos.z, to.x, to.y, to.z, up.x, up.y, up.z);
+}
+
+void tCamera::SetModelViewProjectionMatrix(void)
+{
+	SetProjectionMatrix();
+	SetModelViewMatrix();
 }
 
 

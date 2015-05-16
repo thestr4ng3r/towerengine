@@ -11,9 +11,9 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 	this->light = light;
 	this->size = size;
 
-	culled = false;
+	//culled = false;
 
-	render_space = new tRenderSpace();
+	render_object_space = new tRenderSpace();
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
@@ -31,6 +31,10 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	for(int i=0; i<6; i++)
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, tex, 0);
+
 	glGenRenderbuffers(1, &depth_rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size, size);
@@ -104,7 +108,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 
 	for(s=0; s<6; s++)
 	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0 + s);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glMatrixMode(GL_MODELVIEW);
@@ -118,7 +122,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 			v_vec = Vec(0.0, 0.0, -1.0);
 		gluLookAt(pos.x, pos.y, pos.z, cam_to.x, cam_to.y, cam_to.z, v_vec.x, v_vec.y, v_vec.z);
 
-		render_space->GeometryPass(renderer);
+		render_object_space->GeometryPass(renderer);
 	}
 	tShader::Unbind(); // TODO: remove this if possible
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

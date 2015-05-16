@@ -9,11 +9,12 @@ const float tEngine::identity_matrix4[16] = { 1.0, 0.0, 0.0, 0.0,
 
 void tEngine::Init(void)
 {
-	int max_textures;
-
+	int v;
 	printf("Supported OpenGL version: %s\n", glGetString(GL_VERSION));
-	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_textures);
-	printf("Support of %d combined texture image units\n", max_textures);
+	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &v);
+	printf("Support of %d combined texture image units\n", v);
+	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &v);
+	printf("Support of %d color attachments\n", v);
 
 	#ifdef _WIN32
 		GLenum glew_r = glewInit();

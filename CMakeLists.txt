@@ -61,7 +61,9 @@ set(towerengine_SRC
 	src/asset.cpp
 	src/ssao.cpp
 	src/ssao_blur_shader.cpp
-	src/fog_shader.cpp)
+	src/fog_shader.cpp
+	src/cube_map_reflection.cpp
+	src/cube_map_reflection_shader.cpp)
 
 add_definitions(-g -Wall)
 

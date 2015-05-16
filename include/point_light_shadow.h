@@ -8,7 +8,7 @@ class tPointLightShadow
 	private:
 		tPointLight *light;
 
-		tRenderSpace *render_space;
+		tRenderObjectSpace *render_object_space;
 
 		GLuint tex;
 		GLuint fbo;
@@ -25,7 +25,7 @@ class tPointLightShadow
 
 		int size;
 
-		bool culled;
+		//bool culled;
 
 	public:
 		tPointLightShadow(tPointLight *light, int size, bool blur_enabled = false);
@@ -36,12 +36,12 @@ class tPointLightShadow
 
 		void SetBlurEnabled(bool enabled)	{ blur_enabled = enabled; }
 		void SetBlurSize(float size)		{ blur_size = size; }
-		void SetCulled(bool culled)			{ this->culled = culled; }
+		//void SetCulled(bool culled)			{ this->culled = culled; }
 
 		bool GetBlurEnabled(void)			{ return blur_enabled; }
 		float GetBlurSize(void)				{ return blur_size; }
-		tRenderSpace *GetRenderSpace(void)	{ return render_space; }
-		bool GetCulled(void)				{ return culled; }
+		tRenderObjectSpace *GetRenderObjectSpace(void)	{ return render_object_space; }
+		//bool GetCulled(void)				{ return culled; }
 };
 
 

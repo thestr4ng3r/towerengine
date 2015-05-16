@@ -93,20 +93,20 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 	blur_vao->UnBind();
 }
 
-void tDirectionalLightShadow::Render(tRenderer *renderer)
+void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 {
 	tWorld *world = renderer->GetWorld();
 
 	int s;
-	tVector cam_pos = world->GetCamera()->GetPosition();
+	tVector cam_pos = camera->GetPosition();
 	//CVector cam_dir = world->GetCamera()->GetDirection();
 	tVector light_dir, light_to, light_up, light_right;
 	tVector *cam_frustum;
 	float left, right, top, bottom;
 	float d;
 
-	float cam_near = world->GetCamera()->GetNearClip();
-	float cam_far = world->GetCamera()->GetFarClip();
+	float cam_near = camera->GetNearClip();
+	float cam_far = camera->GetFarClip();
 	float c_log, c_uni;
 
 	float *h_blur, *v_blur;
@@ -136,7 +136,7 @@ void tDirectionalLightShadow::Render(tRenderer *renderer)
 	renderer->GetDirectionalShadowShader()->SetClip(near_clip, far_clip);
 	renderer->GetDirectionalShadowShader()->SetCamPos(cam_pos);
 
-	splits_z[0] = world->GetCamera()->GetNearClip();
+	splits_z[0] = camera->GetNearClip();
 
 	for(s=0; s<splits; s++)
 	{
@@ -149,7 +149,7 @@ void tDirectionalLightShadow::Render(tRenderer *renderer)
 		//splits_z[s+1] = world->GetCamera()->GetNearClip() +
 		//		(world->GetCamera()->GetFarClip() - world->GetCamera()->GetNearClip()) * pow(2, -(splits - (s+1)));
 
-		cam_frustum = world->GetCamera()->GetRelativeFrustumCorners(splits_z[s], splits_z[s+1]);
+		cam_frustum = camera->GetRelativeFrustumCorners(splits_z[s], splits_z[s+1]);
 
 		left = bottom = INFINITY;
 		right = top = -INFINITY;

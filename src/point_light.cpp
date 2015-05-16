@@ -46,3 +46,34 @@ void tPointLight::InitRenderLighting(tPointLightingShader *shader)
 
 	shader->SetPointLight(pos, color, distance, shadow_enabled ? 1 : 0, shadow_map);
 }
+
+bool tPointLight::TestPointCulling(tVector point)
+{
+	return (point - pos).SquaredLen() > (distance * distance);
+}
+
+bool tPointLight::TestSphereCulling(tVector center, float radius)
+{
+	return (center - pos).SquaredLen() > (distance * distance + radius * radius);
+}
+
+bool tPointLight::TestBoundingBoxCulling(tBoundingBox b)
+{
+	tVector minv = b.GetMin();
+	tVector maxv = b.GetMax();
+
+	if(minv.x > pos.x + distance)
+		return true;
+	if(minv.y > pos.y + distance)
+		return true;
+	if(minv.z > pos.z + distance)
+		return true;
+	if(maxv.x < pos.x - distance)
+		return true;
+	if(maxv.y < pos.y - distance)
+		return true;
+	if(maxv.z < pos.z - distance)
+		return true;
+
+	return false;
+}

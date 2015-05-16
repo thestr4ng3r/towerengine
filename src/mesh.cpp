@@ -2,33 +2,8 @@
 
 #include "rapidxml.hpp"
 
-/*#define FILE_MODUS_MAT 0
-#define FILE_MODUS_VERT 1
-#define FILE_MODUS_TRI 2
-#define FILE_MODUS_POS 3
-#define FILE_MODUS_KEY 4
-#define FILE_MODUS_ANIM 5
-#define FILE_MODUS_END 10
-
-#define FILE_MODUS_MAT_OLD 0
-#define FILE_MODUS_TRI_OLD 1
-#define FILE_MODUS_END_OLD 2
-
-#define READ_MODUS_FINISH 1
-#define READ_MODUS_READ -1
-#define READ_MODUS_VALUES 0*/
-
-
-tVector light_dir;
-tVector light_pos;
-tVector cam_pos;
-tVector ambient_color;
-tVector light_attenuation;
-
 
 using namespace rapidxml;
-
-
 
 void tMesh::CalculateNormalsSolid(void)
 {
@@ -109,9 +84,6 @@ void tMesh::Create(void)
 
 void tMesh::Delete(void)
 {
-	if(!GetState())
-		return;
-
 	map<string, tMeshPose *>::iterator cpi;
 	for(cpi=custom_pose.begin(); cpi!=custom_pose.end(); cpi++)
 		delete custom_pose.begin()->second;
@@ -184,11 +156,8 @@ tVertex *tMesh::CreateVertex(tVector v)
 	return o;
 }
 
-tTriangle *tMesh::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3) // TODO: Optimieren!
+tTriangle *tMesh::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3) // TODO: optimize!
 {
-    if(!GetState())
-        return 0;
-
 	refresh_ibos = true;
 
     return tTriangle::CreateTriangle(v1, v2, v3, color, material, t1, t2, t3, this);
@@ -569,7 +538,7 @@ void tMesh::RefreshIBOs(void)
 	refresh_ibos = false;
 }
 
-void tMesh::PutToGL(tRenderer *renderer)
+void tMesh::GeometryPass(tRenderer *renderer)
 {
 	vector<tMeshMaterial *>::iterator i;
 	tVBO<float> *vertex_vbo, *vertex2_vbo;
@@ -637,11 +606,11 @@ void tMesh::PutToGL(tRenderer *renderer)
 	//CEngine::GetFaceShader()->BindShader();
 	renderer->GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
-	glEnable(GL_BLEND);
+	glEnable(GL_BLEND); // TODO: remove here!!
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for(i=materials.begin(); i!=materials.end(); i++)
 	{
-		(*i)->PutToGL(renderer);
+		(*i)->InitGeometryPass(renderer);
 
 		if(this->wireframe)
 			(*i)->ibo->Draw(GL_LINE_STRIP);
@@ -650,9 +619,40 @@ void tMesh::PutToGL(tRenderer *renderer)
 	}
 }
 
-int tMesh::GetState(void)
+void tMesh::CubeMapReflectionPass(tRenderer *renderer)
 {
-    return 1;
+	vector<tMeshMaterial *>::iterator i;
+	tVBO<float> *vertex_vbo;
+
+	if(animation_mode)
+	{
+		printf("reflection in animation mode not implemented\n");
+		return;
+	}
+	else
+		vertex_vbo = current_pose->vbo;
+
+	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
+
+	if(refresh_ibos)
+		RefreshIBOs();
+
+	for(i=materials.begin(); i!=materials.end(); i++)
+	{
+		(*i)->InitCubeMapReflectionPass(renderer);
+		(*i)->ibo->Draw(GL_TRIANGLES);
+	}
+}
+
+bool tMesh::GetCubeMapReflectionEnabled(void)
+{
+	vector<tMeshMaterial *>::iterator i;
+
+	for(i=materials.begin(); i!=materials.end(); i++)
+		if((*i)->GetCubeMapReflectionEnabled())
+			return true;
+
+	return false;
 }
 
 bool tMesh::LoadFromFile(const char *file, int no_material)
@@ -826,6 +826,9 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 	string normal_file;
 	string bump_file; float bump_depth;
 
+	bool cube_map_reflection_enabled = false;
+	tVector cube_map_reflection_color = Vec(0.0, 0.0, 0.0);
+
 	unsigned char *diffuse_data, *specular_data, *normal_data, *bump_data;
 	size_t diffuse_size, specular_size, normal_size, bump_size;
 	char *diffuse_ext, *specular_ext, *normal_ext, *bump_ext;
@@ -884,7 +887,7 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 			if((attr = child->first_attribute("b")))
 				diffuse_color.b = atof(attr->value());
 		}
-		if(strcmp(name_temp, "specular") == 0)
+		else if(strcmp(name_temp, "specular") == 0)
 		{
 			if((attr = child->first_attribute("file")))
 			{
@@ -913,7 +916,7 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 			if((attr = child->first_attribute("b")))
 				specular_color.b = atof(attr->value());
 		}
-		if(strcmp(name_temp, "normal") == 0)
+		else if(strcmp(name_temp, "normal") == 0)
 		{
 			if((attr = child->first_attribute("file")))
 			{
@@ -935,7 +938,7 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 			}
 
 		}
-		if(strcmp(name_temp, "bump") == 0)
+		else if(strcmp(name_temp, "bump") == 0)
 		{
 			if((attr = child->first_attribute("file")))
 			{
@@ -958,6 +961,17 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 			if((attr = child->first_attribute("depth")))
 				bump_depth = atof(attr->value());
 		}
+		else if(strcmp(name_temp, "cube_map_reflection") == 0)
+		{
+			cube_map_reflection_enabled = true;
+
+			if((attr = child->first_attribute("r")))
+				cube_map_reflection_color.r = atof(attr->value());
+			if((attr = child->first_attribute("g")))
+				cube_map_reflection_color.g = atof(attr->value());
+			if((attr = child->first_attribute("b")))
+				cube_map_reflection_color.b = atof(attr->value());
+		}
 
 		child = child->next_sibling();
 	}
@@ -968,6 +982,7 @@ tMeshMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 	r->SetDiffuse(diffuse_color);
 	r->SetSpecular(specular_color, exponent);
 	r->SetBump(bump_depth);
+	r->SetCubeMapReflection(cube_map_reflection_enabled, cube_map_reflection_color);
 
 	if(diffuse_mode == TEXTURE_FILE)
 	{

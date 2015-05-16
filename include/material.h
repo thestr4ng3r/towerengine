@@ -1,5 +1,5 @@
-#ifndef _MATERIAL_H_
-#define _MATERIAL_H_
+#ifndef _MATERIAL_H
+#define _MATERIAL_H
 
 class tMaterial
 {
@@ -32,17 +32,22 @@ class tMaterial
 			float depth;
 		} bump;
 
+		struct CubeMapReflection
+		{
+			bool enabled;
+			tVector color;
+		} cube_map_reflection;
+
 		bool transparent;
 
 	public:
 		tMaterial(void);
 		~tMaterial(void);
 
-		bool GetTransparent(void)	{ return transparent; }
-
 		void SetDiffuse(tVector color);
 		void SetSpecular(tVector color, float exponent);
 		void SetBump(float depth);
+		void SetCubeMapReflection(bool enabled, tVector color);
 
 		void LoadDiffuseTextureURL(string file);
 		void LoadSpecularTextureURL(string file);
@@ -54,7 +59,13 @@ class tMaterial
 		void LoadNormalTextureBinary(const char *extension, const void *data, unsigned int size);
 		void LoadBumpTextureBinary(const char *extension, const void *data, unsigned int size);
 
-		void PutToGL(tRenderer *renderer);
+		void InitGeometryPass(tRenderer *renderer);
+		void InitCubeMapReflectionPass(tRenderer *renderer);
+
+		bool GetTransparent(void)	{ return transparent; }
+
+		bool GetCubeMapReflectionEnabled(void)	{ return cube_map_reflection.enabled; }
+		tVector GetCubeMapReflectionColor(void)	{ return cube_map_reflection.color; }
 };
 
 #endif

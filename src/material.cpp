@@ -18,6 +18,9 @@ tMaterial::tMaterial(void)
 	bump.enabled = false;
 	bump.tex = 0;
 	bump.depth = 0;
+
+	cube_map_reflection.enabled = false;
+	cube_map_reflection.color = Vec(0.0, 0.0, 0.0);
 }
 
 tMaterial::~tMaterial(void)
@@ -44,6 +47,12 @@ void tMaterial::SetSpecular(tVector color, float exponent)
 void tMaterial::SetBump(float depth)
 {
 	bump.depth = depth;
+}
+
+void tMaterial::SetCubeMapReflection(bool enabled, tVector color)
+{
+	cube_map_reflection.enabled = enabled;
+	cube_map_reflection.color = color;
 }
 
 void tMaterial::LoadDiffuseTextureURL(string file)
@@ -110,7 +119,7 @@ void tMaterial::LoadBumpTextureBinary(const char *extension, const void *data, u
 	bump.enabled = bump.tex ? 1 : 0;
 }
 
-void tMaterial::PutToGL(tRenderer *renderer)
+void tMaterial::InitGeometryPass(tRenderer *renderer)
 {
 	renderer->GetCurrentFaceShader()->SetDiffuseTexture(diffuse.enabled, diffuse.tex);
 	renderer->GetCurrentFaceShader()->SetSpecularTexture(specular.enabled, specular.tex);
@@ -120,4 +129,9 @@ void tMaterial::PutToGL(tRenderer *renderer)
 	renderer->GetCurrentFaceShader()->SetSpecularColor(specular.color);
 	renderer->GetCurrentFaceShader()->SetSpecular(specular.exponent);
 	renderer->GetCurrentFaceShader()->SetBumpDepth(bump.depth);
+}
+
+void tMaterial::InitCubeMapReflectionPass(tRenderer *renderer)
+{
+	renderer->GetCubeMapReflectionShader()->SetReflectionColor(cube_map_reflection.color);
 }

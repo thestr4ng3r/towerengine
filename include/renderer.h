@@ -11,6 +11,7 @@ class tRenderer
 		tDirectionalLightingShader *directional_lighting_shader;
 		tPointLightingShader *point_lighting_shader;
 		tSSAOLightingShader *ssao_lighting_shader;
+		tCubeMapReflectionShader *cube_map_reflection_shader;
 
 		tSkyBoxShader *skybox_shader;
 		tPointShadowShader *point_shadow_shader;
@@ -50,8 +51,18 @@ class tRenderer
 
 		int point_light_shadow_limit;
 
+		tCamera *camera;
+		tRenderSpace *camera_render_space;
+		list<tPointLight *> render_point_light_shadows;
+
+
+		tCubeMapReflection *test_reflection;
+
+
+		void RenderShadowMaps(void);
 		void GeometryPass(void);
 		void LightPass(void);
+		void ReflectionPass(void);
 		void ForwardPass(void);
 
 	public:
@@ -74,6 +85,10 @@ class tRenderer
 		void BindCurrentFaceShader(void)			{ current_face_shader->Bind(); }
 		void SetCurrentFaceShader(tFaceShader *s)	{ current_face_shader = s; }
 
+		tGeometryPassShader *GetGeometryPassShader(void)					{ return geometry_pass_shader; }
+		tAmbientLightingShader *GetAmbientLightingShader(void)				{ return ambient_lighting_shader; }
+		tDirectionalLightingShader *GetDirectionalLightingShader(void)		{ return directional_lighting_shader; }
+		tPointLightingShader *GetPointLightingShader(void)					{ return point_lighting_shader; }
 		tPointShadowShader *GetPointShadowShader(void)						{ return point_shadow_shader; }
 		tPointShadowBlurShader *GetPointShadowBlurShader(void)				{ return point_shadow_blur_shader; }
 		tDirectionalShadowShader *GetDirectionalShadowShader(void)			{ return directional_shadow_shader; }
@@ -81,11 +96,13 @@ class tRenderer
 		tSkyBoxShader *GetSkyBoxShader(void)								{ return skybox_shader; }
 		tColorShader *GetColorShader(void)									{ return color_shader; }
 		tSSAOShader *GetSSAOShader(void)									{ return ssao_shader; }
+		tCubeMapReflectionShader *GetCubeMapReflectionShader(void)			{ return cube_map_reflection_shader; }
 
 		int GetScreenWidth(void)	{ return screen_width; }
 		int GetScreenHeight(void)	{ return screen_height; }
 
 		tWorld *GetWorld(void)		{ return world; }
+		tCamera *GetCamera(void)			{ return camera; }
 
 		float *GetProjectionMatrix(void)	{ return projection_matrix; }
 		float *GetModelViewMatrix(void)		{ return modelview_matrix; }

@@ -25,3 +25,5 @@ color_shader_vert: shader/color_shader.vert
 color_shader_frag: shader/color_shader.frag
 fog_shader_vert: shader/fog_shader.vert
 fog_shader_frag: shader/fog_shader.frag
+cube_map_reflection_shader_vert: shader/cube_map_reflection_shader.vert
+cube_map_reflection_shader_frag: shader/cube_map_reflection_shader.frag

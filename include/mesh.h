@@ -101,10 +101,13 @@ class tMesh
         //int LoadFromFile_0_0(const char *file) { printf("LoadFromFile_0_0 function was removed.\n"); return 0; };
 		//void SetOrientation(CVector o);
 		//CVector ApplyOrientation(CVector v) { return Orientation(v, orient_x, orient_y, orient_z); };
-		void PutToGL(tRenderer *renderer);
-		int GetState(void);
+		void GeometryPass(tRenderer *renderer);
+		void CubeMapReflectionPass(tRenderer *renderer);
+
 		void Create(void);
 		void Delete(void);
+
+		bool GetCubeMapReflectionEnabled(void);
 
 		void SetWireframe(int wf)					{ wireframe = wf ? 1 : 0; }
 		int GetWireframe(void)						{ return wireframe; }

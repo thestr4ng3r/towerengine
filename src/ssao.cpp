@@ -132,7 +132,7 @@ void tSSAO::Render(void)
 	ssao_shader->SetTextures(renderer->GetDepthTexture(), gbuffer->GetTexture(tGBuffer::POSITION_TEX), gbuffer->GetTexture(tGBuffer::FACE_NORMAL_TEX));
 	ssao_shader->SetMatrices(renderer->GetProjectionMatrix(), renderer->GetModelViewMatrix());
 	ssao_shader->SetRadius(radius);
-	ssao_shader->SetCamera(renderer->GetWorld()->GetCamera()->GetPosition(), renderer->GetWorld()->GetCamera()->GetDirection());
+	ssao_shader->SetCamera(renderer->GetCamera()->GetPosition(), renderer->GetCamera()->GetDirection());
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

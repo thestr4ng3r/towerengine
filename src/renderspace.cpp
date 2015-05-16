@@ -1,11 +1,11 @@
 #include "towerengine.h"
 
-void tRenderSpace::ClearObjects(void)
+void tRenderObjectSpace::Clear(void)
 {
 	objects.clear();
 }
 
-void tRenderSpace::GeometryPass(tRenderer *renderer)
+void tRenderObjectSpace::GeometryPass(tRenderer *renderer)
 {
 	set<tObject *>::iterator i;
 
@@ -13,10 +13,19 @@ void tRenderSpace::GeometryPass(tRenderer *renderer)
 		(*i)->GeometryPass(renderer);
 }
 
-void tRenderSpace::ForwardPass(tRenderer *renderer)
+void tRenderObjectSpace::ForwardPass(tRenderer *renderer)
 {
 	set<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		(*i)->ForwardPass(renderer);
+}
+
+
+void tRenderSpace::Clear(void)
+{
+	tRenderObjectSpace::Clear();
+
+	point_lights.clear();
+	dir_lights.clear();
 }

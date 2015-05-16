@@ -8,8 +8,6 @@ tWorld::tWorld(void)
 {
 	ambient_color = Vec(0.1, 0.1, 0.1);
 	sky_box = 0;
-	camera = new tCamera();
-	camera_render_space = new tRenderSpace();
 
 	physics.broadphase = new btDbvtBroadphase();
 	physics.collision_configuration = new btDefaultCollisionConfiguration();
@@ -94,26 +92,27 @@ void tWorld::Clear(void)
 	objects.clear();
 }
 
-void tWorld::RenderShadowMaps(tRenderer *renderer)  // TODO: move to tRenderer
+
+void tWorld::FillRenderObjectSpace(tRenderObjectSpace *space, tCulling *culling, bool clear, bool init_culling)
 {
-	list<tPointLight *>::iterator pi;
+	if(clear)
+		space->Clear();
 
-	for(pi=render_point_light_shadows.begin(); pi!=render_point_light_shadows.end(); pi++)
-		(*pi)->RenderShadow(renderer);
+	if(init_culling)
+		culling->InitCulling();
 
-	set<tDirectionalLight *>::iterator di;
+	vector<tObject *>::iterator i;
 
-	for(di=camera_render_dir_lights.begin(); di!=camera_render_dir_lights.end(); di++)
-		(*di)->RenderShadow(renderer);
+	for(i=objects.begin(); i!=objects.end(); i++)
+	{
+		if(culling->TestBoundingBoxCulling((*i)->GetBoundingBox()))
+			continue;
+		space->objects.insert((*i));
+	}
 }
 
-bool CompareFloatComparable(tComparable<float> *a, tComparable<float> *b)
-{
-	return a->GetCompareValue() < b->GetCompareValue();
-}
 
-
-void tWorld::FillRenderSpaces(int point_light_shadow_limit)
+void tWorld::FillRenderSpace(tRenderSpace *space, tCulling *culling, bool init_culling)
 {
 	tBoundingBox b;
 	tVector minv, maxv;
@@ -121,19 +120,12 @@ void tWorld::FillRenderSpaces(int point_light_shadow_limit)
 	float light_dist;
 	vector<tObject *>::iterator i;
 
-	camera->CalculateFrustumPlanes();
+	if(init_culling)
+		culling->InitCulling();
 
-	camera_render_space->ClearObjects();
-	camera_render_point_lights.clear();
-	camera_render_dir_lights.clear();
-	render_point_light_shadows.clear();
+	space->Clear();
 
-	for(i=objects.begin(); i!=objects.end(); i++)
-	{
-		if(camera->TestBoundingBoxCulling((*i)->GetBoundingBox()))
-			continue;
-		camera_render_space->objects.insert((*i));
-	}
+	FillRenderObjectSpace(space, culling, false, false);
 
 	vector<tPointLight *>::iterator pi;
 
@@ -145,78 +137,23 @@ void tWorld::FillRenderSpaces(int point_light_shadow_limit)
 		light_pos = (*pi)->GetPosition();
 		light_dist = (*pi)->GetDistance();
 
-		if(camera->TestSphereCulling(light_pos, light_dist))
+		if(culling->TestSphereCulling(light_pos, light_dist))
 			continue;
 
-		camera_render_point_lights.insert(*pi);
-
-		if((*pi)->GetShadowEnabled())
-		{
-			render_point_light_shadows.push_back(*pi);
-			(*pi)->SetCompareValue((light_pos - camera->GetPosition()).SquaredLen());
-		}
-	}
-
-	if(point_light_shadow_limit == 0)
-		render_point_light_shadows.clear();
-	else if(point_light_shadow_limit > 0)
-	{
-		render_point_light_shadows.sort(CompareFloatComparable);
-
-		while((int)render_point_light_shadows.size() > point_light_shadow_limit)
-			render_point_light_shadows.pop_back();
-	}
-
-
-	for(pi=point_lights.begin(); pi!=point_lights.end(); pi++)
-	{
-		if(!(*pi)->GetShadowInvalid())
-			continue;
-		render_point_light_shadows.push_back(*pi);
-	}
-	render_point_light_shadows.unique();
-
-
-	list<tPointLight *>::iterator pli;
-
-	for(pli=render_point_light_shadows.begin(); pli!=render_point_light_shadows.end(); pli++)
-	{
-		light_pos = (*pli)->GetPosition();
-		light_dist = (*pli)->GetDistance();
-
-		for(i=objects.begin(); i!=objects.end(); i++)
-		{
-			b = (*i)->GetBoundingBox();
-			minv = b.GetMin(); maxv = b.GetMax();
-
-			if(minv.x > light_pos.x + light_dist)
-				continue;
-			if(minv.y > light_pos.y + light_dist)
-				continue;
-			if(minv.z > light_pos.z + light_dist)
-				continue;
-			if(maxv.x < light_pos.x - light_dist)
-				continue;
-			if(maxv.y < light_pos.y - light_dist)
-				continue;
-			if(maxv.z < light_pos.z - light_dist)
-				continue;
-
-			(*pli)->GetShadow()->GetRenderSpace()->objects.insert((*i));
-		}
+		space->point_lights.insert(*pi);
 	}
 
 	vector<tDirectionalLight *>::iterator di;
 
 	for(di=dir_lights.begin(); di!=dir_lights.end(); di++)
 	{
-		camera_render_dir_lights.insert(*di);
+		space->dir_lights.insert(*di);
 
 		if(!(*di)->GetShadowEnabled())
 			continue;
 
 		for(i=objects.begin(); i!=objects.end(); i++)
-			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i));
+			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i)); // TODO: move to tRenderer
 	}
 }
 

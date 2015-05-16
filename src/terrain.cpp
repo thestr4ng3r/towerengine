@@ -172,7 +172,7 @@ void tTerrain::Paint(tRenderer *renderer)
 	renderer->GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
 
 	if(material)
-		material->PutToGL(renderer);
+		material->InitGeometryPass(renderer);
 	else
 	{
 		renderer->GetCurrentFaceShader()->SetDiffuseTexture(true, height_map->GetHeightTex());

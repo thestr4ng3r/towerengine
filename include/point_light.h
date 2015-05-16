@@ -2,7 +2,7 @@
 #ifndef _POINT_LIGHT_H
 #define _POINT_LIGHT_H
 
-class tPointLight: public tComparable<float>
+class tPointLight: public tComparable<float>, public tCulling
 {
 	private:
 		tVector pos;
@@ -42,6 +42,10 @@ class tPointLight: public tComparable<float>
 
 		void InvalidateShadow(void)		{ shadow_invalid = true; }
 		bool GetShadowInvalid(void)		{ return shadow_invalid; }
+
+		bool TestPointCulling(tVector point);
+		bool TestSphereCulling(tVector center, float radius);
+		bool TestBoundingBoxCulling(tBoundingBox b);
 };
 
 #endif

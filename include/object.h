@@ -9,15 +9,16 @@ class tObject
 		tWorld *world;
 
 	protected:
-		virtual void AddedToWorld(tWorld *world) {};
-		virtual void RemovedFromWorld(tWorld *world) {};
+		virtual void AddedToWorld(tWorld *world) {}
+		virtual void RemovedFromWorld(tWorld *world) {}
 
 	public:
 		tObject(void);
 		virtual ~tObject(void) {}
 
-		virtual void GeometryPass(tRenderer *) {};
-		virtual void ForwardPass(tRenderer *) {};
+		virtual void GeometryPass(tRenderer *) {}
+		virtual void CubeMapReflectionPass(tRenderer *) {}
+		virtual void ForwardPass(tRenderer *) {}
 		virtual tBoundingBox GetBoundingBox(void) = 0;
 
 		void AddedObjectToWorld(tWorld *world);
@@ -25,10 +26,7 @@ class tObject
 
 		tWorld *GetWorld(void)	{ return world; }
 
-
-
-		//void SetTag(string tag)		{ this->tag = tag; }
-		//string GetTag(void)			{ return tag; }
+		virtual bool GetCubeMapReflectionEnabled(void)	{ return false; }
 };
 
 class tTransformObject : public tObject

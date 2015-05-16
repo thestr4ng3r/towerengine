@@ -2,7 +2,7 @@
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
-class tCamera
+class tCamera : public tCulling
 {
 	private:
 		tVector pos;
@@ -35,6 +35,7 @@ class tCamera
 		tVector GetScreenRay(float x, float y);
 		tVector2 GetProjectedPoint(tVector point);
 
+		void InitCulling(void);
 		bool TestPointCulling(tVector point);
 		bool TestSphereCulling(tVector center, float radius);
 		bool TestBoundingBoxCulling(tBoundingBox b);
@@ -48,7 +49,9 @@ class tCamera
 		void SetNearClip(float n)		{ near_clip = n; }
 		void SetFarClip(float f)		{ far_clip = f; }
 
-		void SetModelviewProjectionMatrix(void);
+		void SetProjectionMatrix(void);
+		void SetModelViewMatrix(void);
+		void SetModelViewProjectionMatrix(void);
 };
 
 #endif

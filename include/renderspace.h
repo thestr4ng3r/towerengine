@@ -3,16 +3,24 @@
 #define _RENDERSPACE_H
 
 
-class tRenderSpace
+struct tRenderObjectSpace
 {
-	public:
-		set<tObject *> objects;
+	set<tObject *> objects;
 
-	public:
-		void ClearObjects(void);
+	virtual ~tRenderObjectSpace(void)	{}
 
-		void GeometryPass(tRenderer *renderer);
-		void ForwardPass(tRenderer *renderer);
+	virtual void Clear(void);
+
+	void GeometryPass(tRenderer *renderer);
+	void ForwardPass(tRenderer *renderer);
+};
+
+struct tRenderSpace : public tRenderObjectSpace
+{
+	set<tPointLight *> point_lights;
+	set<tDirectionalLight *> dir_lights;
+
+	void Clear(void);
 };
 
 

@@ -34,7 +34,7 @@ class tDirectionalLightShadow
 	public:
 		tDirectionalLightShadow(tDirectionalLight *light, int size, int splits, bool blur_enabled = false, float blur_size = 0.003);
 
-		void Render(tRenderer *renderer);
+		void Render(tCamera *camera, tRenderer *renderer);
 
 		GLuint GetShadowMap(void)			{ return tex; }
 		float **GetTextureMatrix(void)		{ return tex_matrix; }
