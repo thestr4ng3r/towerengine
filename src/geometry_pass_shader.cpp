@@ -40,6 +40,10 @@ void tGeometryPassShader::Init(void)
 	bump_tex_enabled_uniform = GetUniformLocation("bump_tex_enabled_uni");
 	self_illumination_tex_enabled_uniform = GetUniformLocation("self_illumination_tex_enabled_uni");
 
+	cube_map_reflection_enabled_uniform = GetUniformLocation("cube_map_reflection_enabled_uni");
+	cube_map_reflection_color_uniform = GetUniformLocation("cube_map_reflection_color_uni");
+	cube_map_reflection_tex_uniform = GetUniformLocation("cube_map_reflection_tex_uni");
+
 	transformation_uniform = GetUniformLocation("transformation_uni");
 
 	clip_uniform = GetUniformLocation("clip_vec_uni");
@@ -52,6 +56,7 @@ void tGeometryPassShader::Init(void)
 	glUniform1i(normal_tex_uniform, normal_tex_unit);
 	glUniform1i(bump_tex_uniform, bump_tex_unit);
 	glUniform1i(self_illumination_tex_uniform, self_illumination_tex_unit);
+	glUniform1i(cube_map_reflection_tex_uniform, cube_map_reflection_tex_unit);
 }
 
 void tGeometryPassShader::SetTransformation(const float m[16])
@@ -145,16 +150,21 @@ void tGeometryPassShader::SetTexCoord(tVector2 coord)
 }
 
 
-void tGeometryPassShader::SetVectors(tVector normal, tVector tangx, tVector tangy, tVector fnormal)
+void tGeometryPassShader::SetCubeMapReflectionEnabled(bool enabled)
 {
-	normal.AttrToGL(normal_attribute);
-
-	if(fnormal.SquaredLen() > 0.0)
-		fnormal.AttrToGL(normal_attribute);
-	else
-		normal.AttrToGL(normal_attribute);
+	glUniform1i(cube_map_reflection_enabled_uniform, enabled ? 1 : 0);
 }
 
+void tGeometryPassShader::SetCubeMapReflectionColor(tVector color)
+{
+	glUniform3f(cube_map_reflection_color_uniform, color.x, color.y, color.z);
+}
+
+void tGeometryPassShader::SetCubeMapReflectionTexture(GLuint tex)
+{
+	glActiveTexture(GL_TEXTURE0 + cube_map_reflection_tex_unit);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+}
 
 
 void tGeometryPassShader::SetClip(tVector c, float d)

@@ -33,7 +33,5 @@ extern const char *color_shader_vert;
 extern const char *color_shader_frag;
 extern const char *fog_shader_vert;
 extern const char *fog_shader_frag;
-extern const char *cube_map_reflection_shader_vert;
-extern const char *cube_map_reflection_shader_frag;
 
 #endif

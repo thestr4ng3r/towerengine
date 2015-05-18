@@ -17,7 +17,6 @@ class tObject
 		virtual ~tObject(void) {}
 
 		virtual void GeometryPass(tRenderer *) {}
-		virtual void CubeMapReflectionPass(tRenderer *) {}
 		virtual void ForwardPass(tRenderer *) {}
 		virtual tBoundingBox GetBoundingBox(void) = 0;
 

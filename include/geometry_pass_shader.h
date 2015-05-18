@@ -28,6 +28,10 @@ class tGeometryPassShader : public tFaceShader
 		GLint bump_tex_uniform;
 		GLint self_illumination_tex_uniform;
 
+		GLint cube_map_reflection_enabled_uniform;
+		GLint cube_map_reflection_color_uniform;
+		GLint cube_map_reflection_tex_uniform;
+
 		GLint clip_uniform;
 		GLint clip_dist_uniform;
 
@@ -46,12 +50,14 @@ class tGeometryPassShader : public tFaceShader
 		void SetNormalTexture(bool enabled, GLuint tex = 0);
 		void SetBumpTexture(bool enabled, GLuint tex = 0);
 		void SetTexCoord(tVector2 coord);
-		void SetVectors(tVector normal, tVector tangx, tVector tangy, tVector fnormal = Vec(0.0, 0.0, 0.0));
 		void SetBumpDepth(float depth);
 		void SetTransformation(const float m[16]);
 		void SetVertexMix(float m = 0.0);
 		void SetSelfIlluminationColor(tVector color);
 		void SetSelfIlluminationTexture(bool enabled, GLuint tex =0);
+		void SetCubeMapReflectionEnabled(bool enabled);
+		void SetCubeMapReflectionColor(tVector color);
+		void SetCubeMapReflectionTexture(GLuint tex);
 };
 
 

@@ -51,11 +51,10 @@ class tMeshObject : public tTransformObject
 		void UpdateRigidBodyTransformation(void);
 
 		void GeometryPass(tRenderer *renderer);
-		void CubeMapReflectionPass(tRenderer *renderer);
 		void ForwardPass(tRenderer *renderer);
 		tBoundingBox GetBoundingBox(void);
 
-		bool GetCubeMapReflectionEnabled(void)	{ return mesh->GetCubeMapReflectionEnabled(); }
+		//bool GetCubeMapReflectionEnabled(void)	{ return mesh->GetCubeMapReflectionEnabled(); }
 
 		btRigidBody *GetRigidBody(void)		{ return rigid_body; }
 

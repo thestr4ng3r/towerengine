@@ -1,7 +1,5 @@
 #version 330
 
-#define M_PI 3.1415926535897932384626433832795
-
 uniform vec3 diffuse_color_uni;
 uniform vec4 diffuse_color2_uni;
 uniform vec3 specular_color_uni;
@@ -20,6 +18,10 @@ uniform sampler2D normal_tex_uni;
 uniform sampler2D specular_tex_uni;
 uniform sampler2D bump_tex_uni;
 uniform sampler2D self_illumination_tex_uni;
+
+uniform bool cube_map_reflection_enabled_uni;
+uniform vec3 cube_map_reflection_color_uni;
+uniform samplerCube cube_map_reflection_tex_uni;
 
 
 uniform vec3 clip_vec_uni;
@@ -109,6 +111,15 @@ void main(void)
 	
 	if(self_illumination_tex_enabled_uni)
 		self_illumination *= texture2D(self_illumination_tex_uni, uv).rgb;
+		
+	
+	// cube map reflection
+	
+	if(cube_map_reflection_enabled_uni)
+	{
+		vec3 cam_reflected = reflect(-cam_dir_var, normal);
+		self_illumination += texture(cube_map_reflection_tex_uni, cam_reflected).rgb * cube_map_reflection_color_uni;
+	}
 		
 	
 	// out

@@ -11,7 +11,6 @@ class tRenderer
 		tDirectionalLightingShader *directional_lighting_shader;
 		tPointLightingShader *point_lighting_shader;
 		tSSAOLightingShader *ssao_lighting_shader;
-		tCubeMapReflectionShader *cube_map_reflection_shader;
 
 		tSkyBoxShader *skybox_shader;
 		tPointShadowShader *point_shadow_shader;
@@ -61,8 +60,7 @@ class tRenderer
 
 		void RenderShadowMaps(void);
 		void GeometryPass(void);
-		void LightPass(void);
-		void ReflectionPass(void);
+		void LightPass(void)
 		void ForwardPass(void);
 
 	public:
@@ -78,7 +76,7 @@ class tRenderer
 
 		void SetFog(bool enabled, float start_dist = 0.0, float end_dist = 100.0, float exp = 1.0, tVector color = Vec(0.0, 0.0, 0.0));
 
-		void Render(GLuint dst_fbo = 0);
+		void Render(GLuint dst_fbo = 0, int width = 0, int height = 0);
 		void RenderScreenQuad(void);
 
 		tFaceShader *GetCurrentFaceShader(void)		{ return current_face_shader; }
@@ -96,7 +94,6 @@ class tRenderer
 		tSkyBoxShader *GetSkyBoxShader(void)								{ return skybox_shader; }
 		tColorShader *GetColorShader(void)									{ return color_shader; }
 		tSSAOShader *GetSSAOShader(void)									{ return ssao_shader; }
-		tCubeMapReflectionShader *GetCubeMapReflectionShader(void)			{ return cube_map_reflection_shader; }
 
 		int GetScreenWidth(void)	{ return screen_width; }
 		int GetScreenHeight(void)	{ return screen_height; }

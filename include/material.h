@@ -66,7 +66,6 @@ class tMaterial
 		void LoadSelfIlluminationTexture(const char *extension, const void *data, unsigned int size);
 
 		void InitGeometryPass(tRenderer *renderer);
-		void InitCubeMapReflectionPass(tRenderer *renderer);
 
 		bool GetTransparent(void)	{ return transparent; }
 

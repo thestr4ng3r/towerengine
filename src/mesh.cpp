@@ -599,32 +599,7 @@ void tMesh::GeometryPass(tRenderer *renderer)
 	}
 }
 
-void tMesh::CubeMapReflectionPass(tRenderer *renderer)
-{
-	vector<tMeshMaterial *>::iterator i;
-	tVBO<float> *vertex_vbo;
-
-	if(animation_mode)
-	{
-		printf("reflection in animation mode not implemented\n");
-		return;
-	}
-	else
-		vertex_vbo = current_pose->vbo;
-
-	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
-
-	if(refresh_ibos)
-		RefreshIBOs();
-
-	for(i=materials.begin(); i!=materials.end(); i++)
-	{
-		(*i)->InitCubeMapReflectionPass(renderer);
-		(*i)->ibo->Draw(GL_TRIANGLES);
-	}
-}
-
-bool tMesh::GetCubeMapReflectionEnabled(void)
+/*bool tMesh::GetCubeMapReflectionEnabled(void)
 {
 	vector<tMeshMaterial *>::iterator i;
 
@@ -633,7 +608,7 @@ bool tMesh::GetCubeMapReflectionEnabled(void)
 			return true;
 
 	return false;
-}
+}*/
 
 bool tMesh::LoadFromFile(const char *file, int no_material)
 {

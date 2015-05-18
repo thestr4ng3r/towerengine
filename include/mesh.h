@@ -102,12 +102,11 @@ class tMesh
 		//void SetOrientation(CVector o);
 		//CVector ApplyOrientation(CVector v) { return Orientation(v, orient_x, orient_y, orient_z); };
 		void GeometryPass(tRenderer *renderer);
-		void CubeMapReflectionPass(tRenderer *renderer);
 
 		void Create(void);
 		void Delete(void);
 
-		bool GetCubeMapReflectionEnabled(void);
+		//bool GetCubeMapReflectionEnabled(void);
 
 		void SetWireframe(int wf)					{ wireframe = wf ? 1 : 0; }
 		int GetWireframe(void)						{ return wireframe; }

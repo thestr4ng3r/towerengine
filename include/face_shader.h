@@ -14,10 +14,11 @@ class tFaceShader : public tShader
 		static const GLint uvcoord_attribute = 5;
 
 		static const unsigned int diffuse_tex_unit = 0;
-		static const unsigned int specular_tex_unit = 4;
+		static const unsigned int specular_tex_unit = 1;
 		static const unsigned int normal_tex_unit = 2;
 		static const unsigned int bump_tex_unit = 3;
-		static const unsigned int self_illumination_tex_unit = 3;
+		static const unsigned int self_illumination_tex_unit = 4;
+		static const unsigned int cube_map_reflection_tex_unit = 5;
 
 		virtual void SetClip(tVector c, float d) {}
 		virtual void SetDiffuseColor(tVector color) {}
@@ -33,11 +34,13 @@ class tFaceShader : public tShader
 		virtual void SetNormalTexture(bool enabled, GLuint tex = 0) {}
 		virtual void SetBumpTexture(bool enabled, GLuint tex = 0) {}
 		virtual void SetTexCoord(tVector2 coord) {}
-		virtual void SetVectors(tVector normal, tVector tangx, tVector tangy, tVector fnormal = Vec(0.0, 0.0, 0.0)) {}
 		virtual void SetTransformation(const float m[16]) {}
 		virtual void SetVertexMix(float m = 0.0) {}
 		virtual void SetSelfIlluminationColor(tVector color) {}
 		virtual void SetSelfIlluminationTexture(bool enabled, GLuint tex = 0) {}
+		virtual void SetCubeMapReflectionEnabled(bool enabled) {}
+		virtual void SetCubeMapReflectionColor(tVector color) {}
+		virtual void SetCubeMapReflectionTexture(GLuint tex) {}
 };
 
 #endif

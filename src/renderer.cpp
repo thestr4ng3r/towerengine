@@ -26,9 +26,6 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	ambient_lighting_shader = new tAmbientLightingShader();
 	ambient_lighting_shader->Init(gbuffer);
 
-	cube_map_reflection_shader = new tCubeMapReflectionShader();
-	cube_map_reflection_shader->Init(gbuffer);
-
 	skybox_shader = new tSkyBoxShader();
 	skybox_shader->Init();
 
@@ -67,8 +64,8 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	glGenTextures(2, color_tex);
 
 	glBindTexture(GL_TEXTURE_2D, color_tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -76,8 +73,8 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_tex[0], 0);
 
 	glBindTexture(GL_TEXTURE_2D, color_tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -111,7 +108,7 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 
 	point_light_shadow_limit = -1;
 
-	test_reflection = new tCubeMapReflection(256, Vec(15.78722, 1.31274, 11.01917));
+	test_reflection = new tCubeMapReflection(256, Vec(16.49956, 1.00724, 11.46118));
 
 }
 
@@ -180,7 +177,7 @@ void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp
 	fog_shader->SetFog(start_dist, end_dist, exp, color);
 }
 
-void tRenderer::Render(GLuint dst_fbo)
+void tRenderer::Render(GLuint dst_fbo, int width, int height)
 {
 	test_reflection->Render(this);
 
@@ -234,6 +231,9 @@ void tRenderer::Render(GLuint dst_fbo)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, dst_fbo);
 
+	if(width > 0 && height > 0)
+		glViewport(0, 0, width, height);
+
 	post_process_shader->Bind();
 	post_process_shader->SetFXAA(fxaa_enabled);
 	post_process_shader->SetTextures(color_tex[current_read_color_tex], screen_width, screen_height);
@@ -242,8 +242,8 @@ void tRenderer::Render(GLuint dst_fbo)
 
 	tShader::Unbind();
 
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	if(dst_fbo != 0)
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 
@@ -329,26 +329,10 @@ void tRenderer::GeometryPass(void)
 
 	SetCurrentFaceShader(geometry_pass_shader);
 	BindCurrentFaceShader();
+	geometry_pass_shader->SetCubeMapReflectionTexture(test_reflection->GetCubeMapTexture());
 
 	camera_render_space->GeometryPass(this);
 }
-
-void tRenderer::ReflectionPass(void)
-{
-	camera->SetModelViewProjectionMatrix();
-
-	cube_map_reflection_shader->Bind();
-	cube_map_reflection_shader->SetCameraPosition(camera->GetPosition());
-	cube_map_reflection_shader->SetCubeMapTexture(test_reflection->GetCubeMapTexture());
-
-	set<tObject *>::iterator i;
-	for(i=camera_render_space->objects.begin(); i!=camera_render_space->objects.end(); i++)
-	{
-		if((*i)->GetCubeMapReflectionEnabled())
-			(*i)->CubeMapReflectionPass(this);
-	}
-}
-
 
 void tRenderer::LightPass(void)
 {
@@ -394,17 +378,6 @@ void tRenderer::LightPass(void)
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
-
-	ReflectionPass();
-
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
 
 	directional_lighting_shader->Bind();
 	directional_lighting_shader->SetCameraPosition(camera->GetPosition());

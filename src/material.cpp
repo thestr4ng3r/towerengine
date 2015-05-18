@@ -124,9 +124,8 @@ void tMaterial::InitGeometryPass(tRenderer *renderer)
 	renderer->GetCurrentFaceShader()->SetBumpDepth(bump.depth);
 	renderer->GetCurrentFaceShader()->SetSelfIlluminationColor(self_illum.color);
 	renderer->GetCurrentFaceShader()->SetSelfIlluminationTexture(self_illum.tex != 0, self_illum.tex);
-}
 
-void tMaterial::InitCubeMapReflectionPass(tRenderer *renderer)
-{
-	renderer->GetCubeMapReflectionShader()->SetReflectionColor(cube_map_reflection.color);
+	renderer->GetCurrentFaceShader()->SetCubeMapReflectionEnabled(cube_map_reflection.enabled);
+	if(cube_map_reflection.enabled)
+		renderer->GetCurrentFaceShader()->SetCubeMapReflectionColor(cube_map_reflection.color);
 }
