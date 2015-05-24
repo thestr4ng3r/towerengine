@@ -2,6 +2,8 @@
 #include "towerengine.h"
 #include "tresources.h"
 
+using namespace std;
+
 void tSSAOShader::Init(void)
 {
 	InitShader(ssao_shader_vert, ssao_shader_frag, "SSAO Shader");

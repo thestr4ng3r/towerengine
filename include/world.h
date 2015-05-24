@@ -5,9 +5,9 @@
 class tWorld
 {
 	private:
-		vector<tObject *> objects;
-		vector<tPointLight *> point_lights;
-		vector<tDirectionalLight *> dir_lights;
+		std::vector<tObject *> objects;
+		std::vector<tPointLight *> point_lights;
+		std::vector<tDirectionalLight *> dir_lights;
 		tSkyBox *sky_box;
 
 		//tRenderSpace *camera_render_space;

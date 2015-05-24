@@ -1,5 +1,9 @@
 #include "towerengine.h"
 
+
+using namespace std;
+
+
 tVAO::tVAO(void)
 {
 	glGenVertexArrays(1, &vao);

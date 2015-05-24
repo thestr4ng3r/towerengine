@@ -10,7 +10,7 @@
 class tSceneObject
 {
 	private:
-		string tag;
+		std::string tag;
 
 	public:
 		tSceneObject(void)			{ tag = ""; }
@@ -21,8 +21,8 @@ class tSceneObject
 
 		virtual int GetType(void) =0;
 
-		void SetTag(string tag)		{ this->tag = tag; }
-		string GetTag(void)			{ return tag; }
+		void SetTag(std::string tag)		{ this->tag = tag; }
+		std::string GetTag(void)			{ return tag; }
 };
 
 class tObjectSceneObject : public tSceneObject

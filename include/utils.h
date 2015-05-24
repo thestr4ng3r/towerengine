@@ -10,7 +10,7 @@ char *itoa(int v, int len = 50);
 char *cstr(const char *);
 
 void SetColor(GLenum which, float r, float g, float b);
-string PathOfFile(string file);
+std::string PathOfFile(std::string file);
 void PaintAxes(void);
 
 void CombineMatrix4(float MatrixA[16],float MatrixB[16], float *retM);

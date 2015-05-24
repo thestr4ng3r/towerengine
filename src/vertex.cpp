@@ -1,17 +1,16 @@
 #include "towerengine.h"
 
 
-tVertex::tVertex(tMesh *mesh) : tVector()
+tVertex::tVertex(tMesh *mesh)
 {
 	Create(mesh);
+	pos = Vec(0.0, 0.0, 0.0);
 }
 
 tVertex::tVertex(tVector v, tMesh *mesh)
 {
 	Create(mesh);
-	x = v.x;
-	y = v.y;
-	z = v.z;
+	pos = v;
 }
 
 void tVertex::Create(tMesh *mesh)
@@ -90,7 +89,3 @@ int tVertex::GetTriangles(tTriangle **&t, int *&number, tTriangle *exclude)
 	return count;
 }
 
-tVector tVertex::operator=(tVertex v)
-{
-	return (tVector)v;
-}

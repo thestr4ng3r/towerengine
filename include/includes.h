@@ -20,8 +20,6 @@
 #include <stdexcept>
 
 
-using namespace std;
-
 #ifndef GL_GLEXT_PROTOTYPES
 #define GL_GLEXT_PROTOTYPES
 #endif

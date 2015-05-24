@@ -1,5 +1,7 @@
 #include "towerengine.h"
 
+using namespace std;
+
 tMaterial::tMaterial(void)
 {
 	diffuse.color.Set(1.0, 1.0, 1.0);

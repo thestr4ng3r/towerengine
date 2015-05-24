@@ -5,7 +5,7 @@
 
 struct tRenderObjectSpace
 {
-	set<tObject *> objects;
+	std::set<tObject *> objects;
 
 	virtual ~tRenderObjectSpace(void)	{}
 
@@ -17,8 +17,8 @@ struct tRenderObjectSpace
 
 struct tRenderSpace : public tRenderObjectSpace
 {
-	set<tPointLight *> point_lights;
-	set<tDirectionalLight *> dir_lights;
+	std::set<tPointLight *> point_lights;
+	std::set<tDirectionalLight *> dir_lights;
 
 	void Clear(void);
 };

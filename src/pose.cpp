@@ -1,36 +1,6 @@
 #include "towerengine.h"
 
-/*CVertexPosition::CVertexPosition(CMeshPosition *parent, CVertex *v, CVector p)
-{
-	this->parent = parent;
-	chain_next = parent->pos_first;
-	parent->pos_first = this;
-
-	this->v = v;
-	this->p = p;
-}
-
-CVertexPosition::~CVertexPosition(void)
-{
-}
-
-void CVertexPosition::CopyPosition(void)
-{
-	p = (CVector)*v;
-}
-
-void CVertexPosition::ApplyPosition(void)
-{
-	v->SetVector(p);
-}
-
-void CVertexPosition::ApplyMixedPosition(CVector o, float mix)
-{
-	v->SetVector(Mix(p, o, mix));
-}*/
-
-//------------------------------------------------------------
-
+using namespace std;
 
 tMeshPose::tMeshPose(tMesh *mesh)
 {
@@ -55,7 +25,7 @@ void tMeshPose::CopyFromVertices(void)
 	for(i=0; i<mesh->GetVertexCount(); i++)
 	{
 		v = mesh->GetVertex(i);
-		p = *v;
+		p = v->pos;
 		vertices.insert(pair<tVertex *, tVector>(v, p));
 	}
 
@@ -93,7 +63,7 @@ void tMeshPose::ApplyPoseToVertices(void)
 	map<tVertex *, tVector>::iterator i;
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
-		i->first->SetVector(i->second);
+		i->first->pos = i->second;
 }
 
 void tMeshPose::ApplyMixedPoseToVertices(tMeshPose *o, float mix)
@@ -104,9 +74,9 @@ void tMeshPose::ApplyMixedPoseToVertices(tMeshPose *o, float mix)
 	{
 		oi = o->vertices.find(i->first);
 		if(oi == o->vertices.end())
-			i->first->SetVector(i->second);
+			i->first->pos = i->second;
 		else
-			i->first->SetVector(i->second * mix + oi->second * (1.0 - mix));
+			i->first->pos = i->second * mix + oi->second * (1.0 - mix);
 
 	}
 }
@@ -131,7 +101,7 @@ void tMeshPose::RefreshVBO(void)
 		vt = mesh->GetVertex(i);
 		vi = vertices.find(vt);
 		if(vi==vertices.end())
-			p = vt->v;
+			p = vt->pos.v;
 		else
 			p = vi->second.v;
 		memcpy(vertex_data + vt->index * 3, p, 3 * sizeof(float));

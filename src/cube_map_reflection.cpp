@@ -1,9 +1,10 @@
 
 #include "towerengine.h"
 
+using namespace std;
+
 tCubeMapReflection::tCubeMapReflection(int resolution, tVector position)
 {
-
 	this->resolution = resolution;
 	this->position = position;
 

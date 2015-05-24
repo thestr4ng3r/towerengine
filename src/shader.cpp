@@ -1,6 +1,8 @@
 
 #include "towerengine.h"
 
+using namespace std;
+
 void tShader::SetSource(const char *vertex, const char *fragment)
 {
 	vertex_src = vertex;

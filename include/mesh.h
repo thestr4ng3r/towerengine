@@ -27,7 +27,6 @@ class tMesh
 	private:
 		int file_version;
 
-		bool wireframe;
 		bool loop_anim;
 		bool anim_finished;
 		bool animation_mode;
@@ -43,25 +42,27 @@ class tMesh
 		tVBO<float> *uvcoord_vbo;
 		int data_count;
 
+		std::map<tMaterial *, tMaterialIBO *> material_ibos;
+
 		tBoundingBox bounding_box;
 
-		set<tVertex *> outdated_vertices;
+		std::set<tVertex *> outdated_vertices;
 
 		tMeshPose *current_pose;
 		tAnimation *current_animation;
 
 		tMeshPose *idle_pose;
 
-		tMeshMaterial *idle_material;
+		tMaterial *idle_material;
 
-		vector<tVertex *> vertices;
-		vector<tTriangle *> triangles;
-		vector<tMeshMaterial *> materials;
-		map<string, tMeshPose *> custom_pose;
-		vector<tAnimation *> animations;
-		vector<tEntity *> entities;
+		std::vector<tVertex *> vertices;
+		std::vector<tTriangle *> triangles;
+		std::map<std::string, tMaterial *> materials;
+		std::map<std::string, tMeshPose *> custom_pose;
+		std::vector<tAnimation *> animations;
+		std::vector<tEntity *> entities;
 
-		map<int, tVertex *> vertex_indices;
+		std::map<int, tVertex *> vertex_indices;
 
 
 		btTriangleMesh *physics_triangle_mesh;
@@ -75,7 +76,7 @@ class tMesh
 		void DeleteVBOData(void);
 
 		tVertex *ParseVertexNode(rapidxml::xml_node<char> *cur);
-		tMeshMaterial *ParseMaterialNode(rapidxml::xml_node<char> *cur, string path);
+		tMaterial *ParseMaterialNode(rapidxml::xml_node<char> *cur, std::string path);
 		tTriangle *ParseTriangleNode(rapidxml::xml_node<char> *cur);
 		tMeshPose *ParsePoseNode(rapidxml::xml_node<char> *cur);
 		tAnimation *ParseAnimationNode(rapidxml::xml_node<char> *cur);
@@ -89,27 +90,13 @@ class tMesh
 
 		void ApplyMatrix(float m[16]);
 
-		#ifdef TMS_USE_LIB_G3D
-        static G3DContext *g3d_context;
-        static void CreateG3DContext(void) { if(g3d_context) return; g3d_context = g3d_context_new(); };
-        static void DeleteG3DContext(void) { if(!g3d_context) return; g3d_context_free(g3d_context); g3d_context = 0; };
-		#endif
-
 		bool LoadFromFile(const char *file, int no_material = 0);
-		bool LoadFromData(char *data, string path = "");
-		bool LoadFromXML(rapidxml::xml_document<char> *doc, string path, int no_material);
-        //int LoadFromFile_0_0(const char *file) { printf("LoadFromFile_0_0 function was removed.\n"); return 0; };
-		//void SetOrientation(CVector o);
-		//CVector ApplyOrientation(CVector v) { return Orientation(v, orient_x, orient_y, orient_z); };
+		bool LoadFromData(char *data, std::string path = "");
+		bool LoadFromXML(rapidxml::xml_document<char> *doc, std::string path, int no_material);
+
 		void GeometryPass(tRenderer *renderer);
 
-		void Create(void);
-		void Delete(void);
-
 		//bool GetCubeMapReflectionEnabled(void);
-
-		void SetWireframe(int wf)					{ wireframe = wf ? 1 : 0; }
-		int GetWireframe(void)						{ return wireframe; }
 
 		int GetVertexCount(void)					{ return vertices.size(); }
 		int GetTriangleCount(void)					{ return triangles.size(); }
@@ -120,36 +107,35 @@ class tMesh
 
 		tVertex *GetVertex(int i)					{ return vertices.at(i); }
 		tTriangle *GetTriangle(int i)				{ return triangles.at(i); }
-		tMeshMaterial *GetMaterial(int i)				{ return materials.at(i); }
-		tMeshPose *GetCustomPose(string s) 			{ return custom_pose.at(s); }
+		tMeshPose *GetCustomPose(std::string s) 			{ return custom_pose.at(s); }
 		tAnimation *GetAnimation(int i)				{ return animations.at(i); }
 		tEntity *GetEntity(int i)					{ return entities.at(i); }
 
-		tMeshMaterial *GetIdleMaterial(void)			{ return idle_material; }
+		tMaterial *GetIdleMaterial(void)			{ return idle_material; }
 
-		map<string, tEntity *> GetEntitiesInGroup(const char *group = "");
+		std::map<std::string, tEntity *> GetEntitiesInGroup(const char *group = "");
 
 		tBoundingBox GetBoundingBox(void)			{ return bounding_box; }
 
 		void AddVertex(tVertex *v);
 		void AddTriangle(tTriangle *t);
-		void AddMaterial(tMeshMaterial *m);
-		void AddCustomPose(string name, tMeshPose *p);
+		void AddMaterial(std::string name, tMaterial *m);
+		void AddCustomPose(std::string name, tMeshPose *p);
 		void AddAnimation(tAnimation *a);
 
 		void RemoveVertex(tVertex *v);
 		void RemoveTriangle(tTriangle *t);
-		void RemoveMaterial(tMeshMaterial *m);
-		void RemoveCustomPose(string name);
+		void RemoveMaterial(std::string name);
+		void RemoveCustomPose(std::string name);
 		void RemoveAnimation(tAnimation *a);
 		void RemoveEntity(tEntity *e);
 
 		tIBO *CreateIBO(void)						{ return new tIBO(vao); }
 
 		tMeshPose *GetIdlePose(void)		{ return idle_pose; }
-		tMeshPose *GetCustomPoseByName(string name);
+		tMeshPose *GetCustomPoseByName(std::string name);
 		tMeshPose *GetCurrentPose(void);
-		string GetCurrentPoseName(string idle = string("Idle"));
+		std::string GetCurrentPoseName(std::string idle = std::string("Idle"));
 
 		tAnimation *CreateAnimation(const char *name, float len = 1.0);
 		void ChangeAnimation(tAnimation *a);
@@ -164,7 +150,7 @@ class tMesh
 		int GetAnimationFinished(void) { return anim_finished; };
 
         void SetTriangleMaterials(void);
-		void CalculateNormalsSolid(void);
+		//void CalculateNormalsSolid(void);
 
 		void GenerateBoundingBox(void);
 
@@ -172,19 +158,19 @@ class tMesh
 		btTriangleMesh *GetPhysicsMesh(void)		{ return physics_triangle_mesh; }
 
 		tVertex *CreateVertex(tVector v);
-		tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3);
-		tTriangle *CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, char material[100], tVector t1, tVector t2, tVector t3);
-		tMeshPose *CreateCustomPose(string name);
-		tEntity *CreateEntity(string name, string group = string());
+		tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, std::string material, tVector t1, tVector t2, tVector t3);
+		tTriangle *CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, std::string material, tVector t1, tVector t2, tVector t3);
+		tMeshPose *CreateCustomPose(std::string name);
+		tEntity *CreateEntity(std::string name, std::string group = std::string());
 
 		tVBO<float> *CreateFloatVBO(int components);
 		void AssignVertexArrayPositions(void);
 
-		void ChangePose(string name, string idle = "Idle");
+		void ChangePose(std::string name, std::string idle = "Idle");
 		void ChangePose(tMeshPose *pos);
 		void CopyPoseFromVertices(void);
 
-		tMeshMaterial *GetMaterialByName(string name);
+		tMaterial *GetMaterialByName(std::string name);
 		tVertex *GetVertexByID(int id);
 
 		void SetVertexId(tVertex *v, int id);

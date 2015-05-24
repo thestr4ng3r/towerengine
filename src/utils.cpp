@@ -6,6 +6,8 @@
 #define snprintf sprintf_s
 #endif
 
+using namespace std;
+
 char *ftoa(float f, int len)
 {
 	char *buf = new char[len + 1];

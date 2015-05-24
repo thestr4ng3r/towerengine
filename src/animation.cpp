@@ -1,5 +1,7 @@
 #include "towerengine.h"
 
+using namespace std;
+
 tAnimation::tAnimation(tMesh *mesh, const char *name, float len, int create_keyframes)
 {
 	this->mesh = mesh;

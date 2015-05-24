@@ -17,10 +17,10 @@ class tScene
 	private:
 		tWorld *world;
 
-		string load_path;
+		std::string load_path;
 
-		map<string, tAsset *> assets;
-		map<string, tSceneObject *> objects;
+		std::map<std::string, tAsset *> assets;
+		std::map<std::string, tSceneObject *> objects;
 
 		tCubeMapAsset *sky_cubemap;
 		tSkyBox *skybox;
@@ -48,15 +48,15 @@ class tScene
 		tScene(tWorld *world);
 		~tScene(void);
 
-		bool LoadFromFile(string file);
+		bool LoadFromFile(std::string file);
 
 		void AddToWorld(void);
 		void RemoveFromWorld(void);
 
-		tSceneObject *GetObjectByTag(string tag);
-		list<tSceneObject *> *GetObjectsByTag(string tag);
-		tSceneObject *GetObjectWhereTagStartsWith(string start);
-		list<tSceneObject *> *GetObjectsWhereTagStartsWith(string start);
+		tSceneObject *GetObjectByTag(std::string tag);
+		std::list<tSceneObject *> *GetObjectsByTag(std::string tag);
+		tSceneObject *GetObjectWhereTagStartsWith(std::string start);
+		std::list<tSceneObject *> *GetObjectsWhereTagStartsWith(std::string start);
 };
 
 

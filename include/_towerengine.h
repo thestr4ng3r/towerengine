@@ -7,7 +7,6 @@ struct tKeyFrame;
 class tMesh;
 struct tTriangle;
 class tMaterial;
-class tMeshMaterial;
 struct tVertex;
 struct tEntity;
 class tWorld;
@@ -49,7 +48,7 @@ class tRenderer;
 #include "vertex.h"
 #include "triangle.h"
 #include "material.h"
-#include "mesh_material.h"
+#include "material_ibo.h"
 #include "mesh.h"
 #include "pose.h"
 #include "animation.h"

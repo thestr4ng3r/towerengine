@@ -4,6 +4,8 @@
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletDynamics/Character/btKinematicCharacterController.h"
 
+using namespace std;
+
 tWorld::tWorld(void)
 {
 	ambient_color = Vec(0.1, 0.1, 0.1);

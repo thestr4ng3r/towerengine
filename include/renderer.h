@@ -52,7 +52,7 @@ class tRenderer
 
 		tCamera *camera;
 		tRenderSpace *camera_render_space;
-		list<tPointLight *> render_point_light_shadows;
+		std::list<tPointLight *> render_point_light_shadows;
 
 
 		tCubeMapReflection *test_reflection;
@@ -60,7 +60,7 @@ class tRenderer
 
 		void RenderShadowMaps(void);
 		void GeometryPass(void);
-		void LightPass(void)
+		void LightPass(void);
 		void ForwardPass(void);
 
 	public:

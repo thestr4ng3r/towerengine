@@ -1,5 +1,7 @@
 #include "towerengine.h"
 
+using namespace std;
+
 void tRenderObjectSpace::Clear(void)
 {
 	objects.clear();

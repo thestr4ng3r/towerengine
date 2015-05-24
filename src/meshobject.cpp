@@ -3,6 +3,7 @@
 
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 
+using namespace std;
 
 tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 {

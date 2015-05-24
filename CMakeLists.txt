@@ -50,7 +50,7 @@ set(towerengine_SRC
 	src/point_shadow_shader.cpp
 	src/directional_shadow_shader.cpp
 	src/post_process_shader.cpp
-	src/mesh_material.cpp
+	src/material_ibo.cpp
 	src/renderer.cpp
 	src/ssao_shader.cpp
 	src/utilobjects.cpp

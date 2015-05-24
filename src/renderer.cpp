@@ -1,6 +1,8 @@
 
 #include "towerengine.h"
 
+using namespace std;
+
 tRenderer::tRenderer(int width, int height, tWorld *world)
 {
 	geometry_pass_shader = new tGeometryPassShader();
@@ -108,7 +110,7 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 
 	point_light_shadow_limit = -1;
 
-	test_reflection = new tCubeMapReflection(256, Vec(16.49956, 1.00724, 11.46118));
+	test_reflection = new tCubeMapReflection(256, Vec(2.39925, 3.0, 7.15911));
 
 }
 
@@ -177,9 +179,15 @@ void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp
 	fog_shader->SetFog(start_dist, end_dist, exp, color);
 }
 
+int temp_render_count = 0;
+
 void tRenderer::Render(GLuint dst_fbo, int width, int height)
 {
-	test_reflection->Render(this);
+	if(temp_render_count < 10)
+	{
+		test_reflection->Render(this);
+		temp_render_count++;
+	}
 
 	camera->SetAspect((float)screen_width / (float)screen_height);
 

@@ -1,6 +1,8 @@
 #include "towerengine.h"
 #include "tresources.h"
 
+using namespace std;
+
 void tSkyBoxShader::Init(void)
 {
 	InitShader(cube_env_shader_vert, cube_env_shader_frag, "SkyBox Shader");

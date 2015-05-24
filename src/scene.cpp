@@ -4,6 +4,8 @@
 
 #include "rapidxml.hpp"
 
+
+using namespace std;
 using namespace rapidxml;
 
 

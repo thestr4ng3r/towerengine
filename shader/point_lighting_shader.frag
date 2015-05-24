@@ -56,7 +56,7 @@ void main(void)
 	{ 
 		vec2 moments = texture(point_light_shadow_map_uni, -light_dir).rg;
 		
-		float light_depth = length(point_light_pos_uni - position.xyz);
+		float light_depth = length(point_light_pos_uni - position.xyz) - 0.05;
 								
 		// Surface is fully lit. as the current fragment is before the light occluder
 		if(light_depth <= moments.x)

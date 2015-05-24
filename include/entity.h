@@ -8,12 +8,12 @@ struct tEntityAttribute;
 
 struct tEntity
 {
-	string name;
-	string group;
+	std::string name;
+	std::string group;
 
-	map<string, tEntityAttribute *> attributes;
+	std::map<std::string, tEntityAttribute *> attributes;
 
-	void RemoveAttribute(string name) { attributes.erase(name); }
+	void RemoveAttribute(std::string name) { attributes.erase(name); }
 };
 
 
@@ -28,7 +28,7 @@ struct tEntityAttribute
 		float float_v;
 		int int_v;
 	};
-	string string_v;
+	std::string string_v;
 };
 
 #endif

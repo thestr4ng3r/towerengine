@@ -116,7 +116,7 @@ template <class T> bool tVBO<T>::SetSize(int size, bool copy)
 	if(old != 0)
 	{
 		if(copy)
-			memcpy(data, old, min(this->size, size) * components * sizeof(T));
+			memcpy(data, old, std::min(this->size, size) * components * sizeof(T));
 		delete[] old;
 	}
 	this->size = size;

@@ -53,11 +53,11 @@ class tMaterial
 		void SetSelfIlluminationColor(tVector color);
 		void SetCubeMapReflection(bool enabled, tVector color);
 
-		void LoadDiffuseTexture(string file);
-		void LoadSpecularTexture(string file);
-		void LoadNormalTexture(string file);
-		void LoadBumpTexture(string file);
-		void LoadSelfIlluminationTexture(string file);
+		void LoadDiffuseTexture(std::string file);
+		void LoadSpecularTexture(std::string file);
+		void LoadNormalTexture(std::string file);
+		void LoadBumpTexture(std::string file);
+		void LoadSelfIlluminationTexture(std::string file);
 
 		void LoadDiffuseTexture(const char *extension, const void *data, unsigned int size);
 		void LoadSpecularTexture(const char *extension, const void *data, unsigned int size);

@@ -10,7 +10,7 @@ struct tMeshPose
 	tMesh *mesh;
 
 	tVBO<float> *vbo;
-	map<tVertex *, tVector> vertices;
+	std::map<tVertex *, tVector> vertices;
 
 	int id; // TODO: ID (nur zum saven) wo anders speichern (am besten in maps)
 	

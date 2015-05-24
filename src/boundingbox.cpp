@@ -1,6 +1,7 @@
 
 #include "towerengine.h"
 
+using namespace std;
 
 tBoundingBox::tBoundingBox(tVector a, tVector b)
 {
