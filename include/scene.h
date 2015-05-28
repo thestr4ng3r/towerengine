@@ -17,6 +17,8 @@ class tScene
 	private:
 		tWorld *world;
 
+		tMaterialManager *material_manager;
+
 		std::string load_path;
 
 		std::map<std::string, tAsset *> assets;
@@ -29,6 +31,7 @@ class tScene
 
 		void ParseAssetsNode(rapidxml::xml_node<char> *cur);
 		void ParseMeshAssetNode(rapidxml::xml_node<char> *cur);
+		void ParseMaterialAssetNode(rapidxml::xml_node<char> *cur);
 		void ParseCubeMapAssetNode(rapidxml::xml_node<char> *cur);
 
 		void ParseObjectsNode(rapidxml::xml_node<char> *cur);

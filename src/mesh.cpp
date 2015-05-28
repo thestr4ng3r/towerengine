@@ -7,7 +7,7 @@ using namespace std;
 using namespace rapidxml;
 
 
-tMesh::tMesh(const char *file)
+tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 {
 	idle_pose = 0;
 	vao = 0;
@@ -51,7 +51,6 @@ tMesh::~tMesh(void)
 
 	for(cpi=custom_pose.begin(); cpi!=custom_pose.end(); cpi++)
 		delete custom_pose.begin()->second;
-	custom_pose.clear();
 
 	while(!animations.empty())
 		delete animations.back();
@@ -62,11 +61,9 @@ tMesh::~tMesh(void)
 	while(!triangles.empty())
 		delete triangles.back();
 	
-	map<string, tMaterial *>::iterator mi;
-	for(mi=materials.begin(); mi!=materials.end(); mi++)
-		delete mi->second;
-	materials.clear();
-	
+	set<tMaterial *>::iterator mi;
+	for(mi=own_materials.begin(); mi!=own_materials.end(); mi++)
+		delete *mi;
 
 	while(!vertices.empty())
 		delete vertices.back();
@@ -77,12 +74,7 @@ tMesh::~tMesh(void)
 		entities.pop_back();
 	}
 
-	vertex_indices.clear();
-
 	DeleteVBOData();
-	outdated_vertices.clear();
-	refresh_vbos = true;
-	refresh_ibos = true;
 
 	delete physics_triangle_mesh;
 }
@@ -137,14 +129,14 @@ tVertex *tMesh::CreateVertex(tVector v)
 	return o;
 }
 
-tTriangle *tMesh::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, string material, tVector t1, tVector t2, tVector t3)
+tTriangle *tMesh::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material, tVector t1, tVector t2, tVector t3)
 {
 	refresh_ibos = true;
 
     return tTriangle::CreateTriangle(v1, v2, v3, color, material, t1, t2, t3, this);
 }
 
-tTriangle *tMesh::CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, string material, tVector t1, tVector t2, tVector t3)
+/*tTriangle *tMesh::CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, string material, tVector t1, tVector t2, tVector t3)
 {
 	tVertex *vert[3];
 	vector<tVertex *>::iterator verti;
@@ -172,7 +164,7 @@ tTriangle *tMesh::CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector
                t1,			    // t1
                t2,			    // t2
                t3);			    // t3
-}
+}*/
 
 tEntity *tMesh::CreateEntity(string name, string group)
 {
@@ -373,7 +365,7 @@ void tMesh::SetIDs(void)
 		p->second->id = i;
 }
 
-void tMesh::SetTriangleMaterials(void)
+/*void tMesh::SetTriangleMaterials(void)
 {
     vector<tTriangle *>::iterator t;
 
@@ -381,7 +373,7 @@ void tMesh::SetTriangleMaterials(void)
         (*t)->mat = GetMaterialByName((*t)->m_name);
 
 	//refresh_vbo = true;
-}
+}*/
 
 void tMesh::AssignVertexArrayPositions(void)
 {
@@ -585,7 +577,7 @@ void tMesh::GeometryPass(tRenderer *renderer)
 	return false;
 }*/
 
-bool tMesh::LoadFromFile(const char *file, int no_material)
+bool tMesh::LoadFromFile(const char *file, tMaterialManager *material_manager)
 {
 	bool r;
 	string path;
@@ -600,7 +592,7 @@ bool tMesh::LoadFromFile(const char *file, int no_material)
 
 	xml_document<> *doc = new xml_document<>();
 	doc->parse<0>(data);
-	r = LoadFromXML(doc, path, no_material);
+	r = LoadFromXML(doc, path, material_manager);
 
 	delete [] data;
 
@@ -610,14 +602,14 @@ bool tMesh::LoadFromFile(const char *file, int no_material)
 	return r;
 }
 
-bool tMesh::LoadFromData(char *data, string path)
+bool tMesh::LoadFromData(char *data, string path, tMaterialManager *material_manager)
 {
 	bool r;
 
 	xml_document<> *doc = new xml_document<>();
 	doc->parse<0>(data);
 
-	r = LoadFromXML(doc, path, 0);
+	r = LoadFromXML(doc, path, material_manager);
 
 	refresh_vbos = true;
 	refresh_ibos = true;
@@ -636,7 +628,7 @@ int TEMVersionFromString(const char *s)
 	return -1;
 }
 
-bool tMesh::LoadFromXML(xml_document<> *doc, string path, int no_material)
+bool tMesh::LoadFromXML(xml_document<> *doc, string path, tMaterialManager *material_manager)
 {
 	xml_node<> *cur;
 	xml_attribute<> *attr;
@@ -682,10 +674,10 @@ bool tMesh::LoadFromXML(xml_document<> *doc, string path, int no_material)
 
 		if(strcmp(name, "vertex") == 0)
 			ParseVertexNode(cur);
-		if(strcmp(name, "material") == 0 && !no_material)
+		if(strcmp(name, "material") == 0)
 			ParseMaterialNode(cur, path);
 		if(strcmp(name, "triangle") == 0)
-			ParseTriangleNode(cur);
+			ParseTriangleNode(cur, material_manager);
 		if(strcmp(name, "pose") == 0 || strcmp(name, "position") == 0)
 			ParsePoseNode(cur);
 		if(strcmp(name, "animation") == 0)
@@ -743,7 +735,7 @@ tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 #define TEXTURE_DATA 2
 
 
-tMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
+tMaterial *tMesh::ParseXMLMaterialNode(xml_node<> *cur, string &name, string path)
 {
 	xml_node<> *child;
 	int diffuse_mode, specular_mode, normal_mode, bump_mode, self_illum_mode;
@@ -763,7 +755,6 @@ tMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 	char *diffuse_ext, *specular_ext, *normal_ext, *bump_ext, *self_illum_ext;
 	char *base64_temp;
 
-	string name;
 	xml_attribute<> *attr;
 	tMaterial *r;
 
@@ -967,15 +958,26 @@ tMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 	else if(self_illum_mode == TEXTURE_DATA)
 		r->LoadSelfIlluminationTexture(self_illum_ext, self_illum_data, self_illum_size);
 
-
-	AddMaterial(name, r);
-
 	return r;
 }
 
-tTriangle *tMesh::ParseTriangleNode(xml_node<> *cur)
+tMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 {
-	char *material = 0;
+	string name;
+	tMaterial *mat = ParseXMLMaterialNode(cur, name, path);
+
+	if(mat)
+	{
+		AddMaterial(name, mat);
+		own_materials.insert(mat);
+	}
+
+	return mat;
+}
+
+tTriangle *tMesh::ParseTriangleNode(xml_node<> *cur, tMaterialManager *material_manager)
+{
+	string mat_name;
 	int v[3];
 	int i;
 	tVector uv[3];
@@ -986,7 +988,7 @@ tTriangle *tMesh::ParseTriangleNode(xml_node<> *cur)
 
 
 	if((attr = cur->first_attribute("mat")))
-		material = attr->value();
+		mat_name = string(attr->value());
 
 	child = cur->first_node("vertex");
 	for(i=0; i<3 && child; child=child->next_sibling("vertex"))
@@ -1004,7 +1006,26 @@ tTriangle *tMesh::ParseTriangleNode(xml_node<> *cur)
 	if(i<2) // less than 3 vertices
 		return 0;
 
-	r = CreateTriangle(vt[0], vt[1], vt[2], Vec(1.0, 1.0, 1.0), material, uv[0], uv[1], uv[2]);
+	tMaterial *mat = 0;
+	map<string, tMaterial *>::iterator mi = materials.find(mat_name);
+	if(mi == materials.end())
+	{
+		if(material_manager)
+		{
+			mat = material_manager->GetMaterial(mat_name);
+			if(mat)
+				AddMaterial(mat_name, mat);
+		}
+	}
+	else
+	{
+		mat = mi->second;
+	}
+
+	if(!mat)
+		mat = GetIdleMaterial();
+
+	r = CreateTriangle(vt[0], vt[1], vt[2], Vec(1.0, 1.0, 1.0), mat, uv[0], uv[1], uv[2]);
 	return r;
 }
 

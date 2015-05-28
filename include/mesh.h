@@ -62,6 +62,8 @@ class tMesh
 		std::vector<tAnimation *> animations;
 		std::vector<tEntity *> entities;
 
+		std::set<tMaterial *> own_materials;
+
 		std::map<int, tVertex *> vertex_indices;
 
 
@@ -77,7 +79,7 @@ class tMesh
 
 		tVertex *ParseVertexNode(rapidxml::xml_node<char> *cur);
 		tMaterial *ParseMaterialNode(rapidxml::xml_node<char> *cur, std::string path);
-		tTriangle *ParseTriangleNode(rapidxml::xml_node<char> *cur);
+		tTriangle *ParseTriangleNode(rapidxml::xml_node<char> *cur, tMaterialManager *material_manager);
 		tMeshPose *ParsePoseNode(rapidxml::xml_node<char> *cur);
 		tAnimation *ParseAnimationNode(rapidxml::xml_node<char> *cur);
 		tKeyFrame *ParseKeyFrameNode(rapidxml::xml_node<char> *cur, tAnimation *anim);
@@ -88,11 +90,15 @@ class tMesh
 
 		static void Color(tVector c, float a = 1.0);
 
+
+		static tMaterial *ParseXMLMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
+
+
 		void ApplyMatrix(float m[16]);
 
-		bool LoadFromFile(const char *file, int no_material = 0);
-		bool LoadFromData(char *data, std::string path = "");
-		bool LoadFromXML(rapidxml::xml_document<char> *doc, std::string path, int no_material);
+		bool LoadFromFile(const char *file, tMaterialManager *material_manager = 0);
+		bool LoadFromData(char *data, std::string path = "", tMaterialManager *material_manager = 0);
+		bool LoadFromXML(rapidxml::xml_document<char> *doc, std::string path, tMaterialManager *material_manager = 0);
 
 		void GeometryPass(tRenderer *renderer);
 
@@ -149,7 +155,7 @@ class tMesh
 		void SetAnimationLoop(int l) { loop_anim = l ? 1 : 0; anim_finished = 0; };
 		int GetAnimationFinished(void) { return anim_finished; };
 
-        void SetTriangleMaterials(void);
+        //void SetTriangleMaterials(void);
 		//void CalculateNormalsSolid(void);
 
 		void GenerateBoundingBox(void);
@@ -158,8 +164,8 @@ class tMesh
 		btTriangleMesh *GetPhysicsMesh(void)		{ return physics_triangle_mesh; }
 
 		tVertex *CreateVertex(tVector v);
-		tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, std::string material, tVector t1, tVector t2, tVector t3);
-		tTriangle *CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, std::string material, tVector t1, tVector t2, tVector t3);
+		tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material, tVector t1, tVector t2, tVector t3);
+		//tTriangle *CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, std::string material, tVector t1, tVector t2, tVector t3);
 		tMeshPose *CreateCustomPose(std::string name);
 		tEntity *CreateEntity(std::string name, std::string group = std::string());
 
@@ -186,7 +192,7 @@ class tMesh
 
 		void SetRefreshFunc(void (*func)(void)) { refresh_func = func; }
 
-		tMesh(const char *file = 0);
+		tMesh(const char *file = 0, tMaterialManager *material_manager = 0);
 		~tMesh(void);
 };
 

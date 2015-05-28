@@ -49,6 +49,7 @@ class tRenderer;
 #include "triangle.h"
 #include "material.h"
 #include "material_ibo.h"
+#include "material_manager.h"
 #include "mesh.h"
 #include "pose.h"
 #include "animation.h"

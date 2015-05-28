@@ -14,11 +14,13 @@ tScene::tScene(tWorld *world)
 	sky_cubemap = 0;
 	skybox = 0;
 	this->world = world;
+	material_manager = new tMaterialManager();
 }
 
 tScene::~tScene(void)
 {
-
+	// TODO: delete assets, objects, ...
+	delete material_manager;
 }
 
 bool tScene::LoadFromFile(string file)
@@ -74,6 +76,8 @@ void tScene::ParseAssetsNode(xml_node<> *cur)
 	{
 		if(strcmp(child->name(), "mesh") == 0)
 			ParseMeshAssetNode(child);
+		else if(strcmp(child->name(), "material") == 0)
+			ParseMaterialAssetNode(child);
 		else if(strcmp(child->name(), "cubemap") == 0)
 			ParseCubeMapAssetNode(child);
 
@@ -116,17 +120,37 @@ void tScene::ParseMeshAssetNode(xml_node<> *cur)
 	if(file_data)
 	{
 		mesh = new tMesh();
-		mesh->LoadFromData(file_data, "");
+		mesh->LoadFromData(file_data, "", material_manager);
 	}
 	else if(file.size() > 0)
 	{
 		mesh = new tMesh();
-		mesh->LoadFromFile((load_path + "/" + file).c_str());
+		mesh->LoadFromFile((load_path + "/" + file).c_str(), material_manager);
 	}
 	else
 		return;
 
 	assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tMeshAsset(mesh))));
+}
+
+void tScene::ParseMaterialAssetNode(xml_node<> *cur)
+{
+	string name;
+	tMaterial *mat;
+
+	mat = tMesh::ParseXMLMaterialNode(cur, name, load_path);
+
+	if(mat)
+	{
+		try
+		{
+			material_manager->AddMaterial(name, mat);
+		}
+		catch(std::exception &ex)
+		{
+			printf("exception: %s\n", ex.what());
+		}
+	}
 }
 
 void tScene::ParseCubeMapAssetNode(xml_node<> *cur)
