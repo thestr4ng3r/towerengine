@@ -55,7 +55,7 @@ class tRenderer
 		std::list<tPointLight *> render_point_light_shadows;
 
 
-		tCubeMapReflection *test_reflection;
+		tCubeMapReflection *cube_map_reflection;
 
 
 		void RenderShadowMaps(void);
@@ -75,6 +75,8 @@ class tRenderer
 		void SetFXAAEnabled(bool enabled)	{ fxaa_enabled = enabled; }
 
 		void SetFog(bool enabled, float start_dist = 0.0, float end_dist = 100.0, float exp = 1.0, tVector color = Vec(0.0, 0.0, 0.0));
+
+		void InitCubeMapReflection(int resolution, tVector position);
 
 		void Render(GLuint dst_fbo = 0, int width = 0, int height = 0);
 		void RenderScreenQuad(void);

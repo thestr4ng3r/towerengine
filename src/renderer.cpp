@@ -60,6 +60,8 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 
 	fxaa_enabled = false;
 
+	cube_map_reflection = 0;
+
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	color_tex = new GLuint[2];
@@ -109,9 +111,6 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	screen_quad_vbo->AssignData();
 
 	point_light_shadow_limit = -1;
-
-	test_reflection = new tCubeMapReflection(256, Vec(2.39925, 3.0, 7.15911));
-
 }
 
 tRenderer::~tRenderer(void)
@@ -138,7 +137,7 @@ tRenderer::~tRenderer(void)
 	delete camera;
 	delete camera_render_space;
 
-	delete test_reflection;
+	delete cube_map_reflection;
 }
 
 void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
@@ -179,15 +178,18 @@ void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp
 	fog_shader->SetFog(start_dist, end_dist, exp, color);
 }
 
-int temp_render_count = 0;
+
+void tRenderer::InitCubeMapReflection(int resolution, tVector position)
+{
+	delete cube_map_reflection;
+	cube_map_reflection = new tCubeMapReflection(this, resolution, position);
+}
+
 
 void tRenderer::Render(GLuint dst_fbo, int width, int height)
 {
-	if(temp_render_count < 10)
-	{
-		test_reflection->Render(this);
-		temp_render_count++;
-	}
+	if(cube_map_reflection)
+		cube_map_reflection->Render();
 
 	camera->SetAspect((float)screen_width / (float)screen_height);
 
@@ -337,7 +339,11 @@ void tRenderer::GeometryPass(void)
 
 	SetCurrentFaceShader(geometry_pass_shader);
 	BindCurrentFaceShader();
-	geometry_pass_shader->SetCubeMapReflectionTexture(test_reflection->GetCubeMapTexture());
+
+	if(cube_map_reflection)
+		geometry_pass_shader->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());
+	else
+		geometry_pass_shader->SetCubeMapReflectionTexture(0);
 
 	camera_render_space->GeometryPass(this);
 }
