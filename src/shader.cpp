@@ -1,6 +1,12 @@
 
 #include "towerengine.h"
 
+#include <IL/il.h>
+#include <IL/ilu.h>
+
+//#define CODEXL_WORKAROUND
+
+
 using namespace std;
 
 void tShader::SetSource(const char *vertex, const char *fragment)
@@ -91,7 +97,14 @@ GLuint CreateShader(GLenum type, const char *src, const char *name)
 
 
 	len = strlen(src);
+
+#ifdef CODEXL_WORKAROUND
+	glShaderSourceARB(s, 1, &src, &len);
+	printf("WARNING: using glShaderSourceARB instead of glShaderSource as a workaround for CodeXL.\n");
+#else
 	glShaderSource(s, 1, &src, &len);
+#endif
+
 
 	glCompileShader(s);
 	PrintGLInfoLog("Compile", s, name);
@@ -115,6 +128,8 @@ void LinkShaderProgram(GLuint program)
 	glLinkProgram(program);
 	//PrintGLInfoLog("Link", program);
 }
+
+GLuint LoadGLTextureIL(ILuint image, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 
 GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, int alpha_channel)
 {

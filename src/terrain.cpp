@@ -167,7 +167,7 @@ void tTerrain::Paint(tRenderer *renderer)
 	uvcoord_vbo->SetAttribute(tFaceShader::uvcoord_attribute, GL_FLOAT);
 	renderer->GetCurrentFaceShader()->SetVertexMix(0.0);
 
-	renderer->GetCurrentFaceShader()->SetTransformation(tEngine::identity_matrix4);
+	renderer->GetCurrentFaceShader()->SetTransformation(tMatrix4::identity_matrix);
 
 	renderer->GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
 

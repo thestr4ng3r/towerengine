@@ -4,7 +4,7 @@
 
 #define MAX_SSAO_KERNEL_SIZE 32
 
-class tSSAOShader : public tShader
+class tSSAOShader : public tScreenShader
 {
 	private:
 		GLint kernel_uniform;

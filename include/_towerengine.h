@@ -21,6 +21,8 @@ class tRenderer;
 #include "vector2.h"
 #include "vector.h"
 #include "boundingbox.h"
+#include "matrix3.h"
+#include "matrix4.h"
 #include "transform.h"
 #include "utils.h"
 #include "buffers.h"
@@ -30,7 +32,7 @@ class tRenderer;
 #include "gbuffer.h"
 #include "comparable.h"
 
-#include "lighting_shader.h"
+#include "screen_shader.h"
 #include "ambient_lighting_shader.h"
 #include "directional_lighting_shader.h"
 #include "point_lighting_shader.h"

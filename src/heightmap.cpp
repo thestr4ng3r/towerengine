@@ -1,5 +1,8 @@
 #include "towerengine.h"
 
+#include <IL/il.h>
+#include <IL/ilu.h>
+
 tHeightMap::tHeightMap(int size)
 {
 	this->size = size;

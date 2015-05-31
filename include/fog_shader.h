@@ -3,7 +3,7 @@
 #define _FOG_SHADER_H
 
 
-class tFogShader : public tShader
+class tFogShader : public tScreenShader
 {
 	private:
 		GLint position_tex_uniform;

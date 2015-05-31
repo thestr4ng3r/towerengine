@@ -22,7 +22,7 @@ void tCoordinateSystemObject::ForwardPass(tRenderer *renderer)
 		glDisable(GL_DEPTH_TEST);
 
 	renderer->GetColorShader()->Bind();
-	renderer->GetColorShader()->SetTransformation(tEngine::identity_matrix4);
+	renderer->GetColorShader()->SetTransformation(tMatrix4::identity_matrix);
 
 	glLineWidth(3.0);
 

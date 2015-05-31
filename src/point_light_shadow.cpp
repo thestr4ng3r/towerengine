@@ -88,7 +88,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	tVector cam_dir, cam_to;
 	tVector v_vec;
 
-	tWorld *world = renderer->GetWorld();
+	//tWorld *world = renderer->GetWorld();
 
 	glEnable(GL_DEPTH_TEST);
 

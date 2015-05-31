@@ -125,15 +125,6 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 		sky_box->Paint(renderer, camera->GetPosition());
 
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-
-
 	gbuffer->BindTextures();
 
 	renderer->GetAmbientLightingShader()->Bind();

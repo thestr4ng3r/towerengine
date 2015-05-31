@@ -3,6 +3,9 @@
 
 using namespace std;
 
+#include <IL/il.h>
+#include <IL/ilu.h>
+
 void tSkyBoxShader::Init(void)
 {
 	InitShader(cube_env_shader_vert, cube_env_shader_frag, "SkyBox Shader");
@@ -65,6 +68,8 @@ tVector CubeVecS(int side)
 
 	return Vec(0.0, 0.0, 0.0);
 }
+
+GLuint LoadGLCubeMapIL(ILuint image);
 
 GLuint LoadGLCubeMap(const char *filename[6])
 {

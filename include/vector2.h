@@ -22,8 +22,8 @@ struct tVector2
 	tVector2 &operator += (const tVector2 o) { x+=o.x; y+=o.y; return *this; };
 	tVector2 &operator -= (const tVector2 o) { x-=o.x; y-=o.y; return *this; };
 	tVector2 &operator *= (float f) { x*=f; y*=f; return *this; };
-        tVector2 &operator /= (const tVector2 o) { x/=o.x; y/=o.y; return *this; };
-        tVector2 &operator *= (const tVector2 o) { x*=o.x; y*=o.y; return *this; };
+	tVector2 &operator /= (const tVector2 o) { x/=o.x; y/=o.y; return *this; };
+	tVector2 &operator *= (const tVector2 o) { x*=o.x; y*=o.y; return *this; };
 
 	tVector2 &operator=(const tVector &v);
 };

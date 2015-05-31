@@ -4,8 +4,7 @@
 
 void tPostProcessShader::Init(void)
 {
-	InitShader(post_process_shader_vert, post_process_shader_frag, "Post Process Shader");
-	LinkProgram();
+	InitScreenShader(post_process_shader_frag, "Post Process Shader");
 
 	color_tex_uniform = GetUniformLocation("color_tex_uni");
 	tex_pixel_uniform = GetUniformLocation("tex_pixel_uni");

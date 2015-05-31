@@ -20,7 +20,7 @@ uniform float radius_uni;
 uniform vec3 cam_pos_uni;
 uniform vec3 cam_dir_uni;
 
-in vec2 uv_var;
+in vec2 uv_coord_var;
 
 out vec4 gl_FragColor;
 
@@ -28,12 +28,12 @@ out vec4 gl_FragColor;
 void main(void)
 {
 	mat4 transpose_modelview = transpose(modelview_matrix_uni);
-	vec3 origin = texture(position_tex_uni, uv_var).xyz;
+	vec3 origin = texture(position_tex_uni, uv_coord_var).xyz;
 		
-	vec3 normal = texture(normal_tex_uni, uv_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0);
+	vec3 normal = texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0);
 	normal = normalize(normal);
 	
-	vec3 rvec = texture(noise_tex_uni, uv_var * noise_tex_scale_uni).rgb * 2.0 - 1.0;
+	vec3 rvec = texture(noise_tex_uni, uv_coord_var * noise_tex_scale_uni).rgb * 2.0 - 1.0;
 	vec3 tang = normalize(rvec - normal * dot(rvec, normal));
 	vec3 bitang = cross(normal, tang);
 	mat3 tang_mat = mat3(tang, bitang, normal);

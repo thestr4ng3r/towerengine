@@ -3,7 +3,7 @@
 #define _POINT_LIGHTING_SHADER_H
 
 
-class tPointLightingShader : public tLightingShader
+class tPointLightingShader : public tScreenShader
 {
 	private:
 		GLint cam_pos_uniform;

@@ -263,10 +263,8 @@ const char *geometry_pass_shader_frag =
 "\n"
 "";
 
-const char *light_pass_shader_vert = 
+const char *screen_shader_vert = 
 "#version 330\n"
-"\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
 "\n"
 "in vec2 vertex_attr;\n"
 "\n"
@@ -275,7 +273,7 @@ const char *light_pass_shader_vert =
 "void main(void)\n"
 "{\n"
 "	uv_coord_var = vertex_attr;\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * vec4(vertex_attr, 0.0, 1.0);\n"
+"	gl_Position = vec4(vertex_attr * 2.0 - 1.0, 0.0, 1.0);\n"
 "}\n"
 "\n"
 "";
@@ -815,23 +813,6 @@ const char *directional_shadow_blur_shader_frag =
 "	}\n"
 "}";
 
-const char *post_process_shader_vert = 
-"#version 330\n"
-"\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
-"\n"
-"in vec4 gl_Vertex;\n"
-"\n"
-"out vec2 uv_coord_var;\n"
-"\n"
-"void main(void)\n"
-"{\n"
-"	uv_coord_var = gl_Vertex.xy;\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-"}\n"
-"\n"
-"";
-
 const char *post_process_shader_frag = 
 "#version 330\n"
 "\n"
@@ -914,21 +895,6 @@ const char *post_process_shader_frag =
 "	gl_FragColor = vec4(color, src_color.a);\n"
 "}";
 
-const char *ssao_shader_vert = 
-"#version 330\n"
-"\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
-"\n"
-"in vec4 vertex_attr;\n"
-"\n"
-"out vec2 uv_var;\n"
-"\n"
-"void main(void)\n"
-"{\n"
-"	uv_var = vertex_attr.xy;\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * vertex_attr;\n"
-"}";
-
 const char *ssao_shader_frag = 
 "#version 330\n"
 "\n"
@@ -952,7 +918,7 @@ const char *ssao_shader_frag =
 "uniform vec3 cam_pos_uni;\n"
 "uniform vec3 cam_dir_uni;\n"
 "\n"
-"in vec2 uv_var;\n"
+"in vec2 uv_coord_var;\n"
 "\n"
 "out vec4 gl_FragColor;\n"
 "\n"
@@ -960,12 +926,12 @@ const char *ssao_shader_frag =
 "void main(void)\n"
 "{\n"
 "	mat4 transpose_modelview = transpose(modelview_matrix_uni);\n"
-"	vec3 origin = texture(position_tex_uni, uv_var).xyz;\n"
+"	vec3 origin = texture(position_tex_uni, uv_coord_var).xyz;\n"
 "		\n"
-"	vec3 normal = texture(normal_tex_uni, uv_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0);\n"
+"	vec3 normal = texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0);\n"
 "	normal = normalize(normal);\n"
 "	\n"
-"	vec3 rvec = texture(noise_tex_uni, uv_var * noise_tex_scale_uni).rgb * 2.0 - 1.0;\n"
+"	vec3 rvec = texture(noise_tex_uni, uv_coord_var * noise_tex_scale_uni).rgb * 2.0 - 1.0;\n"
 "	vec3 tang = normalize(rvec - normal * dot(rvec, normal));\n"
 "	vec3 bitang = cross(normal, tang);\n"
 "	mat3 tang_mat = mat3(tang, bitang, normal);\n"
@@ -998,23 +964,6 @@ const char *ssao_shader_frag =
 "		\n"
 "	gl_FragColor = vec4(occlusion, 0.0, 0.0, 1.0);\n"
 "}";
-
-const char *ssao_blur_shader_vert = 
-"#version 330\n"
-"\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
-"\n"
-"in vec2 vertex_attr;\n"
-"\n"
-"out vec2 uv_coord_var;\n"
-"\n"
-"void main(void)\n"
-"{\n"
-"	uv_coord_var = vertex_attr;\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * vec4(vertex_attr, 0.0, 1.0);\n"
-"}\n"
-"\n"
-"";
 
 const char *ssao_blur_shader_frag = 
 "#version 330\n"
@@ -1079,23 +1028,6 @@ const char *color_shader_frag =
 "\n"
 "	gl_FragColor = vec4(diffuse_color_uni, 1.0);\n"
 "}\n"
-"";
-
-const char *fog_shader_vert = 
-"#version 330\n"
-"\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
-"\n"
-"in vec4 gl_Vertex;\n"
-"\n"
-"out vec2 uv_coord_var;\n"
-"\n"
-"void main(void)\n"
-"{\n"
-"	uv_coord_var = gl_Vertex.xy;\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-"}\n"
-"\n"
 "";
 
 const char *fog_shader_frag = 

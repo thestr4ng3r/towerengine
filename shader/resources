@@ -1,6 +1,6 @@
 geometry_pass_shader_vert: shader/geometry_pass_shader.vert
 geometry_pass_shader_frag: shader/geometry_pass_shader.frag
-light_pass_shader_vert: shader/light_pass_shader.vert
+screen_shader_vert: shader/screen_shader.vert
 directional_lighting_shader_frag: shader/directional_lighting_shader.frag
 point_lighting_shader_frag: shader/point_lighting_shader.frag
 ambient_lighting_shader_frag: shader/ambient_lighting_shader.frag
@@ -15,13 +15,9 @@ directional_shadow_shader_vert: shader/directional_shadow_shader.vert
 directional_shadow_shader_frag: shader/directional_shadow_shader.frag
 directional_shadow_blur_shader_vert: shader/directional_shadow_blur_shader.vert
 directional_shadow_blur_shader_frag: shader/directional_shadow_blur_shader.frag
-post_process_shader_vert: shader/post_process_shader.vert
 post_process_shader_frag: shader/post_process_shader.frag
-ssao_shader_vert: shader/ssao_shader.vert
 ssao_shader_frag: shader/ssao_shader.frag
-ssao_blur_shader_vert: shader/ssao_blur_shader.vert
 ssao_blur_shader_frag: shader/ssao_blur_shader.frag
 color_shader_vert: shader/color_shader.vert
 color_shader_frag: shader/color_shader.frag
-fog_shader_vert: shader/fog_shader.vert
 fog_shader_frag: shader/fog_shader.frag

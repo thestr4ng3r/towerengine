@@ -43,7 +43,6 @@ void LinkShaderProgram(GLuint program);
 
 GLuint LoadGLTexture(const char *filename, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
-GLuint LoadGLTextureIL(ILuint image, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 
 inline GLuint LoadGLTexture(const char *filename, bool *transparent, int alpha_channel = 3)
 		{ return LoadGLTexture(filename, 0, 0, transparent, alpha_channel); }

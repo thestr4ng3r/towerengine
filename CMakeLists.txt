@@ -18,7 +18,7 @@ set(towerengine_SRC
 	src/boundingbox.cpp
 	src/transform.cpp
 	src/geometry_pass_shader.cpp
-	src/lighting_shader.cpp
+	src/screen_shader.cpp
 	src/directional_lighting_shader.cpp
 	src/point_lighting_shader.cpp
 	src/ambient_lighting_shader.cpp
@@ -62,7 +62,9 @@ set(towerengine_SRC
 	src/ssao_blur_shader.cpp
 	src/fog_shader.cpp
 	src/cube_map_reflection.cpp
-	src/material_manager.cpp)
+	src/material_manager.cpp
+	src/matrix3.cpp
+	src/matrix4.cpp)
 
 add_definitions(-g -Wall)
 

@@ -4,7 +4,7 @@
 
 void tPointLightingShader::Init(tGBuffer *gbuffer)
 {
-	InitLightingShader(point_lighting_shader_frag, "Point Lighting Shader");
+	InitScreenShader(point_lighting_shader_frag, "Point Lighting Shader");
 
 	position_tex_uniform = GetUniformLocation("position_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");

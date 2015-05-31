@@ -5,8 +5,7 @@
 
 void tSSAOBlurShader::Init(void)
 {
-	InitShader(ssao_blur_shader_vert, ssao_blur_shader_frag, "SSAO Blur Shader");
-	LinkProgram();
+	InitScreenShader(ssao_blur_shader_frag, "SSAO Blur Shader");
 
 	tex_uniform = GetUniformLocation("tex_uni");
 

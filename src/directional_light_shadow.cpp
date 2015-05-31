@@ -18,7 +18,7 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 	{
 		splits_z[i] = 0.0;
 		tex_matrix[i] = new float[16];
-		memcpy(tex_matrix[i], tEngine::identity_matrix4, 16 * sizeof(float));
+		memcpy(tex_matrix[i], tMatrix4::identity_matrix, 16 * sizeof(float));
 	}
 	splits_z[splits] = 0.0;
 
@@ -95,7 +95,7 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 
 void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 {
-	tWorld *world = renderer->GetWorld();
+	//tWorld *world = renderer->GetWorld();
 
 	int s;
 	tVector cam_pos = camera->GetPosition();
@@ -207,14 +207,6 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 	glViewport(0, 0, size, size);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
 
 	renderer->GetDirectionalShadowBlurShader()->Bind();
 	renderer->GetDirectionalShadowBlurShader()->SetTexture(tex);

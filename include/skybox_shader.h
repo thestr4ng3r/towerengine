@@ -22,7 +22,6 @@ tVector CubeVecS(int side);
 GLuint LoadGLCubeMap(const char *filename[6]);
 GLuint LoadGLCubeMap(const char *filename);
 GLuint LoadGLCubeMapBinary(const char *ext, const void *data, unsigned int size);
-GLuint LoadGLCubeMapIL(ILuint image);
 
 GLuint CreateCubeTexture(GLenum type, int width, int height);
 GLuint GLTextureFromColor(const tVector &color);

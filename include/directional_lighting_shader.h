@@ -3,7 +3,7 @@
 #define _DIRECTIONAL_LIGHT_SHADER_H
 
 
-class tDirectionalLightingShader : public tLightingShader
+class tDirectionalLightingShader : public tScreenShader
 {
 	private:
 		GLint cam_pos_uniform;

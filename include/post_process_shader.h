@@ -3,7 +3,7 @@
 #define _POST_PROCESS_SHADER_H
 
 
-class tPostProcessShader : public tShader
+class tPostProcessShader : public tScreenShader
 {
 	private:
 		GLint color_tex_uniform;

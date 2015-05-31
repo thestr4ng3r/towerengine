@@ -16,10 +16,6 @@ void tColorShader::Init(void)
 
 	diffuse_color_uniform = GetUniformLocation("diffuse_color_uni");
 	transformation_uniform = GetUniformLocation("transformation_uni");
-
-	Bind();
-	ResetUniforms();
-	Unbind();
 }
 
 void tColorShader::SetTransformation(const float m[16])
@@ -32,10 +28,4 @@ void tColorShader::SetDiffuseColor(tVector color)
 {
 	if(diffuse_color_uniform != -1)
 		glUniform3f(diffuse_color_uniform, color.x, color.y, color.z);
-}
-
-void tColorShader::ResetUniforms(void)
-{
-	SetDiffuseColor(Vec(1.0, 1.0, 1.0));
-	SetTransformation(tEngine::identity_matrix4);
 }

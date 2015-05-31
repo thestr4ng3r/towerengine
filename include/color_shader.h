@@ -15,7 +15,6 @@ class tColorShader : public tFaceShader
 
 		void SetDiffuseColor(tVector color);
 		void SetTransformation(const float m[16]);
-		void ResetUniforms(void);
 };
 
 

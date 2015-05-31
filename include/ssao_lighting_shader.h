@@ -3,7 +3,7 @@
 #define _SSAO_LIGHTING_SHADER_H
 
 
-class tSSAOLightingShader : public tLightingShader
+class tSSAOLightingShader : public tScreenShader
 {
 	private:
 		GLint ssao_tex_uniform;

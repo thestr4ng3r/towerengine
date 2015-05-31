@@ -4,8 +4,7 @@
 
 void tFogShader::Init(void)
 {
-	InitShader(fog_shader_vert, fog_shader_frag, "Post Process Shader");
-	LinkProgram();
+	InitScreenShader(fog_shader_frag, "Post Process Shader");
 
 	position_tex_uniform = GetUniformLocation("position_tex_uni");
 	color_tex_uniform = GetUniformLocation("color_tex_uni");

@@ -6,11 +6,7 @@ using namespace std;
 
 void tSSAOShader::Init(void)
 {
-	InitShader(ssao_shader_vert, ssao_shader_frag, "SSAO Shader");
-
-	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
-
-	LinkProgram();
+	InitScreenShader(ssao_shader_frag, "SSAO Shader");
 
 	kernel_uniform = GetUniformLocation("kernel_uni");
 	kernel_size_uniform = GetUniformLocation("kernel_size_uni");

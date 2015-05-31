@@ -1,11 +1,10 @@
 
 #include "towerengine.h"
 
+#include <IL/il.h>
+#include <IL/ilu.h>
 
-const float tEngine::identity_matrix4[16] = { 1.0, 0.0, 0.0, 0.0,
-										  	  0.0, 1.0, 0.0, 0.0,
-										  	  0.0, 0.0, 1.0, 0.0,
-										  	  0.0, 0.0, 0.0, 1.0 };
+
 
 void tEngine::Init(void)
 {

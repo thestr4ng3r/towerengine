@@ -581,10 +581,10 @@ bool tMesh::LoadFromFile(const char *file, tMaterialManager *material_manager)
 {
 	bool r;
 	string path;
-	struct stat s;
+	//struct stat s;
 	
-	if(stat(file, &s) != 0 && errno == ENOENT)
-	    return 0;
+	//if(stat(file, &s) != 0 && errno == ENOENT)
+	//    return 0;
 	
 	path = PathOfFile(string(file));
 

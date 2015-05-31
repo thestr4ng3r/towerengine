@@ -3,7 +3,7 @@
 #define _AMBIENT_LIGHTING_SHADER_H
 
 
-class tAmbientLightingShader : public tLightingShader
+class tAmbientLightingShader : public tScreenShader
 {
 	private:
 		GLint diffuse_tex_uniform;

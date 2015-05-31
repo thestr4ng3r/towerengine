@@ -3,7 +3,7 @@
 #define _SSAO_BLUR_SHADER_H
 
 
-class tSSAOBlurShader : public tShader
+class tSSAOBlurShader : public tScreenShader
 {
 	private:
 		GLint tex_uniform;

@@ -211,15 +211,6 @@ void tRenderer::Render(GLuint dst_fbo, int width, int height)
 
 	ForwardPass();
 
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, 0.1, 2.0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0); //pos x, y, z, to x, y, z
-
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
@@ -363,16 +354,6 @@ void tRenderer::LightPass(void)
 
 	if(sky_box)
 		sky_box->Paint(this, camera->GetPosition());
-
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-
 
 	gbuffer->BindTextures();
 
