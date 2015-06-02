@@ -18,6 +18,9 @@ void tGeometryPassShader::Init(void)
 
 	LinkProgram();
 
+	modelview_matrix_uniform = GetUniformLocation("modelview_matrix_uni");
+	projection_matrix_uniform = GetUniformLocation("projection_matrix_uni");
+
 	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
 
 	diffuse_color_uniform = GetUniformLocation("diffuse_color_uni");
@@ -59,10 +62,16 @@ void tGeometryPassShader::Init(void)
 	glUniform1i(cube_map_reflection_tex_uniform, cube_map_reflection_tex_unit);
 }
 
+
+void tGeometryPassShader::SetModelViewProjectionMatrix(float modelview[16], float projection[16])
+{
+	glUniformMatrix4fv(modelview_matrix_uniform, 1, GL_FALSE, modelview);
+	glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, projection);
+}
+
 void tGeometryPassShader::SetTransformation(const float m[16])
 {
-	if(transformation_uniform != -1)
-		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
+	glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
 void tGeometryPassShader::SetDiffuseColor(tVector color)

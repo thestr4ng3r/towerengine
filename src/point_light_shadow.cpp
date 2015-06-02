@@ -136,10 +136,6 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	glBindFramebuffer(GL_FRAMEBUFFER, blur_fbo);
 	glViewport(0, 0, size, size);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(90.0, 1.0, 0.001, 5.0);
-
 	renderer->GetPointShadowBlurShader()->Bind();
 	renderer->GetPointShadowBlurShader()->SetTexture(tex);
 
@@ -147,10 +143,6 @@ void tPointLightShadow::Render(tRenderer *renderer)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, blur_tex, 0);
 
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0);
 
 	renderer->GetPointShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0, 0.0) * blur_size);
 

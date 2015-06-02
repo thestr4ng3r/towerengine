@@ -1,7 +1,5 @@
 #version 130
 
-uniform mat4 gl_ModelViewProjectionMatrix;
-
 in vec2 vertex_attr;
 
 uniform vec3 blur_dir_uni;
@@ -29,5 +27,5 @@ void main(void)
 	blur_dir_var[4] = vec3(-blur_dir_uni.x, blur_dir_uni.y, 0.0);
 	blur_dir_var[5] = vec3(blur_dir_uni.x, blur_dir_uni.y, 0.0);
 		
-	gl_Position = gl_ModelViewProjectionMatrix * vec4(vertex_attr, -1.0, 1.0);
+	gl_Position = vec4(vertex_attr, -1.0, 1.0);
 }

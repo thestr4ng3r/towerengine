@@ -188,14 +188,14 @@ void tRenderer::InitCubeMapReflection(int resolution, tVector position)
 
 void tRenderer::Render(GLuint dst_fbo, int width, int height)
 {
-	if(cube_map_reflection)
-		cube_map_reflection->Render();
-
 	camera->SetAspect((float)screen_width / (float)screen_height);
 
 	world->FillRenderSpace(camera_render_space, camera);
 
 	RenderShadowMaps();
+
+	if(cube_map_reflection)
+		cube_map_reflection->Render();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -330,6 +330,9 @@ void tRenderer::GeometryPass(void)
 
 	SetCurrentFaceShader(geometry_pass_shader);
 	BindCurrentFaceShader();
+
+
+	geometry_pass_shader->SetModelViewProjectionMatrix(modelview_matrix, projection_matrix);
 
 	if(cube_map_reflection)
 		geometry_pass_shader->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());

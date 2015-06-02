@@ -189,7 +189,13 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 
 		glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
 		glGetFloatv(GL_PROJECTION_MATRIX, projection);
-		CombineMatrix4(modelview, projection, tex_matrix[s]);
+
+		tMatrix4 modelview_mat(modelview);
+		tMatrix4 projection_mat(projection);
+		tMatrix4 mul = projection_mat * modelview_mat;
+		memcpy(tex_matrix[s], mul.GetData(), sizeof(float) * 16);
+
+		//CombineMatrix4(modelview, projection, tex_matrix[s]);
 
 		glClearColor(1.0, 1.0, 1.0, 1.0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);

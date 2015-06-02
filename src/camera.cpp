@@ -213,10 +213,16 @@ void tCamera::SetProjectionMatrix(void)
 
 void tCamera::SetModelViewMatrix(void)
 {
+	tVector to = pos + dir;
+
+	tMatrix4 m;
+
+	m.SetLookAt(pos, to, up);
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	tVector to = pos + dir;
-	gluLookAt(pos.x, pos.y, pos.z, to.x, to.y, to.z, up.x, up.y, up.z);
+	m.GLMultMatrix();
+	//gluLookAt(pos.x, pos.y, pos.z, to.x, to.y, to.z, up.x, up.y, up.z);
 }
 
 void tCamera::SetModelViewProjectionMatrix(void)

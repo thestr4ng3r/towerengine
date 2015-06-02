@@ -8,17 +8,15 @@
 const char *geometry_pass_shader_vert = 
 "#version 330\n"
 "\n"
-"\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
-"uniform mat4 gl_ModelViewMatrix;\n"
-"uniform mat4 gl_ModelViewMatrixInverse;\n"
-"\n"
 "in vec3 vertex_attr;\n"
 "in vec3 vertex2_attr; // vertex of next keyframe\n"
 "in vec2 uv_attr;\n"
 "in vec3 normal_attr;\n"
 "in vec3 tang_attr;\n"
 "in vec3 bitang_attr;\n"
+"\n"
+"uniform mat4 modelview_matrix_uni;\n"
+"uniform mat4 projection_matrix_uni;\n"
 "\n"
 "uniform float vertex_mix_uni;\n"
 "uniform mat4 transformation_uni;\n"
@@ -43,9 +41,9 @@ const char *geometry_pass_shader_vert =
 "	tang_var = normalize(tang_attr * mat3(transformation_uni));\n"
 "	bitang_var = normalize(bitang_attr * mat3(transformation_uni));\n"
 "	uv_var = uv_attr;\n"
-"	cam_dir_var = gl_ModelViewMatrixInverse[3].xyz - pos.xyz;\n"
+"	cam_dir_var = inverse(modelview_matrix_uni)[3].xyz - pos.xyz;\n"
 "	\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * pos;\n"
+"	gl_Position = (projection_matrix_uni * modelview_matrix_uni) * pos;\n"
 "}";
 
 const char *geometry_pass_shader_frag = 
@@ -629,8 +627,6 @@ const char *point_shadow_shader_frag =
 const char *point_shadow_blur_shader_vert = 
 "#version 130\n"
 "\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
-"\n"
 "in vec2 vertex_attr;\n"
 "\n"
 "uniform vec3 blur_dir_uni;\n"
@@ -658,7 +654,7 @@ const char *point_shadow_blur_shader_vert =
 "	blur_dir_var[4] = vec3(-blur_dir_uni.x, blur_dir_uni.y, 0.0);\n"
 "	blur_dir_var[5] = vec3(blur_dir_uni.x, blur_dir_uni.y, 0.0);\n"
 "		\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * vec4(vertex_attr, -1.0, 1.0);\n"
+"	gl_Position = vec4(vertex_attr, -1.0, 1.0);\n"
 "}\n"
 "";
 

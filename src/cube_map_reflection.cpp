@@ -34,6 +34,7 @@ tCubeMapReflection::tCubeMapReflection(tRenderer *renderer, int resolution, tVec
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, resolution, resolution);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
 
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	camera = new tCamera();

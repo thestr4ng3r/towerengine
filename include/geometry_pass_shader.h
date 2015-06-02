@@ -6,6 +6,9 @@
 class tGeometryPassShader : public tFaceShader
 {
 	private:
+		GLint modelview_matrix_uniform;
+		GLint projection_matrix_uniform;
+
 		GLint transformation_uniform;
 
 		GLint diffuse_color_uniform;
@@ -40,6 +43,7 @@ class tGeometryPassShader : public tFaceShader
 	public:
 		void Init(void);
 
+		void SetModelViewProjectionMatrix(float modelview[16], float projection[16]);
 		void SetClip(tVector c, float d);
 		void SetDiffuseColor(tVector color);
 		void SetDiffuseColor2(tVector color, float alpha);

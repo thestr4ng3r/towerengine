@@ -94,7 +94,7 @@ class tMesh
 		static tMaterial *ParseXMLMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 
 
-		void ApplyMatrix(float m[16]);
+		//void ApplyMatrix(float m[16]);
 
 		bool LoadFromFile(const char *file, tMaterialManager *material_manager = 0);
 		bool LoadFromData(char *data, std::string path = "", tMaterialManager *material_manager = 0);

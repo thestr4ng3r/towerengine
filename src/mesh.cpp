@@ -91,13 +91,13 @@ void tMesh::Color(tVector c, float a)
 }
 
 
-void tMesh::ApplyMatrix(float m[16])
+/*void tMesh::ApplyMatrix(float m[16])
 {
 	vector<tVertex *>::iterator v;
 
 	for(v=vertices.begin(); v!=vertices.end(); v++)
 		(*v)->pos = ApplyMatrix4(m, (*v)->pos);
-}
+}*/
 
 
 void tMesh::DeleteVBOData(void)

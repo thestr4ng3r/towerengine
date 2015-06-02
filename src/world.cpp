@@ -117,7 +117,7 @@ void tWorld::FillRenderObjectSpace(tRenderObjectSpace *space, tCulling *culling,
 void tWorld::FillRenderSpace(tRenderSpace *space, tCulling *culling, bool init_culling)
 {
 	tBoundingBox b;
-	tVector minv, maxv;
+	//tVector minv, maxv;
 	tVector light_pos;
 	float light_dist;
 	vector<tObject *>::iterator i;
