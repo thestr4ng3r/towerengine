@@ -15,8 +15,9 @@ const char *geometry_pass_shader_vert =
 "in vec3 tang_attr;\n"
 "in vec3 bitang_attr;\n"
 "\n"
-"uniform mat4 modelview_matrix_uni;\n"
-"uniform mat4 projection_matrix_uni;\n"
+"uniform mat4 modelview_projection_matrix_uni;\n"
+"\n"
+"uniform vec3 cam_pos_uni;\n"
 "\n"
 "uniform float vertex_mix_uni;\n"
 "uniform mat4 transformation_uni;\n"
@@ -41,9 +42,9 @@ const char *geometry_pass_shader_vert =
 "	tang_var = normalize(tang_attr * mat3(transformation_uni));\n"
 "	bitang_var = normalize(bitang_attr * mat3(transformation_uni));\n"
 "	uv_var = uv_attr;\n"
-"	cam_dir_var = inverse(modelview_matrix_uni)[3].xyz - pos.xyz;\n"
+"	cam_dir_var = cam_pos_uni - pos.xyz;\n"
 "	\n"
-"	gl_Position = (projection_matrix_uni * modelview_matrix_uni) * pos;\n"
+"	gl_Position = modelview_projection_matrix_uni * pos;\n"
 "}";
 
 const char *geometry_pass_shader_frag = 
@@ -75,7 +76,6 @@ const char *geometry_pass_shader_frag =
 "\n"
 "uniform vec3 clip_vec_uni;\n"
 "uniform float clip_dist_uni;\n"
-"\n"
 "\n"
 "in vec3 pos_var;\n"
 "in vec3 normal_var;\n"
@@ -270,8 +270,8 @@ const char *screen_shader_vert =
 "\n"
 "void main(void)\n"
 "{\n"
-"	uv_coord_var = vertex_attr;\n"
-"	gl_Position = vec4(vertex_attr * 2.0 - 1.0, 0.0, 1.0);\n"
+"	uv_coord_var = (vertex_attr + 1.0) * 0.5;\n"
+"	gl_Position = vec4(vertex_attr, 0.0, 1.0);\n"
 "}\n"
 "\n"
 "";
@@ -528,10 +528,9 @@ const char *ssao_lighting_shader_frag =
 const char *cube_env_shader_vert = 
 "#version 330\n"
 "\n"
-"uniform mat4 gl_ModelViewMatrix;\n"
-"uniform mat4 gl_ProjectionMatrix;\n"
+"uniform mat4 modelview_projection_matrix_uni;\n"
 "\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
+"uniform vec3 cam_pos_uni;\n"
 "\n"
 "in vec3 vertex_attr;\n"
 "\n"
@@ -540,8 +539,7 @@ const char *cube_env_shader_vert =
 "void main(void)\n"
 "{\n"
 "	pos_var = vertex_attr;\n"
-"	vec4 p = gl_ModelViewMatrix * vec4(vertex_attr, 0.0);\n"
-"	gl_Position = gl_ProjectionMatrix * vec4(p.xyz, 1.0);\n"
+"	gl_Position = modelview_projection_matrix_uni * vec4(cam_pos_uni + vertex_attr, 1.0);\n"
 "}";
 
 const char *cube_env_shader_frag = 
@@ -562,9 +560,7 @@ const char *cube_env_shader_frag =
 const char *point_shadow_shader_vert = 
 "#version 130\n"
 "\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
-"uniform mat4 gl_ModelViewMatrix;\n"
-"uniform mat4 gl_ModelViewMatrixInverse;\n"
+"uniform mat4 modelview_projection_matrix_uni;\n"
 "\n"
 "in vec3 vertex_attr;\n"
 "in vec3 vertex2_attr; // vertex of next keyframe\n"
@@ -583,7 +579,7 @@ const char *point_shadow_shader_vert =
 "	vec4 pos = vec4(vertex_pos, 1.0) * transformation_uni;\n"
 "	pos_var = pos.xyz;\n"
 "	\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * pos;\n"
+"	gl_Position = modelview_projection_matrix_uni * pos;\n"
 "}";
 
 const char *point_shadow_shader_frag = 
@@ -689,11 +685,11 @@ const char *point_shadow_blur_shader_frag =
 const char *directional_shadow_shader_vert = 
 "#version 330\n"
 "\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
-"\n"
 "in vec3 vertex_attr;\n"
 "in vec3 vertex2_attr; // vertex of next keyframe\n"
 "in vec2 uv_attr;\n"
+"\n"
+"uniform mat4 modelview_projection_matrix_uni;\n"
 "\n"
 "uniform float vertex_mix_uni;\n"
 "uniform mat4 transformation_uni;\n"
@@ -715,7 +711,7 @@ const char *directional_shadow_shader_vert =
 "	moment1_var = dot(pos.xyz - cam_pos_uni, light_dir_uni) / (clip_uni.y - clip_uni.x);\n"
 "	uv_var = uv_attr;\n"
 "	\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * pos;\n"
+"	gl_Position = modelview_projection_matrix_uni * pos;\n"
 "}";
 
 const char *directional_shadow_shader_frag = 

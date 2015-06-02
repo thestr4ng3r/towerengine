@@ -105,6 +105,9 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 	float left, right, top, bottom;
 	float d;
 
+	tMatrix4 modelview_matrix, projection_matrix;
+	tMatrix4 modelview_projection_matrix;
+
 	float cam_near = camera->GetNearClip();
 	float cam_far = camera->GetFarClip();
 	float c_log, c_uni;
@@ -179,7 +182,14 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 		h_blur[s] = 1.0 / (right - left);
 		v_blur[s] = 1.0 / (top - bottom);
 
-		glMatrixMode(GL_PROJECTION);
+		modelview_matrix.SetLookAt(cam_pos, light_to, light_up);
+		projection_matrix.SetOrtho(left, right, bottom, top, near_clip, far_clip);
+
+		modelview_projection_matrix = projection_matrix * modelview_matrix;
+
+		renderer->GetDirectionalShadowShader()->SetModelViewProjectionMatrix(modelview_projection_matrix.GetData());
+
+		/*glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(left, right, bottom, top, near_clip, far_clip);
 
@@ -192,8 +202,9 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 
 		tMatrix4 modelview_mat(modelview);
 		tMatrix4 projection_mat(projection);
-		tMatrix4 mul = projection_mat * modelview_mat;
-		memcpy(tex_matrix[s], mul.GetData(), sizeof(float) * 16);
+		tMatrix4 mul = projection_mat * modelview_mat;*/
+
+		memcpy(tex_matrix[s], modelview_projection_matrix.GetData(), sizeof(float) * 16);
 
 		//CombineMatrix4(modelview, projection, tex_matrix[s]);
 

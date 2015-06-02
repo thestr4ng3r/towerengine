@@ -18,8 +18,8 @@ void tGeometryPassShader::Init(void)
 
 	LinkProgram();
 
-	modelview_matrix_uniform = GetUniformLocation("modelview_matrix_uni");
-	projection_matrix_uniform = GetUniformLocation("projection_matrix_uni");
+	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
+	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
 	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
 
@@ -63,10 +63,14 @@ void tGeometryPassShader::Init(void)
 }
 
 
-void tGeometryPassShader::SetModelViewProjectionMatrix(float modelview[16], float projection[16])
+void tGeometryPassShader::SetModelViewProjectionMatrix(float m[16])
 {
-	glUniformMatrix4fv(modelview_matrix_uniform, 1, GL_FALSE, modelview);
-	glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, projection);
+	glUniformMatrix4fv(modelview_projection_matrix_uniform, 1, GL_TRUE, m);
+}
+
+void tGeometryPassShader::SetCameraPosition(tVector pos)
+{
+	glUniform3f(cam_pos_uniform, pos.x, pos.y, pos.z);
 }
 
 void tGeometryPassShader::SetTransformation(const float m[16])
@@ -76,28 +80,23 @@ void tGeometryPassShader::SetTransformation(const float m[16])
 
 void tGeometryPassShader::SetDiffuseColor(tVector color)
 {
-	if(diffuse_color_uniform != -1)
-		glUniform3f(diffuse_color_uniform, color.x, color.y, color.z);
+	glUniform3f(diffuse_color_uniform, color.x, color.y, color.z);
 }
 
 void tGeometryPassShader::SetDiffuseColor2(tVector color, float alpha)
 {
-	if(diffuse_color2_uniform != -1)
-		glUniform4f(diffuse_color2_uniform, color.x, color.y, color.z, alpha);
+	glUniform4f(diffuse_color2_uniform, color.x, color.y, color.z, alpha);
 }
 
 void tGeometryPassShader::SetSpecularColor(tVector color)
 {
-	if(specular_color_uniform != -1)
-		glUniform3f(specular_color_uniform, color.x, color.y, color.z);
+	glUniform3f(specular_color_uniform, color.x, color.y, color.z);
 }
 
 
 void tGeometryPassShader::SetSpecular(float size)
 {
-	if(specular_size_uniform != -1)
-		glUniform1f(specular_size_uniform, size);
-
+	glUniform1f(specular_size_uniform, size);
 }
 
 

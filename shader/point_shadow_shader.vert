@@ -1,8 +1,6 @@
 #version 130
 
-uniform mat4 gl_ModelViewProjectionMatrix;
-uniform mat4 gl_ModelViewMatrix;
-uniform mat4 gl_ModelViewMatrixInverse;
+uniform mat4 modelview_projection_matrix_uni;
 
 in vec3 vertex_attr;
 in vec3 vertex2_attr; // vertex of next keyframe
@@ -21,5 +19,5 @@ void main(void)
 	vec4 pos = vec4(vertex_pos, 1.0) * transformation_uni;
 	pos_var = pos.xyz;
 	
-	gl_Position = gl_ModelViewProjectionMatrix * pos;
+	gl_Position = modelview_projection_matrix_uni * pos;
 }

@@ -130,7 +130,7 @@ void tSSAO::Render(void)
 	ssao_shader->SetKernel(kernel_size, kernel);
 	ssao_shader->SetNoiseTex(noise_tex, noise_tex_scale);
 	ssao_shader->SetTextures(renderer->GetDepthTexture(), gbuffer->GetTexture(tGBuffer::POSITION_TEX), gbuffer->GetTexture(tGBuffer::FACE_NORMAL_TEX));
-	ssao_shader->SetMatrices(renderer->GetProjectionMatrix(), renderer->GetModelViewMatrix());
+	ssao_shader->SetMatrices(renderer->GetCamera()->GetProjectionMatrix().GetData(), renderer->GetCamera()->GetModelViewMatrix().GetData());
 	ssao_shader->SetRadius(radius);
 	ssao_shader->SetCamera(renderer->GetCamera()->GetPosition(), renderer->GetCamera()->GetDirection());
 

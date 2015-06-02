@@ -91,6 +91,8 @@ void tCubeMapReflection::GeometryPass(int side, tWorld *world)
 
 	camera->SetUp(cam_up);
 
+	camera->CalculateModelViewProjectionMatrix();
+
 	world->FillRenderSpace(render_space, camera);
 
 	gbuffer->BindDrawBuffers();
@@ -100,10 +102,13 @@ void tCubeMapReflection::GeometryPass(int side, tWorld *world)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
+	tGeometryPassShader *shader = renderer->GetGeometryPassShader();
+
 	renderer->SetCurrentFaceShader(renderer->GetGeometryPassShader());
 	renderer->BindCurrentFaceShader();
 
-	camera->SetModelViewProjectionMatrix();
+	shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
+	shader->SetCameraPosition(camera->GetPosition());
 
 	render_space->GeometryPass(renderer);
 }
@@ -120,11 +125,14 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 
-	camera->SetModelViewProjectionMatrix();
-
 	if(sky_box)
+	{
+		tSkyBoxShader *skybox_shader = renderer->GetSkyBoxShader();
+		skybox_shader->Bind();
+		skybox_shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
+		skybox_shader->SetCameraPosition(camera->GetPosition());
 		sky_box->Paint(renderer, camera->GetPosition());
-
+	}
 
 	gbuffer->BindTextures();
 

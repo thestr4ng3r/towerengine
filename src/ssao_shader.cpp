@@ -62,8 +62,8 @@ void tSSAOShader::SetTextures(GLuint depth, GLuint pos, GLuint normal)
 
 void tSSAOShader::SetMatrices(float *proj, float *modelview)
 {
-	glUniformMatrix4fv(projection_matrix_uniform, 1, GL_FALSE, proj);
-	glUniformMatrix4fv(modelview_matrix_uniform, 1, GL_FALSE, modelview);
+	glUniformMatrix4fv(projection_matrix_uniform, 1, GL_TRUE, proj);
+	glUniformMatrix4fv(modelview_matrix_uniform, 1, GL_TRUE, modelview);
 }
 
 void tSSAOShader::SetRadius(float radius)

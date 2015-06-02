@@ -1,9 +1,12 @@
-#ifndef _ENVIRONMENT_SHADER_H
-#define _ENVIRONMENT_SHADER_H
+#ifndef _SKYBOX_SHADER_H
+#define _SKYBOX_SHADER_H
 
 class tSkyBoxShader : public tShader
 {
 	private:
+		GLint modelview_projection_matrix_uniform;
+		GLint cam_pos_uniform;
+
 		GLint tex_uniform;
 	
 	public:
@@ -11,7 +14,8 @@ class tSkyBoxShader : public tShader
 
 		void Init(void);
 		void SetCubeMap(GLuint tex);
-		void ResetUniforms(void) {};
+		void SetModelViewProjectionMatrix(float m[16]);
+		void SetCameraPosition(tVector pos);
 };
 
 GLenum CubeTex(int side);

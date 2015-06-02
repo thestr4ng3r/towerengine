@@ -12,10 +12,17 @@ void tPointShadowShader::Init(void)
 	glBindAttribLocation(program, tFaceShader::vertex2_attribute, "vertex2_attr");
 	LinkProgram();
 
+	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
+
 	light_pos_uniform = GetUniformLocation("light_pos_uni");
 	light_dist_uniform = GetUniformLocation("light_dist_uni");
 	transformation_uniform = GetUniformLocation("transformation_uni");
 	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
+}
+
+void tPointShadowShader::SetModelViewProjectionMatrix(float m[16])
+{
+	glUniformMatrix4fv(modelview_projection_matrix_uniform, 1, GL_TRUE, m);
 }
 
 void tPointShadowShader::SetLightPos(tVector v)

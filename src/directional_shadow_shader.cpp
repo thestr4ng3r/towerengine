@@ -13,6 +13,8 @@ void tDirectionalShadowShader::Init(void)
 	glBindAttribLocation(program, tFaceShader::uvcoord_attribute, "uv_attr");
 	LinkProgram();
 
+	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
+
 	light_dir_uniform = GetUniformLocation("light_dir_uni");
 	clip_uniform = GetUniformLocation("clip_uni");
 	transformation_uniform = GetUniformLocation("transformation_uni");
@@ -24,6 +26,11 @@ void tDirectionalShadowShader::Init(void)
 
 	Bind();
 	glUniform1i(diffuse_tex_uniform, 0);
+}
+
+void tDirectionalShadowShader::SetModelViewProjectionMatrix(float m[16])
+{
+	glUniformMatrix4fv(modelview_projection_matrix_uniform, 1, GL_TRUE, m);
 }
 
 void tDirectionalShadowShader::SetLightDir(tVector v)

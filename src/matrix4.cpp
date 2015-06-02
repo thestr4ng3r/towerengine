@@ -138,7 +138,7 @@ void tMatrix4::GLMultMatrix(void)
 tMatrix4 operator*(tMatrix4 &a, tMatrix4 &b)
 {
 	tMatrix4 r;
-	MultiplyMatrix4(b.GetData(), a.GetData(), r.GetData());
+	MultiplyMatrix4(a.GetData(), b.GetData(), r.GetData());
 	return r;
 }
 

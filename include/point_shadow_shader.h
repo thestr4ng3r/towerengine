@@ -5,6 +5,8 @@
 class tPointShadowShader : public tFaceShader
 {
 	private:
+		GLint modelview_projection_matrix_uniform;
+
 		GLint light_pos_uniform;
 		GLint light_dist_uniform;
 
@@ -14,6 +16,8 @@ class tPointShadowShader : public tFaceShader
 
 	public:
 		void Init(void);
+
+		void SetModelViewProjectionMatrix(float m[16]);
 		void SetLightPos(tVector v);
 		void SetLightDist(float d);
 		void SetTransformation(const float m[16]);

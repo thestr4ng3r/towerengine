@@ -5,6 +5,8 @@
 class tDirectionalShadowShader : public tFaceShader
 {
 	private:
+		GLint modelview_projection_matrix_uniform;
+
 		GLint light_dir_uniform;
 		GLint clip_uniform;
 		GLint cam_pos_uniform;
@@ -18,6 +20,8 @@ class tDirectionalShadowShader : public tFaceShader
 
 	public:
 		void Init(void);
+
+		void SetModelViewProjectionMatrix(float m[16]);
 		void SetLightDir(tVector v);
 		void SetClip(float near, float far);
 		void SetTransformation(const float m[16]);

@@ -1,10 +1,10 @@
 #version 330
 
-uniform mat4 gl_ModelViewProjectionMatrix;
-
 in vec3 vertex_attr;
 in vec3 vertex2_attr; // vertex of next keyframe
 in vec2 uv_attr;
+
+uniform mat4 modelview_projection_matrix_uni;
 
 uniform float vertex_mix_uni;
 uniform mat4 transformation_uni;
@@ -26,5 +26,5 @@ void main(void)
 	moment1_var = dot(pos.xyz - cam_pos_uni, light_dir_uni) / (clip_uni.y - clip_uni.x);
 	uv_var = uv_attr;
 	
-	gl_Position = gl_ModelViewProjectionMatrix * pos;
+	gl_Position = modelview_projection_matrix_uni * pos;
 }

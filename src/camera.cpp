@@ -203,32 +203,12 @@ bool tCamera::TestBoundingBoxCulling(tBoundingBox b)
 	return false;
 }
 
-
-void tCamera::SetProjectionMatrix(void)
-{
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(angle, aspect, near_clip, far_clip);
-}
-
-void tCamera::SetModelViewMatrix(void)
+void tCamera::CalculateModelViewProjectionMatrix(void)
 {
 	tVector to = pos + dir;
-
-	tMatrix4 m;
-
-	m.SetLookAt(pos, to, up);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	m.GLMultMatrix();
-	//gluLookAt(pos.x, pos.y, pos.z, to.x, to.y, to.z, up.x, up.y, up.z);
-}
-
-void tCamera::SetModelViewProjectionMatrix(void)
-{
-	SetProjectionMatrix();
-	SetModelViewMatrix();
+	modelview_matrix.SetLookAt(pos, to, up);
+	projection_matrix.SetPerspective(angle, aspect, near_clip, far_clip);
+	modelview_projection_matrix = projection_matrix * modelview_matrix;
 }
 
 

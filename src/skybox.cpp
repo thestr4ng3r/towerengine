@@ -39,10 +39,7 @@ tSkyBox::tSkyBox(GLuint cube_map, float size)
 
 void tSkyBox::Paint(tRenderer *renderer, tVector pos)
 {
-	renderer->GetSkyBoxShader()->Bind();
 	renderer->GetSkyBoxShader()->SetCubeMap(cube_map);
-
 	vbo->SetAttribute(tSkyBoxShader::vertex_attribute, GL_FLOAT);
-
 	ibo->Draw(GL_QUADS);
 }

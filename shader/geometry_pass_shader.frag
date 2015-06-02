@@ -27,7 +27,6 @@ uniform samplerCube cube_map_reflection_tex_uni;
 uniform vec3 clip_vec_uni;
 uniform float clip_dist_uni;
 
-
 in vec3 pos_var;
 in vec3 normal_var;
 in vec3 tang_var;

@@ -7,8 +7,9 @@ in vec3 normal_attr;
 in vec3 tang_attr;
 in vec3 bitang_attr;
 
-uniform mat4 modelview_matrix_uni;
-uniform mat4 projection_matrix_uni;
+uniform mat4 modelview_projection_matrix_uni;
+
+uniform vec3 cam_pos_uni;
 
 uniform float vertex_mix_uni;
 uniform mat4 transformation_uni;
@@ -33,7 +34,7 @@ void main(void)
 	tang_var = normalize(tang_attr * mat3(transformation_uni));
 	bitang_var = normalize(bitang_attr * mat3(transformation_uni));
 	uv_var = uv_attr;
-	cam_dir_var = inverse(modelview_matrix_uni)[3].xyz - pos.xyz;
+	cam_dir_var = cam_pos_uni - pos.xyz;
 	
-	gl_Position = (projection_matrix_uni * modelview_matrix_uni) * pos;
+	gl_Position = modelview_projection_matrix_uni * pos;
 }

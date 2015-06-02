@@ -41,9 +41,6 @@ class tRenderer
 		tVAO *screen_quad_vao;
 		//tIBO *screen_quad_ibo;
 
-		float projection_matrix[16];
-		float modelview_matrix[16];
-
 		bool fxaa_enabled;
 
 		tSSAO *ssao;
@@ -103,8 +100,8 @@ class tRenderer
 		tWorld *GetWorld(void)		{ return world; }
 		tCamera *GetCamera(void)			{ return camera; }
 
-		float *GetProjectionMatrix(void)	{ return projection_matrix; }
-		float *GetModelViewMatrix(void)		{ return modelview_matrix; }
+		//float *GetProjectionMatrix(void)	{ return projection_matrix; }
+		//float *GetModelViewMatrix(void)		{ return modelview_matrix; }
 
 		tGBuffer *GetGBuffer(void)			{ return gbuffer; }
 

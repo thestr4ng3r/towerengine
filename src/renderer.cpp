@@ -103,9 +103,9 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	screen_quad_vbo = new tVBO<float>(2, screen_quad_vao, 4);
 
 	float *screen_quad_data = screen_quad_vbo->GetData();
-	screen_quad_data[0] = 0.0; screen_quad_data[1] = 1.0;
-	screen_quad_data[2] = 0.0; screen_quad_data[3] = 0.0;
-	screen_quad_data[4] = 1.0; screen_quad_data[5] = 0.0;
+	screen_quad_data[0] = -1.0; screen_quad_data[1] = 1.0;
+	screen_quad_data[2] = -1.0; screen_quad_data[3] = -1.0;
+	screen_quad_data[4] = 1.0; screen_quad_data[5] = -1.0;
 	screen_quad_data[6] = 1.0; screen_quad_data[7] = 1.0;
 
 	screen_quad_vbo->AssignData();
@@ -189,6 +189,7 @@ void tRenderer::InitCubeMapReflection(int resolution, tVector position)
 void tRenderer::Render(GLuint dst_fbo, int width, int height)
 {
 	camera->SetAspect((float)screen_width / (float)screen_height);
+	camera->CalculateModelViewProjectionMatrix();
 
 	world->FillRenderSpace(camera_render_space, camera);
 
@@ -320,10 +321,13 @@ void tRenderer::GeometryPass(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, screen_width, screen_height);
 
-	camera->SetModelViewProjectionMatrix();
+	/*glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	camera->GetModelViewMatrix().GLMultMatrix();
 
-	glGetFloatv(GL_PROJECTION_MATRIX, projection_matrix);
-	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	camera->GetProjectionMatrix().GLMultMatrix();*/
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
@@ -331,8 +335,8 @@ void tRenderer::GeometryPass(void)
 	SetCurrentFaceShader(geometry_pass_shader);
 	BindCurrentFaceShader();
 
-
-	geometry_pass_shader->SetModelViewProjectionMatrix(modelview_matrix, projection_matrix);
+	geometry_pass_shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
+	geometry_pass_shader->SetCameraPosition(camera->GetPosition());
 
 	if(cube_map_reflection)
 		geometry_pass_shader->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());
@@ -353,10 +357,13 @@ void tRenderer::LightPass(void)
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 
-	camera->SetModelViewProjectionMatrix();
-
 	if(sky_box)
+	{
+		skybox_shader->Bind();
+		skybox_shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
+		skybox_shader->SetCameraPosition(camera->GetPosition());
 		sky_box->Paint(this, camera->GetPosition());
+	}
 
 	gbuffer->BindTextures();
 
@@ -406,7 +413,14 @@ void tRenderer::LightPass(void)
 
 void tRenderer::ForwardPass(void)
 {
-	camera->SetModelViewProjectionMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	camera->GetModelViewMatrix().GLMultMatrix();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	camera->GetProjectionMatrix().GLMultMatrix();
+
 	camera_render_space->ForwardPass(this);
 }
 

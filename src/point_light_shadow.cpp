@@ -88,6 +88,10 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	tVector cam_dir, cam_to;
 	tVector v_vec;
 
+	tMatrix4 modelview_matrix;
+	tMatrix4 projection_matrix;
+	tMatrix4 modelview_projection_matrix;
+
 	//tWorld *world = renderer->GetWorld();
 
 	glEnable(GL_DEPTH_TEST);
@@ -97,9 +101,11 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
-	glMatrixMode(GL_PROJECTION);
+	/*glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(90.0, 1.0, 0.001, light->GetDistance());
+	gluPerspective(90.0, 1.0, 0.001, light->GetDistance());*/
+
+	projection_matrix.SetPerspective(90.0, 1.0, 0.001, light->GetDistance()); // TODO: maybe higher near clip
 
 	renderer->SetCurrentFaceShader(renderer->GetPointShadowShader()); // TODO: bind once in tRenderer before rendering all pointlights
 	renderer->BindCurrentFaceShader();
@@ -111,8 +117,8 @@ void tPointLightShadow::Render(tRenderer *renderer)
 		glDrawBuffer(GL_COLOR_ATTACHMENT0 + s);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+		//glMatrixMode(GL_MODELVIEW);
+		//glLoadIdentity();
 		cam_dir = CubeVecS(s);
 		cam_to = pos + cam_dir;
 		v_vec = Vec(0.0, -1.0, 0.0);
@@ -120,7 +126,11 @@ void tPointLightShadow::Render(tRenderer *renderer)
 			v_vec = Vec(0.0, 0.0, 1.0);
 		else if(s == 3)
 			v_vec = Vec(0.0, 0.0, -1.0);
-		gluLookAt(pos.x, pos.y, pos.z, cam_to.x, cam_to.y, cam_to.z, v_vec.x, v_vec.y, v_vec.z);
+		//gluLookAt(pos.x, pos.y, pos.z, cam_to.x, cam_to.y, cam_to.z, v_vec.x, v_vec.y, v_vec.z);
+		modelview_matrix.SetLookAt(pos, cam_to, v_vec);
+
+		modelview_projection_matrix = projection_matrix * modelview_matrix;
+		renderer->GetPointShadowShader()->SetModelViewProjectionMatrix(modelview_projection_matrix.GetData());
 
 		render_object_space->GeometryPass(renderer);
 	}

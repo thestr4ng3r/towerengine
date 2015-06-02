@@ -12,6 +12,10 @@ class tCamera : public tCulling
 		float aspect;
 		float near_clip, far_clip;
 
+		tMatrix4 modelview_matrix;
+		tMatrix4 projection_matrix;
+		tMatrix4 modelview_projection_matrix;
+
 		tVector frustum_planes_points[6];
 		tVector frustum_planes_normals[6];
 
@@ -49,9 +53,11 @@ class tCamera : public tCulling
 		void SetNearClip(float n)		{ near_clip = n; }
 		void SetFarClip(float f)		{ far_clip = f; }
 
-		void SetProjectionMatrix(void);
-		void SetModelViewMatrix(void);
-		void SetModelViewProjectionMatrix(void);
+		void CalculateModelViewProjectionMatrix(void);
+
+		tMatrix4 GetModelViewMatrix(void)				{ return modelview_matrix; }
+		tMatrix4 GetProjectionMatrix(void)				{ return projection_matrix; }
+		tMatrix4 GetModelViewProjectionMatrix(void)		{ return modelview_projection_matrix; }
 };
 
 #endif
