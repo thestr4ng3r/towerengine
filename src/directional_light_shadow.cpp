@@ -71,7 +71,7 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 
 	blur_vao = new tVAO();
 
-	blur_vertex_vbo = new tVBO<float>(2, blur_vao, 4);
+	blur_vertex_vbo = new tVBO<float>(2, 4);
 	static const float blur_vertices[] = {	-1.0, 1.0,
 											-1.0, -1.0,
 											1.0, -1.0,
@@ -79,7 +79,7 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 	memcpy(blur_vertex_vbo->GetData(), blur_vertices, sizeof(float) * 8);
 	blur_vertex_vbo->AssignData();
 
-	blur_uv_vbo = new tVBO<float>(2, blur_vao, 4);
+	blur_uv_vbo = new tVBO<float>(2, 4);
 	static const float blur_uv_coords[] = {	0.0, 1.0,
 											0.0, 0.0,
 											1.0, 0.0,
@@ -91,6 +91,8 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 	blur_vertex_vbo->SetAttribute(tDirectionalShadowBlurShader::vertex_attribute, GL_FLOAT);
 	blur_uv_vbo->SetAttribute(tDirectionalShadowBlurShader::uv_coord_attribute, GL_FLOAT);
 	blur_vao->UnBind();
+
+	// TODO: Use tRenderer::RenderScreenQuad for blurring
 }
 
 void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)

@@ -136,7 +136,7 @@ class tMesh
 		void RemoveAnimation(tAnimation *a);
 		void RemoveEntity(tEntity *e);
 
-		tIBO *CreateIBO(void)						{ return new tIBO(vao); }
+		//tIBO *CreateIBO(void)						{ return new tIBO(); }
 
 		tMeshPose *GetIdlePose(void)		{ return idle_pose; }
 		tMeshPose *GetCustomPoseByName(std::string name);

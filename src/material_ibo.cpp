@@ -4,7 +4,7 @@
 tMaterialIBO::tMaterialIBO(tMesh *mesh)
 {
 	ibo_data = 0;
-	ibo = mesh->CreateIBO();
+	ibo = new tIBO();
 }
 
 tMaterialIBO::~tMaterialIBO(void)

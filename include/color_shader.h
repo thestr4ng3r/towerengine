@@ -3,17 +3,18 @@
 #define _COLOR_FACE_SHADER_H
 
 
-class tColorShader : public tFaceShader
+class tColorShader : public tShader
 {
 	private:
+		GLint modelview_projection_matrix_uniform;
 		GLint transformation_uniform;
 
-		GLint diffuse_color_uniform;
-
 	public:
+		static const GLint color_attribute = 1;
+
 		void Init(void);
 
-		void SetDiffuseColor(tVector color);
+		void SetModelViewProjectionmatrix(const float m[16]);
 		void SetTransformation(const float m[16]);
 };
 

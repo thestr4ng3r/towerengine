@@ -1,6 +1,6 @@
 #version 330
 
-uniform vec3 diffuse_color_uni;
+in vec4 color_var;
 
 out vec4 gl_FragColor;
 
@@ -9,5 +9,5 @@ void main(void)
 	if(!gl_FrontFacing)
 		discard;
 
-	gl_FragColor = vec4(diffuse_color_uni, 1.0);
+	gl_FragColor = color_var;
 }

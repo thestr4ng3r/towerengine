@@ -6,7 +6,6 @@
 class tFaceShader : public tShader
 {
 	public:
-		static const GLint vertex_attribute = 0;
 		static const GLint vertex2_attribute = 1;
 		static const GLint normal_attribute = 2;
 		static const GLint tang_attribute = 3;

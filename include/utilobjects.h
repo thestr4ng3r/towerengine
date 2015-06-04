@@ -11,6 +11,10 @@ class tCoordinateSystemObject : public tObject
 		tVector size;
 		bool depth_test;
 
+		tVAO *vao;
+		tVBO<float> *vertex_vbo;
+		tVBO<float> *color_vbo;
+
 	public:
 		tCoordinateSystemObject(bool depth_test = false);
 		~tCoordinateSystemObject(void);

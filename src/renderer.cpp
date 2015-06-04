@@ -100,15 +100,18 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 
 
 	screen_quad_vao = new tVAO();
-	screen_quad_vbo = new tVBO<float>(2, screen_quad_vao, 4);
+	screen_quad_vao->Bind();
+
+	screen_quad_vbo = new tVBO<float>(2, 4);
 
 	float *screen_quad_data = screen_quad_vbo->GetData();
 	screen_quad_data[0] = -1.0; screen_quad_data[1] = 1.0;
 	screen_quad_data[2] = -1.0; screen_quad_data[3] = -1.0;
-	screen_quad_data[4] = 1.0; screen_quad_data[5] = -1.0;
-	screen_quad_data[6] = 1.0; screen_quad_data[7] = 1.0;
+	screen_quad_data[4] = 1.0; screen_quad_data[5] = 1.0;
+	screen_quad_data[6] = 1.0; screen_quad_data[7] = -1.0;
 
 	screen_quad_vbo->AssignData();
+	screen_quad_vbo->SetAttribute(tShader::vertex_attribute, GL_FLOAT);
 
 	point_light_shadow_limit = -1;
 }
@@ -413,13 +416,13 @@ void tRenderer::LightPass(void)
 
 void tRenderer::ForwardPass(void)
 {
-	glMatrixMode(GL_MODELVIEW);
+	/*glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	camera->GetModelViewMatrix().GLMultMatrix();
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	camera->GetProjectionMatrix().GLMultMatrix();
+	camera->GetProjectionMatrix().GLMultMatrix();*/
 
 	camera_render_space->ForwardPass(this);
 }
@@ -453,9 +456,9 @@ void tRenderer::ChangeSize(int width, int height)
 
 void tRenderer::RenderScreenQuad(void)
 {
-	screen_quad_vao->Bind();
-	screen_quad_vbo->SetAttribute(tShader::vertex_attribute, GL_FLOAT);
-	screen_quad_vao->Draw(GL_QUADS, 0, 4);
+	//screen_quad_vao->Bind();
+	//screen_quad_vbo->SetAttribute(tShader::vertex_attribute, GL_FLOAT);
+	screen_quad_vao->Draw(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 

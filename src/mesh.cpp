@@ -24,11 +24,19 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 	vao = new tVAO();
 	current_pose = idle_pose = new tMeshPose(this);
 	//vertex_vbo = new VBO<float>(3, vao);
-	normal_vbo = new tVBO<float>(3, vao);
-	tang_vbo = new tVBO<float>(3, vao);
-	bitang_vbo = new tVBO<float>(3, vao);
-	face_normal_vbo = new tVBO<float>(3, vao);
-	uvcoord_vbo = new tVBO<float>(2, vao);
+	normal_vbo = new tVBO<float>(3);
+	tang_vbo = new tVBO<float>(3);
+	bitang_vbo = new tVBO<float>(3);
+	face_normal_vbo = new tVBO<float>(3);
+	uvcoord_vbo = new tVBO<float>(2);
+
+	vao->Bind();
+	normal_vbo->SetAttribute(tFaceShader::normal_attribute, GL_FLOAT);
+	tang_vbo->SetAttribute(tFaceShader::tang_attribute, GL_FLOAT);
+	bitang_vbo->SetAttribute(tFaceShader::bitang_attribute, GL_FLOAT);
+	uvcoord_vbo->SetAttribute(tFaceShader::uvcoord_attribute, GL_FLOAT);
+	tVAO::UnBind();
+
 	outdated_vertices.clear();
 	data_count = 0;
 	refresh_func = 0;
@@ -117,7 +125,7 @@ void tMesh::DeleteVBOData(void)
 
 tVBO<float> *tMesh::CreateFloatVBO(int components)
 {
-	return new tVBO<float>(components, vao);
+	return new tVBO<float>(components);
 }
 
 
@@ -539,6 +547,8 @@ void tMesh::GeometryPass(tRenderer *renderer)
 	if(refresh_vbos)
 		RefreshAllVBOs();
 
+	vao->Bind();
+
 	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
 	if(vertex2_vbo)
 	{
@@ -547,11 +557,6 @@ void tMesh::GeometryPass(tRenderer *renderer)
 	}
 	else
 		renderer->GetCurrentFaceShader()->SetVertexMix(0.0);
-
-	normal_vbo->SetAttribute(tFaceShader::normal_attribute, GL_FLOAT);
-	tang_vbo->SetAttribute(tFaceShader::tang_attribute, GL_FLOAT);
-	bitang_vbo->SetAttribute(tFaceShader::bitang_attribute, GL_FLOAT);
-	uvcoord_vbo->SetAttribute(tFaceShader::uvcoord_attribute, GL_FLOAT);
 
 	if(refresh_ibos)
 		RefreshIBOs();

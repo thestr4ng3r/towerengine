@@ -38,12 +38,12 @@ class tVector
 		float Len(void) const		{ return sqrt(x * x + y * y + z * z); }
 		float SquaredLen(void) const		{ return x * x + y * y + z * z; }
 		void Normalize(void)		{ float l; l = 1.0 / Len(); x *= l; y *= l; z *= l; }
-		void PutToGL(void) const	{ glVertex3fv(v); }
-		void NormalToGL(void) const	{ glNormal3fv(v); }
-		void TexcoordToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE0, v); }
-		void TangXToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE1, v); }
-		void TangYToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE2, v); }
-		void AttrToGL(int which) const             { glVertexAttrib3fv(which, v); }
+		//void PutToGL(void) const	{ glVertex3fv(v); }
+		//void NormalToGL(void) const	{ glNormal3fv(v); }
+		//void TexcoordToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE0, v); }
+		//void TangXToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE1, v); }
+		//void TangYToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE2, v); }
+		//void AttrToGL(int which) const             { glVertexAttrib3fv(which, v); }
 		void SetFromPlane(const tVector2 &p, const tVector &n, float d);
 		tVector operator -(void) const	{tVector r; r.x = -x, r.y = -y, r.z = -z; return r; }
 		operator tVector2() const	{tVector2 r; r.x = x; r.y = z; return r; }

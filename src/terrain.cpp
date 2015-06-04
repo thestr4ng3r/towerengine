@@ -20,11 +20,11 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 	this->material = material;
 
 	vao = new tVAO();
-	vertex_vbo = new tVBO<float>(3, vao, map_size * map_size);
-	normal_vbo = new tVBO<float>(3, vao, map_size * map_size);
-	tang_vbo = new tVBO<float>(3, vao, map_size * map_size);
-	bitang_vbo = new tVBO<float>(3, vao, map_size * map_size);
-	uvcoord_vbo = new tVBO<float>(2, vao, map_size * map_size);
+	vertex_vbo = new tVBO<float>(3, map_size * map_size);
+	normal_vbo = new tVBO<float>(3, map_size * map_size);
+	tang_vbo = new tVBO<float>(3, map_size * map_size);
+	bitang_vbo = new tVBO<float>(3, map_size * map_size);
+	uvcoord_vbo = new tVBO<float>(2, map_size * map_size);
 
 	vertex_data = vertex_vbo->GetData();
 	normal_data = normal_vbo->GetData();
@@ -60,7 +60,7 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 	bitang_vbo->AssignData();
 	uvcoord_vbo->AssignData();
 
-	ibo = new tIBO(vao, (map_size - 1) * (map_size - 1) * 6);
+	ibo = new tIBO((map_size - 1) * (map_size - 1) * 6);
 
 	face_normals = new tVector **[map_size-1];
 
@@ -160,6 +160,8 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 
 void tTerrain::Paint(tRenderer *renderer)
 {
+	vao->Bind();
+
 	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
 	normal_vbo->SetAttribute(tFaceShader::normal_attribute, GL_FLOAT);
 	tang_vbo->SetAttribute(tFaceShader::tang_attribute, GL_FLOAT);

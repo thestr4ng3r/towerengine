@@ -25,13 +25,13 @@ void tVAO::Draw(GLenum mode, GLint first, GLsizei count)
 // --------------------------------------------------------------------
 
 
-tIBO::tIBO(tVAO *vao, int size)
+tIBO::tIBO(int size)
 {
 	data = 0;
 	this->size = 0;
-	vao->Bind();
+	//vao->Bind();
 	glGenBuffers(1, &ibo);
-	tVAO::UnBind();
+	//tVAO::UnBind();
 	SetSize(size);
 }
 

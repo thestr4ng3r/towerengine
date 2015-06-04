@@ -5,27 +5,23 @@
 
 void tColorShader::Init(void)
 {
-	SetSource(color_shader_vert, color_shader_frag);
-	CreateVertexShader();
-	CreateFragmentShader();
-	CreateProgram();
+	InitShader(color_shader_vert, color_shader_frag);
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
+	glBindAttribLocation(program, color_attribute, "color_attr");
 
 	LinkProgram();
 
-	diffuse_color_uniform = GetUniformLocation("diffuse_color_uni");
+	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
 	transformation_uniform = GetUniformLocation("transformation_uni");
+}
+
+void tColorShader::SetModelViewProjectionmatrix(const float m[16])
+{
+	glUniformMatrix4fv(modelview_projection_matrix_uniform, 1, GL_TRUE, m);
 }
 
 void tColorShader::SetTransformation(const float m[16])
 {
-	if(transformation_uniform != -1)
-		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
-}
-
-void tColorShader::SetDiffuseColor(tVector color)
-{
-	if(diffuse_color_uniform != -1)
-		glUniform3f(diffuse_color_uniform, color.x, color.y, color.z);
+	glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }

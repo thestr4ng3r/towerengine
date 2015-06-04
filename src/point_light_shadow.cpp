@@ -66,7 +66,7 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 	glDrawBuffers(6, blur_draw_buffers);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	blur_vao = new tVAO();
+	/*blur_vao = new tVAO();
 
 	blur_vertex_vbo = new tVBO<float>(2, blur_vao, 4);
 	static const float blur_vertices[] = {	-1.0, 1.0,
@@ -78,7 +78,7 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 	blur_vao->Bind();
 	blur_vertex_vbo->SetAttribute(tPointShadowBlurShader::vertex_attribute, GL_FLOAT);
-	blur_vao->UnBind();
+	blur_vao->UnBind();*/
 }
 
 void tPointLightShadow::Render(tRenderer *renderer)
@@ -156,7 +156,8 @@ void tPointLightShadow::Render(tRenderer *renderer)
 
 	renderer->GetPointShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0, 0.0) * blur_size);
 
-	blur_vao->Draw(GL_QUADS, 0, 4);
+	//blur_vao->Draw(GL_QUADS, 0, 4);
+	renderer->RenderScreenQuad();
 
 
 	renderer->GetPointShadowBlurShader()->SetTexture(blur_tex);
@@ -168,7 +169,9 @@ void tPointLightShadow::Render(tRenderer *renderer)
 
 	renderer->GetPointShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0, 0.0) * blur_size);
 
-	blur_vao->Draw(GL_QUADS, 0, 4);
+	//blur_vao->Draw(GL_QUADS, 0, 4);
+
+	renderer->RenderScreenQuad();
 
 	tShader::Unbind();
 

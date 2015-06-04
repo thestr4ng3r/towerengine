@@ -18,7 +18,7 @@ tCubeMapReflection::tCubeMapReflection(tRenderer *renderer, int resolution, tVec
 	glGenTextures(1, &color_tex);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, color_tex);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -76,6 +76,10 @@ void tCubeMapReflection::Render(void)
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, color_tex);
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 void tCubeMapReflection::GeometryPass(int side, tWorld *world)

@@ -255,23 +255,23 @@ GLuint LoadGLCubeMapIL(ILuint image)
 
 
 	GetSubImage(side_data, data, width, height, bpp, 0, 0, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
 
 	GetSubImage(side_data, data, width, height, bpp, side_width, 0, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
 
 	GetSubImage(side_data, data, width, height, bpp, side_width * 2, 0, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
 
 
 	GetSubImage(side_data, data, width, height, bpp, 0, side_height, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
 
 	GetSubImage(side_data, data, width, height, bpp, side_width, side_height, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
 
 	GetSubImage(side_data, data, width, height, bpp, side_width * 2, side_height, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, bpp, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
 
 	delete [] side_data;
 

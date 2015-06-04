@@ -247,7 +247,7 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 
 	glTexImage2D(GL_TEXTURE_2D, 				// Type of texture
 				 0,								// Pyramid level (for mip-mapping) - 0 is the top level
-				 ilGetInteger(IL_IMAGE_BPP),	// Image colour depth
+				 ilGetInteger(IL_IMAGE_FORMAT),	// Image colour depth
 				 width,							// Image width
 				 height,						// Image height
 				 0,								// Border width in pixels (can either be 1 or 0)

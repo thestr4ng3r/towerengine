@@ -993,23 +993,28 @@ const char *ssao_blur_shader_frag =
 const char *color_shader_vert = 
 "#version 330\n"
 "\n"
-"uniform mat4 gl_ModelViewProjectionMatrix;\n"
-"\n"
-"in vec3 vertex_attr;\n"
+"uniform mat4 modelview_projection_matrix_uni;\n"
 "\n"
 "uniform mat4 transformation_uni;\n"
 "\n"
+"in vec3 vertex_attr;\n"
+"in vec4 color_attr;\n"
+"\n"
+"out vec4 color_var;\n"
+"\n"
 "void main(void)\n"
 "{\n"
-"	vec4 pos = vec4(vertex_attr, 1.0) * transformation_uni;\n"
+"	color_var = color_attr;\n"
 "	\n"
-"	gl_Position = gl_ModelViewProjectionMatrix * pos;\n"
+"	vec4 pos = vec4(vertex_attr, 1.0) * transformation_uni;\n"
+"		\n"
+"	gl_Position = modelview_projection_matrix_uni * pos;\n"
 "}";
 
 const char *color_shader_frag = 
 "#version 330\n"
 "\n"
-"uniform vec3 diffuse_color_uni;\n"
+"in vec4 color_var;\n"
 "\n"
 "out vec4 gl_FragColor;\n"
 "\n"
@@ -1018,7 +1023,7 @@ const char *color_shader_frag =
 "	if(!gl_FrontFacing)\n"
 "		discard;\n"
 "\n"
-"	gl_FragColor = vec4(diffuse_color_uni, 1.0);\n"
+"	gl_FragColor = color_var;\n"
 "}\n"
 "";
 
