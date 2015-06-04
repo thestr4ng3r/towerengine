@@ -123,15 +123,15 @@ GLuint LoadGLCubeMap(const char *filename[6])
 
 		glTexImage2D(CubeTex(i), 				// Type of texture
 					 0,				// Pyramid level (for mip-mapping) - 0 is the top level
-					 ilGetInteger(IL_IMAGE_BPP),	// Image colour depth
+					 ilGetInteger(IL_IMAGE_FORMAT),	// Image colour depth
 					 ilGetInteger(IL_IMAGE_WIDTH),	// Image width
 					 ilGetInteger(IL_IMAGE_HEIGHT),	// Image height
 					 0,				// Border width in pixels (can either be 1 or 0)
 					 ilGetInteger(IL_IMAGE_FORMAT),	// Image format (i.e. RGB, RGBA, BGR etc.)
 					 GL_UNSIGNED_BYTE,		// Image data type
 					 ilGetData());			// The actual image data itself
-		gluBuild2DMipmaps(CubeTex(i), ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),
-					ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
+		//gluBuild2DMipmaps(CubeTex(i), ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),
+		//			ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, ilGetData());
 	}
 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -139,6 +139,9 @@ GLuint LoadGLCubeMap(const char *filename[6])
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	//glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_anisotropy);
+
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 	return handle;
@@ -301,9 +304,11 @@ GLuint CreateCubeTexture(GLenum type, int width, int height)
 	glTexParameterf(type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(type, GL_GENERATE_MIPMAP, GL_TRUE);
+	//glTexParameteri(type, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexImage2D(type, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glGenerateMipmap(type);
 
 	return tex;
 }
+
 

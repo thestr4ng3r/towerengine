@@ -33,6 +33,8 @@ class tDirectionalShadowShader : public tFaceShader
 class tDirectionalShadowBlurShader : public tShader
 {
 	private:
+		GLint modelview_projection_matrix_uniform;
+
 		GLint tex_uniform;
 		GLint tex_layers_count_uniform;
 		GLint blur_factors_uniform;
@@ -45,6 +47,7 @@ class tDirectionalShadowBlurShader : public tShader
 		static const GLint uv_coord_attribute = 1;
 
 		void Init(void);
+		void SetModelViewProjectionMatrix(float m[16]);
 		void SetTexture(GLuint tex);
 		void SetTextureLayers(int layers, float *blur_factors);
 		void SetBlurDir(tVector2 v);

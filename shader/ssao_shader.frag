@@ -22,7 +22,7 @@ uniform vec3 cam_dir_uni;
 
 in vec2 uv_coord_var;
 
-out vec4 gl_FragColor;
+out vec4 color_out;
 
 
 void main(void)
@@ -64,5 +64,5 @@ void main(void)
 		
 	occlusion = 1.0 - (occlusion / float(kernel_size_uni));
 		
-	gl_FragColor = vec4(occlusion, 0.0, 0.0, 1.0);
+	color_out = vec4(occlusion, 0.0, 0.0, 1.0);
 }

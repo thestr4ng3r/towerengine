@@ -7,8 +7,7 @@ uniform bool fxaa_enabled_uni;
 
 in vec2 uv_coord_var;
 
-out vec4 gl_FragColor;
-
+out vec4 color_out;
 
 
 #define FXAA_EDGE_THRESHOLD_MIN	(1.0 / 16.0)
@@ -51,11 +50,11 @@ vec3 FXAA(vec3 rgb_m)
 			
 			
 	vec3 rgb_a = (1.0/2.0) * (
-			texture2D(color_tex_uni, uv_coord_var + dir * (1.0/3.0 - 0.5)).xyz +
-			texture2D(color_tex_uni, uv_coord_var + dir * (2.0/3.0 - 0.5)).xyz);
+			texture(color_tex_uni, uv_coord_var + dir * (1.0/3.0 - 0.5)).xyz +
+			texture(color_tex_uni, uv_coord_var + dir * (2.0/3.0 - 0.5)).xyz);
 	vec3 rgb_b = rgb_a * (1.0/2.0) + (1.0/4.0) * (
-			texture2D(color_tex_uni, uv_coord_var + dir * (0.0/3.0 - 0.5)).xyz +
-			texture2D(color_tex_uni, uv_coord_var + dir * (3.0/3.0 - 0.5)).xyz);
+			texture(color_tex_uni, uv_coord_var + dir * (0.0/3.0 - 0.5)).xyz +
+			texture(color_tex_uni, uv_coord_var + dir * (3.0/3.0 - 0.5)).xyz);
 	float luma_b = dot(rgb_b, luma);
 	
 	
@@ -76,5 +75,5 @@ void main(void)
 		color = src_color.rgb;	
 		
 	
-	gl_FragColor = vec4(color, src_color.a);
+	color_out = vec4(color, src_color.a);
 }

@@ -1,11 +1,11 @@
-#version 130
-
-out vec4 tex_out[6];
+#version 330
 
 uniform samplerCube tex_uni;
 
 in vec3 coords_var[6];
 in vec3 blur_dir_var[6];
+
+out vec4 tex_out[6];
 
 void main()
 {

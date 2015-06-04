@@ -12,7 +12,7 @@ uniform vec3 color_uni;
 
 in vec2 uv_coord_var;
 
-out vec4 gl_FragColor;
+out vec4 color_out;
 
 
 void main(void)
@@ -28,5 +28,5 @@ void main(void)
 	att = pow(att, exp_uni) * src_color.a;
 	color = color_uni * att + (1.0 - att) * color; 
 	
-	gl_FragColor = vec4(color, src_color.a);
+	color_out = vec4(color, src_color.a);
 }

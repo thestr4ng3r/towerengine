@@ -49,6 +49,6 @@ inline GLuint LoadGLTexture(const char *filename, bool *transparent, int alpha_c
 inline GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, bool *transparent, int alpha_channel = 3)
 		{ return LoadGLTextureBinary(ext, data, size, 0, 0, transparent, alpha_channel); }
 
-GLuint GLTextureFromColor(const tVector &color);
+//GLuint GLTextureFromColor(const tVector &color);
 
 #endif

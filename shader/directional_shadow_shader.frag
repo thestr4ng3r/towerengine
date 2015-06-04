@@ -1,4 +1,4 @@
-#version 130
+#version 330
 
 uniform bool diffuse_tex_enabled_uni;
 uniform sampler2D diffuse_tex_uni;
@@ -6,7 +6,7 @@ uniform sampler2D diffuse_tex_uni;
 in float moment1_var;
 in vec2 uv_var;
 
-out vec4 gl_FragColor;
+out vec4 color_out;
 
 void main(void)
 {
@@ -16,5 +16,5 @@ void main(void)
 			discard;
 	}
 		
-	gl_FragColor = vec4(moment1_var, moment1_var * moment1_var, 0.0, 1.0);
+	color_out = vec4(moment1_var, moment1_var * moment1_var, 0.0, 1.0);
 }

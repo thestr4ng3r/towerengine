@@ -2,12 +2,12 @@
 
 in vec4 color_var;
 
-out vec4 gl_FragColor;
+out vec4 color_out;
 
 void main(void)
 {
 	if(!gl_FrontFacing)
 		discard;
 
-	gl_FragColor = color_var;
+	color_out = color_var;
 }

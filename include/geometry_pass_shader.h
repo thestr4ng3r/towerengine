@@ -54,7 +54,6 @@ class tGeometryPassShader : public tFaceShader
 		void SetSpecularTexture(bool enabled, GLuint tex = 0);
 		void SetNormalTexture(bool enabled, GLuint tex = 0);
 		void SetBumpTexture(bool enabled, GLuint tex = 0);
-		void SetTexCoord(tVector2 coord);
 		void SetBumpDepth(float depth);
 		void SetTransformation(const float m[16]);
 		void SetVertexMix(float m = 0.0);

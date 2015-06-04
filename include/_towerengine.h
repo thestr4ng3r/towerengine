@@ -1,7 +1,7 @@
 #ifndef __TOWERENGINE_H
 #define __TOWERENGINE_H
 
-class tMeshPose;
+struct tMeshPose;
 class tAnimation;
 struct tKeyFrame;
 class tMesh;

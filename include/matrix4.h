@@ -26,7 +26,7 @@ class tMatrix4
 
 		void SetMultiply(tMatrix4 m);
 
-		void GLMultMatrix(void);
+		//void GLMultMatrix(void);
 
 		static tMatrix4 GetIdentity(void)		{ return tMatrix4(); }
 };

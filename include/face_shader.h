@@ -19,7 +19,7 @@ class tFaceShader : public tShader
 		static const unsigned int self_illumination_tex_unit = 4;
 		static const unsigned int cube_map_reflection_tex_unit = 5;
 
-		virtual void SetClip(tVector c, float d) {}
+		//virtual void SetClip(tVector c, float d) {}
 		virtual void SetDiffuseColor(tVector color) {}
 		virtual void SetDiffuseColor2(tVector color, float alpha) {}
 		virtual void SetSpecularColor(tVector color) {}
@@ -32,7 +32,6 @@ class tFaceShader : public tShader
 		virtual void SetSpecularTexture(bool enabled, GLuint tex = 0) {}
 		virtual void SetNormalTexture(bool enabled, GLuint tex = 0) {}
 		virtual void SetBumpTexture(bool enabled, GLuint tex = 0) {}
-		virtual void SetTexCoord(tVector2 coord) {}
 		virtual void SetTransformation(const float m[16]) {}
 		virtual void SetVertexMix(float m = 0.0) {}
 		virtual void SetSelfIlluminationColor(tVector color) {}

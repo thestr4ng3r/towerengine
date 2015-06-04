@@ -73,7 +73,7 @@ void main(void)
 	vec4 diffuse_color = vec4(1.0, 1.0, 1.0, 1.0);
 	
 	if(diffuse_tex_enabled_uni)
-		diffuse_color = texture2D(diffuse_tex_uni, uv).rgba;
+		diffuse_color = texture(diffuse_tex_uni, uv).rgba;
 		
 	if(diffuse_color.a < 0.5)
 		discard;
@@ -86,7 +86,7 @@ void main(void)
 	vec3 normal;
 	if(normal_tex_enabled_uni)
 	{
-		vec3 normal_tex_color = texture2D(normal_tex_uni, uv).rgb;
+		vec3 normal_tex_color = texture(normal_tex_uni, uv).rgb;
 		normal = tang_mat * ((normal_tex_color - vec3(0.5, 0.5, 0.5)) * 2.0);
 	}
 	else
@@ -101,7 +101,7 @@ void main(void)
 			
 	vec3 specular_color = specular_color_uni;
 	if(specular_tex_enabled_uni)
-		specular_color *= texture2D(specular_tex_uni, uv).rgb;
+		specular_color *= texture(specular_tex_uni, uv).rgb;
 	
 		
 	// self illumination
@@ -109,7 +109,7 @@ void main(void)
 	vec3 self_illumination = self_illumination_color_uni;
 	
 	if(self_illumination_tex_enabled_uni)
-		self_illumination *= texture2D(self_illumination_tex_uni, uv).rgb;
+		self_illumination *= texture(self_illumination_tex_uni, uv).rgb;
 		
 	
 	// cube map reflection
@@ -132,7 +132,7 @@ void main(void)
 
 vec2 ParallaxUV(void)
 {
-	float height = texture2D(bump_tex_uni, uv_var).r * bump_depth_uni;
+	float height = texture(bump_tex_uni, uv_var).r * bump_depth_uni;
 	vec3 cam_offset = height * normalize(cam_dir_var);
 	vec2 uv_offset;
 	uv_offset.x = dot(cam_offset, tang_var);

@@ -17,7 +17,7 @@ uniform sampler2D specular_tex_uni;
 
 in vec2 uv_coord_var;
 
-out vec4 gl_FragColor;
+out vec4 color_out;
 
 
 float linstep(float min, float max, float v)
@@ -27,14 +27,14 @@ float linstep(float min, float max, float v)
 
 void main(void)
 {
-	vec4 diffuse = texture2D(diffuse_tex_uni, uv_coord_var).rgba;
+	vec4 diffuse = texture(diffuse_tex_uni, uv_coord_var).rgba;
 
 	if(diffuse.a == 0.0)
 		discard;
 		
-	vec3 position = texture2D(position_tex_uni, uv_coord_var).rgb; 	
-	vec3 normal = normalize(texture2D(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
-	vec4 specular = texture2D(specular_tex_uni, uv_coord_var).rgba;
+	vec3 position = texture(position_tex_uni, uv_coord_var).rgb; 	
+	vec3 normal = normalize(texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
+	vec4 specular = texture(specular_tex_uni, uv_coord_var).rgba;
 	
 	
 	
@@ -46,7 +46,7 @@ void main(void)
 	float light_dist_sq = light_dir.x * light_dir.x + light_dir.y * light_dir.y + light_dir.z * light_dir.z; // squared distance
 	if(light_dist_sq > point_light_distance_uni * point_light_distance_uni)
 	{
-		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+		color_out = vec4(0.0, 0.0, 0.0, 1.0);
 		return;
 	}
 	float light_dist = sqrt(light_dist_sq); // real distance
@@ -84,5 +84,5 @@ void main(void)
 	color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow * light_dist_attenuation;
 	
 	
-	gl_FragColor = vec4(color, 1.0);
+	color_out = vec4(color, 1.0);
 }

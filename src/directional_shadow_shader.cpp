@@ -4,10 +4,7 @@
 
 void tDirectionalShadowShader::Init(void)
 {
-	SetSource(directional_shadow_shader_vert, directional_shadow_shader_frag);
-	CreateVertexShader();
-	CreateFragmentShader();
-	CreateProgram();
+	InitShader(directional_shadow_shader_vert, directional_shadow_shader_frag, "Directional Shadow Shader");
 	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, tFaceShader::vertex2_attribute, "vertex2_attr");
 	glBindAttribLocation(program, tFaceShader::uvcoord_attribute, "uv_attr");
@@ -84,6 +81,8 @@ void tDirectionalShadowBlurShader::Init(void)
 
 	LinkProgram();
 
+	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
+
 	tex_uniform = GetUniformLocation("tex_uni");
 	tex_layers_count_uniform = GetUniformLocation("tex_layers_count_uni");
 	blur_dir_uniform = GetUniformLocation("blur_dir_uni");
@@ -91,6 +90,11 @@ void tDirectionalShadowBlurShader::Init(void)
 
 	Bind();
 	glUniform1i(tex_uniform, 0);
+}
+
+void tDirectionalShadowBlurShader::SetModelViewProjectionMatrix(float m[16])
+{
+	glUniformMatrix4fv(modelview_projection_matrix_uniform, 1, GL_TRUE, m);
 }
 
 void tDirectionalShadowBlurShader::SetTexture(GLuint tex)

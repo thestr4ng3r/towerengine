@@ -129,10 +129,10 @@ void tMatrix4::SetMultiply(tMatrix4 m)
 	memcpy(v, temp, sizeof(float) * 16);
 }
 
-void tMatrix4::GLMultMatrix(void)
+/*void tMatrix4::GLMultMatrix(void)
 {
 	glMultTransposeMatrixf(v);
-}
+}*/
 
 
 tMatrix4 operator*(tMatrix4 &a, tMatrix4 &b)

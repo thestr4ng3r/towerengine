@@ -1,7 +1,7 @@
 #ifndef _POSE_H
 #define _POSE_H
 
-class tVertex;
+struct tVertex;
 class tMesh;
 
 

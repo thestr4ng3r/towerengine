@@ -4,10 +4,7 @@
 
 void tGeometryPassShader::Init(void)
 {
-	SetSource(geometry_pass_shader_vert, geometry_pass_shader_frag);
-	CreateVertexShader();
-	CreateFragmentShader();
-	CreateProgram();
+	InitShader(geometry_pass_shader_vert, geometry_pass_shader_frag, "Geometry Pass Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, vertex2_attribute, "vertex2_attr");
@@ -149,12 +146,6 @@ void tGeometryPassShader::SetBumpTexture(bool enabled, GLuint tex)
 		glActiveTexture(GL_TEXTURE0 + bump_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
-}
-
-
-void tGeometryPassShader::SetTexCoord(tVector2 coord)
-{
-	glMultiTexCoord2fv(GL_TEXTURE0, coord.v);
 }
 
 

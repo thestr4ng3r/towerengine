@@ -6,7 +6,7 @@ uniform bool blur_vertical_uni; // false => horizontal
 
 in vec2 uv_coord_var;
 
-out vec4 gl_FragColor;
+out vec4 color_out;
 
 
 void main(void)
@@ -27,5 +27,5 @@ void main(void)
 	result += texture(tex_uni, uv_coord_var - offset).r 	* 0.24477;
 	result += texture(tex_uni, uv_coord_var - offset * 2).r	* 0.06136;
 	
-	gl_FragColor = vec4(result, 0.0, 0.0, 1.0);
+	color_out = vec4(result, 0.0, 0.0, 1.0);
 }

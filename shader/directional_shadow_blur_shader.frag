@@ -1,10 +1,8 @@
-#version 130
+#version 330
 
 #define MAX_LAYERS 8
 
 #define GAUSSIAN_BLUR
-
-out vec4 tex_out[MAX_LAYERS]; 
 
 uniform sampler2DArray tex_uni;
 
@@ -13,6 +11,8 @@ uniform float blur_factors_uni[MAX_LAYERS];
 uniform int tex_layers_count_uni;
 
 in vec2 uv_coord_var;
+
+out vec4 tex_out[MAX_LAYERS];
 
 void main()
 {

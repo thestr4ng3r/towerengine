@@ -7,59 +7,58 @@
 class tMatrix3;
 class tTransform;
 
-class tVector
+struct tVector
 {
-	public:
-		union
+	union
+	{
+		float v[3];
+		struct
 		{
-			float v[3];
-			struct
-			{
-				float x;
-				float y;
-				float z;
-			};
-			struct
-			{
-				float r;
-				float g;
-				float b;
-			};
+			float x;
+			float y;
+			float z;
 		};
+		struct
+		{
+			float r;
+			float g;
+			float b;
+		};
+	};
 
-		tVector2 xy(void) { return Vec(x, y); };
-		tVector2 xz(void) { return Vec(x, z); };
-		tVector2 yx(void) { return Vec(y, x); };
-		tVector2 yz(void) { return Vec(y, z); };
-		tVector2 zx(void) { return Vec(z, x); };
-		tVector2 zy(void) { return Vec(z, y); };
+	tVector2 xy(void) { return Vec(x, y); };
+	tVector2 xz(void) { return Vec(x, z); };
+	tVector2 yx(void) { return Vec(y, x); };
+	tVector2 yz(void) { return Vec(y, z); };
+	tVector2 zx(void) { return Vec(z, x); };
+	tVector2 zy(void) { return Vec(z, y); };
 
-		void Set(float _x, float _y, float _z) { x = _x; y = _y; z = _z; }
-		float Len(void) const		{ return sqrt(x * x + y * y + z * z); }
-		float SquaredLen(void) const		{ return x * x + y * y + z * z; }
-		void Normalize(void)		{ float l; l = 1.0 / Len(); x *= l; y *= l; z *= l; }
-		//void PutToGL(void) const	{ glVertex3fv(v); }
-		//void NormalToGL(void) const	{ glNormal3fv(v); }
-		//void TexcoordToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE0, v); }
-		//void TangXToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE1, v); }
-		//void TangYToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE2, v); }
-		//void AttrToGL(int which) const             { glVertexAttrib3fv(which, v); }
-		void SetFromPlane(const tVector2 &p, const tVector &n, float d);
-		tVector operator -(void) const	{tVector r; r.x = -x, r.y = -y, r.z = -z; return r; }
-		operator tVector2() const	{tVector2 r; r.x = x; r.y = z; return r; }
+	void Set(float _x, float _y, float _z) { x = _x; y = _y; z = _z; }
+	float Len(void) const		{ return sqrt(x * x + y * y + z * z); }
+	float SquaredLen(void) const		{ return x * x + y * y + z * z; }
+	void Normalize(void)		{ float l; l = 1.0 / Len(); x *= l; y *= l; z *= l; }
+	//void PutToGL(void) const	{ glVertex3fv(v); }
+	//void NormalToGL(void) const	{ glNormal3fv(v); }
+	//void TexcoordToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE0, v); }
+	//void TangXToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE1, v); }
+	//void TangYToGL(void) const	{ glMultiTexCoord3fv(GL_TEXTURE2, v); }
+	//void AttrToGL(int which) const             { glVertexAttrib3fv(which, v); }
+	void SetFromPlane(const tVector2 &p, const tVector &n, float d);
+	tVector operator -(void) const	{tVector r; r.x = -x, r.y = -y, r.z = -z; return r; }
+	operator tVector2() const	{tVector2 r; r.x = x; r.y = z; return r; }
 
-		tVector &operator+=(const tVector o)	{ x += o.x; y += o.y; z += o.z; return *this; }
-		tVector &operator-=(const tVector o)	{ x -= o.x; y -= o.y; z -= o.z; return *this; }
-		tVector &operator*=(const tVector o)	{ x *= o.x; y *= o.y; z *= o.z; return *this; }
-		tVector &operator*=(float f)			{ x *= f; y *= f; z *= f; return *this; }
-		tVector &operator/=(float f)			{ x /= f; y /= f; z /= f; return *this; }
-		tVector &operator*=(tMatrix3 m);
-		tVector &operator*=(tTransform t);
-		#ifdef TMS_USE_LIB_3DS
-			tVector &operator=(Lib3dsVector o)      {x = o[0]; y = o[1]; z = o[2]; return *this;}
-		#endif
+	tVector &operator+=(const tVector o)	{ x += o.x; y += o.y; z += o.z; return *this; }
+	tVector &operator-=(const tVector o)	{ x -= o.x; y -= o.y; z -= o.z; return *this; }
+	tVector &operator*=(const tVector o)	{ x *= o.x; y *= o.y; z *= o.z; return *this; }
+	tVector &operator*=(float f)			{ x *= f; y *= f; z *= f; return *this; }
+	tVector &operator/=(float f)			{ x /= f; y /= f; z /= f; return *this; }
+	tVector &operator*=(tMatrix3 m);
+	tVector &operator*=(tTransform t);
+	#ifdef TMS_USE_LIB_3DS
+		tVector &operator=(Lib3dsVector o)      {x = o[0]; y = o[1]; z = o[2]; return *this;}
+	#endif
 
-		tVector &operator=(const btVector3 &a)	{ x = a.x(); y = a.y(); z = a.z(); return *this; }
+	tVector &operator=(const btVector3 &a)	{ x = a.x(); y = a.y(); z = a.z(); return *this; }
 };
 
 tVector Vec(float x, float y, float z);

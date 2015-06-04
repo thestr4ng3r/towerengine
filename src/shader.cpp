@@ -260,7 +260,7 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 	return textureID;
 }
 
-GLuint GLTextureFromColor(const tVector &color)
+/*GLuint GLTextureFromColor(const tVector &color)
 {
 	const int width = 64;
 	const int height = 64;
@@ -286,12 +286,12 @@ GLuint GLTextureFromColor(const tVector &color)
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//printf("Color (%d, %d, %d) successfully loaded [handle = %d, width = %d, height = %d] :)\n", r, g, b, handle, width, height);
 
 	return handle;
-}
+}*/
 
 

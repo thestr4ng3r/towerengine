@@ -1,4 +1,4 @@
-#version 130
+#version 330
 
 uniform mat4 modelview_projection_matrix_uni;
 

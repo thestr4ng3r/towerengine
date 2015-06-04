@@ -223,6 +223,8 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 
 	glDisable(GL_DEPTH_TEST);
 
+	// TODO: use tRenderer::RenderScreenQuad
+
 	glViewport(0, 0, size, size);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glClearColor(1.0, 1.0, 1.0, 1.0);

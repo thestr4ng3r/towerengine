@@ -1,11 +1,11 @@
-#version 130
+#version 330
 
 in vec3 pos_var;
 
 uniform vec3 light_pos_uni;
 uniform float light_dist_uni;
 
-out vec4 gl_FragColor;
+out vec4 color_out;
 
 void main(void)
 {
@@ -17,7 +17,7 @@ void main(void)
 	
 	dist = sqrt(dist);
 	
-	gl_FragColor = vec4(dist, dist*dist, 0.0, 1.0);
+	color_out = vec4(dist, dist*dist, 0.0, 1.0);
 }
 
 

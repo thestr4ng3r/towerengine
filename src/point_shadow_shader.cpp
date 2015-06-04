@@ -4,10 +4,7 @@
 
 void tPointShadowShader::Init(void)
 {
-	SetSource(point_shadow_shader_vert, point_shadow_shader_frag);
-	CreateVertexShader();
-	CreateFragmentShader();
-	CreateProgram();
+	InitShader(point_shadow_shader_vert, point_shadow_shader_frag, "Point Shadow Shader");
 	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, tFaceShader::vertex2_attribute, "vertex2_attr");
 	LinkProgram();
@@ -53,13 +50,12 @@ void tPointShadowShader::SetVertexMix(float m)
 
 void tPointShadowBlurShader::Init(void)
 {
-	SetSource(point_shadow_blur_shader_vert, point_shadow_blur_shader_frag);
-	CreateVertexShader();
-	CreateFragmentShader();
-	CreateProgram();
-	LinkProgram();
+	InitShader(point_shadow_blur_shader_vert, point_shadow_blur_shader_frag, "Point Shadow Blur Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
+
+	LinkProgram();
+
 
 	tex_uniform = GetUniformLocation("tex_uni");
 
@@ -79,3 +75,4 @@ void tPointShadowBlurShader::SetBlurDir(tVector v)
 {
 	glUniform3f(blur_dir_uniform, v.x, v.y, v.z);
 }
+

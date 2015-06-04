@@ -33,51 +33,6 @@ char *cstr(const char *str)
 	return r;
 }
 
-void SetColor(GLenum which, float r, float g, float b)
-{
-	float c[4];
-
-	c[0] = r;
-	c[1] = g;
-	c[2] = b;
-	c[3] = 0.0;
-	glColor3f(r, g, b);
-	glMaterialfv(GL_FRONT_AND_BACK, which, c);
-}
-
-void PaintAxes(void)
-{
-	glDisable(GL_LIGHTING);
-
-	glLineWidth(3);
-
-	SetColor(GL_DIFFUSE, 1.0, 1.0, 0.0);
-	glBegin(GL_LINES);
-	glVertex3f(0.0, -1.0, 0.0);
-	glVertex3f(0.0, 1.0, 0.0);
-	glEnd();
-
-	SetColor(GL_DIFFUSE, 1.0, 0.0, 0.0);
-	glBegin(GL_LINES);
-	glVertex3f(-1.0, 0.0, 0.0);
-	glVertex3f(1.0, 0.0, 0.0);
-	glEnd();
-
-	SetColor(GL_DIFFUSE, 0.0, 0.0, 1.0);
-	glBegin(GL_LINES);
-	glVertex3f(0.0, 0.0, -1.0);
-	glVertex3f(0.0, 0.0, 1.0);
-	glEnd();
-
-	SetColor(GL_DIFFUSE, 1.0, 0.0, 0.0);
-	glBegin(GL_POINTS);
-	glVertex3f(1.0, 0.0, 0.0);
-	glVertex3f(0.0, 1.0, 0.0);
-	glVertex3f(0.0, 0.0, 1.0);
-	glEnd();
-}
-
-
 string PathOfFile(string file)
 {
     int i;
