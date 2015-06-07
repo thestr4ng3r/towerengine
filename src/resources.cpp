@@ -1060,3 +1060,41 @@ const char *fog_shader_frag =
 "	color_out = vec4(color, src_color.a);\n"
 "}";
 
+const char *_2d_sprite_shader_vert = 
+"#version 330\n"
+"\n"
+"uniform int screen_size_uni[2];\n"
+"\n"
+"uniform int sprite_coords_uni[4];\n"
+"\n"
+"in vec2 vertex_attr;\n"
+"\n"
+"out vec2 uv_var;\n"
+"\n"
+"void main(void)\n"
+"{\n"
+"	vec2 pos = vec2(sprite_coords_uni[0], sprite_coords_uni[1]);\n"
+"	pos += vertex_attr * vec2(sprite_coords_uni[2], sprite_coords_uni[3]);\n"
+"	pos /= vec2(screen_size_uni[0], screen_size_uni[1]);\n"
+"	pos = pos * 2.0 - 1.0;\n"
+"	pos.y *= -1.0;\n"
+"	\n"
+"	uv_var = vec2(vertex_attr.x, 1.0 - vertex_attr.y);\n"
+"	\n"
+"	gl_Position = vec4(pos, 0.0, 1.0);\n"
+"}";
+
+const char *_2d_sprite_shader_frag = 
+"#version 330\n"
+"\n"
+"uniform sampler2D tex_uni;\n"
+"\n"
+"in vec2 uv_var;\n"
+"\n"
+"out vec4 color_out;\n"
+"\n"
+"void main(void)\n"
+"{\n"
+"	color_out = texture(tex_uni, uv_var);\n"
+"}";
+

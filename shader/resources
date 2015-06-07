@@ -21,3 +21,5 @@ ssao_blur_shader_frag: shader/ssao_blur_shader.frag
 color_shader_vert: shader/color_shader.vert
 color_shader_frag: shader/color_shader.frag
 fog_shader_frag: shader/fog_shader.frag
+_2d_sprite_shader_vert: shader/2d_sprite_shader.vert
+_2d_sprite_shader_frag: shader/2d_sprite_shader.frag

@@ -64,7 +64,9 @@ set(towerengine_SRC
 	src/cube_map_reflection.cpp
 	src/material_manager.cpp
 	src/matrix3.cpp
-	src/matrix4.cpp)
+	src/matrix4.cpp
+	src/2d_renderer.cpp
+	src/2d_sprite_shader.cpp)
 
 add_definitions(-g -Wall)
 

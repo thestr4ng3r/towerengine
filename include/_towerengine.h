@@ -17,6 +17,7 @@ class tPointLightShadow;
 class tDirectionalLight;
 class tDirectionalLightShadow;
 class tRenderer;
+class t2DRenderer;
 
 #include "vector2.h"
 #include "vector.h"
@@ -29,6 +30,7 @@ class tRenderer;
 #include "shader.h"
 #include "face_shader.h"
 #include "geometry_pass_shader.h"
+#include "2d_sprite_shader.h"
 #include "gbuffer.h"
 #include "comparable.h"
 
@@ -77,5 +79,6 @@ class tRenderer;
 #include "scene.h"
 #include "ssao.h"
 #include "renderer.h"
+#include "2d_renderer.h"
 
 #endif
