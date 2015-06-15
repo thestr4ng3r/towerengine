@@ -22,6 +22,9 @@ out vec2 uv_var;
 
 out vec3 cam_dir_var;
 
+out vec3 reflection_center_var;
+out float reflection_radius_var;
+
 
 void main(void)
 {
@@ -30,11 +33,14 @@ void main(void)
 		vertex_pos = vertex_pos * (1.0 - vertex_mix_uni) + vertex2_attr * vertex_mix_uni;
 	vec4 pos = vec4(vertex_pos, 1.0) * transformation_uni;
 	pos_var = pos.xyz;
-	normal_var = normalize(normal_attr * mat3(transformation_uni));
+	normal_var = normalize(normal_attr * mat3(transformation_uni)); // TODO: correct transformation of normals
 	tang_var = normalize(tang_attr * mat3(transformation_uni));
 	bitang_var = normalize(bitang_attr * mat3(transformation_uni));
 	uv_var = uv_attr;
 	cam_dir_var = cam_pos_uni - pos.xyz;
+	
+	reflection_center_var = (vec4(0.0, 0.0, 0.0, 1.0) * transformation_uni).xyz;
+	reflection_radius_var = 1.0;
 	
 	gl_Position = modelview_projection_matrix_uni * pos;
 }

@@ -126,7 +126,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 	light_up = Cross(light_right, light_dir);
 	light_up.Normalize();
 
-	float modelview[16], projection[16];
+	//float modelview[16], projection[16];
 
 	glEnable(GL_DEPTH_TEST);
 

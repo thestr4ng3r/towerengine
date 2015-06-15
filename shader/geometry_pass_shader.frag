@@ -35,6 +35,8 @@ in vec2 uv_var;
 
 in vec3 cam_dir_var;
 
+in vec3 reflection_center_var;
+in float reflection_radius_var;
 
 layout (location = 0) out vec4 position_out;
 layout (location = 1) out vec4 diffuse_out;
@@ -117,6 +119,7 @@ void main(void)
 	if(cube_map_reflection_enabled_uni)
 	{
 		vec3 cam_reflected = reflect(-cam_dir_var, normal);
+		cam_reflected += (pos_var - reflection_center_var) / reflection_radius_var;
 		self_illumination += texture(cube_map_reflection_tex_uni, cam_reflected).rgb * cube_map_reflection_color_uni;
 	}
 		
