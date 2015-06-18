@@ -43,6 +43,8 @@ tCubeMapReflection::tCubeMapReflection(tRenderer *renderer, int resolution, tVec
 	// TODO: near/far clip other than default
 
 	render_space = new tRenderSpace();
+
+	invalid = true;
 }
 
 tCubeMapReflection::~tCubeMapReflection(void)
@@ -80,6 +82,8 @@ void tCubeMapReflection::Render(void)
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, color_tex);
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+	invalid = false;
 }
 
 void tCubeMapReflection::GeometryPass(int side, tWorld *world)

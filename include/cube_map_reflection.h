@@ -20,6 +20,8 @@ class tCubeMapReflection
 		tCamera *camera;
 		tRenderSpace *render_space;
 
+		bool invalid;
+
 		void GeometryPass(int side, tWorld *world);
 		void LightPass(int side, tWorld *world);
 
@@ -29,8 +31,12 @@ class tCubeMapReflection
 
 		void Render(void);
 
+		void Invalidate(void)			{ invalid = true; }
+
 		tVector GetPosition(void)		{ return position; }
 		GLuint GetCubeMapTexture(void)	{ return color_tex; }
+
+		bool GetInvalid(void)			{ return invalid; }
 };
 
 

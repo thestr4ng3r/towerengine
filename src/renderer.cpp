@@ -199,7 +199,10 @@ void tRenderer::Render(GLuint dst_fbo, int width, int height)
 	RenderShadowMaps();
 
 	if(cube_map_reflection)
-		cube_map_reflection->Render();
+	{
+		if(cube_map_reflection->GetInvalid())
+			cube_map_reflection->Render();
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 

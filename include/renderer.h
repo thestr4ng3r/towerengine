@@ -107,6 +107,8 @@ class tRenderer
 
 		GLuint GetDepthTexture(void)		{ return depth_tex; }
 
+		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
+
 		void SetPointLightShadowRenderLimit(int limit)	{ this->point_light_shadow_limit = limit; }
 };
 
