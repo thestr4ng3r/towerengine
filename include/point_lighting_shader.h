@@ -6,6 +6,8 @@
 class tPointLightingShader : public tScreenShader
 {
 	private:
+		int lights_count;
+
 		GLint cam_pos_uniform;
 
 		GLint point_light_pos_uniform;
@@ -19,13 +21,27 @@ class tPointLightingShader : public tScreenShader
 		GLint normal_tex_uniform;
 		GLint specular_tex_uniform;
 
-		int point_light_shadow_tex_unit;
+		int *point_light_shadow_tex_unit;
 
 	public:
+		tPointLightingShader(int lights_count);
+		~tPointLightingShader(void);
+
 		void Init(tGBuffer *gbuffer);
 
-		void SetPointLight(tVector pos, tVector color, float dist, int shadow_enabled, GLuint shadow_map);
+		/**
+		 * set all point light uniforms
+		 * @param pos length must be 3 * lights_count
+		 * @param color length must be 3 * lights_count
+		 * @param dist length must be lights_count
+		 * @param shadow_enabled length must be lights_count
+		 * @param shadow_map length must be lights_count
+		*/
+		void SetPointLights(float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_map);
+
 		void SetCameraPosition(tVector pos);
+
+		int GetLightsCount(void)	{ return lights_count; }
 
 };
 

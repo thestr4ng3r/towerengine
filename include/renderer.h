@@ -9,7 +9,7 @@ class tRenderer
 		tGeometryPassShader *geometry_pass_shader;
 		tAmbientLightingShader *ambient_lighting_shader;
 		tDirectionalLightingShader *directional_lighting_shader;
-		tPointLightingShader *point_lighting_shader;
+		std::vector<tPointLightingShader *> point_lighting_shaders;
 		tSSAOLightingShader *ssao_lighting_shader;
 
 		tSkyBoxShader *skybox_shader;
@@ -85,7 +85,7 @@ class tRenderer
 		tGeometryPassShader *GetGeometryPassShader(void)					{ return geometry_pass_shader; }
 		tAmbientLightingShader *GetAmbientLightingShader(void)				{ return ambient_lighting_shader; }
 		tDirectionalLightingShader *GetDirectionalLightingShader(void)		{ return directional_lighting_shader; }
-		tPointLightingShader *GetPointLightingShader(void)					{ return point_lighting_shader; }
+		//tPointLightingShader *GetPointLightingShader(void)					{ return point_lighting_shader; }
 		tPointShadowShader *GetPointShadowShader(void)						{ return point_shadow_shader; }
 		tPointShadowBlurShader *GetPointShadowBlurShader(void)				{ return point_shadow_blur_shader; }
 		tDirectionalShadowShader *GetDirectionalShadowShader(void)			{ return directional_shadow_shader; }

@@ -37,15 +37,16 @@ void tPointLight::RenderShadow(tRenderer *renderer)
 	shadow_invalid = false;
 }
 
-void tPointLight::InitRenderLighting(tPointLightingShader *shader)
+/*void tPointLight::InitRenderLighting(tPointLightingShader *shader)
 {
 	GLuint shadow_map = 0;
 
 	if(shadow_enabled)
 		shadow_map = shadow->GetShadowMap();
 
-	shader->SetPointLight(pos, color, distance, shadow_enabled ? 1 : 0, shadow_map);
-}
+	int se = shadow_enabled ? 1 : 0;
+	shader->SetPointLights(&pos, &color, &distance, &se, &shadow_map);
+}*/
 
 bool tPointLight::TestPointCulling(tVector point)
 {

@@ -163,7 +163,7 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 	}
 
 
-	renderer->GetPointLightingShader()->Bind();
+	/*renderer->GetPointLightingShader()->Bind();
 	renderer->GetPointLightingShader()->SetCameraPosition(camera->GetPosition());
 
 	set<tPointLight *>::iterator point_light_it;
@@ -174,7 +174,7 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 			continue;
 		light->InitRenderLighting(renderer->GetPointLightingShader());
 		renderer->RenderScreenQuad();
-	}
+	}*/
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

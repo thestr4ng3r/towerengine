@@ -22,8 +22,19 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	directional_lighting_shader = new tDirectionalLightingShader();
 	directional_lighting_shader->Init(gbuffer);
 
-	point_lighting_shader = new tPointLightingShader();
-	point_lighting_shader->Init(gbuffer);
+	// VERY IMPORTANT:	these shaders must be ordered descending by lights_count.
+	//					also, there has to be one shader with a lights_count of 1
+	point_lighting_shaders.push_back(new tPointLightingShader(8));
+	point_lighting_shaders.push_back(new tPointLightingShader(7));
+	point_lighting_shaders.push_back(new tPointLightingShader(6));
+	point_lighting_shaders.push_back(new tPointLightingShader(5));
+	point_lighting_shaders.push_back(new tPointLightingShader(4));
+	point_lighting_shaders.push_back(new tPointLightingShader(3));
+	point_lighting_shaders.push_back(new tPointLightingShader(2));
+	point_lighting_shaders.push_back(new tPointLightingShader(1));
+
+	for(vector<tPointLightingShader *>::iterator psi=point_lighting_shaders.begin(); psi!=point_lighting_shaders.end(); psi++)
+		(*psi)->Init(gbuffer);
 
 	ambient_lighting_shader = new tAmbientLightingShader();
 	ambient_lighting_shader->Init(gbuffer);
@@ -124,7 +135,10 @@ tRenderer::~tRenderer(void)
 	delete geometry_pass_shader;
 	delete ambient_lighting_shader;
 	delete directional_lighting_shader;
-	delete point_lighting_shader;
+
+	for(vector<tPointLightingShader *>::iterator psi=point_lighting_shaders.begin(); psi!=point_lighting_shaders.end(); psi++)
+		delete *psi;
+
 	delete ssao_lighting_shader;
 	delete ssao_shader;
 
@@ -390,6 +404,7 @@ void tRenderer::LightPass(void)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 
+	// directional lights
 	directional_lighting_shader->Bind();
 	directional_lighting_shader->SetCameraPosition(camera->GetPosition());
 
@@ -401,7 +416,74 @@ void tRenderer::LightPass(void)
 	}
 
 
-	point_lighting_shader->Bind();
+	// point lights
+	vector<tPointLight *> point_lights;
+
+	set<tPointLight *>::iterator point_light_sit;
+	for(point_light_sit=camera_render_space->point_lights.begin(); point_light_sit!=camera_render_space->point_lights.end(); point_light_sit++)
+	{
+		tPointLight *light = *point_light_sit;
+		if(!light->GetEnabled())
+			continue;
+		point_lights.push_back(light);
+	}
+
+	int point_lights_count = point_lights.size();
+	float point_lights_pos[point_lights_count*3];
+	float point_lights_color[point_lights_count*3];
+	float point_lights_dist[point_lights_count];
+	int point_lights_shadow_enabled[point_lights_count];
+	GLuint point_lights_shadow_maps[point_lights_count];
+
+	vector<tPointLight *>::iterator point_light_it;
+	int point_light_i = 0;
+	for(point_light_it=point_lights.begin(); point_light_it!=point_lights.end(); point_light_it++, point_light_i++)
+	{
+		tPointLight *light = *point_light_it;
+		memcpy(point_lights_pos + 3*point_light_i, light->GetPosition().v, sizeof(float)*3);
+		memcpy(point_lights_color + 3*point_light_i, light->GetColor().v, sizeof(float)*3);
+		point_lights_dist[point_light_i] = light->GetDistance();
+
+		if(light->GetShadowEnabled())
+		{
+			point_lights_shadow_enabled[point_light_i] = 1;
+			point_lights_shadow_maps[point_light_i] = light->GetShadow()->GetShadowMap();
+		}
+		else
+		{
+			point_lights_shadow_enabled[point_light_i] = 0;
+			point_lights_shadow_maps[point_light_i] = 0;
+		}
+	}
+
+	int point_lights_rendered = 0;
+	int shader_passes;
+	for(vector<tPointLightingShader *>::iterator shader_i=point_lighting_shaders.begin(); shader_i!=point_lighting_shaders.end(); shader_i++)
+	{
+		tPointLightingShader *shader = *shader_i;
+
+		if(shader->GetLightsCount() > point_lights_count - point_lights_rendered)
+			continue;
+
+		shader_passes = (point_lights_count - point_lights_rendered) / shader->GetLightsCount();
+
+		shader->Bind();
+		shader->SetCameraPosition(camera->GetPosition());
+
+		for(int pass=0; pass<shader_passes; pass++)
+		{
+			shader->SetPointLights(	point_lights_pos + 3*point_lights_rendered,
+									point_lights_color + 3*point_lights_rendered,
+									point_lights_dist + point_lights_rendered,
+									point_lights_shadow_enabled + point_lights_rendered,
+									point_lights_shadow_maps + point_lights_rendered);
+			RenderScreenQuad();
+
+			point_lights_rendered += shader->GetLightsCount();
+		}
+	}
+
+	/*point_lighting_shader->Bind();
 	point_lighting_shader->SetCameraPosition(camera->GetPosition());
 
 	set<tPointLight *>::iterator point_light_it;
@@ -412,7 +494,7 @@ void tRenderer::LightPass(void)
 			continue;
 		light->InitRenderLighting(point_lighting_shader);
 		RenderScreenQuad();
-	}
+	}*/
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
