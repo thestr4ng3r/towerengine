@@ -49,7 +49,7 @@ void main(void)
 	float light_intensity;
 	vec3 specular_color;
 	float specular_intensity;
-	vec3 color;
+	vec3 color = vec3(0.0, 0.0, 0.0);
 	
 	$(for i from 0 ex param LIGHTS_COUNT)
 		shadow = 1.0;
@@ -82,6 +82,7 @@ void main(void)
 			}
 			else
 				shadow = 1.0;
+		
 		
 			light_dist_attenuation = (1.0 - light_dist / point_light_distance_uni[$(var i)]);
 			light_intensity = max(dot(normal, light_dir), 0.0) *  light_dist_attenuation;
