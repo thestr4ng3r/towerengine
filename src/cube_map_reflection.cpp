@@ -152,6 +152,8 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 
+
+	// directional lights
 	renderer->GetDirectionalLightingShader()->Bind();
 	renderer->GetDirectionalLightingShader()->SetCameraPosition(camera->GetPosition());
 
@@ -163,18 +165,75 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 	}
 
 
-	/*renderer->GetPointLightingShader()->Bind();
-	renderer->GetPointLightingShader()->SetCameraPosition(camera->GetPosition());
 
-	set<tPointLight *>::iterator point_light_it;
-	for(point_light_it=render_space->point_lights.begin(); point_light_it!=render_space->point_lights.end(); point_light_it++)
+
+
+	// point lights
+	vector<tPointLight *> point_lights;
+
+	set<tPointLight *>::iterator point_light_sit;
+	for(point_light_sit=render_space->point_lights.begin(); point_light_sit!=render_space->point_lights.end(); point_light_sit++)
 	{
-		tPointLight *light = *point_light_it;
+		tPointLight *light = *point_light_sit;
 		if(!light->GetEnabled())
 			continue;
-		light->InitRenderLighting(renderer->GetPointLightingShader());
-		renderer->RenderScreenQuad();
-	}*/
+		point_lights.push_back(light);
+	}
+
+	int point_lights_count = point_lights.size();
+	float point_lights_pos[point_lights_count*3];
+	float point_lights_color[point_lights_count*3];
+	float point_lights_dist[point_lights_count];
+	int point_lights_shadow_enabled[point_lights_count];
+	GLuint point_lights_shadow_maps[point_lights_count];
+
+	vector<tPointLight *>::iterator point_light_it;
+	int point_light_i = 0;
+	for(point_light_it=point_lights.begin(); point_light_it!=point_lights.end(); point_light_it++, point_light_i++)
+	{
+		tPointLight *light = *point_light_it;
+		memcpy(point_lights_pos + 3*point_light_i, light->GetPosition().v, sizeof(float)*3);
+		memcpy(point_lights_color + 3*point_light_i, light->GetColor().v, sizeof(float)*3);
+		point_lights_dist[point_light_i] = light->GetDistance();
+
+		if(light->GetShadowEnabled())
+		{
+			point_lights_shadow_enabled[point_light_i] = 1;
+			point_lights_shadow_maps[point_light_i] = light->GetShadow()->GetShadowMap();
+		}
+		else
+		{
+			point_lights_shadow_enabled[point_light_i] = 0;
+			point_lights_shadow_maps[point_light_i] = 0;
+		}
+	}
+
+	int point_lights_rendered = 0;
+	int shader_passes;
+	for(vector<tPointLightingShader *>::iterator shader_i=renderer->GetPointLightingShadersBegin(); shader_i!=renderer->GetPointLightingShadersEnd(); shader_i++)
+	{
+		tPointLightingShader *shader = *shader_i;
+
+		if(shader->GetLightsCount() > point_lights_count - point_lights_rendered)
+			continue;
+
+		shader_passes = (point_lights_count - point_lights_rendered) / shader->GetLightsCount();
+
+		shader->Bind();
+		shader->SetCameraPosition(camera->GetPosition());
+
+		for(int pass=0; pass<shader_passes; pass++)
+		{
+			shader->SetPointLights(	point_lights_pos + 3*point_lights_rendered,
+									point_lights_color + 3*point_lights_rendered,
+									point_lights_dist + point_lights_rendered,
+									point_lights_shadow_enabled + point_lights_rendered,
+									point_lights_shadow_maps + point_lights_rendered);
+			renderer->RenderScreenQuad();
+
+			point_lights_rendered += shader->GetLightsCount();
+		}
+	}
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

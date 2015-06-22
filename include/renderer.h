@@ -86,6 +86,8 @@ class tRenderer
 		tAmbientLightingShader *GetAmbientLightingShader(void)				{ return ambient_lighting_shader; }
 		tDirectionalLightingShader *GetDirectionalLightingShader(void)		{ return directional_lighting_shader; }
 		//tPointLightingShader *GetPointLightingShader(void)					{ return point_lighting_shader; }
+		std::vector<tPointLightingShader *>::iterator GetPointLightingShadersBegin(void)	{ return point_lighting_shaders.begin(); }
+		std::vector<tPointLightingShader *>::iterator GetPointLightingShadersEnd(void)		{ return point_lighting_shaders.end(); }
 		tPointShadowShader *GetPointShadowShader(void)						{ return point_shadow_shader; }
 		tPointShadowBlurShader *GetPointShadowBlurShader(void)				{ return point_shadow_blur_shader; }
 		tDirectionalShadowShader *GetDirectionalShadowShader(void)			{ return directional_shadow_shader; }
