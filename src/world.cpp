@@ -21,11 +21,11 @@ tWorld::tWorld(void)
 
 tWorld::~tWorld(void)
 {
-	delete physics.broadphase;
-	delete physics.collision_configuration;
-	delete physics.collision_dispatcher;
-	delete physics.solver;
 	delete physics.dynamics_world;
+	delete physics.solver;
+	delete physics.collision_dispatcher;
+	delete physics.collision_configuration;
+	delete physics.broadphase;
 }
 
 void tWorld::AddObject(tObject *o)

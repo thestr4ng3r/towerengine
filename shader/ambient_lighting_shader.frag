@@ -12,12 +12,14 @@ out vec4 color_out;
 
 void main(void)
 {
-	vec4 diffuse = texture(diffuse_tex_uni, uv_coord_var).rgba;
+	ivec2 texel_uv = ivec2(uv_coord_var * textureSize(diffuse_tex_uni, 0).xy);
+
+	vec4 diffuse = texelFetch(diffuse_tex_uni, texel_uv, 0).rgba;
 
 	if(diffuse.a == 0.0)
 		discard;
 		
-	vec3 self_illumination = texture(self_illumination_tex_uni, uv_coord_var).rgb;
+	vec3 self_illumination = texelFetch(self_illumination_tex_uni, texel_uv, 0).rgb;
 		
 	vec3 color = light_ambient_color_uni * diffuse.rgb + self_illumination;
 	

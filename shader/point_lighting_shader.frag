@@ -30,14 +30,16 @@ float linstep(float min, float max, float v)
 
 void main(void)
 {
-	vec4 diffuse = texture(diffuse_tex_uni, uv_coord_var).rgba;
+	ivec2 texel_uv = ivec2(uv_coord_var * textureSize(diffuse_tex_uni, 0).xy);
+	
+	vec4 diffuse = texelFetch(diffuse_tex_uni, texel_uv, 0).rgba;
 
 	if(diffuse.a == 0.0)
 		discard;
 		
-	vec3 position = texture(position_tex_uni, uv_coord_var).rgb; 	
-	vec3 normal = normalize(texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
-	vec4 specular = texture(specular_tex_uni, uv_coord_var).rgba;
+	vec3 position = texelFetch(position_tex_uni, texel_uv, 0).rgb; 	
+	vec3 normal = normalize(texelFetch(normal_tex_uni, texel_uv, 0).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
+	vec4 specular = texelFetch(specular_tex_uni, texel_uv, 0).rgba;
 	
 	vec3 cam_dir = normalize(cam_pos_uni - position.xyz);
 	
