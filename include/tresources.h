@@ -12,6 +12,7 @@ extern const char *screen_shader_vert;
 extern const char *directional_lighting_shader_frag;
 extern const char *point_lighting_shader_frag;
 extern const char *ambient_lighting_shader_frag;
+extern const char *ssao_ambient_lighting_shader_frag;
 extern const char *ssao_lighting_shader_frag;
 extern const char *cube_env_shader_vert;
 extern const char *cube_env_shader_frag;

@@ -4,6 +4,7 @@ screen_shader_vert: shader/screen_shader.vert
 directional_lighting_shader_frag: shader/directional_lighting_shader.frag
 point_lighting_shader_frag: shader/point_lighting_shader.frag
 ambient_lighting_shader_frag: shader/ambient_lighting_shader.frag
+ssao_ambient_lighting_shader_frag: shader/ssao_ambient_lighting_shader.frag
 ssao_lighting_shader_frag: shader/ssao_lighting_shader.frag
 cube_env_shader_vert: shader/skybox_shader.vert
 cube_env_shader_frag: shader/skybox_shader.frag

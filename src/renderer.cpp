@@ -63,8 +63,10 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	this->world = world;
 
 	ssao = 0;
+	ssao_ambient_lighting_shader = 0;
 	ssao_lighting_shader = 0;
 	ssao_shader = 0;
+	ssao_ambient_only = false;
 
 	fog_shader = 0;
 	fog_enabled = false;
@@ -142,6 +144,7 @@ tRenderer::~tRenderer(void)
 		delete *psi;
 
 	delete ssao_lighting_shader;
+	delete ssao_ambient_lighting_shader;
 	delete ssao_shader;
 
 	delete skybox_shader;
@@ -159,12 +162,25 @@ tRenderer::~tRenderer(void)
 	delete cube_map_reflection;
 }
 
-void tRenderer::InitSSAO(int kernel_size, float radius, int noise_tex_size)
+void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int noise_tex_size)
 {
-	if(!ssao_lighting_shader)
+	ssao_ambient_only = ambient_only;
+
+	if(ssao_ambient_only)
 	{
-		ssao_lighting_shader = new tSSAOLightingShader();
-		ssao_lighting_shader->Init(gbuffer);
+		if(!ssao_ambient_lighting_shader)
+		{
+			ssao_ambient_lighting_shader = new tSSAOAmbientLightingShader();
+			ssao_ambient_lighting_shader->Init(gbuffer);
+		}
+	}
+	else
+	{
+		if(!ssao_lighting_shader)
+		{
+			ssao_lighting_shader = new tSSAOLightingShader();
+			ssao_lighting_shader->Init(gbuffer);
+		}
 	}
 
 	if(!ssao_shader)
@@ -389,11 +405,11 @@ void tRenderer::LightPass(void)
 
 	gbuffer->BindTextures();
 
-	if(ssao)
+	if(ssao && ssao_ambient_only)
 	{
-		ssao_lighting_shader->Bind();
-		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
-		ssao_lighting_shader->SetAmbientLight(world->GetAmbientColor());
+		ssao_ambient_lighting_shader->Bind();
+		ssao_ambient_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
+		ssao_ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
 	}
 	else
 	{
@@ -485,6 +501,16 @@ void tRenderer::LightPass(void)
 		}
 	}
 
+	if(ssao && !ssao_ambient_only)
+	{
+		glBlendFunc(GL_DST_COLOR, GL_ZERO);
+
+		ssao_lighting_shader->Bind();
+		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
+
+		RenderScreenQuad();
+	}
+
 	/*point_lighting_shader->Bind();
 	point_lighting_shader->SetCameraPosition(camera->GetPosition());
 
@@ -503,14 +529,6 @@ void tRenderer::LightPass(void)
 
 void tRenderer::ForwardPass(void)
 {
-	/*glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	camera->GetModelViewMatrix().GLMultMatrix();
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	camera->GetProjectionMatrix().GLMultMatrix();*/
-
 	camera_render_space->ForwardPass(this);
 }
 

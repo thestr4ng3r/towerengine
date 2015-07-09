@@ -32,7 +32,7 @@ tSSAO::tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_s
 			scale = Mix(0.1, 1.0, scale * scale);
 			v *= scale;
 
-			if(v.z > 0.04)
+			if(v.z > 0.05)
 				break;
 		}
 

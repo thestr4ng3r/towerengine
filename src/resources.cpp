@@ -523,7 +523,7 @@ const char *ambient_lighting_shader_frag =
 "	color_out = vec4(color, 1.0);\n"
 "}";
 
-const char *ssao_lighting_shader_frag = 
+const char *ssao_ambient_lighting_shader_frag = 
 "#version 330\n"
 "\n"
 "uniform vec3 light_ambient_color_uni;\n"
@@ -549,6 +549,22 @@ const char *ssao_lighting_shader_frag =
 "	vec3 color = light_ambient_color_uni * diffuse.rgb * occlusion + self_illumination;\n"
 "	\n"
 "	color_out = vec4(color, 1.0);\n"
+"}";
+
+const char *ssao_lighting_shader_frag = 
+"#version 330\n"
+"\n"
+"uniform sampler2D ssao_tex_uni;\n"
+"\n"
+"in vec2 uv_coord_var;\n"
+"\n"
+"out vec4 color_out;\n"
+"\n"
+"void main(void)\n"
+"{\n"
+"	float occlusion = texture(ssao_tex_uni, uv_coord_var).r;\n"
+"	\n"
+"	color_out = vec4(vec3(1.0) * occlusion, 1.0);\n"
 "}";
 
 const char *cube_env_shader_vert = 

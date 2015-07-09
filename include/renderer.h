@@ -8,6 +8,7 @@ class tRenderer
 	private:
 		tGeometryPassShader *geometry_pass_shader;
 		tAmbientLightingShader *ambient_lighting_shader;
+		tSSAOAmbientLightingShader *ssao_ambient_lighting_shader;
 		tDirectionalLightingShader *directional_lighting_shader;
 		std::vector<tPointLightingShader *> point_lighting_shaders;
 		tSSAOLightingShader *ssao_lighting_shader;
@@ -44,6 +45,7 @@ class tRenderer
 		bool fxaa_enabled;
 
 		tSSAO *ssao;
+		bool ssao_ambient_only;
 
 		int point_light_shadow_limit;
 
@@ -68,7 +70,7 @@ class tRenderer
 
 		void SetWorld(tWorld *world)	{ this->world = world; }
 
-		void InitSSAO(int kernel_size, float radius, int noise_tex_size = 4);
+		void InitSSAO(bool ambient_only, int kernel_size, float radius, int noise_tex_size = 4);
 		void SetFXAAEnabled(bool enabled)	{ fxaa_enabled = enabled; }
 
 		void SetFog(bool enabled, float start_dist = 0.0, float end_dist = 100.0, float exp = 1.0, tVector color = Vec(0.0, 0.0, 0.0));
