@@ -1140,3 +1140,28 @@ const char *_2d_sprite_shader_frag =
 "	color_out = texture(tex_uni, uv_var);\n"
 "}";
 
+const char *particle_shader_vert = 
+"#version 330\n"
+"\n"
+"in vec3 vertex_attr;\n"
+"\n"
+"uniform mat4 modelview_projection_matrix_uni;\n"
+"\n"
+"void main(void)\n"
+"{	\n"
+"	gl_PointSize = 8.0;\n"
+"	gl_Position = modelview_projection_matrix_uni * vec4(vertex_attr, 1.0);\n"
+"}";
+
+const char *particle_shader_frag = 
+"#version 330\n"
+"\n"
+"uniform vec4 color_uni;\n"
+"\n"
+"out vec4 color_out;\n"
+"\n"
+"void main(void)\n"
+"{\n"
+"	color_out = color_uni;\n"
+"}";
+

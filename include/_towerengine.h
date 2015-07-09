@@ -49,6 +49,8 @@ class t2DRenderer;
 #include "ssao_shader.h"
 #include "ssao_blur_shader.h"
 #include "color_shader.h"
+#include "particle_shader.h"
+
 #include "skybox.h"
 #include "vertex.h"
 #include "triangle.h"
@@ -67,6 +69,8 @@ class t2DRenderer;
 #include "heightmap.h"
 #include "terrain.h"
 #include "terrainobject.h"
+#include "particle.h"
+
 #include "culling.h"
 #include "camera.h"
 #include "point_light.h"

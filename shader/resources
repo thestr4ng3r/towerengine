@@ -24,3 +24,5 @@ color_shader_frag: shader/color_shader.frag
 fog_shader_frag: shader/fog_shader.frag
 _2d_sprite_shader_vert: shader/2d_sprite_shader.vert
 _2d_sprite_shader_frag: shader/2d_sprite_shader.frag
+particle_shader_vert: shader/particle_shader.vert
+particle_shader_frag: shader/particle_shader.frag

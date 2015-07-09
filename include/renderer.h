@@ -21,6 +21,8 @@ class tRenderer
 		tColorShader *color_shader;
 		tPostProcessShader *post_process_shader;
 
+		tParticleShader *particle_shader;
+
 		tSSAOShader *ssao_shader;
 
 		tFogShader *fog_shader;
@@ -97,6 +99,7 @@ class tRenderer
 		tSkyBoxShader *GetSkyBoxShader(void)								{ return skybox_shader; }
 		tColorShader *GetColorShader(void)									{ return color_shader; }
 		tSSAOShader *GetSSAOShader(void)									{ return ssao_shader; }
+		tParticleShader *GetParticleShader(void)							{ return particle_shader; }
 
 		int GetScreenWidth(void)	{ return screen_width; }
 		int GetScreenHeight(void)	{ return screen_height; }

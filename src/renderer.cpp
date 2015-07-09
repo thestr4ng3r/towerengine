@@ -60,6 +60,9 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	post_process_shader = new tPostProcessShader();
 	post_process_shader->Init();
 
+	particle_shader = new tParticleShader();
+	particle_shader->Init();
+
 	this->world = world;
 
 	ssao = 0;
@@ -155,6 +158,8 @@ tRenderer::~tRenderer(void)
 	delete color_shader;
 	delete post_process_shader;
 	delete fog_shader;
+
+	delete particle_shader;
 
 	delete camera;
 	delete camera_render_space;
@@ -359,14 +364,6 @@ void tRenderer::GeometryPass(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, screen_width, screen_height);
 
-	/*glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	camera->GetModelViewMatrix().GLMultMatrix();
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	camera->GetProjectionMatrix().GLMultMatrix();*/
-
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
@@ -530,6 +527,22 @@ void tRenderer::LightPass(void)
 void tRenderer::ForwardPass(void)
 {
 	camera_render_space->ForwardPass(this);
+
+	if(world->GetParticleSystemsCount() > 0)
+	{
+		glEnable(GL_DEPTH_TEST);
+
+		glEnable(GL_PROGRAM_POINT_SIZE);
+
+		particle_shader->Bind();
+		particle_shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
+
+		for(int i=0; i<world->GetParticleSystemsCount(); i++)
+		{
+			tParticleSystem *ps = world->GetParticleSystem(i);
+			ps->Render(this);
+		}
+	}
 }
 
 

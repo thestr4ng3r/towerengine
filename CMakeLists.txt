@@ -68,7 +68,9 @@ set(towerengine_SRC
 	src/matrix4.cpp
 	src/2d_renderer.cpp
 	src/2d_sprite_shader.cpp
-	src/shader_source.cpp)
+	src/shader_source.cpp
+	src/particle.cpp
+	src/particle_shader.cpp)
 
 add_definitions(-g -Wall)
 

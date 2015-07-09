@@ -8,6 +8,7 @@ class tWorld
 		std::vector<tObject *> objects;
 		std::vector<tPointLight *> point_lights;
 		std::vector<tDirectionalLight *> dir_lights;
+		std::vector<tParticleSystem *> particle_systems;
 		tSkyBox *sky_box;
 
 		//tRenderSpace *camera_render_space;
@@ -33,7 +34,7 @@ class tWorld
 		void AddObject(tObject *o);
 		void RemoveObject(tObject *o);
 		void SetSkyBox(tSkyBox *sky_box)				{ this->sky_box = sky_box; }
-		void Clear(void);
+		void ClearObjects(void)							{ objects.clear(); }
 
 		tVector GetAmbientColor(void)					{ return ambient_color; }
 		btDiscreteDynamicsWorld *GetDynamicsWorld(void) { return physics.dynamics_world; }
@@ -50,10 +51,17 @@ class tWorld
 
 		void AddDirectionalLight(tDirectionalLight *light);
 		void RemoveDirectionalLight(tDirectionalLight *light);
-		void ClearDirectionalLights(void);
+		void ClearDirectionalLights(void)				{ dir_lights.clear(); }
 
 		int GetDirectionalLightsCount(void)				{ return dir_lights.size(); }
 		tDirectionalLight *GetDirectionalLight(int i)	{ return dir_lights.at(i); }
+
+		void AddParticleSystem(tParticleSystem *ps);
+		void RemoveParticleSystem(tParticleSystem *ps);
+		void ClearParticleSystems(void)					{ particle_systems.clear(); }
+
+		int GetParticleSystemsCount(void)				{ return particle_systems.size(); }
+		tParticleSystem *GetParticleSystem(int i)		{ return particle_systems.at(i); }
 
 		void Step(float time);
 

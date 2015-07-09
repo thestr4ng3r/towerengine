@@ -89,10 +89,26 @@ void tWorld::RemoveDirectionalLight(tDirectionalLight *light)
 		}
 }
 
-void tWorld::Clear(void)
+
+
+void tWorld::AddParticleSystem(tParticleSystem *ps)
 {
-	objects.clear();
+	for(vector<tParticleSystem *>::iterator i = particle_systems.begin(); i != particle_systems.end(); i++)
+		if(*i == ps)
+			return;
+	particle_systems.push_back(ps);
 }
+
+void tWorld::RemoveParticleSystem(tParticleSystem *ps)
+{
+	for(vector<tParticleSystem *>::iterator i = particle_systems.begin(); i != particle_systems.end(); i++)
+		if(*i == ps)
+		{
+			particle_systems.erase(i);
+			return;
+		}
+}
+
 
 
 void tWorld::FillRenderObjectSpace(tRenderObjectSpace *space, tCulling *culling, bool clear, bool init_culling)
@@ -163,6 +179,9 @@ void tWorld::FillRenderSpace(tRenderSpace *space, tCulling *culling, bool init_c
 void tWorld::Step(float time)
 {
 	physics.dynamics_world->stepSimulation(time, 10);
+
+	for(vector<tParticleSystem *>::iterator psi = particle_systems.begin(); psi != particle_systems.end(); psi++)
+		(*psi)->Step(time);
 }
 
 
