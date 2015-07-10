@@ -61,7 +61,7 @@ tRenderer::tRenderer(int width, int height, tWorld *world)
 	post_process_shader->Init();
 
 	particle_shader = new tParticleShader();
-	particle_shader->Init();
+	particle_shader->Init(gbuffer);
 
 	this->world = world;
 
@@ -532,16 +532,16 @@ void tRenderer::ForwardPass(void)
 	{
 		glEnable(GL_DEPTH_TEST);
 
-		glEnable(GL_PROGRAM_POINT_SIZE);
-
 		particle_shader->Bind();
-		particle_shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
+		particle_shader->SetModelViewProjectionMatrices(camera->GetModelViewMatrix().GetData(), camera->GetProjectionMatrix().GetData());
 
 		for(int i=0; i<world->GetParticleSystemsCount(); i++)
 		{
 			tParticleSystem *ps = world->GetParticleSystem(i);
 			ps->Render(this);
 		}
+
+		glDepthMask(GL_TRUE);
 	}
 }
 

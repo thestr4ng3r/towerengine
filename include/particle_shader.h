@@ -6,15 +6,23 @@
 class tParticleShader : public tShader
 {
 	private:
-		GLint modelview_projection_matrix_uniform;
+		GLint modelview_matrix_uniform;
+		GLint projection_matrix_uniform;
 
 		GLint color_uniform;
 
-	public:
-		void Init(void);
+		GLint texture_uniform;
 
-		void SetModelViewProjectionMatrix(float m[16]);
+		int texture_unit;
+
+	public:
+		static const int size_attribute = 1;
+
+		void Init(tGBuffer *gbuffer);
+
+		void SetModelViewProjectionMatrices(float modelview[16], float projection[16]);
 		void SetColor(tVector color, float alpha);
+		void SetTexture(GLuint texture);
 };
 
 

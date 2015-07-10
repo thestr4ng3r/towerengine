@@ -1,26 +1,15 @@
 #ifndef _SHADER_H
 #define _SHADER_H
 
-struct tShaderProgram
-{
-	const char *vertex_src;
-	const char *fragment_src;
-
-	GLuint vertex_shader;
-	GLuint fragment_shader;
-	GLuint program;
-};
-
-class tShader : protected tShaderProgram
+class tShader
 {
 	private:
 		const char *name;
 
 	protected:
-		void SetSource(const char *vertex, const char *fragment);
-		void CreateVertexShader(void);
-		void CreateFragmentShader(void);
-		void CreateProgram(void);
+		GLuint program;
+
+		void CreateAndAttachShader(GLenum type, const char *src);
 		void LinkProgram(void);
 
 		void InitShader(const char *vert_src, const char *frag_src, const char *shader_name = 0);
@@ -38,8 +27,6 @@ class tShader : protected tShaderProgram
 
 void PrintGLInfoLog(const char *log_title, GLuint handle);
 GLuint CreateShader(GLenum type, const char *src, const char *name);
-GLuint CreateShaderProgram(GLuint vertex_shader, GLuint fragment_shader);
-void LinkShaderProgram(GLuint program);
 
 GLuint LoadGLTexture(const char *filename, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
@@ -49,6 +36,5 @@ inline GLuint LoadGLTexture(const char *filename, bool *transparent, int alpha_c
 inline GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, bool *transparent, int alpha_channel = 3)
 		{ return LoadGLTextureBinary(ext, data, size, 0, 0, transparent, alpha_channel); }
 
-//GLuint GLTextureFromColor(const tVector &color);
 
 #endif

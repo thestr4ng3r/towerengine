@@ -9,40 +9,24 @@
 
 using namespace std;
 
-void tShader::SetSource(const char *vertex, const char *fragment)
-{
-	vertex_src = vertex;
-	fragment_src = fragment;
-}
 
-void tShader::CreateVertexShader(void)
+void tShader::CreateAndAttachShader(GLenum type, const char *src)
 {
-	vertex_shader = CreateShader(GL_VERTEX_SHADER, vertex_src, name);
-}
-
-void tShader::CreateFragmentShader(void)
-{
-	fragment_shader = CreateShader(GL_FRAGMENT_SHADER, fragment_src, name);
-}
-
-void tShader::CreateProgram(void)
-{
-	program = CreateShaderProgram(vertex_shader, fragment_shader);
+	GLuint shader = CreateShader(type, src, name);
+	glAttachShader(program, shader);
 }
 
 void tShader::LinkProgram(void)
 {
-	LinkShaderProgram(program);
+	glLinkProgram(program);
 }
 
 void tShader::InitShader(const char *vert_src, const char *frag_src, const char *shader_name)
 {
 	name = shader_name;
-
-	SetSource(vert_src, frag_src);
-	CreateVertexShader();
-	CreateFragmentShader();
-	CreateProgram();
+	program = glCreateProgram();
+	CreateAndAttachShader(GL_VERTEX_SHADER, vert_src);
+	CreateAndAttachShader(GL_FRAGMENT_SHADER, frag_src);
 }
 
 GLint tShader::GetUniformLocation(const char *uniform)
@@ -53,8 +37,6 @@ GLint tShader::GetUniformLocation(const char *uniform)
 void tShader::Bind(void)
 {
 	glUseProgram(program);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void tShader::Unbind(void)
@@ -112,7 +94,7 @@ GLuint CreateShader(GLenum type, const char *src, const char *name)
 	return s;
 }
 
-GLuint CreateShaderProgram(GLuint vertex_shader, GLuint fragment_shader)
+/*GLuint CreateShaderProgram(GLuint vertex_shader, GLuint fragment_shader)
 {
 	GLuint p;
 
@@ -121,13 +103,13 @@ GLuint CreateShaderProgram(GLuint vertex_shader, GLuint fragment_shader)
 	glAttachShader(p, fragment_shader);
 
 	return p;
-}
+}*/
 
-void LinkShaderProgram(GLuint program)
+/*void LinkShaderProgram(GLuint program)
 {
 	glLinkProgram(program);
 	//PrintGLInfoLog("Link", program);
-}
+}*/
 
 GLuint LoadGLTextureIL(ILuint image, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 
