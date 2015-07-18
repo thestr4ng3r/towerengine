@@ -243,15 +243,14 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 }
 
 
-GLuint LoadGLTextureArray(const char **filenames, int count, int *w, int *h)
+GLuint LoadGLTextureArray(const char **filenames, const int count, int *w, int *h)
 {
 	if(count <= 0)
 		return 0;
 
 	int width, height;
 
-	ILuint il_images[count];
-
+	ILuint *il_images = new ILuint[count];
 	ilGenImages(count, il_images);
 
 	for(int i=0; i<count; i++)
@@ -264,6 +263,7 @@ GLuint LoadGLTextureArray(const char **filenames, int count, int *w, int *h)
 		{
 			printf("Failed to load image \"%s\": %s\n", filenames[i], iluErrorString(ilGetError()));
 			ilDeleteImages(count, il_images);
+			delete[] il_images;
 			return 0;
 		}
 
@@ -278,6 +278,7 @@ GLuint LoadGLTextureArray(const char **filenames, int count, int *w, int *h)
 		{
 			printf("Size of image %s does not match others in texture array.\n", filenames[i]);
 			ilDeleteImages(count, il_images);
+			delete[] il_images;
 			return 0;
 		}
 
@@ -288,6 +289,7 @@ GLuint LoadGLTextureArray(const char **filenames, int count, int *w, int *h)
 		{
 			printf("Failed to convert image: %s\n", iluErrorString(ilGetError()));
 			ilDeleteImages(count, il_images);
+			delete[] il_images;
 			return 0;
 		}
 	}
@@ -319,6 +321,7 @@ GLuint LoadGLTextureArray(const char **filenames, int count, int *w, int *h)
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 
 	ilDeleteImages(count, il_images);
+	delete[] il_images;
 
 	return gl_texture;
 }

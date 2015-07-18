@@ -98,17 +98,17 @@ void tMatrix4::SetLookAt(tVector eye, tVector center, tVector up)
 	SetMultiply(trans);
 }
 
-void tMatrix4::SetOrtho(float left, float right, float top, float bottom, float near, float far)
+void tMatrix4::SetOrtho(float left, float right, float top, float bottom, float near_clip, float far_clip)
 {
 	SetIdentity();
 
 	v[0] = 2.0 / (right - left);	v[3] = -((right + left) / (right - left));
 	v[5] = 2.0 / (top - bottom);	v[7] = -((top + bottom) / (top - bottom));
-	v[10] = 2.0 / (far - near);		v[11] = -((far + near) / (far - near));
+	v[10] = 2.0 / (far_clip - near_clip);		v[11] = -((far_clip + near_clip) / (far_clip - near_clip));
 	//v[15] = 1.0;
 }
 
-void tMatrix4::SetPerspective(float fovy, float aspect, float near, float far)
+void tMatrix4::SetPerspective(float fovy, float aspect, float near_clip, float far_clip)
 {
 	SetIdentity();
 
@@ -116,7 +116,7 @@ void tMatrix4::SetPerspective(float fovy, float aspect, float near, float far)
 
 	v[0] = f / aspect;
 	v[5] = f;
-	v[10] = (far + near) / (near - far);	v[11] = (2 * far * near) / (near - far);
+	v[10] = (far_clip + near_clip) / (near_clip - far_clip);	v[11] = (2 * far_clip * near_clip) / (near_clip - far_clip);
 	v[14] = -1.0;
 	v[15] = 0.0;
 }

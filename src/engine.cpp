@@ -16,6 +16,7 @@ void tEngine::Init(void)
 	printf("Support of %d color attachments\n", v);
 
 	#ifdef _WIN32
+		glewExperimental = GL_TRUE;
 		GLenum glew_r = glewInit();
 		if(glew_r != GLEW_OK)
 		{

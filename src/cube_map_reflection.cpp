@@ -181,11 +181,12 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 	}
 
 	int point_lights_count = point_lights.size();
-	float point_lights_pos[point_lights_count*3];
-	float point_lights_color[point_lights_count*3];
-	float point_lights_dist[point_lights_count];
-	int point_lights_shadow_enabled[point_lights_count];
-	GLuint point_lights_shadow_maps[point_lights_count];
+	float *point_lights_pos = new float[point_lights_count * 3];
+	float *point_lights_color = new float[point_lights_count * 3];
+	float *point_lights_dist = new float[point_lights_count];
+	int *point_lights_shadow_enabled = new int[point_lights_count];
+	GLuint *point_lights_shadow_maps = new GLuint[point_lights_count];
+
 
 	vector<tPointLight *>::iterator point_light_it;
 	int point_light_i = 0;
@@ -234,6 +235,12 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 			point_lights_rendered += shader->GetLightsCount();
 		}
 	}
+
+	delete[] point_lights_pos;
+	delete[] point_lights_color;
+	delete[] point_lights_dist;
+	delete[] point_lights_shadow_enabled;
+	delete[] point_lights_shadow_maps;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

@@ -21,8 +21,8 @@ class tMatrix4
 		void SetIdentity(void);
 		void SetTranslation(tVector t);
 		void SetLookAt(tVector eye, tVector center, tVector up);
-		void SetOrtho(float left, float right, float top, float bottom, float near, float far);
-		void SetPerspective(float fovy, float aspect, float near, float far);
+		void SetOrtho(float left, float right, float top, float bottom, float near_clip, float far_clip);
+		void SetPerspective(float fovy, float aspect, float near_clip, float far_clip);
 
 		void SetMultiply(tMatrix4 m);
 
