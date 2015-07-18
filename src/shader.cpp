@@ -298,7 +298,7 @@ GLuint LoadGLTextureArray(const char **filenames, const int count, int *w, int *
 	glGenTextures(1, &gl_texture);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, gl_texture);
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height, count);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, width, height, count, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 	for(int i=0; i<count; i++)
 	{
