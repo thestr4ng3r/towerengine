@@ -129,7 +129,18 @@ void Base64Decode(char *in, unsigned char **out, size_t *out_size)
 
 float RandomFloat(float min, float max)
 {
+	if(max <= min)
+		return min;
+
 	return ((float)rand() / (float)RAND_MAX) * (max - min) + min;
+}
+
+int RandomInt(int min, int max)
+{
+	if(max <= min)
+		return min;
+
+	return rand() % (max - min) + min;
 }
 
 float Mix(float a, float b, float mix)

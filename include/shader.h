@@ -31,6 +31,8 @@ GLuint CreateShader(GLenum type, const char *src, const char *name);
 GLuint LoadGLTexture(const char *filename, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 
+GLuint LoadGLTextureArray(const char **filenames, int count, int *w = 0, int *h = 0);
+
 inline GLuint LoadGLTexture(const char *filename, bool *transparent, int alpha_channel = 3)
 		{ return LoadGLTexture(filename, 0, 0, transparent, alpha_channel); }
 inline GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, bool *transparent, int alpha_channel = 3)

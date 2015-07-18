@@ -8,12 +8,13 @@ void tParticleShader::Init(tGBuffer *gbuffer)
 	CreateAndAttachShader(GL_GEOMETRY_SHADER, particle_shader_geom);
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, size_attribute, "size_attr");
+	glBindAttribLocation(program, rotation_attribute, "rotation_attr");
+	glBindAttribLocation(program, color_attribute, "color_attr");
+	glBindAttribLocation(program, texture_index_attribute, "texture_index_attr");
 	LinkProgram();
 
 	modelview_matrix_uniform = GetUniformLocation("modelview_matrix_uni");
 	projection_matrix_uniform = GetUniformLocation("projection_matrix_uni");
-
-	color_uniform = GetUniformLocation("color_uni");
 
 	texture_uniform = GetUniformLocation("texture_uni");
 
@@ -29,13 +30,8 @@ void tParticleShader::SetModelViewProjectionMatrices(float modelview[16], float 
 	glUniformMatrix4fv(projection_matrix_uniform, 1, GL_TRUE, projection);
 }
 
-void tParticleShader::SetColor(tVector color, float alpha)
-{
-	glUniform4f(color_uniform, color.x, color.y, color.z, alpha);
-}
-
 void tParticleShader::SetTexture(GLuint texture)
 {
 	glActiveTexture(GL_TEXTURE0 + texture_unit);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
 }

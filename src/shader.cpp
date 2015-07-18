@@ -242,38 +242,85 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 	return textureID;
 }
 
-/*GLuint GLTextureFromColor(const tVector &color)
+
+GLuint LoadGLTextureArray(const char **filenames, int count, int *w, int *h)
 {
-	const int width = 64;
-	const int height = 64;
-	unsigned char data[width * height * 3];
-	unsigned char *p;
-	GLuint handle;
-	int i;
+	if(count <= 0)
+		return 0;
 
-	unsigned char r = (unsigned char)fmax(0.0, fmin(255.0, floor(color.x * 256.0)));
-	unsigned char g = (unsigned char)fmax(0.0, fmin(255.0, floor(color.y * 256.0)));
-	unsigned char b = (unsigned char)fmax(0.0, fmin(255.0, floor(color.z * 256.0)));
+	int width, height;
 
-	p = data;
-	for(i = 0; i < width * height; i++)
+	ILuint il_images[count];
+
+	ilGenImages(count, il_images);
+
+	for(int i=0; i<count; i++)
 	{
-		*p++ = r;
-		*p++ = g;
-		*p++ = b;
+		ILinfo image_info;
+
+		ilBindImage(il_images[i]);
+
+		if(!ilLoadImage(filenames[i]))
+		{
+			printf("Failed to load image \"%s\": %s\n", filenames[i], iluErrorString(ilGetError()));
+			ilDeleteImages(count, il_images);
+			return 0;
+		}
+
+		iluGetImageInfo(&image_info);
+
+		if(i == 0)
+		{
+			width = image_info.Width;
+			height = image_info.Height;
+		}
+		else if((int)image_info.Width != width || (int)image_info.Height != height)
+		{
+			printf("Size of image %s does not match others in texture array.\n", filenames[i]);
+			ilDeleteImages(count, il_images);
+			return 0;
+		}
+
+		if(image_info.Origin == IL_ORIGIN_UPPER_LEFT)
+			iluFlipImage();
+
+		if(!ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE))
+		{
+			printf("Failed to convert image: %s\n", iluErrorString(ilGetError()));
+			ilDeleteImages(count, il_images);
+			return 0;
+		}
 	}
 
-	glGenTextures(1, &handle);
-	glBindTexture(GL_TEXTURE_2D, handle);
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	//printf("Color (%d, %d, %d) successfully loaded [handle = %d, width = %d, height = %d] :)\n", r, g, b, handle, width, height);
+	GLuint gl_texture;
+	glGenTextures(1, &gl_texture);
 
-	return handle;
-}*/
+	glBindTexture(GL_TEXTURE_2D_ARRAY, gl_texture);
+	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height, count);
+
+	for(int i=0; i<count; i++)
+	{
+		ilBindImage(il_images[i]);
+		ILubyte *data = ilGetData();
+
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+
+	if(w != 0)
+		*w = width;
+	if(h != 0)
+		*h = height;
+
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+
+	ilDeleteImages(count, il_images);
+
+	return gl_texture;
+}
 
 
