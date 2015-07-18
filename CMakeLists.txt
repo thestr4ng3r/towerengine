@@ -175,11 +175,6 @@ install(TARGETS towerengine #EXPORT towerengine_targets
 install(FILES ${towerengine_INCLUDES} DESTINATION include/towerengine)
 
 
-#if(MSVC)
-set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
-#endif()
-
 #config
 #include(CMakePackageConfigHelpers)
 #write_basic_package_version_file(

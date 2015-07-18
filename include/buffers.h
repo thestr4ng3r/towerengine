@@ -32,7 +32,7 @@ template <class T> class tVBO
 		void AssignData(void);
 		void Bind(void)					{ glBindBuffer(GL_ARRAY_BUFFER, vbo); };
 		static void UnBind(void)		{ glBindBuffer(GL_ARRAY_BUFFER, 0); };
-		bool SetSize(int size, bool copy = false); // returns true if size has changed and false if not
+		bool SetSize(int size); // returns true if size has changed and false if not
 		T *GetData(void)				{ return data; };
 		int GetComponents(void)			{ return components; };
 		int GetSize(void)				{ return size; };
@@ -100,7 +100,7 @@ template <class T> void tVBO<T>::AssignData(void)
 	UnBind();
 }
 
-template <class T> bool tVBO<T>::SetSize(int size, bool copy)
+template <class T> bool tVBO<T>::SetSize(int size)
 {
 	if(size == this->size)
 		return false;
@@ -109,12 +109,9 @@ template <class T> bool tVBO<T>::SetSize(int size, bool copy)
 
 	data = new T[size * components];
 
-	if(old != 0)
-	{
-		if(copy)
-			memcpy(data, old, min(this->size, size) * components * sizeof(T));
+	if(old)
 		delete[] old;
-	}
+
 	this->size = size;
 	return true;
 }
