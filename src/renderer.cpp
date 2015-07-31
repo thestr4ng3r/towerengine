@@ -3,18 +3,15 @@
 
 using namespace std;
 
-tRenderer::tRenderer(int width, int height, tWorld *world)
+void tRenderer::InitRenderer(int width, int height, tWorld *world)
 {
-	geometry_pass_shader = new tGeometryPassShader();
-	geometry_pass_shader->Init();
-	//SetCurrentFaceShader(geometry_pass_shader);
-
 	this->screen_width = width;
 	this->screen_height = height;
 
-	camera = new tCamera();
-	camera_render_space = new tRenderSpace();
-
+	geometry_pass_shader = new tGeometryPassShader();
+	geometry_pass_shader->Init();
+	//SetCurrentFaceShader(geometry_pass_shader);
+	
 	glGenFramebuffers(1, &fbo);
 
 	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 2);
@@ -160,10 +157,7 @@ tRenderer::~tRenderer(void)
 	delete fog_shader;
 
 	delete particle_shader;
-
-	delete camera;
-	delete camera_render_space;
-
+	
 	delete cube_map_reflection;
 }
 
@@ -226,12 +220,10 @@ void tRenderer::InitCubeMapReflection(int resolution, tVector position)
 }
 
 
-void tRenderer::Render(GLuint dst_fbo, int width, int height)
+void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
 {
-	camera->SetAspect((float)screen_width / (float)screen_height);
-	camera->CalculateModelViewProjectionMatrix();
-
-	world->FillRenderSpace(camera_render_space, camera);
+	current_rendering_camera = camera;
+	current_rendering_render_space = render_space;
 
 	RenderShadowMaps();
 
@@ -276,8 +268,8 @@ void tRenderer::Render(GLuint dst_fbo, int width, int height)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, dst_fbo);
 
-	if(width > 0 && height > 0)
-		glViewport(0, 0, width, height);
+	if(viewport_width > 0 && viewport_height > 0)
+		glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
 
 	post_process_shader->Bind();
 	post_process_shader->SetFXAA(fxaa_enabled);
@@ -309,13 +301,13 @@ void tRenderer::RenderShadowMaps(void)
 	set<tDirectionalLight *>::iterator di;
 	list<tPointLight *>::iterator pli;
 
-	for(pi=camera_render_space->point_lights.begin(); pi!=camera_render_space->point_lights.end(); pi++)
+	for(pi=current_rendering_render_space->point_lights.begin(); pi!=current_rendering_render_space->point_lights.end(); pi++)
 	{
 		if(!(*pi)->GetShadowEnabled())
 			continue;
 
 		render_point_light_shadows.push_back(*pi);
-		(*pi)->SetCompareValue(((*pi)->GetPosition() - camera->GetPosition()).SquaredLen());
+		(*pi)->SetCompareValue(((*pi)->GetPosition() - current_rendering_camera->GetPosition()).SquaredLen());
 	}
 
 
@@ -330,7 +322,7 @@ void tRenderer::RenderShadowMaps(void)
 	} // < 0 renders all point lights
 
 	// add all point light shadows which have not been rendered at all yet
-	for(pi=camera_render_space->point_lights.begin(); pi!=camera_render_space->point_lights.end(); pi++)
+	for(pi=current_rendering_render_space->point_lights.begin(); pi!=current_rendering_render_space->point_lights.end(); pi++)
 	{
 		if(!(*pi)->GetShadowInvalid())
 			continue;
@@ -351,8 +343,8 @@ void tRenderer::RenderShadowMaps(void)
 		(*pli)->RenderShadow(this);
 
 
-	for(di=camera_render_space->dir_lights.begin(); di!=camera_render_space->dir_lights.end(); di++)
-		(*di)->RenderShadow(camera, this);
+	for(di=current_rendering_render_space->dir_lights.begin(); di!=current_rendering_render_space->dir_lights.end(); di++)
+		(*di)->RenderShadow(current_rendering_camera, this);
 }
 
 
@@ -370,15 +362,15 @@ void tRenderer::GeometryPass(void)
 	SetCurrentFaceShader(geometry_pass_shader);
 	BindCurrentFaceShader();
 
-	geometry_pass_shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
-	geometry_pass_shader->SetCameraPosition(camera->GetPosition());
+	geometry_pass_shader->SetModelViewProjectionMatrix(current_rendering_camera->GetModelViewProjectionMatrix().GetData());
+	geometry_pass_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 
 	if(cube_map_reflection)
 		geometry_pass_shader->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());
 	else
 		geometry_pass_shader->SetCubeMapReflectionTexture(0);
 
-	camera_render_space->GeometryPass(this);
+	current_rendering_render_space->GeometryPass(this);
 }
 
 void tRenderer::LightPass(void)
@@ -395,9 +387,9 @@ void tRenderer::LightPass(void)
 	if(sky_box)
 	{
 		skybox_shader->Bind();
-		skybox_shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
-		skybox_shader->SetCameraPosition(camera->GetPosition());
-		sky_box->Paint(this, camera->GetPosition());
+		skybox_shader->SetModelViewProjectionMatrix(current_rendering_camera->GetModelViewProjectionMatrix().GetData());
+		skybox_shader->SetCameraPosition(current_rendering_camera->GetPosition());
+		sky_box->Paint(this, current_rendering_camera->GetPosition());
 	}
 
 	gbuffer->BindTextures();
@@ -421,10 +413,10 @@ void tRenderer::LightPass(void)
 
 	// directional lights
 	directional_lighting_shader->Bind();
-	directional_lighting_shader->SetCameraPosition(camera->GetPosition());
+	directional_lighting_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 
 	set<tDirectionalLight *>::iterator dir_light_it;
-	for(dir_light_it=camera_render_space->dir_lights.begin(); dir_light_it!=camera_render_space->dir_lights.end(); dir_light_it++)
+	for(dir_light_it=current_rendering_render_space->dir_lights.begin(); dir_light_it!=current_rendering_render_space->dir_lights.end(); dir_light_it++)
 	{
 		(*dir_light_it)->InitRenderLighting(directional_lighting_shader);
 		RenderScreenQuad();
@@ -435,7 +427,7 @@ void tRenderer::LightPass(void)
 	vector<tPointLight *> point_lights;
 
 	set<tPointLight *>::iterator point_light_sit;
-	for(point_light_sit=camera_render_space->point_lights.begin(); point_light_sit!=camera_render_space->point_lights.end(); point_light_sit++)
+	for(point_light_sit=current_rendering_render_space->point_lights.begin(); point_light_sit!=current_rendering_render_space->point_lights.end(); point_light_sit++)
 	{
 		tPointLight *light = *point_light_sit;
 		if(!light->GetEnabled())
@@ -484,7 +476,7 @@ void tRenderer::LightPass(void)
 		shader_passes = (point_lights_count - point_lights_rendered) / shader->GetLightsCount();
 
 		shader->Bind();
-		shader->SetCameraPosition(camera->GetPosition());
+		shader->SetCameraPosition(current_rendering_camera->GetPosition());
 
 		for(int pass=0; pass<shader_passes; pass++)
 		{
@@ -533,14 +525,14 @@ void tRenderer::LightPass(void)
 
 void tRenderer::ForwardPass(void)
 {
-	camera_render_space->ForwardPass(this);
+	current_rendering_render_space->ForwardPass(this);
 
 	if(world->GetParticleSystemsCount() > 0)
 	{
 		glEnable(GL_DEPTH_TEST);
 
 		particle_shader->Bind();
-		particle_shader->SetModelViewProjectionMatrices(camera->GetModelViewMatrix().GetData(), camera->GetProjectionMatrix().GetData());
+		particle_shader->SetModelViewProjectionMatrices(current_rendering_camera->GetModelViewMatrix().GetData(), current_rendering_camera->GetProjectionMatrix().GetData());
 
 		for(int i=0; i<world->GetParticleSystemsCount(); i++)
 		{
@@ -553,7 +545,7 @@ void tRenderer::ForwardPass(void)
 }
 
 
-void tRenderer::ChangeSize(int width, int height)
+void tRenderer::ChangeScreenSize(int width, int height)
 {
 	if(screen_width == width && screen_height == height)
 		return;

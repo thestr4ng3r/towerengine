@@ -5,7 +5,7 @@
 
 class tRenderer
 {
-	private:
+	protected:
 		tGeometryPassShader *geometry_pass_shader;
 		tAmbientLightingShader *ambient_lighting_shader;
 		tSSAOAmbientLightingShader *ssao_ambient_lighting_shader;
@@ -31,10 +31,11 @@ class tRenderer
 
 		tFaceShader *current_face_shader;
 
+		int screen_width, screen_height;
+
 		tWorld *world;
 
 		tGBuffer *gbuffer;
-		int screen_width, screen_height;
 
 		GLuint fbo;
 		GLuint *color_tex;
@@ -51,24 +52,28 @@ class tRenderer
 
 		int point_light_shadow_limit;
 
-		tCamera *camera;
-		tRenderSpace *camera_render_space;
+		
 		std::list<tPointLight *> render_point_light_shadows;
 
 
 		tCubeMapReflection *cube_map_reflection;
 
+		tCamera *current_rendering_camera;
+		tRenderSpace *current_rendering_render_space;
+
+		void InitRenderer(int width, int height, tWorld *world);
+		void Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height);
 
 		void RenderShadowMaps(void);
 		void GeometryPass(void);
 		void LightPass(void);
 		void ForwardPass(void);
 
-	public:
-		tRenderer(int width, int height, tWorld *world = 0);
-		~tRenderer();
+		void ChangeScreenSize(int width, int height);
 
-		void ChangeSize(int width, int height);
+	public:
+		virtual ~tRenderer();
+
 
 		void SetWorld(tWorld *world)	{ this->world = world; }
 
@@ -79,7 +84,6 @@ class tRenderer
 
 		void InitCubeMapReflection(int resolution, tVector position);
 
-		void Render(GLuint dst_fbo = 0, int width = 0, int height = 0);
 		void RenderScreenQuad(void);
 
 		tFaceShader *GetCurrentFaceShader(void)		{ return current_face_shader; }
@@ -105,10 +109,11 @@ class tRenderer
 		int GetScreenHeight(void)	{ return screen_height; }
 
 		tWorld *GetWorld(void)		{ return world; }
-		tCamera *GetCamera(void)			{ return camera; }
 
 		//float *GetProjectionMatrix(void)	{ return projection_matrix; }
 		//float *GetModelViewMatrix(void)		{ return modelview_matrix; }
+
+		tCamera *GetCurrentRenderingCamera(void)	{ return current_rendering_camera; }
 
 		tGBuffer *GetGBuffer(void)			{ return gbuffer; }
 

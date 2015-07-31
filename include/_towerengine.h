@@ -84,6 +84,8 @@ class t2DRenderer;
 #include "scene.h"
 #include "ssao.h"
 #include "renderer.h"
+#include "default_renderer.h"
+#include "vr_renderer.h"
 #include "2d_renderer.h"
 
 #endif

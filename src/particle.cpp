@@ -169,8 +169,8 @@ void tParticleSystem::Render(tRenderer *renderer)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDepthMask(GL_TRUE);
 
-		tVector cam_pos = renderer->GetCamera()->GetPosition();
-		tVector cam_dir = renderer->GetCamera()->GetDirection();
+		tVector cam_pos = renderer->GetCurrentRenderingCamera()->GetPosition();
+		tVector cam_dir = renderer->GetCurrentRenderingCamera()->GetDirection();
 
 		for(vector<tParticle>::iterator pi=particles.begin(); pi!=particles.end(); pi++)
 		{

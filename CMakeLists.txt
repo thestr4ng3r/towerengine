@@ -124,7 +124,9 @@ set(towerengine_SRC
 	src/2d_sprite_shader.cpp
 	src/shader_source.cpp
 	src/particle.cpp
-	src/particle_shader.cpp)
+	src/particle_shader.cpp
+	src/default_renderer.cpp
+	src/vr_renderer.cpp)
 
 add_definitions(-g -Wall)
 

@@ -51,7 +51,7 @@ void tCoordinateSystemObject::ForwardPass(tRenderer *renderer)
 		glDisable(GL_DEPTH_TEST);
 
 	renderer->GetColorShader()->Bind();
-	renderer->GetColorShader()->SetModelViewProjectionmatrix(renderer->GetCamera()->GetModelViewProjectionMatrix().GetData());
+	renderer->GetColorShader()->SetModelViewProjectionmatrix(renderer->GetCurrentRenderingCamera()->GetModelViewProjectionMatrix().GetData());
 	renderer->GetColorShader()->SetTransformation(tMatrix4::identity_matrix);
 
 	glLineWidth(3.0);
