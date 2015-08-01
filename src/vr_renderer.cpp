@@ -1,6 +1,8 @@
 
 #include "towerengine.h"
 
+using namespace std;
+
 tVRRenderer::tVRRenderer(int left_width, int left_height, int right_width, int right_height, tWorld *world)
 {
 	width[0] = left_width;
