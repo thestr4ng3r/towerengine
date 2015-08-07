@@ -126,7 +126,27 @@ void tMeshObject::GeometryPass(tRenderer *renderer)
 
 void tMeshObject::ForwardPass(tRenderer *renderer)
 {
+	if(!visible || alpha <= 0.0 || !mesh)
+		return;
 
+	tMesh::Color(color, alpha);
+
+	if(animation_mode && animation)
+	{
+		mesh->ChangeAnimation(animation);
+		mesh->SetAnimationLoop(0);
+		animation->SetTime(time);
+	}
+	else
+	{
+		if(pose)
+			mesh->ChangePose(pose);
+		else
+			mesh->ChangePose("Idle");
+	}
+
+	float *temp = transform.GetMatrix(transform_matrix);
+	mesh->ForwardPass(renderer, temp);
 }
 
 

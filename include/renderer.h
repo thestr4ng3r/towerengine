@@ -7,6 +7,7 @@ class tRenderer
 {
 	protected:
 		tGeometryPassShader *geometry_pass_shader;
+		tSimpleForwardShader *simple_forward_shader;
 		tAmbientLightingShader *ambient_lighting_shader;
 		tSSAOAmbientLightingShader *ssao_ambient_lighting_shader;
 		tDirectionalLightingShader *directional_lighting_shader;
@@ -91,6 +92,7 @@ class tRenderer
 		void SetCurrentFaceShader(tFaceShader *s)	{ current_face_shader = s; }
 
 		tGeometryPassShader *GetGeometryPassShader(void)					{ return geometry_pass_shader; }
+		tSimpleForwardShader *GetSimpleForwardShader(void)					{ return simple_forward_shader; }
 		tAmbientLightingShader *GetAmbientLightingShader(void)				{ return ambient_lighting_shader; }
 		tDirectionalLightingShader *GetDirectionalLightingShader(void)		{ return directional_lighting_shader; }
 		//tPointLightingShader *GetPointLightingShader(void)					{ return point_lighting_shader; }

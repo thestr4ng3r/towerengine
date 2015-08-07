@@ -27,3 +27,5 @@ _2d_sprite_shader_frag: shader/2d_sprite_shader.frag
 particle_shader_vert: shader/particle_shader.vert
 particle_shader_frag: shader/particle_shader.frag
 particle_shader_geom: shader/particle_shader.geom
+simple_forward_shader_vert: shader/simple_forward_shader.vert
+simple_forward_shader_frag: shader/simple_forward_shader.frag

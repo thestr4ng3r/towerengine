@@ -85,6 +85,9 @@ class tMesh
 		tKeyFrame *ParseKeyFrameNode(rapidxml::xml_node<char> *cur, tAnimation *anim);
 		tEntity *ParseEntityNode(rapidxml::xml_node<char> *cur);
 
+		static tDefaultMaterial *ParseXMLDefaultMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
+		static tSimpleForwardMaterial *ParseXMLSimpleForwardMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
+
 	public:
 		static float color[4];
 
@@ -101,6 +104,7 @@ class tMesh
 		bool LoadFromXML(rapidxml::xml_document<char> *doc, std::string path, tMaterialManager *material_manager = 0);
 
 		void GeometryPass(tRenderer *renderer);
+		void ForwardPass(tRenderer *renderer, float *transform);
 
 		//bool GetCubeMapReflectionEnabled(void);
 
@@ -185,7 +189,7 @@ class tMesh
 		void TriggerIBOsRefresh(void)		{ refresh_ibos = true; }
 		void RefreshIBOs(void);
 
-		void SortTriangles(tVector cam);
+		//void SortTriangles(tVector cam);
 		void SortMaterials(void);
 
 		void SetIDs(void);

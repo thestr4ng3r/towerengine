@@ -42,7 +42,7 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 	refresh_func = 0;
 	refresh_vbos = true;
 	refresh_ibos = true;
-	idle_material = new tMaterial();
+	idle_material = new tDefaultMaterial();
 	material_ibos[idle_material] = new tMaterialIBO(this);
 	//VAO::UnBind();
 
@@ -519,7 +519,6 @@ void tMesh::RefreshIBOs(void)
 
 void tMesh::GeometryPass(tRenderer *renderer)
 {
-	map<tMaterial *, tMaterialIBO *>::iterator i;
 	tVBO<float> *vertex_vbo, *vertex2_vbo;
 	tKeyFrame *a, *b;
 	float mix;
@@ -564,10 +563,30 @@ void tMesh::GeometryPass(tRenderer *renderer)
 	//CEngine::GetFaceShader()->BindShader();
 	renderer->GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
 
-	for(i=material_ibos.begin(); i!=material_ibos.end(); i++)
+	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
-		i->first->InitGeometryPass(renderer);
-		i->second->ibo->Draw(GL_TRIANGLES);
+		if(i->first->InitGeometryPass(renderer))
+			i->second->ibo->Draw(GL_TRIANGLES);
+	}
+}
+
+void tMesh::ForwardPass(tRenderer *renderer, float *transform)
+{
+	bool vao_bound = false;
+
+	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
+	{
+		if(i->first->InitForwardPass(renderer, transform))
+		{
+			if(!vao_bound)
+			{
+				vao_bound = true;
+				vao->Bind();
+				//current_pose->vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
+			}
+
+			i->second->ibo->Draw(GL_TRIANGLES);
+		}
 	}
 }
 
@@ -739,8 +758,23 @@ tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 #define TEXTURE_FILE 1
 #define TEXTURE_DATA 2
 
-
 tMaterial *tMesh::ParseXMLMaterialNode(xml_node<> *cur, string &name, string path)
+{
+	xml_attribute<> *attr;
+
+	if((attr = cur->first_attribute("type")))
+	{
+		if(strcmp(attr->value(), "simple_forward") == 0)
+			return ParseXMLSimpleForwardMaterialNode(cur, name, path);
+		else
+			return ParseXMLDefaultMaterialNode(cur, name, path);
+	}
+	else
+		return ParseXMLDefaultMaterialNode(cur, name, path);
+
+}
+
+tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &name, string path)
 {
 	xml_node<> *child;
 	int diffuse_mode, specular_mode, normal_mode, bump_mode, self_illum_mode;
@@ -761,7 +795,7 @@ tMaterial *tMesh::ParseXMLMaterialNode(xml_node<> *cur, string &name, string pat
 	char *base64_temp;
 
 	xml_attribute<> *attr;
-	tMaterial *r;
+	tDefaultMaterial *r;
 
 	diffuse_mode = specular_mode = normal_mode = bump_mode = self_illum_mode = TEXTURE_DISABLED;
 	diffuse_ext = specular_ext = normal_ext = bump_ext = self_illum_ext = 0;
@@ -927,7 +961,7 @@ tMaterial *tMesh::ParseXMLMaterialNode(xml_node<> *cur, string &name, string pat
 		child = child->next_sibling();
 	}
 
-	r = new tMaterial();
+	r = new tDefaultMaterial();
 
 	r->SetDiffuse(diffuse_color);
 	r->SetSpecular(specular_color, exponent);
@@ -962,6 +996,96 @@ tMaterial *tMesh::ParseXMLMaterialNode(xml_node<> *cur, string &name, string pat
 		r->LoadSelfIlluminationTexture(path + self_illum_file);
 	else if(self_illum_mode == TEXTURE_DATA)
 		r->LoadSelfIlluminationTexture(self_illum_ext, self_illum_data, self_illum_size);
+
+	return r;
+}
+
+
+tSimpleForwardMaterial *tMesh::ParseXMLSimpleForwardMaterialNode(xml_node<> *cur, string &name, string path)
+{
+	xml_node<> *child;
+
+	int tex_mode = TEXTURE_DISABLED;
+	string tex_file;
+	tVector color = Vec(1.0, 1.0, 1.0);
+	float alpha = 1.0;
+
+	tSimpleForwardMaterial::BlendMode blend_mode = tSimpleForwardMaterial::ALPHA;
+
+	unsigned char *tex_data = 0;
+	size_t tex_size = 0;
+	char *tex_ext = 0;
+	char *base64_temp = 0;
+
+
+	xml_attribute<> *attr;
+
+	if(!(attr = cur->first_attribute("name")))
+		return 0;
+
+	name = string(attr->value());
+
+	if((attr = cur->first_attribute("blend_mode")))
+	{
+		if(strcmp(attr->value(), "alpha") == 0)
+			blend_mode = tSimpleForwardMaterial::ALPHA;
+		else if(strcmp(attr->value(), "add") == 0)
+			blend_mode = tSimpleForwardMaterial::ADD;
+		else if(strcmp(attr->value(), "multiply") == 0)
+			blend_mode = tSimpleForwardMaterial::MULTIPLY;
+	}
+
+	child = cur->first_node();
+	while(child)
+	{
+		char *name_temp = child->name();
+
+		if(strcmp(name_temp, "tex") == 0)
+		{
+			if((attr = child->first_attribute("file")))
+			{
+				tex_file = string(attr->value());
+				tex_mode = TEXTURE_FILE;
+			}
+			else if(child->value_size() > 0)
+			{
+				base64_temp = child->value();
+
+				Base64Decode(base64_temp, &tex_data, &tex_size);
+
+				attr = child->first_attribute("image-extension");
+				if(attr)
+					tex_ext = attr->value();
+				else
+					tex_ext = 0;
+				tex_mode = TEXTURE_DATA;
+			}
+		}
+		else if(strcmp(name_temp, "color") == 0)
+		{
+			if((attr = child->first_attribute("r")))
+				color.r = atof(attr->value());
+			if((attr = child->first_attribute("g")))
+				color.g = atof(attr->value());
+			if((attr = child->first_attribute("b")))
+				color.b = atof(attr->value());
+			if((attr = child->first_attribute("a")))
+				alpha = atof(attr->value());
+		}
+
+		child = child->next_sibling();
+	}
+
+
+	tSimpleForwardMaterial *r = new tSimpleForwardMaterial();
+
+	r->SetColor(color, alpha);
+	r->SetBlendMode(blend_mode);
+
+	if(tex_mode == TEXTURE_FILE)
+		r->LoadTexture(path + tex_file);
+	else if(tex_mode == TEXTURE_DATA)
+		r->LoadTexture(tex_ext, tex_data, tex_size);
 
 	return r;
 }
@@ -1434,7 +1558,7 @@ bool CompareTriangleDist(tTriangle *a, tTriangle *b)
 	return a->cam_dist > b->cam_dist;
 }
 
-bool CompareTriangleMaterial(tTriangle *a, tTriangle *b)
+/*bool CompareTriangleMaterial(tTriangle *a, tTriangle *b)
 {
 	//if(a->mat == b->mat)
 	//	return CompareDist(a, b);
@@ -1443,30 +1567,30 @@ bool CompareTriangleMaterial(tTriangle *a, tTriangle *b)
 		return a->mat < b->mat;
 	else
 		return b->mat->GetTransparent() && !a->mat->GetTransparent();
-}
+}*/
 
-bool CompareMaterialTransparency(tMaterial *a, tMaterial *b)
+/*bool CompareMaterialTransparency(tMaterial *a, tMaterial *b)
 {
 	if(b->GetTransparent() == a->GetTransparent())
 		return a < b;
 	else
 		return b->GetTransparent() && !a->GetTransparent();
-}
+}*/
 
-void tMesh::SortTriangles(tVector cam)
+/*void tMesh::SortTriangles(tVector cam)
 {
 	//vector<CTriangle *>::iterator t;
 	//vector<CVertex *>::iterator v;
 
-	/*for(v=vertices.begin(); v!=vertices.end(); v++)
-		(*v)->cam_dist = (cam - ApplyMatrix4(transformation, **v)).SquaredLen();
+	//for(v=vertices.begin(); v!=vertices.end(); v++)
+	//	(*v)->cam_dist = (cam - ApplyMatrix4(transformation, **v)).SquaredLen();
 	
-	for(t=triangles.begin(); t!=triangles.end(); t++)
-		(*t)->cam_dist = ((*t)->v[0]->cam_dist + (*t)->v[1]->cam_dist + (*t)->v[2]->cam_dist) * (1.0/3.0);*/
+	//for(t=triangles.begin(); t!=triangles.end(); t++)
+	//	(*t)->cam_dist = ((*t)->v[0]->cam_dist + (*t)->v[1]->cam_dist + (*t)->v[2]->cam_dist) * (1.0/3.0);
 
 	sort(triangles.begin(), triangles.end(), CompareTriangleMaterial);
 	refresh_vbos = true;
-}
+}*/
 
 void tMesh::SortMaterials(void)
 {

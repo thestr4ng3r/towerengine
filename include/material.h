@@ -3,6 +3,18 @@
 
 class tMaterial
 {
+	public:
+		virtual ~tMaterial(void) {}
+
+		virtual bool InitGeometryPass(tRenderer *renderer)					{ return false; }
+		virtual bool InitForwardPass(tRenderer *renderer, float *transform)	{ return false; }
+
+		virtual bool GetCubeMapReflectionEnabled(void)	{ return false; }
+		virtual tVector GetCubeMapReflectionColor(void)	{ return Vec(0.0, 0.0, 0.0); }
+};
+
+class tDefaultMaterial : public tMaterial
+{
 	protected:
 		struct Diffuse
 		{
@@ -41,11 +53,11 @@ class tMaterial
 			tVector color;
 		} cube_map_reflection;
 
-		bool transparent;
+		//bool transparent;
 
 	public:
-		tMaterial(void);
-		~tMaterial(void);
+		tDefaultMaterial(void);
+		~tDefaultMaterial(void);
 
 		void SetDiffuse(tVector color);
 		void SetSpecular(tVector color, float exponent);
@@ -65,9 +77,9 @@ class tMaterial
 		void LoadBumpTexture(const char *extension, const void *data, unsigned int size);
 		void LoadSelfIlluminationTexture(const char *extension, const void *data, unsigned int size);
 
-		void InitGeometryPass(tRenderer *renderer);
+		//bool GetTransparent(void)	{ return transparent; }
 
-		bool GetTransparent(void)	{ return transparent; }
+		bool InitGeometryPass(tRenderer *renderer);
 
 		bool GetCubeMapReflectionEnabled(void)	{ return cube_map_reflection.enabled; }
 		tVector GetCubeMapReflectionColor(void)	{ return cube_map_reflection.color; }

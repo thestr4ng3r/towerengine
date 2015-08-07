@@ -11,7 +11,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	geometry_pass_shader = new tGeometryPassShader();
 	geometry_pass_shader->Init();
 	//SetCurrentFaceShader(geometry_pass_shader);
-	
+
 	glGenFramebuffers(1, &fbo);
 
 	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 2);
@@ -32,6 +32,9 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 
 	for(vector<tPointLightingShader *>::iterator psi=point_lighting_shaders.begin(); psi!=point_lighting_shaders.end(); psi++)
 		(*psi)->Init(gbuffer);
+
+	simple_forward_shader = new tSimpleForwardShader();
+	simple_forward_shader->Init();
 
 	ambient_lighting_shader = new tAmbientLightingShader();
 	ambient_lighting_shader->Init(gbuffer);
@@ -137,6 +140,7 @@ tRenderer::~tRenderer(void)
 	delete gbuffer;
 
 	delete geometry_pass_shader;
+	delete simple_forward_shader;
 	delete ambient_lighting_shader;
 	delete directional_lighting_shader;
 

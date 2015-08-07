@@ -178,6 +178,9 @@ void tWorld::FillRenderSpace(tRenderSpace *space, tCulling *culling, bool init_c
 
 void tWorld::Step(float time)
 {
+	if(time < 0.001)
+		time = 0.001;
+
 	physics.dynamics_world->stepSimulation(time, 10);
 
 	for(vector<tParticleSystem *>::iterator psi = particle_systems.begin(); psi != particle_systems.end(); psi++)
