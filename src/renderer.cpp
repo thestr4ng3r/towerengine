@@ -530,6 +530,7 @@ void tRenderer::LightPass(void)
 void tRenderer::ForwardPass(void)
 {
 	current_rendering_render_space->ForwardPass(this);
+	glDepthMask(GL_TRUE);
 
 	if(world->GetParticleSystemsCount() > 0)
 	{

@@ -52,12 +52,15 @@ bool tSimpleForwardMaterial::InitForwardPass(tRenderer *renderer, float *transfo
 	{
 		case ALPHA:
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDepthMask(GL_TRUE);
 			break;
 		case ADD:
 			glBlendFunc(GL_ONE, GL_ONE);
+			glDepthMask(GL_FALSE);
 			break;
 		case MULTIPLY:
 			glBlendFunc(GL_DST_COLOR, GL_ZERO);
+			glDepthMask(GL_FALSE);
 			break;
 	}
 

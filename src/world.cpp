@@ -16,7 +16,10 @@ tWorld::tWorld(void)
 	physics.collision_dispatcher = new btCollisionDispatcher(physics.collision_configuration);
 	physics.solver = new btSequentialImpulseConstraintSolver();
 	physics.dynamics_world = new btDiscreteDynamicsWorld(physics.collision_dispatcher, physics.broadphase, physics.solver, physics.collision_configuration);
-	physics.dynamics_world->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
+	physics.dynamics_world->setGravity(btVector3(0, -10, 0));
+	//physics.dynamics_world->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
+
+	physics.broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
 }
 
 tWorld::~tWorld(void)
@@ -152,11 +155,14 @@ void tWorld::FillRenderSpace(tRenderSpace *space, tCulling *culling, bool init_c
 		if(!(*pi)->GetEnabled())
 			continue;
 
-		light_pos = (*pi)->GetPosition();
-		light_dist = (*pi)->GetDistance();
+		if(!(*pi)->GetShadowInvalid())
+		{
+			light_pos = (*pi)->GetPosition();
+			light_dist = (*pi)->GetDistance();
 
-		if(culling->TestSphereCulling(light_pos, light_dist))
-			continue;
+			if(culling->TestSphereCulling(light_pos, light_dist))
+				continue;
+		}
 
 		space->point_lights.insert(*pi);
 	}
@@ -182,6 +188,7 @@ void tWorld::Step(float time)
 		time = 0.001;
 
 	physics.dynamics_world->stepSimulation(time, 10);
+	//CProfileManager::dumpAll();
 
 	for(vector<tParticleSystem *>::iterator psi = particle_systems.begin(); psi != particle_systems.end(); psi++)
 		(*psi)->Step(time);

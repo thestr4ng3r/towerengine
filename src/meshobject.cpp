@@ -161,7 +161,9 @@ void tMeshObject::InitMeshRigidBody(float mass)
 
 		btConvexTriangleMeshShape *shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
 
+		shape->setMargin(0.01);
 		shape->calculateLocalInertia(mass, inertia);
+
 		rigid_body = new btRigidBody(mass, motion_state, shape, inertia);
 		//rigid_body->setActivationState(DISABLE_DEACTIVATION);
 	}
@@ -172,6 +174,8 @@ void tMeshObject::InitMeshRigidBody(float mass)
 			shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), true);
 		else
 			shape = new btEmptyShape();
+
+		shape->setMargin(0.01);
 
 		rigid_body = new btRigidBody(0.0, motion_state, shape, btVector3(0.0, 0.0, 0.0));
 	}
