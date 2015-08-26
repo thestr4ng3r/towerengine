@@ -19,12 +19,12 @@ void tVertex::Create(tMesh *mesh)
 	{
 		this->mesh = mesh;
 		mesh->AddVertex(this);
-		id = 0;
+		id = -1;
 	}
 	else
 	{
 		mesh = 0;
-		id = 0;
+		id = -1;
 	}
 }
 

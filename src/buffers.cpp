@@ -38,6 +38,7 @@ tIBO::tIBO(int size)
 tIBO::~tIBO(void)
 {
 	glDeleteBuffers(1, &ibo);
+	delete [] data;
 }
 
 bool tIBO::SetSize(int size, bool copy)

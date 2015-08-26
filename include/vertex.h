@@ -10,7 +10,7 @@ struct tVertex
 	tVector pos;
 	float cam_dist;
 	tVector2 uv;
-	bool uv_set;
+	//bool uv_set;
 	tVector normal;
 	tVector tang, bitang;
 

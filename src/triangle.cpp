@@ -40,7 +40,7 @@ void tTriangle::Set(tVertex *v1, tVertex *v2, tVertex *v3, tVector color)
     this->color = color;
 }
 
-tTriangle *tTriangle::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material, tVector t1, tVector t2, tVector t3, tMesh *chain)
+tTriangle *tTriangle::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material, tMesh *chain)
 {
     tTriangle *t;
 

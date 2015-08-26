@@ -23,7 +23,7 @@ struct tTriangle
 	void Set(tVertex *v1, tVertex *v2, tVertex *v3, tVector color);
 	void Flip(void) { tVertex *temp = v[0]; v[0] = v[2]; v[2] = temp; };
 
-	static tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material, tVector t1, tVector t2, tVector t3, tMesh *parent = 0);
+	static tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material, tMesh *parent = 0);
 };
 
 #endif

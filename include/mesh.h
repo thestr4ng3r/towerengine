@@ -4,13 +4,15 @@
 #define TEM_VERSION_0_1				1
 #define TEM_VERSION_0_2				2
 #define TEM_VERSION_0_3				3
+#define TEM_VERSION_0_4				3
 
 #define TEM_VERSION_0_1_STRING		"0.1"
 #define TEM_VERSION_0_2_STRING		"0.2"
 #define TEM_VERSION_0_3_STRING		"0.3"
+#define TEM_VERSION_0_4_STRING		"0.4"
 
-#define TEM_CURRENT_VERSION			TEM_VERSION_0_3
-#define TEM_CURRENT_VERSION_STRING	TEM_VERSION_0_3_STRING
+#define TEM_CURRENT_VERSION			TEM_VERSION_0_4
+#define TEM_CURRENT_VERSION_STRING	TEM_VERSION_0_4_STRING
 
 template <class T> class tVBO;
 
@@ -80,6 +82,7 @@ class tMesh
 		tVertex *ParseVertexNode(rapidxml::xml_node<char> *cur);
 		tMaterial *ParseMaterialNode(rapidxml::xml_node<char> *cur, std::string path);
 		tTriangle *ParseTriangleNode(rapidxml::xml_node<char> *cur, tMaterialManager *material_manager);
+		void ParseMeshDataNode(rapidxml::xml_node<char> *cur, tMaterialManager *material_manager, int &current_vertex_id);
 		tMeshPose *ParsePoseNode(rapidxml::xml_node<char> *cur);
 		tAnimation *ParseAnimationNode(rapidxml::xml_node<char> *cur);
 		tKeyFrame *ParseKeyFrameNode(rapidxml::xml_node<char> *cur, tAnimation *anim);
@@ -168,7 +171,7 @@ class tMesh
 		btTriangleMesh *GetPhysicsMesh(void)		{ return physics_triangle_mesh; }
 
 		tVertex *CreateVertex(tVector v);
-		tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material, tVector t1, tVector t2, tVector t3);
+		tTriangle *CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material);
 		//tTriangle *CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, std::string material, tVector t1, tVector t2, tVector t3);
 		tMeshPose *CreateCustomPose(std::string name);
 		tEntity *CreateEntity(std::string name, std::string group = std::string());

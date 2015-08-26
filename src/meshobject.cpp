@@ -159,7 +159,11 @@ void tMeshObject::InitMeshRigidBody(float mass)
 		btVector3 inertia;
 		//btBoxShape *shape = new btBoxShape(btVector3(1.0, 1.0, 1.0));
 
-		btConvexTriangleMeshShape *shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
+		btCollisionShape *shape;
+		if(mesh->GetPhysicsMesh())
+			shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
+		else
+			shape = new btEmptyShape();
 
 		shape->setMargin(0.01);
 		shape->calculateLocalInertia(mass, inertia);
