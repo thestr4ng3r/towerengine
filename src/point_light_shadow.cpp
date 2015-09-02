@@ -105,7 +105,11 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	glLoadIdentity();
 	gluPerspective(90.0, 1.0, 0.001, light->GetDistance());*/
 
-	projection_matrix.SetPerspective(90.0, 1.0, 0.001, light->GetDistance()); // TODO: maybe higher near clip
+	float near_clip = 0.01;
+	float far_clip = light->GetDistance();
+	float clear_color[] = { far_clip, far_clip * far_clip, 0.0, 0.0 };
+
+	projection_matrix.SetPerspective(90.0, 1.0, near_clip, far_clip);
 
 	renderer->SetCurrentFaceShader(renderer->GetPointShadowShader()); // TODO: bind once in tRenderer before rendering all pointlights
 	renderer->BindCurrentFaceShader();
@@ -115,7 +119,8 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	for(s=0; s<6; s++)
 	{
 		glDrawBuffer(GL_COLOR_ATTACHMENT0 + s);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glClearBufferfv(GL_COLOR, s, clear_color);
 
 		//glMatrixMode(GL_MODELVIEW);
 		//glLoadIdentity();

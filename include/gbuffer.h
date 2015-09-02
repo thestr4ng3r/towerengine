@@ -27,6 +27,7 @@ class tGBuffer
 		GLenum *draw_buffers;
 		int *tex_units;
 
+		void CreateTexImage(GBUFFER_TEXTURE_TYPE type, int width, int height);
 
 	public:
 		tGBuffer(int width, int height, GLuint fbo, int first_attachment);
@@ -37,11 +38,11 @@ class tGBuffer
 		void BindDrawBuffers(void);
 		void BindTextures(void);
 
-		GLuint GetTexture(GBUFFER_TEXTURE_TYPE type)	{ return tex[type]; }
-		int GetTextureUnit(GBUFFER_TEXTURE_TYPE type)	{ return tex_units[type]; }
-		int GetLastTextureUnit(void)					{ return tex_count-1; }
+		GLuint GetTexture(GBUFFER_TEXTURE_TYPE type)		{ return tex[type]; }
+		int GetTextureUnit(GBUFFER_TEXTURE_TYPE type)		{ return tex_units[type]; }
+		int GetLastTextureUnit(void)						{ return tex_count-1; }
 
-		static int GetTexCount(void)					{ return tex_count; }
+		static int GetTexCount(void)						{ return tex_count; }
 };
 
 

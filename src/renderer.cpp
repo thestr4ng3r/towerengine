@@ -356,8 +356,10 @@ void tRenderer::GeometryPass(void)
 {
 	gbuffer->BindDrawBuffers();
 
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	float clear_color[] = { 0.0, 0.0, 0.0, 0.0 };
+	glClearBufferfv(GL_COLOR, tGBuffer::DIFFUSE_TEX, clear_color);
+
 	glViewport(0, 0, screen_width, screen_height);
 
 	glEnable(GL_DEPTH_TEST);

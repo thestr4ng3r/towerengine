@@ -50,6 +50,8 @@ void tCoordinateSystemObject::ForwardPass(tRenderer *renderer)
 	else
 		glDisable(GL_DEPTH_TEST);
 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	renderer->GetColorShader()->Bind();
 	renderer->GetColorShader()->SetModelViewProjectionmatrix(renderer->GetCurrentRenderingCamera()->GetModelViewProjectionMatrix().GetData());
 	renderer->GetColorShader()->SetTransformation(tMatrix4::identity_matrix);
