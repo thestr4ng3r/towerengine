@@ -595,6 +595,27 @@ void tMesh::ForwardPass(tRenderer *renderer, float *transform)
 	}
 }
 
+
+void tMesh::RefractionPass(tRenderer *renderer, float *transform)
+{
+	bool vao_bound = false;
+
+	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
+	{
+		if(i->first->InitRefractionPass(renderer, transform))
+		{
+			if(!vao_bound)
+			{
+				vao_bound = true;
+				vao->Bind();
+				//current_pose->vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
+			}
+
+			i->second->ibo->Draw(GL_TRIANGLES);
+		}
+	}
+}
+
 /*bool tMesh::GetCubeMapReflectionEnabled(void)
 {
 	vector<tMeshMaterial *>::iterator i;
@@ -777,6 +798,8 @@ tMaterial *tMesh::ParseXMLMaterialNode(xml_node<> *cur, string &name, string pat
 	{
 		if(strcmp(attr->value(), "simple_forward") == 0)
 			return ParseXMLSimpleForwardMaterialNode(cur, name, path);
+		else if(strcmp(attr->value(), "refraction") == 0)
+			return ParseXMLRefractionMaterialNode(cur, name, path);
 		else
 			return ParseXMLDefaultMaterialNode(cur, name, path);
 	}
@@ -1100,6 +1123,114 @@ tSimpleForwardMaterial *tMesh::ParseXMLSimpleForwardMaterialNode(xml_node<> *cur
 
 	return r;
 }
+
+
+tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, string &name, string path)
+{
+	xml_node<> *child;
+
+	int color_tex_mode = TEXTURE_DISABLED;
+	string color_tex_file;
+	int normal_tex_mode = TEXTURE_DISABLED;
+	string normal_tex_file;
+	tVector color = Vec(1.0, 1.0, 1.0);
+
+	unsigned char *color_tex_data = 0;
+	size_t color_tex_size = 0;
+	char *color_tex_ext = 0;
+
+	unsigned char *normal_tex_data = 0;
+	size_t normal_tex_size = 0;
+	char *normal_tex_ext = 0;
+
+	char *base64_temp = 0;
+
+
+	xml_attribute<> *attr;
+
+	if(!(attr = cur->first_attribute("name")))
+		return 0;
+
+	name = string(attr->value());
+
+	child = cur->first_node();
+	while(child)
+	{
+		char *name_temp = child->name();
+
+		if(strcmp(name_temp, "color_tex") == 0)
+		{
+			if((attr = child->first_attribute("file")))
+			{
+				color_tex_file = string(attr->value());
+				color_tex_mode = TEXTURE_FILE;
+			}
+			else if(child->value_size() > 0)
+			{
+				base64_temp = child->value();
+
+				Base64Decode(base64_temp, &color_tex_data, &color_tex_size);
+
+				attr = child->first_attribute("image-extension");
+				if(attr)
+					color_tex_ext = attr->value();
+				else
+					color_tex_ext = 0;
+				color_tex_mode = TEXTURE_DATA;
+			}
+		}
+		else if(strcmp(name_temp, "normal_tex") == 0)
+		{
+			if((attr = child->first_attribute("file")))
+			{
+				normal_tex_file = string(attr->value());
+				normal_tex_mode = TEXTURE_FILE;
+			}
+			else if(child->value_size() > 0)
+			{
+				base64_temp = child->value();
+
+				Base64Decode(base64_temp, &normal_tex_data, &normal_tex_size);
+
+				attr = child->first_attribute("image-extension");
+				if(attr)
+					normal_tex_ext = attr->value();
+				else
+					normal_tex_ext = 0;
+				normal_tex_mode = TEXTURE_DATA;
+			}
+		}
+		else if(strcmp(name_temp, "color") == 0)
+		{
+			if((attr = child->first_attribute("r")))
+				color.r = atof(attr->value());
+			if((attr = child->first_attribute("g")))
+				color.g = atof(attr->value());
+			if((attr = child->first_attribute("b")))
+				color.b = atof(attr->value());
+		}
+
+		child = child->next_sibling();
+	}
+
+
+	tRefractionMaterial *r = new tRefractionMaterial();
+
+	r->SetColor(color);
+
+	if(color_tex_mode == TEXTURE_FILE)
+		r->LoadColorTexture(path + color_tex_file);
+	else if(color_tex_mode == TEXTURE_DATA)
+		r->LoadColorTexture(color_tex_ext, color_tex_data, color_tex_size);
+
+	if(normal_tex_mode == TEXTURE_FILE)
+		r->LoadNormalTexture(path + normal_tex_file);
+	else if(normal_tex_mode == TEXTURE_DATA)
+		r->LoadNormalTexture(normal_tex_ext, normal_tex_data, normal_tex_size);
+
+	return r;
+}
+
 
 tMaterial *tMesh::ParseMaterialNode(xml_node<> *cur, string path)
 {

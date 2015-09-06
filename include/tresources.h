@@ -37,5 +37,7 @@ extern const char *particle_shader_frag;
 extern const char *particle_shader_geom;
 extern const char *simple_forward_shader_vert;
 extern const char *simple_forward_shader_frag;
+extern const char *refraction_shader_vert;
+extern const char *refraction_shader_frag;
 
 #endif

@@ -8,6 +8,7 @@ class tRenderer
 	protected:
 		tGeometryPassShader *geometry_pass_shader;
 		tSimpleForwardShader *simple_forward_shader;
+		tRefractionShader *refraction_shader;
 		tAmbientLightingShader *ambient_lighting_shader;
 		tSSAOAmbientLightingShader *ssao_ambient_lighting_shader;
 		tDirectionalLightingShader *directional_lighting_shader;
@@ -59,6 +60,8 @@ class tRenderer
 
 		tCubeMapReflection *cube_map_reflection;
 
+		int current_read_color_tex;
+
 		tCamera *current_rendering_camera;
 		tRenderSpace *current_rendering_render_space;
 
@@ -69,6 +72,7 @@ class tRenderer
 		void GeometryPass(void);
 		void LightPass(void);
 		void ForwardPass(void);
+		void RefractionPass(void);
 
 		void ChangeScreenSize(int width, int height);
 
@@ -93,6 +97,7 @@ class tRenderer
 
 		tGeometryPassShader *GetGeometryPassShader(void)					{ return geometry_pass_shader; }
 		tSimpleForwardShader *GetSimpleForwardShader(void)					{ return simple_forward_shader; }
+		tRefractionShader *GetRefractionShader(void)						{ return refraction_shader; }
 		tAmbientLightingShader *GetAmbientLightingShader(void)				{ return ambient_lighting_shader; }
 		tDirectionalLightingShader *GetDirectionalLightingShader(void)		{ return directional_lighting_shader; }
 		//tPointLightingShader *GetPointLightingShader(void)					{ return point_lighting_shader; }
@@ -120,7 +125,7 @@ class tRenderer
 		tGBuffer *GetGBuffer(void)			{ return gbuffer; }
 
 		GLuint GetDepthTexture(void)		{ return depth_tex; }
-
+		GLuint GetCurrentReadColorTexture(void)			{ return color_tex[current_read_color_tex]; }
 		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
 
 		void SetPointLightShadowRenderLimit(int limit)	{ this->point_light_shadow_limit = limit; }

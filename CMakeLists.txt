@@ -128,7 +128,9 @@ set(towerengine_SRC
 	src/default_renderer.cpp
 	src/vr_renderer.cpp
 	src/simple_forward_shader.cpp
-	src/simple_forward_material.cpp)
+	src/simple_forward_material.cpp
+	src/refraction_shader.cpp
+	src/refraction_material.cpp)
 
 add_definitions(-g -Wall)
 

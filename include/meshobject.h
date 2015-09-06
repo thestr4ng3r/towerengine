@@ -52,6 +52,7 @@ class tMeshObject : public tTransformObject
 
 		void GeometryPass(tRenderer *renderer);
 		void ForwardPass(tRenderer *renderer);
+		void RefractionPass(tRenderer *renderer);
 		tBoundingBox GetBoundingBox(void);
 
 		//bool GetCubeMapReflectionEnabled(void)	{ return mesh->GetCubeMapReflectionEnabled(); }

@@ -120,7 +120,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	{
 		glDrawBuffer(GL_COLOR_ATTACHMENT0 + s);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		glClearBufferfv(GL_COLOR, s, clear_color);
+		glClearBufferfv(GL_COLOR, 0, clear_color);
 
 		//glMatrixMode(GL_MODELVIEW);
 		//glLoadIdentity();

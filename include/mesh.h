@@ -90,6 +90,7 @@ class tMesh
 
 		static tDefaultMaterial *ParseXMLDefaultMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 		static tSimpleForwardMaterial *ParseXMLSimpleForwardMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
+		static tRefractionMaterial *ParseXMLRefractionMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 
 	public:
 		static float color[4];
@@ -108,6 +109,7 @@ class tMesh
 
 		void GeometryPass(tRenderer *renderer);
 		void ForwardPass(tRenderer *renderer, float *transform);
+		void RefractionPass(tRenderer *renderer, float *transform);
 
 		//bool GetCubeMapReflectionEnabled(void);
 

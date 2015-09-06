@@ -36,6 +36,9 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	simple_forward_shader = new tSimpleForwardShader();
 	simple_forward_shader->Init();
 
+	refraction_shader = new tRefractionShader();
+	refraction_shader->Init();
+
 	ambient_lighting_shader = new tAmbientLightingShader();
 	ambient_lighting_shader->Init(gbuffer);
 
@@ -130,6 +133,8 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	screen_quad_vbo->SetAttribute(tShader::vertex_attribute, GL_FLOAT);
 
 	point_light_shadow_limit = -1;
+
+	current_read_color_tex = 0;
 }
 
 tRenderer::~tRenderer(void)
@@ -141,6 +146,7 @@ tRenderer::~tRenderer(void)
 
 	delete geometry_pass_shader;
 	delete simple_forward_shader;
+	delete refraction_shader;
 	delete ambient_lighting_shader;
 	delete directional_lighting_shader;
 
@@ -251,10 +257,16 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 
 	ForwardPass();
 
+	current_read_color_tex = 0;
+
+	glReadBuffer(GL_COLOR_ATTACHMENT0 + current_read_color_tex);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
+	glBlitFramebuffer(0, 0, screen_width, screen_height, 0, 0, screen_width, screen_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	RefractionPass();
+	current_read_color_tex = 1-current_read_color_tex;
+
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
-
-	int current_read_color_tex = 0;
 
 	if(fog_enabled)
 	{
@@ -550,6 +562,12 @@ void tRenderer::ForwardPass(void)
 		glDepthMask(GL_TRUE);
 	}
 }
+
+void tRenderer::RefractionPass(void)
+{
+	current_rendering_render_space->RefractionPass(this);
+}
+
 
 
 void tRenderer::ChangeScreenSize(int width, int height)

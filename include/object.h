@@ -18,6 +18,7 @@ class tObject
 
 		virtual void GeometryPass(tRenderer *) {}
 		virtual void ForwardPass(tRenderer *) {}
+		virtual void RefractionPass(tRenderer *) {}
 		virtual tBoundingBox GetBoundingBox(void) = 0;
 
 		void AddedObjectToWorld(tWorld *world);

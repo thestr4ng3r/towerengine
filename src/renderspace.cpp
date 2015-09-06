@@ -23,6 +23,14 @@ void tRenderObjectSpace::ForwardPass(tRenderer *renderer)
 		(*i)->ForwardPass(renderer);
 }
 
+void tRenderObjectSpace::RefractionPass(tRenderer *renderer)
+{
+	set<tObject *>::iterator i;
+
+	for(i=objects.begin(); i!=objects.end(); i++)
+		(*i)->RefractionPass(renderer);
+}
+
 
 void tRenderSpace::Clear(void)
 {

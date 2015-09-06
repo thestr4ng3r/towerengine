@@ -6,8 +6,9 @@ class tMaterial
 	public:
 		virtual ~tMaterial(void) {}
 
-		virtual bool InitGeometryPass(tRenderer *renderer)					{ return false; }
-		virtual bool InitForwardPass(tRenderer *renderer, float *transform)	{ return false; }
+		virtual bool InitGeometryPass(tRenderer *renderer)						{ return false; }
+		virtual bool InitForwardPass(tRenderer *renderer, float *transform)		{ return false; }
+		virtual bool InitRefractionPass(tRenderer *renderer, float *transform)	{ return false; }
 
 		virtual bool GetCubeMapReflectionEnabled(void)	{ return false; }
 		virtual tVector GetCubeMapReflectionColor(void)	{ return Vec(0.0, 0.0, 0.0); }

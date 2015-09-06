@@ -13,6 +13,7 @@ struct tRenderObjectSpace
 
 	void GeometryPass(tRenderer *renderer);
 	void ForwardPass(tRenderer *renderer);
+	void RefractionPass(tRenderer *renderer);
 };
 
 struct tRenderSpace : public tRenderObjectSpace
