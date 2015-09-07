@@ -1158,28 +1158,7 @@ tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, stri
 	{
 		char *name_temp = child->name();
 
-		if(strcmp(name_temp, "color_tex") == 0)
-		{
-			if((attr = child->first_attribute("file")))
-			{
-				color_tex_file = string(attr->value());
-				color_tex_mode = TEXTURE_FILE;
-			}
-			else if(child->value_size() > 0)
-			{
-				base64_temp = child->value();
-
-				Base64Decode(base64_temp, &color_tex_data, &color_tex_size);
-
-				attr = child->first_attribute("image-extension");
-				if(attr)
-					color_tex_ext = attr->value();
-				else
-					color_tex_ext = 0;
-				color_tex_mode = TEXTURE_DATA;
-			}
-		}
-		else if(strcmp(name_temp, "normal_tex") == 0)
+		if(strcmp(name_temp, "normal_tex") == 0)
 		{
 			if((attr = child->first_attribute("file")))
 			{
@@ -1208,6 +1187,26 @@ tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, stri
 				color.g = atof(attr->value());
 			if((attr = child->first_attribute("b")))
 				color.b = atof(attr->value());
+
+
+			if((attr = child->first_attribute("file")))
+			{
+				color_tex_file = string(attr->value());
+				color_tex_mode = TEXTURE_FILE;
+			}
+			else if(child->value_size() > 0)
+			{
+				base64_temp = child->value();
+
+				Base64Decode(base64_temp, &color_tex_data, &color_tex_size);
+
+				attr = child->first_attribute("image-extension");
+				if(attr)
+					color_tex_ext = attr->value();
+				else
+					color_tex_ext = 0;
+				color_tex_mode = TEXTURE_DATA;
+			}
 		}
 
 		child = child->next_sibling();
