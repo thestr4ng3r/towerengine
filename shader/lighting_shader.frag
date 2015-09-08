@@ -8,6 +8,10 @@ uniform sampler2D position_tex_uni;
 uniform sampler2D diffuse_tex_uni;
 uniform sampler2D normal_tex_uni;
 uniform sampler2D specular_tex_uni;
+uniform sampler2D self_illumination_tex_uni;
+
+uniform bool ssao_enabled_uni;
+uniform sampler2D ssao_tex_uni;
 
 in vec2 uv_coord_var;
 
@@ -19,15 +23,23 @@ uniform vec3 light_ambient_color_uni;
 
 // point lights
 
-#define MAX_POINT_LIGHTS_COUNT 10
+#define MAX_POINT_LIGHTS_COUNT 32
 
-uniform int point_light_count_uni;
-uniform vec3 point_light_pos_uni[MAX_POINT_LIGHTS_COUNT];
-uniform vec3 point_light_color_uni[MAX_POINT_LIGHTS_COUNT];
-uniform float point_light_distance_uni[MAX_POINT_LIGHTS_COUNT];
-uniform bool point_light_shadow_enabled_uni[MAX_POINT_LIGHTS_COUNT];
-uniform samplerCube point_light_shadow_map_uni[MAX_POINT_LIGHTS_COUNT];
+struct PointLight
+{
+	float dist;
+	int shadow_enabled;
+	vec3 pos;
+	vec3 color;
+	samplerCube shadow_map;
+};
 
+
+layout(std140, binding = 0) uniform PointLightBlock
+{	
+	int count;
+	PointLight light[MAX_POINT_LIGHTS_COUNT];
+} point_light_uni;
 
 float linstep(float min, float max, float v)
 {
@@ -51,9 +63,18 @@ void main(void)
 	
 	
 	
-	// ambient lighting
+	// ambient lighting, ssao and self illumination
 	
 	vec3 color = diffuse.rgb * light_ambient_color_uni;
+	
+	if(ssao_enabled_uni)
+	{
+		float occlusion = texture(ssao_tex_uni, uv_coord_var).r;
+		color *= occlusion;
+	}
+	
+	vec3 self_illumination = texelFetch(self_illumination_tex_uni, texel_uv, 0).rgb;
+	color += self_illumination;
 	
 	
 	// point lighting
@@ -67,23 +88,23 @@ void main(void)
 	vec3 specular_color;
 	float specular_intensity;
 	
-	for(int i=0; i<point_light_count_uni; i++)
+	for(int i=0; i<point_light_uni.count; i++)
 	{
 		shadow = 1.0;
 	
-		light_dir = point_light_pos_uni[i] - position.xyz; // pos to light
+		light_dir = point_light_uni.light[i].pos - position.xyz; // pos to light
 		light_dist_sq = light_dir.x * light_dir.x + light_dir.y * light_dir.y + light_dir.z * light_dir.z; // squared distance
-		if(light_dist_sq <= point_light_distance_uni[i] * point_light_distance_uni[i])
+		if(light_dist_sq <= point_light_uni.light[i].dist * point_light_uni.light[i].dist)
 		{
 			light_dist = sqrt(light_dist_sq); // real distance
 			light_dir /= light_dist; // normalized dir
 			
-			if(point_light_shadow_enabled_uni[i])
+			if(point_light_uni.light[i].shadow_enabled != 0)
 			{ 
-				vec2 moments = texture(point_light_shadow_map_uni[i], -light_dir).rg;
+				vec2 moments = texture(point_light_uni.light[i].shadow_map, -light_dir).rg;
 				//vec2 moments = vec2(0.0);
 				
-				float light_depth = length(point_light_pos_uni[i] - position.xyz) - 0.01;
+				float light_depth = length(point_light_uni.light[i].pos - position.xyz) - 0.01;
 							
 				// Surface is fully lit. as the current fragment is before the light occluder
 				if(light_depth <= moments.x)
@@ -102,17 +123,16 @@ void main(void)
 				shadow = 1.0;
 		
 		
-			light_dist_attenuation = (1.0 - light_dist / point_light_distance_uni[i]);
-			light_intensity = max(dot(normal, light_dir), 0.0) *  light_dist_attenuation;
-			color += shadow * light_intensity * point_light_color_uni[i] * diffuse.rgb; // diffuse light
+			light_dist_attenuation = (1.0 - light_dist / point_light_uni.light[i].dist);
+			light_intensity = max(dot(normal, light_dir), 0.0) * light_dist_attenuation;
+			color += shadow * light_intensity * point_light_uni.light[i].color * diffuse.rgb; // diffuse light
 		
 			//specular
-			specular_color = specular.rgb * point_light_color_uni[i];
+			specular_color = specular.rgb * point_light_uni.light[i].color;
 			specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0);
 			color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow * light_dist_attenuation;
 		}
 	}
-	
 	
 	color_out = vec4(color, 1.0);
 }

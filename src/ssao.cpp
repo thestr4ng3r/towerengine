@@ -88,10 +88,14 @@ tSSAO::tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_s
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, blur_tex, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	tex_handle = glGetTextureHandleARB(tex);
+	tex_handle_resident = false;
 }
 
 tSSAO::~tSSAO(void)
 {
+	MakeTextureHandleResident(false);
 	glDeleteTextures(1, &tex);
 	glDeleteTextures(1, &blur_tex);
 	glDeleteFramebuffers(1, &fbo);
@@ -153,10 +157,23 @@ void tSSAO::Render(void)
 	blur_shader->SetTexture(blur_tex);
 	blur_shader->SetBlurDirection(true);
 	renderer->RenderScreenQuad();
+
+	MakeTextureHandleResident(true);
 }
 
 
+void tSSAO::MakeTextureHandleResident(bool resident)
+{
+	if(tex_handle_resident == resident)
+		return;
 
+	if(resident)
+		glMakeTextureHandleResidentARB(tex_handle);
+	else
+		glMakeTextureHandleNonResidentARB(tex_handle);
+
+	tex_handle_resident = resident;
+}
 
 
 

@@ -123,6 +123,9 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
+	glGenBuffers(1, &point_lights_buffer);
+
+
 	screen_quad_vao = new tVAO();
 	screen_quad_vao->Bind();
 
@@ -178,8 +181,6 @@ tRenderer::~tRenderer(void)
 
 void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int noise_tex_size)
 {
-	return; // TODO: remove
-
 	ssao_ambient_only = ambient_only;
 
 	if(ssao_ambient_only)
@@ -262,20 +263,20 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	LightPass();
 
-	//ForwardPass();
+	ForwardPass();
 
 	current_read_color_tex = 0;
 
-	//glReadBuffer(GL_COLOR_ATTACHMENT0 + current_read_color_tex);
-	//glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
-	//glBlitFramebuffer(0, 0, screen_width, screen_height, 0, 0, screen_width, screen_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	//RefractionPass();
-	//current_read_color_tex = 1-current_read_color_tex;
+	glReadBuffer(GL_COLOR_ATTACHMENT0 + current_read_color_tex);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
+	glBlitFramebuffer(0, 0, screen_width, screen_height, 0, 0, screen_width, screen_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	RefractionPass();
+	current_read_color_tex = 1-current_read_color_tex;
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	/*if(fog_enabled)
+	if(fog_enabled)
 	{
 		glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
 
@@ -286,7 +287,7 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 		RenderScreenQuad();
 
 		current_read_color_tex = 1 - current_read_color_tex;
-	}*/
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, dst_fbo);
 
@@ -419,19 +420,6 @@ void tRenderer::LightPass(void)
 
 	gbuffer->BindTextures();
 
-	/*if(ssao && ssao_ambient_only)
-	{
-		ssao_ambient_lighting_shader->Bind();
-		ssao_ambient_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
-		ssao_ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
-	}
-	else
-	{
-		ambient_lighting_shader->Bind();
-		ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
-	}*/
-
-
 
 
 	// point lights
@@ -447,53 +435,66 @@ void tRenderer::LightPass(void)
 	}
 
 	int point_lights_count = point_lights.size();
-	float *point_lights_pos = new float[point_lights_count*3];
-	float *point_lights_color = new float[point_lights_count*3];
-	float *point_lights_dist = new float[point_lights_count];
-	int *point_lights_shadow_enabled = new int[point_lights_count];
-	GLuint64 *point_lights_shadow_map_handles = new GLuint64[point_lights_count];
+	if(point_lights_count > tLightingShader::max_point_lights_count)
+		point_lights_count = tLightingShader::max_point_lights_count;
+	unsigned int buffer_size = 16+4*16*tLightingShader::max_point_lights_count;
+	unsigned char *point_lights_data = new unsigned char[buffer_size];
 
+	((int *)(&point_lights_data[0*16]))[0] = point_lights_count;
 
 	vector<tPointLight *>::iterator point_light_it;
 	int point_light_i = 0;
-	for(point_light_it=point_lights.begin(); point_light_it!=point_lights.end(); point_light_it++, point_light_i++)
+
+	for(point_light_it=point_lights.begin(); point_light_it!=point_lights.end() && point_light_i<point_lights_count; point_light_it++, point_light_i++)
 	{
 		tPointLight *light = *point_light_it;
-		memcpy(point_lights_pos + 3*point_light_i, light->GetPosition().v, sizeof(float)*3);
-		memcpy(point_lights_color + 3*point_light_i, light->GetColor().v, sizeof(float)*3);
-		point_lights_dist[point_light_i] = light->GetDistance();
 
-		if(light->GetShadowEnabled())
+		unsigned int buffer_pos = 16 + point_light_i*4*16;
+
+		((float *)(&point_lights_data[buffer_pos]))[0] = light->GetDistance();
+		((int *)(&point_lights_data[buffer_pos]))[1] = light->GetShadowEnabled() ? 1 : 0;
+		((float *)(&point_lights_data[buffer_pos+16]))[0] = light->GetPosition().x;
+		((float *)(&point_lights_data[buffer_pos+16]))[1] = light->GetPosition().y;
+		((float *)(&point_lights_data[buffer_pos+16]))[2] = light->GetPosition().z;
+		((float *)(&point_lights_data[buffer_pos+2*16]))[0] = light->GetColor().x;
+		((float *)(&point_lights_data[buffer_pos+2*16]))[1] = light->GetColor().y;
+		((float *)(&point_lights_data[buffer_pos+2*16]))[2] = light->GetColor().z;
+
+		GLuint64 shadow_handle = 0;
+		if(light->GetShadow())
 		{
-			point_lights_shadow_enabled[point_light_i] = 1;
-			point_lights_shadow_map_handles[point_light_i] = light->GetShadow()->GetTextureHandle();
 			light->GetShadow()->MakeTextureHandleResident(true);
+			shadow_handle = light->GetShadow()->GetTextureHandle();
 		}
-		else
-		{
-			point_lights_shadow_enabled[point_light_i] = 0;
-			point_lights_shadow_map_handles[point_light_i] = 0;
-		}
+		((GLuint64 *)(&point_lights_data[buffer_pos+3*16]))[0] = shadow_handle;
 	}
+
+	glBindBuffer(GL_UNIFORM_BUFFER, point_lights_buffer);
+	glBufferData(GL_UNIFORM_BUFFER, buffer_size, point_lights_data, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBufferBase(GL_UNIFORM_BUFFER, tLightingShader::point_light_binding_point, point_lights_buffer);
 
 	lighting_shader->Bind();
 	lighting_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 	lighting_shader->SetAmbientLight(world->GetAmbientColor());
-	lighting_shader->SetPointLights(	point_lights_count,
-										point_lights_pos,
-										point_lights_color,
-										point_lights_dist,
-										point_lights_shadow_enabled,
-										point_lights_shadow_map_handles);
+	if(ssao && ssao_ambient_only)
+		lighting_shader->SetSSAO(true, ssao->GetTextureHandle());
+	else
+		lighting_shader->SetSSAO(false, 0);
+
 
 	RenderScreenQuad();
 
-	delete[] point_lights_pos;
-	delete[] point_lights_color;
-	delete[] point_lights_dist;
-	delete[] point_lights_shadow_enabled;
-	delete[] point_lights_shadow_map_handles;
+	glEnable(GL_BLEND);
+	if(ssao && !ssao_ambient_only)
+	{
+		glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
+		ssao_lighting_shader->Bind();
+		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
+
+		RenderScreenQuad();
+	}
 
 	/*
 
@@ -584,17 +585,8 @@ void tRenderer::LightPass(void)
 	delete[] point_lights_color;
 	delete[] point_lights_dist;
 	delete[] point_lights_shadow_enabled;
-	delete[] point_lights_shadow_maps;
+	delete[] point_lights_shadow_maps;*/
 
-	if(ssao && !ssao_ambient_only)
-	{
-		glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-		ssao_lighting_shader->Bind();
-		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
-
-		RenderScreenQuad();
-	}*/
 
 	/*point_lighting_shader->Bind();
 	point_lighting_shader->SetCameraPosition(camera->GetPosition());

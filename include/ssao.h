@@ -25,6 +25,11 @@ class tSSAO
 		GLuint tex;
 		GLuint blur_tex;
 
+		GLuint64 tex_handle;
+		bool tex_handle_resident;
+
+		void MakeTextureHandleResident(bool resident);
+
 	public:
 		tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_size = 4);
 		~tSSAO(void);
@@ -37,6 +42,8 @@ class tSSAO
 		int GetHeight(void)		{ return render_height; }
 
 		GLuint GetSSAOTexture(void)	{ return tex; }
+
+		GLuint64 GetTextureHandle(void)					{ return tex_handle; }
 };
 
 
