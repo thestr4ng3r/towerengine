@@ -8,10 +8,9 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 	InitScreenShader(lighting_shader_frag, "Lighting Shader");
 
 	position_tex_uniform = GetUniformLocation("position_tex_uni");
+	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
-	tang_tex_uniform = GetUniformLocation("tang_tex_uni");
-	uv_tex_uniform = GetUniformLocation("uv_tex_uni");
-	material_tex_uniform = GetUniformLocation("material_tex_uni");
+	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
 
 	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
 
@@ -29,10 +28,9 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 
 	Bind();
 	glUniform1i(position_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::POSITION_TEX));
+	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
-	glUniform1i(tang_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::TANG_TEX));
-	glUniform1i(uv_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::UV_TEX));
-	glUniform1i(material_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::MATERIAL_TEX));
+	glUniform1i(specular_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_TEX));
 }
 
 void tLightingShader::SetAmbientLight(tVector color)
@@ -40,22 +38,6 @@ void tLightingShader::SetAmbientLight(tVector color)
 	glUniform3f(light_ambient_color_uniform, color.x, color.y, color.z);
 }
 
-
-void tLightingShader::SetMaterials(std::vector<tDefaultMaterial *> &materials)
-{
-	int count = materials.size();
-
-	GLuint64 diffuse_textures[count];
-	int i=0;
-	for(std::vector<tDefaultMaterial *>::iterator it=materials.begin(); it!=materials.end(); it++)
-	{
-		tDefaultMaterial *mat = *it;
-		diffuse_textures[i] = mat->GetTextureHandle(tDefaultMaterial::DIFFUSE);
-		i++;
-	}
-
-	glUniformHandleui64vARB(diffuse_tex_uniform, count, diffuse_textures);
-}
 
 void tLightingShader::SetCameraPosition(tVector pos)
 {

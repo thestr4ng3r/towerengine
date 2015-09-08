@@ -144,9 +144,6 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 
 tRenderer::~tRenderer(void)
 {
-	for(vector<tDefaultMaterial *>::iterator i=rendering_materials.begin(); i!=rendering_materials.end(); i++)
-		(*i)->MakeTextureHandlesResident(false);
-
 	delete screen_quad_vbo;
 
 	delete ssao;
@@ -380,7 +377,7 @@ void tRenderer::GeometryPass(void)
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	float clear_color[] = { 0.0, 0.0, 0.0, 0.0 };
-	//glClearBufferfv(GL_COLOR, tGBuffer::DIFFUSE_TEX, clear_color);
+	glClearBufferfv(GL_COLOR, tGBuffer::DIFFUSE_TEX, clear_color);
 
 	glViewport(0, 0, screen_width, screen_height);
 
@@ -412,13 +409,13 @@ void tRenderer::LightPass(void)
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 
-	/*if(sky_box)
+	if(sky_box)
 	{
 		skybox_shader->Bind();
 		skybox_shader->SetModelViewProjectionMatrix(current_rendering_camera->GetModelViewProjectionMatrix().GetData());
 		skybox_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 		sky_box->Paint(this, current_rendering_camera->GetPosition());
-	}*/
+	}
 
 	gbuffer->BindTextures();
 
@@ -482,7 +479,6 @@ void tRenderer::LightPass(void)
 	lighting_shader->Bind();
 	lighting_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 	lighting_shader->SetAmbientLight(world->GetAmbientColor());
-	lighting_shader->SetMaterials(rendering_materials);
 	lighting_shader->SetPointLights(	point_lights_count,
 										point_lights_pos,
 										point_lights_color,
@@ -675,25 +671,6 @@ void tRenderer::RenderScreenQuad(void)
 {
 	screen_quad_vao->Draw(GL_TRIANGLE_STRIP, 0, 4);
 }
-
-
-int tRenderer::InitDefaultMaterialRender(tDefaultMaterial *mat)
-{
-	map<tDefaultMaterial *, int>::iterator map_i = rendering_materials_map.find(mat);
-
-	if(map_i == rendering_materials_map.end())
-	{
-		int index = rendering_materials.size();
-		rendering_materials.push_back(mat);
-		rendering_materials_map.insert(pair<tDefaultMaterial *, int>(mat, index));
-		mat->MakeTextureHandlesResident(true);
-		return index;
-	}
-
-	return map_i->second;
-}
-
-
 
 
 

@@ -9,13 +9,14 @@ class tGBuffer
 		enum BufferType
 		{
 			POSITION_TEX,
+			DIFFUSE_TEX,
 			NORMAL_TEX,
-			TANG_TEX,
-			UV_TEX,
-			MATERIAL_TEX
+			FACE_NORMAL_TEX,
+			SPECULAR_TEX,
+			SELF_ILLUMINATION_TEX
 		};
 
-		static const int tex_count = 5;
+		static const int tex_count = 6;
 
 	private:
 		GLuint fbo;
@@ -37,8 +38,8 @@ class tGBuffer
 		void BindDrawBuffers(void);
 		void BindTextures(void);
 
-		GLuint GetTexture(BufferType type)		{ return tex[type]; }
-		int GetTextureUnit(BufferType type)		{ return tex_units[type]; }
+		GLuint GetTexture(BufferType type)					{ return tex[type]; }
+		int GetTextureUnit(BufferType type)					{ return tex_units[type]; }
 		int GetLastTextureUnit(void)						{ return tex_count-1; }
 
 		static int GetTexCount(void)						{ return tex_count; }

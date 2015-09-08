@@ -2,23 +2,16 @@
 
 #extension GL_ARB_bindless_texture : require
 
-
 uniform vec3 cam_pos_uni;
 
 uniform sampler2D position_tex_uni;
+uniform sampler2D diffuse_tex_uni;
 uniform sampler2D normal_tex_uni;
-uniform sampler2D tang_tex_uni;
-uniform sampler2D uv_tex_uni;
-uniform usampler2D material_tex_uni;
+uniform sampler2D specular_tex_uni;
 
 in vec2 uv_coord_var;
 
 out vec4 color_out;
-
-
-uniform sampler2D diffuse_tex_uni[128];
-
-
 
 // ambient
 
@@ -26,7 +19,7 @@ uniform vec3 light_ambient_color_uni;
 
 // point lights
 
-#define MAX_POINT_LIGHTS_COUNT 16
+#define MAX_POINT_LIGHTS_COUNT 10
 
 uniform int point_light_count_uni;
 uniform vec3 point_light_pos_uni[MAX_POINT_LIGHTS_COUNT];
@@ -44,34 +37,23 @@ float linstep(float min, float max, float v)
 void main(void)
 {
 	ivec2 texel_uv = ivec2(uv_coord_var * textureSize(position_tex_uni, 0).xy);
-
-	vec3 position = texelFetch(position_tex_uni, texel_uv, 0).xyz;
-	vec3 normal = texelFetch(normal_tex_uni, texel_uv, 0).xyz;
-	vec4 tang_data = texelFetch(tang_tex_uni, texel_uv, 0);
-	vec3 tang = tang_data.xyz;
-	vec2 uv = texelFetch(uv_tex_uni, texel_uv, 0).xy;
-	uint material_index = texelFetch(material_tex_uni, texel_uv, 0).x;
 	
-	normal = normalize(normal);
-	tang = normalize(tang);
-	vec3 bitang = cross(normal, tang);
-	if(tang_data.w < 0.0)
-		bitang *= -1.0;
-	bitang = normalize(bitang);
+	vec4 diffuse = texelFetch(diffuse_tex_uni, texel_uv, 0).rgba;
+
+	if(diffuse.a == 0.0)
+		discard;
+	
+	vec3 position = texelFetch(position_tex_uni, texel_uv, 0).rgb; 	
+	vec3 normal = normalize(texelFetch(normal_tex_uni, texel_uv, 0).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
+	vec4 specular = texelFetch(specular_tex_uni, texel_uv, 0).rgba;
 		
 	vec3 cam_dir = normalize(cam_pos_uni - position.xyz);
-	
-	// material data
-	
-	vec3 diffuse = texture(diffuse_tex_uni[material_index], uv).rgb;
-	vec4 specular = vec4(1.0, 1.0, 1.0, 32.0); // TODO
-	
 	
 	
 	
 	// ambient lighting
 	
-	vec3 color = diffuse * light_ambient_color_uni;
+	vec3 color = diffuse.rgb * light_ambient_color_uni;
 	
 	
 	// point lighting
@@ -130,10 +112,6 @@ void main(void)
 			color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow * light_dist_attenuation;
 		}
 	}
-	
-	
-	
-	
 	
 	
 	color_out = vec4(color, 1.0);

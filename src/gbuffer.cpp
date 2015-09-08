@@ -69,17 +69,20 @@ void tGBuffer::CreateTexImage(BufferType type, int width, int height)
 		case POSITION_TEX:
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, 0);
 			break;
+		case DIFFUSE_TEX:
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			break;
 		case NORMAL_TEX:
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, 0);
 			break;
-		case TANG_TEX:
+		case FACE_NORMAL_TEX:
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+			break;
+		case SPECULAR_TEX:
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, 0);
 			break;
-		case UV_TEX:
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RG32F, width, height, 0, GL_RG, GL_FLOAT, 0);
-			break;
-		case MATERIAL_TEX:
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, 0);
+		case SELF_ILLUMINATION_TEX:
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, 0);
 			break;
 	}
 }

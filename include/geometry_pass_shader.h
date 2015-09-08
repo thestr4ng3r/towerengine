@@ -11,8 +11,6 @@ class tGeometryPassShader : public tFaceShader
 
 		GLint transformation_uniform;
 
-		GLint material_index_uniform;
-
 		GLint diffuse_color_uniform;
 		GLint diffuse_color2_uniform;
 		GLint specular_color_uniform;
@@ -64,8 +62,6 @@ class tGeometryPassShader : public tFaceShader
 		void SetCubeMapReflectionEnabled(bool enabled);
 		void SetCubeMapReflectionColor(tVector color);
 		void SetCubeMapReflectionTexture(GLuint tex);
-
-		void SetMaterialIndex(int index);
 };
 
 
