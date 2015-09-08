@@ -11,6 +11,7 @@ class tPointLightShadow
 		tRenderObjectSpace *render_object_space;
 
 		GLuint tex;
+		GLuint64 tex_handle;
 		GLuint fbo;
 		GLuint depth_rbo;
 
@@ -27,12 +28,18 @@ class tPointLightShadow
 
 		//bool culled;
 
+		bool tex_resident;
+
 	public:
 		tPointLightShadow(tPointLight *light, int size, bool blur_enabled = false);
+		~tPointLightShadow(void);
 
 		void Render(tRenderer *renderer);
 
 		GLuint GetShadowMap(void)			{ return tex; }
+		GLuint64 GetTextureHandle(void)		{ return tex_handle; }
+
+		void MakeTextureHandleResident(bool resident);
 
 		void SetBlurEnabled(bool enabled)	{ blur_enabled = enabled; }
 		void SetBlurSize(float size)		{ blur_size = size; }

@@ -39,6 +39,8 @@ class tFaceShader : public tShader
 		virtual void SetCubeMapReflectionEnabled(bool enabled) {}
 		virtual void SetCubeMapReflectionColor(tVector color) {}
 		virtual void SetCubeMapReflectionTexture(GLuint tex) {}
+
+		virtual void SetMaterialIndex(int index) {}
 };
 
 #endif

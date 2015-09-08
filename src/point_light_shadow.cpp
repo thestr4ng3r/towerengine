@@ -29,6 +29,9 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
+	tex_handle = glGetTextureHandleARB(tex);
+	tex_resident = false;
+
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -81,6 +84,14 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 	blur_vao->UnBind();*/
 }
 
+tPointLightShadow::~tPointLightShadow(void)
+{
+	MakeTextureHandleResident(false);
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteRenderbuffers(1, &depth_rbo);
+	glDeleteTextures(1, &tex);
+}
+
 void tPointLightShadow::Render(tRenderer *renderer)
 {
 	int s;
@@ -113,6 +124,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 
 	renderer->SetCurrentFaceShader(renderer->GetPointShadowShader()); // TODO: bind once in tRenderer before rendering all pointlights
 	renderer->BindCurrentFaceShader();
+	renderer->GetPointShadowShader()->Bind();
 	renderer->GetPointShadowShader()->SetLightPos(pos);
 	renderer->GetPointShadowShader()->SetLightDist(light->GetDistance());
 
@@ -183,6 +195,18 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void tPointLightShadow::MakeTextureHandleResident(bool resident)
+{
+	if(tex_resident == resident)
+		return;
+
+	if(resident)
+		glMakeTextureHandleResidentARB(tex_handle);
+	else
+		glMakeTextureHandleNonResidentARB(tex_handle);
+
+	tex_resident = resident;
+}
 
 
 

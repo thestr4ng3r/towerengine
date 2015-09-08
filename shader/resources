@@ -31,3 +31,4 @@ simple_forward_shader_vert: shader/simple_forward_shader.vert
 simple_forward_shader_frag: shader/simple_forward_shader.frag
 refraction_shader_vert: shader/refraction_shader.vert
 refraction_shader_frag: shader/refraction_shader.frag
+lighting_shader_frag: shader/lighting_shader.frag

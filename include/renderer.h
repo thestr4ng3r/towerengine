@@ -9,6 +9,7 @@ class tRenderer
 		tGeometryPassShader *geometry_pass_shader;
 		tSimpleForwardShader *simple_forward_shader;
 		tRefractionShader *refraction_shader;
+		tLightingShader *lighting_shader;
 		tAmbientLightingShader *ambient_lighting_shader;
 		tSSAOAmbientLightingShader *ssao_ambient_lighting_shader;
 		tDirectionalLightingShader *directional_lighting_shader;
@@ -64,6 +65,9 @@ class tRenderer
 
 		tCamera *current_rendering_camera;
 		tRenderSpace *current_rendering_render_space;
+
+		std::vector<tDefaultMaterial *> rendering_materials;
+		std::map<tDefaultMaterial *, int> rendering_materials_map;
 
 		void InitRenderer(int width, int height, tWorld *world);
 		void Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height);
@@ -129,6 +133,8 @@ class tRenderer
 		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
 
 		void SetPointLightShadowRenderLimit(int limit)	{ this->point_light_shadow_limit = limit; }
+
+		int InitDefaultMaterialRender(tDefaultMaterial *mat);
 };
 
 

@@ -39,6 +39,9 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	refraction_shader = new tRefractionShader();
 	refraction_shader->Init();
 
+	lighting_shader = new tLightingShader();
+	lighting_shader->Init(gbuffer);
+
 	ambient_lighting_shader = new tAmbientLightingShader();
 	ambient_lighting_shader->Init(gbuffer);
 
@@ -95,6 +98,8 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_tex[0], 0);
 
+	printf("first color tex: %d\n", color_tex[0]);
+
 	glBindTexture(GL_TEXTURE_2D, color_tex[1]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -139,6 +144,9 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 
 tRenderer::~tRenderer(void)
 {
+	for(vector<tDefaultMaterial *>::iterator i=rendering_materials.begin(); i!=rendering_materials.end(); i++)
+		(*i)->MakeTextureHandlesResident(false);
+
 	delete screen_quad_vbo;
 
 	delete ssao;
@@ -173,6 +181,8 @@ tRenderer::~tRenderer(void)
 
 void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int noise_tex_size)
 {
+	return; // TODO: remove
+
 	ssao_ambient_only = ambient_only;
 
 	if(ssao_ambient_only)
@@ -255,20 +265,20 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	LightPass();
 
-	ForwardPass();
+	//ForwardPass();
 
 	current_read_color_tex = 0;
 
-	glReadBuffer(GL_COLOR_ATTACHMENT0 + current_read_color_tex);
-	glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
-	glBlitFramebuffer(0, 0, screen_width, screen_height, 0, 0, screen_width, screen_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	RefractionPass();
-	current_read_color_tex = 1-current_read_color_tex;
+	//glReadBuffer(GL_COLOR_ATTACHMENT0 + current_read_color_tex);
+	//glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
+	//glBlitFramebuffer(0, 0, screen_width, screen_height, 0, 0, screen_width, screen_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	//RefractionPass();
+	//current_read_color_tex = 1-current_read_color_tex;
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	if(fog_enabled)
+	/*if(fog_enabled)
 	{
 		glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
 
@@ -279,10 +289,10 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 		RenderScreenQuad();
 
 		current_read_color_tex = 1 - current_read_color_tex;
-	}
-
+	}*/
 
 	glBindFramebuffer(GL_FRAMEBUFFER, dst_fbo);
+
 
 	if(viewport_width > 0 && viewport_height > 0)
 		glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
@@ -370,7 +380,7 @@ void tRenderer::GeometryPass(void)
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	float clear_color[] = { 0.0, 0.0, 0.0, 0.0 };
-	glClearBufferfv(GL_COLOR, tGBuffer::DIFFUSE_TEX, clear_color);
+	//glClearBufferfv(GL_COLOR, tGBuffer::DIFFUSE_TEX, clear_color);
 
 	glViewport(0, 0, screen_width, screen_height);
 
@@ -402,17 +412,17 @@ void tRenderer::LightPass(void)
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 
-	if(sky_box)
+	/*if(sky_box)
 	{
 		skybox_shader->Bind();
 		skybox_shader->SetModelViewProjectionMatrix(current_rendering_camera->GetModelViewProjectionMatrix().GetData());
 		skybox_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 		sky_box->Paint(this, current_rendering_camera->GetPosition());
-	}
+	}*/
 
 	gbuffer->BindTextures();
 
-	if(ssao && ssao_ambient_only)
+	/*if(ssao && ssao_ambient_only)
 	{
 		ssao_ambient_lighting_shader->Bind();
 		ssao_ambient_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
@@ -422,9 +432,74 @@ void tRenderer::LightPass(void)
 	{
 		ambient_lighting_shader->Bind();
 		ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
+	}*/
+
+
+
+
+	// point lights
+	vector<tPointLight *> point_lights;
+
+	set<tPointLight *>::iterator point_light_sit;
+	for(point_light_sit=current_rendering_render_space->point_lights.begin(); point_light_sit!=current_rendering_render_space->point_lights.end(); point_light_sit++)
+	{
+		tPointLight *light = *point_light_sit;
+		if(!light->GetEnabled())
+			continue;
+		point_lights.push_back(light);
 	}
 
+	int point_lights_count = point_lights.size();
+	float *point_lights_pos = new float[point_lights_count*3];
+	float *point_lights_color = new float[point_lights_count*3];
+	float *point_lights_dist = new float[point_lights_count];
+	int *point_lights_shadow_enabled = new int[point_lights_count];
+	GLuint64 *point_lights_shadow_map_handles = new GLuint64[point_lights_count];
+
+
+	vector<tPointLight *>::iterator point_light_it;
+	int point_light_i = 0;
+	for(point_light_it=point_lights.begin(); point_light_it!=point_lights.end(); point_light_it++, point_light_i++)
+	{
+		tPointLight *light = *point_light_it;
+		memcpy(point_lights_pos + 3*point_light_i, light->GetPosition().v, sizeof(float)*3);
+		memcpy(point_lights_color + 3*point_light_i, light->GetColor().v, sizeof(float)*3);
+		point_lights_dist[point_light_i] = light->GetDistance();
+
+		if(light->GetShadowEnabled())
+		{
+			point_lights_shadow_enabled[point_light_i] = 1;
+			point_lights_shadow_map_handles[point_light_i] = light->GetShadow()->GetTextureHandle();
+			light->GetShadow()->MakeTextureHandleResident(true);
+		}
+		else
+		{
+			point_lights_shadow_enabled[point_light_i] = 0;
+			point_lights_shadow_map_handles[point_light_i] = 0;
+		}
+	}
+
+	lighting_shader->Bind();
+	lighting_shader->SetCameraPosition(current_rendering_camera->GetPosition());
+	lighting_shader->SetAmbientLight(world->GetAmbientColor());
+	lighting_shader->SetMaterials(rendering_materials);
+	lighting_shader->SetPointLights(	point_lights_count,
+										point_lights_pos,
+										point_lights_color,
+										point_lights_dist,
+										point_lights_shadow_enabled,
+										point_lights_shadow_map_handles);
+
 	RenderScreenQuad();
+
+	delete[] point_lights_pos;
+	delete[] point_lights_color;
+	delete[] point_lights_dist;
+	delete[] point_lights_shadow_enabled;
+	delete[] point_lights_shadow_map_handles;
+
+
+	/*
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
@@ -523,7 +598,7 @@ void tRenderer::LightPass(void)
 		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
 
 		RenderScreenQuad();
-	}
+	}*/
 
 	/*point_lighting_shader->Bind();
 	point_lighting_shader->SetCameraPosition(camera->GetPosition());
@@ -598,17 +673,25 @@ void tRenderer::ChangeScreenSize(int width, int height)
 
 void tRenderer::RenderScreenQuad(void)
 {
-	//screen_quad_vao->Bind();
-	//screen_quad_vbo->SetAttribute(tShader::vertex_attribute, GL_FLOAT);
 	screen_quad_vao->Draw(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 
+int tRenderer::InitDefaultMaterialRender(tDefaultMaterial *mat)
+{
+	map<tDefaultMaterial *, int>::iterator map_i = rendering_materials_map.find(mat);
 
+	if(map_i == rendering_materials_map.end())
+	{
+		int index = rendering_materials.size();
+		rendering_materials.push_back(mat);
+		rendering_materials_map.insert(pair<tDefaultMaterial *, int>(mat, index));
+		mat->MakeTextureHandlesResident(true);
+		return index;
+	}
 
-
-
-
+	return map_i->second;
+}
 
 
 

@@ -37,6 +37,7 @@ class t2DRenderer;
 #include "comparable.h"
 
 #include "screen_shader.h"
+#include "lighting_shader.h"
 #include "ambient_lighting_shader.h"
 #include "ssao_ambient_lighting_shader.h"
 #include "directional_lighting_shader.h"

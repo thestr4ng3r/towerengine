@@ -1004,32 +1004,29 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 	r->SetSelfIlluminationColor(self_illum_color);
 
 	if(diffuse_mode == TEXTURE_FILE)
-	{
-		r->LoadDiffuseTexture(path + diffuse_file);
-		//printf("loading texture \"%s\"\n", (path + diffuse_file).c_str());
-	}
+		r->LoadTexture(tDefaultMaterial::DIFFUSE, path + diffuse_file);
 	else if(diffuse_mode == TEXTURE_DATA)
-		r->LoadDiffuseTexture(diffuse_ext, diffuse_data, diffuse_size);
+		r->LoadTexture(tDefaultMaterial::DIFFUSE, diffuse_ext, diffuse_data, diffuse_size);
 
 	if(specular_mode == TEXTURE_FILE)
-		r->LoadSpecularTexture(path + specular_file);
+		r->LoadTexture(tDefaultMaterial::SPECULAR, path + specular_file);
 	else if(specular_mode == TEXTURE_DATA)
-		r->LoadSpecularTexture(specular_ext, specular_data, specular_size);
+		r->LoadTexture(tDefaultMaterial::SPECULAR, specular_ext, specular_data, specular_size);
 
 	if(normal_mode == TEXTURE_FILE)
-		r->LoadNormalTexture(path + normal_file);
+		r->LoadTexture(tDefaultMaterial::NORMAL, path + normal_file);
 	else if(normal_mode == TEXTURE_DATA)
-		r->LoadNormalTexture(normal_ext, normal_data, normal_size);
+		r->LoadTexture(tDefaultMaterial::NORMAL, normal_ext, normal_data, normal_size);
 
 	if(bump_mode == TEXTURE_FILE)
-		r->LoadBumpTexture(path + bump_file);
+		r->LoadTexture(tDefaultMaterial::BUMP, path + bump_file);
 	else if(bump_mode == TEXTURE_DATA)
-		r->LoadBumpTexture(bump_ext, bump_data, bump_size);
+		r->LoadTexture(tDefaultMaterial::BUMP, bump_ext, bump_data, bump_size);
 
 	if(self_illum_mode == TEXTURE_FILE)
-		r->LoadSelfIlluminationTexture(path + self_illum_file);
+		r->LoadTexture(tDefaultMaterial::SELF_ILLUMINATION, path + self_illum_file);
 	else if(self_illum_mode == TEXTURE_DATA)
-		r->LoadSelfIlluminationTexture(self_illum_ext, self_illum_data, self_illum_size);
+		r->LoadTexture(tDefaultMaterial::SELF_ILLUMINATION, self_illum_ext, self_illum_data, self_illum_size);
 
 	return r;
 }

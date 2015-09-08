@@ -20,6 +20,8 @@ void tGeometryPassShader::Init(void)
 
 	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
 
+	material_index_uniform = GetUniformLocation("material_index_uni");
+
 	diffuse_color_uniform = GetUniformLocation("diffuse_color_uni");
 	diffuse_color2_uniform = GetUniformLocation("diffuse_color2_uni");
 	specular_color_uniform = GetUniformLocation("specular_color_uni");
@@ -191,4 +193,9 @@ void tGeometryPassShader::SetSelfIlluminationTexture(bool enabled, GLuint tex)
 		glActiveTexture(GL_TEXTURE0 + self_illumination_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
+}
+
+void tGeometryPassShader::SetMaterialIndex(int index)
+{
+	glUniform1ui(material_index_uniform, index);
 }

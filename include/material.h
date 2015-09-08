@@ -16,35 +16,38 @@ class tMaterial
 
 class tDefaultMaterial : public tMaterial
 {
+	public:
+		enum TextureType
+		{
+			DIFFUSE,
+			SPECULAR,
+			NORMAL,
+			SELF_ILLUMINATION,
+			BUMP
+		};
+
+		static const int tex_count = 5;
+
 	protected:
 		struct Diffuse
 		{
-			GLuint tex;
 			tVector color;
 		} diffuse;
 
 		struct Specular
 		{
-			GLuint tex;
 			float exponent;
 			tVector color;
 		} specular;
 
-		struct Normal
-		{
-			GLuint tex;
-		} normal;
-
 		struct SelfIllumination
 		{
 			tVector color;
-			GLuint tex;
 		} self_illum;
 
 		struct Bump
 		{
 			bool enabled;
-			GLuint tex;
 			float depth;
 		} bump;
 
@@ -56,6 +59,11 @@ class tDefaultMaterial : public tMaterial
 
 		//bool transparent;
 
+		GLuint tex[tex_count];
+		GLuint64 tex_handle[tex_count];
+
+		bool tex_handles_resident;
+
 	public:
 		tDefaultMaterial(void);
 		~tDefaultMaterial(void);
@@ -66,17 +74,11 @@ class tDefaultMaterial : public tMaterial
 		void SetSelfIlluminationColor(tVector color);
 		void SetCubeMapReflection(bool enabled, tVector color);
 
-		void LoadDiffuseTexture(std::string file);
-		void LoadSpecularTexture(std::string file);
-		void LoadNormalTexture(std::string file);
-		void LoadBumpTexture(std::string file);
-		void LoadSelfIlluminationTexture(std::string file);
+		void LoadTexture(TextureType type, std::string file);
+		void LoadTexture(TextureType type, const char *extension, const void *data, unsigned int size);
 
-		void LoadDiffuseTexture(const char *extension, const void *data, unsigned int size);
-		void LoadSpecularTexture(const char *extension, const void *data, unsigned int size);
-		void LoadNormalTexture(const char *extension, const void *data, unsigned int size);
-		void LoadBumpTexture(const char *extension, const void *data, unsigned int size);
-		void LoadSelfIlluminationTexture(const char *extension, const void *data, unsigned int size);
+		void MakeTextureHandlesResident(bool resident);
+		GLuint64 GetTextureHandle(TextureType type)		{ return tex_handle[type]; }
 
 		//bool GetTransparent(void)	{ return transparent; }
 

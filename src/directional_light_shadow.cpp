@@ -137,6 +137,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 
 	renderer->SetCurrentFaceShader(renderer->GetDirectionalShadowShader());
 	renderer->BindCurrentFaceShader();
+	renderer->GetDirectionalShadowShader()->Bind();
 	renderer->GetDirectionalShadowShader()->SetLightDir(light_dir);
 	renderer->GetDirectionalShadowShader()->SetClip(near_clip, far_clip);
 	renderer->GetDirectionalShadowShader()->SetCamPos(cam_pos);

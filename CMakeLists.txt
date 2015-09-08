@@ -130,7 +130,8 @@ set(towerengine_SRC
 	src/simple_forward_shader.cpp
 	src/simple_forward_material.cpp
 	src/refraction_shader.cpp
-	src/refraction_material.cpp)
+	src/refraction_material.cpp
+	src/lighting_shader.cpp)
 
 add_definitions(-g -Wall)
 
