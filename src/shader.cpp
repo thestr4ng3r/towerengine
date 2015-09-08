@@ -19,6 +19,11 @@ void tShader::CreateAndAttachShader(GLenum type, const char *src)
 void tShader::LinkProgram(void)
 {
 	glLinkProgram(program);
+
+	GLint param;
+	glGetProgramiv(program, GL_LINK_STATUS, &param);
+	if(param != GL_TRUE)
+		printf("failed to link %s\n", name);
 }
 
 void tShader::InitShader(const char *vert_src, const char *frag_src, const char *shader_name)
@@ -89,6 +94,12 @@ GLuint CreateShader(GLenum type, const char *src, const char *name)
 
 
 	glCompileShader(s);
+
+	GLint compile_status;
+	glGetShaderiv(s, GL_COMPILE_STATUS, &compile_status);
+	if(compile_status != GL_TRUE)
+		printf("failed to compile shader of %s\n", name);
+
 	PrintGLInfoLog("Compile", s, name);
 
 	return s;
