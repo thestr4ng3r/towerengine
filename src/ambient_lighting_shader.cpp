@@ -13,7 +13,7 @@ void tAmbientLightingShader::Init(tGBuffer *gbuffer)
 	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
 
 	Bind();
-	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::POSITION_TEX));
+	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
 	glUniform1i(self_illumination_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SELF_ILLUMINATION_TEX));
 }
 

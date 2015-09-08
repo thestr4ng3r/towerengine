@@ -146,6 +146,7 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 
 	renderer->GetAmbientLightingShader()->Bind();
 	renderer->GetAmbientLightingShader()->SetAmbientLight(world->GetAmbientColor());
+	//renderer->GetAmbientLightingShader()->SetAmbientLight(Vec(1.0, 1.0, 1.0));
 
 	renderer->RenderScreenQuad();
 
@@ -241,6 +242,7 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 	delete[] point_lights_dist;
 	delete[] point_lights_shadow_enabled;
 	delete[] point_lights_shadow_maps;
+
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
