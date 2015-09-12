@@ -3,6 +3,9 @@
 #include "tresources.h"
 
 
+using namespace std;
+
+
 void tLightingShader::Init(tGBuffer *gbuffer)
 {
 	InitScreenShader(lighting_shader_frag, "Lighting Shader");
@@ -21,14 +24,6 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
-
-	// point lighting
-	/*point_light_count_uniform = GetUniformLocation("point_light_count_uni");
-	point_light_pos_uniform = GetUniformLocation("point_light_pos_uni");
-	point_light_color_uniform = GetUniformLocation("point_light_color_uni");
-	point_light_distance_uniform = GetUniformLocation("point_light_distance_uni");*/
-	//point_light_shadow_enabled_uniform = GetUniformLocation("point_light_shadow_enabled_uni");
-	point_light_shadow_map_uniform = GetUniformLocation("point_light_shadow_map_uni");
 
 
 	Bind();
@@ -59,13 +54,73 @@ void tLightingShader::SetSSAO(bool enabled, GLuint64 tex_handle)
 }
 
 
-/*void tLightingShader::SetPointLights(int count, float *pos, float *color, float *dist, int *shadow_enabled, GLuint64 *shadow_map_handles)
-{
-	glUniform1i(point_light_count_uniform, count);
-	glUniform3fv(point_light_pos_uniform, count, pos);
-	glUniform3fv(point_light_color_uniform, count, color);
-	glUniform1fv(point_light_distance_uniform, count, dist);
 
-	glUniform1iv(point_light_shadow_enabled_uniform, count, shadow_enabled);
-	glUniformHandleui64vARB(point_light_shadow_map_uniform, count, shadow_map_handles);
-}*/
+// -------------------------------
+
+tLightingShaderPointLightsBuffer::tLightingShaderPointLightsBuffer(void)
+{
+	size = 16+4*16*tLightingShader::max_point_lights_count;
+	data = new unsigned char[size];
+
+	glGenBuffers(1, &buffer);
+}
+
+tLightingShaderPointLightsBuffer::~tLightingShaderPointLightsBuffer(void)
+{
+	glDeleteBuffers(1, &buffer);
+	delete [] data;
+}
+
+
+
+void tLightingShaderPointLightsBuffer::UpdateBuffer(std::vector<tPointLight *> lights)
+{
+	int lights_count = lights.size();
+	if(lights_count > tLightingShader::max_point_lights_count)
+		lights_count = tLightingShader::max_point_lights_count;
+
+	((int *)(&data[0*16]))[0] = lights_count;
+
+	vector<tPointLight *>::iterator point_light_it;
+	int point_light_i = 0;
+
+	for(point_light_it=lights.begin(); point_light_it!=lights.end() && point_light_i<lights_count; point_light_it++, point_light_i++)
+	{
+		tPointLight *light = *point_light_it;
+
+		unsigned int buffer_pos = 16 + point_light_i*4*16;
+
+		((float *)(&data[buffer_pos]))[0] = light->GetDistance();
+		((int *)(&data[buffer_pos]))[1] = light->GetShadowEnabled() ? 1 : 0;
+		((float *)(&data[buffer_pos+16]))[0] = light->GetPosition().x;
+		((float *)(&data[buffer_pos+16]))[1] = light->GetPosition().y;
+		((float *)(&data[buffer_pos+16]))[2] = light->GetPosition().z;
+		((float *)(&data[buffer_pos+2*16]))[0] = light->GetColor().x;
+		((float *)(&data[buffer_pos+2*16]))[1] = light->GetColor().y;
+		((float *)(&data[buffer_pos+2*16]))[2] = light->GetColor().z;
+
+		GLuint64 shadow_handle = 0;
+		if(light->GetShadow())
+		{
+			light->GetShadow()->MakeTextureHandleResident(true);
+			shadow_handle = light->GetShadow()->GetTextureHandle();
+		}
+		((GLuint64 *)(&data[buffer_pos+3*16]))[0] = shadow_handle;
+	}
+
+	glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+	glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);
+}
+
+void tLightingShaderPointLightsBuffer::Bind(void)
+{
+	glBindBufferBase(GL_UNIFORM_BUFFER, tLightingShader::point_light_binding_point, buffer);
+}
+
+
+
+
+
+
+
+

@@ -22,14 +22,6 @@ class tLightingShader : public tScreenShader
 		// ambient lighting
 		GLint light_ambient_color_uniform;
 
-		// point lighting
-		/*GLint point_light_count_uniform;
-		GLint point_light_pos_uniform;
-		GLint point_light_color_uniform;
-		GLint point_light_distance_uniform;
-		GLint point_light_shadow_enabled_uniform;*/
-		GLint point_light_shadow_map_uniform;
-
 	public:
 		static const int point_light_binding_point = 0;
 
@@ -40,6 +32,23 @@ class tLightingShader : public tScreenShader
 		void SetAmbientLight(tVector color);
 		void SetCameraPosition(tVector pos);
 		void SetSSAO(bool enabled, GLuint64 tex_handle);
+};
+
+class tLightingShaderPointLightsBuffer
+{
+	private:
+		unsigned int size;
+		unsigned char *data;
+
+		GLuint buffer;
+
+	public:
+		tLightingShaderPointLightsBuffer(void);
+		~tLightingShaderPointLightsBuffer(void);
+
+		void UpdateBuffer(std::vector<tPointLight *> lights);
+
+		void Bind(void);
 };
 
 

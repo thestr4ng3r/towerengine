@@ -74,16 +74,16 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 	blur_vertex_vbo = new tVBO<float>(2, 4);
 	static const float blur_vertices[] = {	-1.0, 1.0,
 											-1.0, -1.0,
-											1.0, -1.0,
-											1.0, 1.0 };
+											1.0, 1.0,
+											1.0, -1.0};
 	memcpy(blur_vertex_vbo->GetData(), blur_vertices, sizeof(float) * 8);
 	blur_vertex_vbo->AssignData();
 
 	blur_uv_vbo = new tVBO<float>(2, 4);
 	static const float blur_uv_coords[] = {	0.0, 1.0,
 											0.0, 0.0,
-											1.0, 0.0,
-											1.0, 1.0 };
+											1.0, 1.0,
+											1.0, 0.0 };
 	memcpy(blur_uv_vbo->GetData(), blur_uv_coords, sizeof(float) * 8);
 	blur_uv_vbo->AssignData();
 
@@ -241,7 +241,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, blur_draw_buffers[s], blur_tex, 0, s);
 
 
-	blur_vao->Draw(GL_QUADS, 0, 4);
+	blur_vao->Draw(GL_TRIANGLE_STRIP, 0, 4);
 
 	renderer->GetDirectionalShadowBlurShader()->SetTexture(blur_tex);
 	renderer->GetDirectionalShadowBlurShader()->SetTextureLayers(splits, v_blur);
@@ -250,7 +250,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 	for(s=0; s<splits; s++)
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, blur_draw_buffers[s], tex, 0, s);
 
-	blur_vao->Draw(GL_QUADS, 0, 4);
+	blur_vao->Draw(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 

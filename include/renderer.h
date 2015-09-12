@@ -57,8 +57,8 @@ class tRenderer
 
 		
 		std::list<tPointLight *> render_point_light_shadows;
+		tLightingShaderPointLightsBuffer *point_lights_buffer;
 
-		GLuint point_lights_buffer;
 
 		tCubeMapReflection *cube_map_reflection;
 

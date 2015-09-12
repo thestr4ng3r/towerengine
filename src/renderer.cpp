@@ -123,7 +123,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-	glGenBuffers(1, &point_lights_buffer);
+	point_lights_buffer = new tLightingShaderPointLightsBuffer();
 
 
 	screen_quad_vao = new tVAO();
@@ -434,45 +434,10 @@ void tRenderer::LightPass(void)
 		point_lights.push_back(light);
 	}
 
-	int point_lights_count = point_lights.size();
-	if(point_lights_count > tLightingShader::max_point_lights_count)
-		point_lights_count = tLightingShader::max_point_lights_count;
-	unsigned int buffer_size = 16+4*16*tLightingShader::max_point_lights_count;
-	unsigned char *point_lights_data = new unsigned char[buffer_size];
+	point_lights_buffer->UpdateBuffer(point_lights);
+	point_lights_buffer->Bind();
 
-	((int *)(&point_lights_data[0*16]))[0] = point_lights_count;
 
-	vector<tPointLight *>::iterator point_light_it;
-	int point_light_i = 0;
-
-	for(point_light_it=point_lights.begin(); point_light_it!=point_lights.end() && point_light_i<point_lights_count; point_light_it++, point_light_i++)
-	{
-		tPointLight *light = *point_light_it;
-
-		unsigned int buffer_pos = 16 + point_light_i*4*16;
-
-		((float *)(&point_lights_data[buffer_pos]))[0] = light->GetDistance();
-		((int *)(&point_lights_data[buffer_pos]))[1] = light->GetShadowEnabled() ? 1 : 0;
-		((float *)(&point_lights_data[buffer_pos+16]))[0] = light->GetPosition().x;
-		((float *)(&point_lights_data[buffer_pos+16]))[1] = light->GetPosition().y;
-		((float *)(&point_lights_data[buffer_pos+16]))[2] = light->GetPosition().z;
-		((float *)(&point_lights_data[buffer_pos+2*16]))[0] = light->GetColor().x;
-		((float *)(&point_lights_data[buffer_pos+2*16]))[1] = light->GetColor().y;
-		((float *)(&point_lights_data[buffer_pos+2*16]))[2] = light->GetColor().z;
-
-		GLuint64 shadow_handle = 0;
-		if(light->GetShadow())
-		{
-			light->GetShadow()->MakeTextureHandleResident(true);
-			shadow_handle = light->GetShadow()->GetTextureHandle();
-		}
-		((GLuint64 *)(&point_lights_data[buffer_pos+3*16]))[0] = shadow_handle;
-	}
-
-	glBindBuffer(GL_UNIFORM_BUFFER, point_lights_buffer);
-	glBufferData(GL_UNIFORM_BUFFER, buffer_size, point_lights_data, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	glBindBufferBase(GL_UNIFORM_BUFFER, tLightingShader::point_light_binding_point, point_lights_buffer);
 
 	lighting_shader->Bind();
 	lighting_shader->SetCameraPosition(current_rendering_camera->GetPosition());
@@ -496,7 +461,7 @@ void tRenderer::LightPass(void)
 		RenderScreenQuad();
 	}
 
-	/*
+
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
@@ -512,6 +477,7 @@ void tRenderer::LightPass(void)
 		RenderScreenQuad();
 	}
 
+	/*
 
 	// point lights
 	vector<tPointLight *> point_lights;
