@@ -56,4 +56,6 @@ void tDirectionalLight::InitRenderLighting(tDirectionalLightingShader *shader)
 									shadow_tex_matrix,
 									shadow_splits_count,
 									shadow_splits_z);
+
+	delete [] shadow_tex_matrix;
 }

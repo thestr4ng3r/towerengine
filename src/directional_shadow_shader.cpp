@@ -37,8 +37,7 @@ void tDirectionalShadowShader::SetLightDir(tVector v)
 
 void tDirectionalShadowShader::SetTransformation(const float m[16])
 {
-	if(transformation_uniform != -1)
-		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
+	glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
 void tDirectionalShadowShader::SetVertexMix(float m)
@@ -81,8 +80,6 @@ void tDirectionalShadowBlurShader::Init(void)
 
 	LinkProgram();
 
-	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
-
 	tex_uniform = GetUniformLocation("tex_uni");
 	tex_layers_count_uniform = GetUniformLocation("tex_layers_count_uni");
 	blur_dir_uniform = GetUniformLocation("blur_dir_uni");
@@ -90,11 +87,6 @@ void tDirectionalShadowBlurShader::Init(void)
 
 	Bind();
 	glUniform1i(tex_uniform, 0);
-}
-
-void tDirectionalShadowBlurShader::SetModelViewProjectionMatrix(float m[16])
-{
-	glUniformMatrix4fv(modelview_projection_matrix_uniform, 1, GL_TRUE, m);
 }
 
 void tDirectionalShadowBlurShader::SetTexture(GLuint tex)

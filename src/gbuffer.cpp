@@ -26,8 +26,6 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 		tex_units[i] = i;
 	}
 
-	printf("first gbuffer texture: %d\n", tex[0]);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

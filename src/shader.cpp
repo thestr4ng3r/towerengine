@@ -30,6 +30,8 @@ void tShader::InitShader(const char *vert_src, const char *frag_src, const char 
 {
 	name = shader_name;
 	program = glCreateProgram();
+	if(name)
+		glObjectLabel(GL_PROGRAM, program, strlen(name), name);
 	CreateAndAttachShader(GL_VERTEX_SHADER, vert_src);
 	CreateAndAttachShader(GL_FRAGMENT_SHADER, frag_src);
 }

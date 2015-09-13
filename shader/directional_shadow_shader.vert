@@ -22,8 +22,8 @@ void main(void)
 	if(vertex_mix_uni > 0.0)
 		vertex_pos = vertex_pos * (1.0 - vertex_mix_uni) + vertex2_attr * vertex_mix_uni;
 	vec4 pos = vec4(vertex_pos, 1.0) * transformation_uni;
-	
-	moment1_var = dot(pos.xyz - cam_pos_uni, light_dir_uni) / (clip_uni.y - clip_uni.x);
+		
+	moment1_var = dot(pos.xyz - cam_pos_uni, light_dir_uni);// / (clip_uni.y - clip_uni.x);
 	uv_var = uv_attr;
 	
 	gl_Position = modelview_projection_matrix_uni * pos;

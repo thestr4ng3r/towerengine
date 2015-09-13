@@ -43,6 +43,23 @@ void main()
 		color += texture(tex_uni, vec3(uv_coord_var + blur_dir * 2.0, layer)).rg * 0.2;
 		
 		#endif
+		
+		
+		/*switch(s)
+		{
+			case 0:
+				color = vec2(1.0, 0.0);
+				break;
+			case 1:
+				color = vec2(0.0, 1.0);
+				break;
+			case 2:
+				color = vec2(1.0, 1.0);
+				break;
+			case 3:
+				color = vec2(0.0, 0.0);
+				break;
+		}*/
 				
 		tex_out[s] = vec4(color, 0.0, 1.0);
 	}

@@ -6,6 +6,8 @@ uniform sampler2D diffuse_tex_uni;
 in float moment1_var;
 in vec2 uv_var;
 
+in vec3 debug_var;
+
 out vec4 color_out;
 
 void main(void)

@@ -192,24 +192,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 
 		renderer->GetDirectionalShadowShader()->SetModelViewProjectionMatrix(modelview_projection_matrix.GetData());
 
-		/*glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(left, right, bottom, top, near_clip, far_clip);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		gluLookAt(cam_pos.x, cam_pos.y, cam_pos.z, light_to.x, light_to.y, light_to.z, light_up.x, light_up.y, light_up.z);
-
-		glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
-		glGetFloatv(GL_PROJECTION_MATRIX, projection);
-
-		tMatrix4 modelview_mat(modelview);
-		tMatrix4 projection_mat(projection);
-		tMatrix4 mul = projection_mat * modelview_mat;*/
-
 		memcpy(tex_matrix[s], modelview_projection_matrix.GetData(), sizeof(float) * 16);
-
-		//CombineMatrix4(modelview, projection, tex_matrix[s]);
 
 		glClearColor(1.0, 1.0, 1.0, 1.0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -223,6 +206,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 		return;
 
 	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 
 	// TODO: use tRenderer::RenderScreenQuad
 
@@ -251,6 +235,8 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, blur_draw_buffers[s], tex, 0, s);
 
 	blur_vao->Draw(GL_TRIANGLE_STRIP, 0, 4);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 

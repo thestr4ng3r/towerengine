@@ -47,8 +47,8 @@ void main(void)
 	
 	vec3 cam_dir = normalize(cam_pos_uni - position.xyz);
 	
-	float shadow = 1.0;	
-
+	float shadow = 1.0;
+	
 	if(directional_light_shadow_enabled_uni)
 	{ 
 		vec2 coord = vec2(0.0, 0.0);
@@ -56,7 +56,9 @@ void main(void)
 		
 		for(int s=0; s<directional_light_shadow_splits_count_uni; s++)
 		{
-			coord = ((directional_light_shadow_tex_matrix_uni[s] * vec4(position.xyz, 1.0)).xy * 0.5) + vec2(0.5, 0.5);
+			vec4 coord2 = directional_light_shadow_tex_matrix_uni[s] * vec4(position.xyz, 1.0);
+			coord2 /= coord2.w;
+			coord = coord2.xy * 0.5 + vec2(0.5, 0.5);
 			
 			if(!(coord.x < 0.0 || coord.x > 1.0 || coord.y < 0.0 || coord.y > 1.0))
 			{	
@@ -68,19 +70,19 @@ void main(void)
 		if(layer != -1)
 		{
 			vec2 moments = texture(directional_light_shadow_map_uni, vec3(coord, float(layer))).rg;
-										
-			float light_dot = dot(position.xyz - cam_pos_uni, -directional_light_dir_uni) / (directional_light_shadow_clip_uni.y - directional_light_shadow_clip_uni.x);
-
+													
+			float light_dot = dot(position.xyz - cam_pos_uni, -directional_light_dir_uni);// / (directional_light_shadow_clip_uni.y - directional_light_shadow_clip_uni.x);
+			
 			if(light_dot <= moments.x)
 				shadow = 1.0;
 			else
 			{
-				float p = smoothstep(light_dot-0.0005, light_dot, moments.x);
+				float p = smoothstep(light_dot-0.00005, light_dot, moments.x);
 			    float variance = max(moments.y - moments.x*moments.x, -0.001);
 			    float d = light_dot - moments.x;
-			    float p_max = linstep(0.5, 1.0, variance / (variance + d*d));
+			    float p_max = linstep(0.8, 1.0, variance / (variance + d*d));
 			    
-			   	shadow = clamp(max(p, p_max), 0.0, 1.0);
+			   	shadow = p_max; //clamp(max(p, p_max), 0.0, 1.0);
 			}	
 		}
 		else
@@ -88,6 +90,7 @@ void main(void)
 	}
 	else
 		shadow = 1.0;
+		
 		
 		
 	float light_intensity = max(dot(normal, directional_light_dir_uni), 0.0);

@@ -102,9 +102,9 @@ void tMatrix4::SetOrtho(float left, float right, float top, float bottom, float 
 {
 	SetIdentity();
 
-	v[0] = 2.0 / (right - left);	v[3] = -((right + left) / (right - left));
-	v[5] = 2.0 / (top - bottom);	v[7] = -((top + bottom) / (top - bottom));
-	v[10] = 2.0 / (far_clip - near_clip);		v[11] = -((far_clip + near_clip) / (far_clip - near_clip));
+	v[0] = 2.0 / (right - left);				v[3] = -((right + left) / (right - left));
+	v[5] = 2.0 / (top - bottom);				v[7] = -((top + bottom) / (top - bottom));
+	v[10] = -2.0 / (far_clip - near_clip);		v[11] = -((far_clip + near_clip) / (far_clip - near_clip));
 	//v[15] = 1.0;
 }
 

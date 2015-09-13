@@ -10,14 +10,14 @@ out vec4 color_out;
 void main(void)
 {
 	vec3 dir = pos_var - light_pos_uni;
-	float dist = dir.x * dir.x + dir.y * dir.y + dir.z * dir.z;
+	float dist_sq = dir.x * dir.x + dir.y * dir.y + dir.z * dir.z;
 	
-	if(dist > light_dist_uni * light_dist_uni)
+	if(dist_sq > light_dist_uni * light_dist_uni)
 		discard;
 	
-	dist = sqrt(dist);
+	float dist = sqrt(dist_sq);
 	
-	color_out = vec4(dist, dist*dist, 0.0, 1.0);
+	color_out = vec4(dist, dist_sq, 0.0, 1.0);
 }
 
 

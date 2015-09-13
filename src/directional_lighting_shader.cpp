@@ -39,7 +39,7 @@ void tDirectionalLightingShader::SetDirectionalLight(tVector dir, tVector color,
 	glUniform3f(directional_light_color_uniform, color.x, color.y, color.z);
 	glUniform1i(directional_light_shadow_enabled_uniform, shadow_enabled);
 	glUniform2f(directional_light_shadow_clip_uniform, shadow_clip.x, shadow_clip.y);
-	glUniformMatrix4fv(directional_light_shadow_tex_matrix_uniform, shadow_splits_count, GL_FALSE, shadow_tex_matrix);
+	glUniformMatrix4fv(directional_light_shadow_tex_matrix_uniform, shadow_splits_count, GL_TRUE, shadow_tex_matrix);
 	glUniform1i(directional_light_shadow_splits_count_uniform, shadow_splits_count);
 	glUniform1fv(directional_light_shadow_splits_z_uniform, shadow_splits_count+1, shadow_splits_z);
 
