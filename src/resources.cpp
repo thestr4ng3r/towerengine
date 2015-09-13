@@ -1362,6 +1362,7 @@ const char *lighting_shader_frag =
 "#version 330\n"
 "\n"
 "#extension GL_ARB_bindless_texture : require\n"
+"#extension GL_ARB_shading_language_420pack : require\n"
 "\n"
 "uniform vec3 cam_pos_uni;\n"
 "\n"

@@ -8,7 +8,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	this->screen_width = width;
 	this->screen_height = height;
 
-	this->bindless_textures_enabled = tEngine::GetARBBindlessTextureSupported() && bindless_textures;
+	this->bindless_textures_enabled = tEngine::GetARBShadingLanguage420PackSupported() && tEngine::GetARBBindlessTextureSupported() && bindless_textures;
 
 	geometry_pass_shader = new tGeometryPassShader();
 	geometry_pass_shader->Init();

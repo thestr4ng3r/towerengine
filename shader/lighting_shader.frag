@@ -1,6 +1,7 @@
 #version 330
 
 #extension GL_ARB_bindless_texture : require
+#extension GL_ARB_shading_language_420pack : require
 
 uniform vec3 cam_pos_uni;
 
