@@ -25,10 +25,12 @@ class tSSAO
 		GLuint tex;
 		GLuint blur_tex;
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 		GLuint64 tex_handle;
 		bool tex_handle_resident;
 
 		void MakeTextureHandleResident(bool resident);
+#endif
 
 	public:
 		tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_size = 4);
@@ -43,8 +45,12 @@ class tSSAO
 
 		GLuint GetSSAOTexture(void)	{ return tex; }
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 		GLuint64 GetTextureHandle(void)					{ return tex_handle; }
+#endif
 };
 
 
 #endif
+
+

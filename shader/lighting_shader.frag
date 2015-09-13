@@ -1,4 +1,4 @@
-#version 450 core
+#version 330
 
 #extension GL_ARB_bindless_texture : require
 

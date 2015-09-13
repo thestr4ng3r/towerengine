@@ -259,7 +259,7 @@ const char *geometry_pass_shader_frag =
 "";
 
 const char *screen_shader_vert = 
-"#version 450 core\n"
+"#version 330\n"
 "\n"
 "in vec2 vertex_attr;\n"
 "\n"
@@ -1359,7 +1359,7 @@ const char *refraction_shader_frag =
 "}";
 
 const char *lighting_shader_frag = 
-"#version 450 core\n"
+"#version 330\n"
 "\n"
 "#extension GL_ARB_bindless_texture : require\n"
 "\n"

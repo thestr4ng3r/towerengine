@@ -1,4 +1,4 @@
-#version 450 core
+#version 330
 
 in vec2 vertex_attr;
 

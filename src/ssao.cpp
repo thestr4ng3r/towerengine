@@ -89,13 +89,17 @@ tSSAO::tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_s
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 	tex_handle = glGetTextureHandleARB(tex);
 	tex_handle_resident = false;
+#endif
 }
 
 tSSAO::~tSSAO(void)
 {
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 	MakeTextureHandleResident(false);
+#endif
 	glDeleteTextures(1, &tex);
 	glDeleteTextures(1, &blur_tex);
 	glDeleteFramebuffers(1, &fbo);
@@ -158,10 +162,13 @@ void tSSAO::Render(void)
 	blur_shader->SetBlurDirection(true);
 	renderer->RenderScreenQuad();
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 	MakeTextureHandleResident(true);
+#endif
 }
 
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 void tSSAO::MakeTextureHandleResident(bool resident)
 {
 	if(tex_handle_resident == resident)
@@ -174,6 +181,8 @@ void tSSAO::MakeTextureHandleResident(bool resident)
 
 	tex_handle_resident = resident;
 }
+#endif
+
 
 
 
