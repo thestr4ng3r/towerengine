@@ -62,7 +62,7 @@ class tDefaultMaterial : public tMaterial
 		GLuint tex[tex_count];
 		//GLuint64 tex_handle[tex_count];
 
-		bool tex_handles_resident;
+		//bool tex_handles_resident;
 
 	public:
 		tDefaultMaterial(void);

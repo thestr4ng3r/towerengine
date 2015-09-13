@@ -29,8 +29,10 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 	tex_handle = glGetTextureHandleARB(tex);
 	tex_resident = false;
+#endif
 
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -86,7 +88,9 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 tPointLightShadow::~tPointLightShadow(void)
 {
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 	MakeTextureHandleResident(false);
+#endif
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteRenderbuffers(1, &depth_rbo);
 	glDeleteTextures(1, &tex);
@@ -195,6 +199,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 void tPointLightShadow::MakeTextureHandleResident(bool resident)
 {
 	if(tex_resident == resident)
@@ -207,6 +212,7 @@ void tPointLightShadow::MakeTextureHandleResident(bool resident)
 
 	tex_resident = resident;
 }
+#endif
 
 
 

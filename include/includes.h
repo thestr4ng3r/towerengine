@@ -24,11 +24,13 @@
 
 //#define MAX_LINE_LEN 300
 
+
 #ifdef _WIN32
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #elif __APPLE__
 #include <OpenGL/gl3.h>
+#define TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>

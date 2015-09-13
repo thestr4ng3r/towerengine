@@ -9,7 +9,9 @@ class tRenderer
 		tGeometryPassShader *geometry_pass_shader;
 		tSimpleForwardShader *simple_forward_shader;
 		tRefractionShader *refraction_shader;
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 		tLightingShader *lighting_shader;
+#endif
 		tAmbientLightingShader *ambient_lighting_shader;
 		tSSAOAmbientLightingShader *ssao_ambient_lighting_shader;
 		tDirectionalLightingShader *directional_lighting_shader;
@@ -53,11 +55,17 @@ class tRenderer
 		tSSAO *ssao;
 		bool ssao_ambient_only;
 
+
+		bool bindless_textures_enabled;
+
 		int point_light_shadow_limit;
 
 		
 		std::list<tPointLight *> render_point_light_shadows;
+
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 		tLightingShaderPointLightsBuffer *point_lights_buffer;
+#endif
 
 
 		tCubeMapReflection *cube_map_reflection;
@@ -67,7 +75,7 @@ class tRenderer
 		tCamera *current_rendering_camera;
 		tRenderSpace *current_rendering_render_space;
 
-		void InitRenderer(int width, int height, tWorld *world);
+		void InitRenderer(int width, int height, tWorld *world, bool bindless_textures);
 		void Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height);
 
 		void RenderShadowMaps(void);
@@ -75,6 +83,11 @@ class tRenderer
 		void LightPass(void);
 		void ForwardPass(void);
 		void RefractionPass(void);
+
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
+		void BindlessTexturesLightPass(void);
+#endif
+		void LegacyLightPass(void);
 
 		void ChangeScreenSize(int width, int height);
 

@@ -3,10 +3,12 @@
 
 using namespace std;
 
-void tRenderer::InitRenderer(int width, int height, tWorld *world)
+void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless_textures)
 {
 	this->screen_width = width;
 	this->screen_height = height;
+
+	this->bindless_textures_enabled = tEngine::GetARBBindlessTextureSupported() && bindless_textures;
 
 	geometry_pass_shader = new tGeometryPassShader();
 	geometry_pass_shader->Init();
@@ -19,19 +21,22 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	directional_lighting_shader = new tDirectionalLightingShader();
 	directional_lighting_shader->Init(gbuffer);
 
-	// VERY IMPORTANT:	these shaders must be ordered descending by lights_count.
-	//					also, there has to be one shader with a lights_count of 1
-	point_lighting_shaders.push_back(new tPointLightingShader(8));
-	point_lighting_shaders.push_back(new tPointLightingShader(7));
-	point_lighting_shaders.push_back(new tPointLightingShader(6));
-	point_lighting_shaders.push_back(new tPointLightingShader(5));
-	point_lighting_shaders.push_back(new tPointLightingShader(4));
-	point_lighting_shaders.push_back(new tPointLightingShader(3));
-	point_lighting_shaders.push_back(new tPointLightingShader(2));
-	point_lighting_shaders.push_back(new tPointLightingShader(1));
+	//if(!bindless_textures_enabled)
+	//{
+		// VERY IMPORTANT:	these shaders must be ordered descending by lights_count.
+		//					also, there has to be one shader with a lights_count of 1
+		point_lighting_shaders.push_back(new tPointLightingShader(8));
+		point_lighting_shaders.push_back(new tPointLightingShader(7));
+		point_lighting_shaders.push_back(new tPointLightingShader(6));
+		point_lighting_shaders.push_back(new tPointLightingShader(5));
+		point_lighting_shaders.push_back(new tPointLightingShader(4));
+		point_lighting_shaders.push_back(new tPointLightingShader(3));
+		point_lighting_shaders.push_back(new tPointLightingShader(2));
+		point_lighting_shaders.push_back(new tPointLightingShader(1));
 
-	for(vector<tPointLightingShader *>::iterator psi=point_lighting_shaders.begin(); psi!=point_lighting_shaders.end(); psi++)
-		(*psi)->Init(gbuffer);
+		for(vector<tPointLightingShader *>::iterator psi=point_lighting_shaders.begin(); psi!=point_lighting_shaders.end(); psi++)
+			(*psi)->Init(gbuffer);
+	//}
 
 	simple_forward_shader = new tSimpleForwardShader();
 	simple_forward_shader->Init();
@@ -39,11 +44,16 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	refraction_shader = new tRefractionShader();
 	refraction_shader->Init();
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 	lighting_shader = new tLightingShader();
 	lighting_shader->Init(gbuffer);
+#endif
 
-	ambient_lighting_shader = new tAmbientLightingShader();
-	ambient_lighting_shader->Init(gbuffer);
+	///if(!bindless_textures_enabled)
+	//{
+		ambient_lighting_shader = new tAmbientLightingShader();
+		ambient_lighting_shader->Init(gbuffer);
+	//}
 
 	skybox_shader = new tSkyBoxShader();
 	skybox_shader->Init();
@@ -121,7 +131,12 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-	point_lights_buffer = new tLightingShaderPointLightsBuffer();
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
+	if(bindless_textures_enabled)
+	{
+		point_lights_buffer = new tLightingShaderPointLightsBuffer();
+	}
+#endif
 
 
 	screen_quad_vao = new tVAO();
@@ -183,7 +198,7 @@ void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int n
 
 	if(ssao_ambient_only)
 	{
-		if(!ssao_ambient_lighting_shader)
+		if(!ssao_ambient_lighting_shader && !bindless_textures_enabled)
 		{
 			ssao_ambient_lighting_shader = new tSSAOAmbientLightingShader();
 			ssao_ambient_lighting_shader->Init(gbuffer);
@@ -418,7 +433,52 @@ void tRenderer::LightPass(void)
 
 	gbuffer->BindTextures();
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
+	if(bindless_textures_enabled)
+		BindlessTexturesLightPass();
+	else
+#endif
+		LegacyLightPass();
 
+	// blending should be enabled and set to GL_ONE/GL_ONE from LightPass methods
+
+
+	// directional lights
+	directional_lighting_shader->Bind();
+	directional_lighting_shader->SetCameraPosition(current_rendering_camera->GetPosition());
+
+	set<tDirectionalLight *>::iterator dir_light_it;
+	for(dir_light_it=current_rendering_render_space->dir_lights.begin(); dir_light_it!=current_rendering_render_space->dir_lights.end(); dir_light_it++)
+	{
+		(*dir_light_it)->InitRenderLighting(directional_lighting_shader);
+		RenderScreenQuad();
+	}
+
+
+
+
+	glEnable(GL_BLEND);
+	if(ssao && !ssao_ambient_only)
+	{
+		glBlendFunc(GL_DST_COLOR, GL_ZERO);
+
+		ssao_lighting_shader->Bind();
+		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
+
+		RenderScreenQuad();
+	}
+
+
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+
+
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
+void tRenderer::BindlessTexturesLightPass(void)
+{
+	// blending should be disabled here
 
 	// point lights
 	vector<tPointLight *> point_lights;
@@ -449,33 +509,30 @@ void tRenderer::LightPass(void)
 	RenderScreenQuad();
 
 	glEnable(GL_BLEND);
-	if(ssao && !ssao_ambient_only)
+	glBlendFunc(GL_ONE, GL_ONE);
+}
+#endif
+
+
+void tRenderer::LegacyLightPass(void)
+{
+	// ambient
+	if(ssao && ssao_ambient_only)
 	{
-		glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
-		ssao_lighting_shader->Bind();
-		ssao_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
-
-		RenderScreenQuad();
+		ssao_ambient_lighting_shader->Bind();
+		ssao_ambient_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
+		ssao_ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
+	}
+	else
+	{
+		ambient_lighting_shader->Bind();
+		ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
 	}
 
-
+	RenderScreenQuad();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
-
-	// directional lights
-	directional_lighting_shader->Bind();
-	directional_lighting_shader->SetCameraPosition(current_rendering_camera->GetPosition());
-
-	set<tDirectionalLight *>::iterator dir_light_it;
-	for(dir_light_it=current_rendering_render_space->dir_lights.begin(); dir_light_it!=current_rendering_render_space->dir_lights.end(); dir_light_it++)
-	{
-		(*dir_light_it)->InitRenderLighting(directional_lighting_shader);
-		RenderScreenQuad();
-	}
-
-	/*
 
 	// point lights
 	vector<tPointLight *> point_lights;
@@ -495,7 +552,7 @@ void tRenderer::LightPass(void)
 	float *point_lights_dist = new float[point_lights_count];
 	int *point_lights_shadow_enabled = new int[point_lights_count];
 	GLuint *point_lights_shadow_maps = new GLuint[point_lights_count];
-	
+
 
 	vector<tPointLight *>::iterator point_light_it;
 	int point_light_i = 0;
@@ -549,24 +606,10 @@ void tRenderer::LightPass(void)
 	delete[] point_lights_color;
 	delete[] point_lights_dist;
 	delete[] point_lights_shadow_enabled;
-	delete[] point_lights_shadow_maps;*/
-
-
-	/*point_lighting_shader->Bind();
-	point_lighting_shader->SetCameraPosition(camera->GetPosition());
-
-	set<tPointLight *>::iterator point_light_it;
-	for(point_light_it=camera_render_space->point_lights.begin(); point_light_it!=camera_render_space->point_lights.end(); point_light_it++)
-	{
-		tPointLight *light = *point_light_it;
-		if(!light->GetEnabled())
-			continue;
-		light->InitRenderLighting(point_lighting_shader);
-		RenderScreenQuad();
-	}*/
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	delete[] point_lights_shadow_maps;
 }
+
+
 
 void tRenderer::ForwardPass(void)
 {

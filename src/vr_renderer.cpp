@@ -10,7 +10,7 @@ tVRRenderer::tVRRenderer(int left_width, int left_height, int right_width, int r
 	width[1] = right_width;
 	height[1] = right_height;
 
-	InitRenderer(left_width, max(left_height, right_height), world);
+	InitRenderer(left_width, max(left_height, right_height), world, true);
 
 	for(int i=0; i<2; i++)
 	{

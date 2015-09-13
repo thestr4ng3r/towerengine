@@ -5,13 +5,14 @@
 #include <IL/ilu.h>
 
 
+bool tEngine::arb_bindless_texture_supported = false;
 
 void tEngine::Init(void)
 {
 	int v;
-	printf("Supported OpenGL version: %s\n", glGetString(GL_VERSION));
-	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &v);
-	printf("Support of %d combined texture image units\n", v);
+	printf("Running with OpenGL version: %s\n", glGetString(GL_VERSION));
+	//glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &v);
+	//printf("Support of %d combined texture image units\n", v);
 	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &v);
 	printf("Support of %d color attachments\n", v);
 
@@ -24,6 +25,26 @@ void tEngine::Init(void)
 			return;
 		}
 	#endif
+
+
+	int ext_count;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &ext_count);
+
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
+	for(int i=0; i<ext_count; i++)
+	{
+		const GLubyte *ext_name = glGetStringi(GL_EXTENSIONS, i);
+
+		if(strcmp((const char *)ext_name, "GL_ARB_bindless_texture") == 0)
+			arb_bindless_texture_supported = true;
+
+		//printf("%s\n", ext_name);
+	}
+
+	if(!arb_bindless_texture_supported)
+		printf("ARB_bindless_texture is not supported by the graphics card or driver! This might have a negative impact on performance.\n");
+#endif
+
 
 	srand(time(0));
 

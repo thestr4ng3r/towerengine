@@ -2,6 +2,8 @@
 #ifndef _LIGHTING_SHADER_H
 #define _LIGHTING_SHADER_H
 
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
+
 #include <vector>
 #include "material.h"
 
@@ -51,6 +53,7 @@ class tLightingShaderPointLightsBuffer
 		void Bind(void);
 };
 
+#endif
 
 
 #endif

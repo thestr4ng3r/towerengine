@@ -24,7 +24,7 @@ tDefaultMaterial::tDefaultMaterial(void)
 		//tex_handle[i] = 0;
 	}
 
-	tex_handles_resident = false;
+	//tex_handles_resident = false;
 }
 
 tDefaultMaterial::~tDefaultMaterial(void)

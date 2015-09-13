@@ -3,7 +3,7 @@
 
 tDefaultRenderer::tDefaultRenderer(int width, int height, tWorld *world)
 {
-	InitRenderer(width, height, world);
+	InitRenderer(width, height, world, true);
 
 	camera = new tCamera();
 	camera_render_space = new tRenderSpace();

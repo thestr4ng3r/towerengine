@@ -1,5 +1,8 @@
 
 #include "towerengine.h"
+
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
+
 #include "tresources.h"
 
 
@@ -117,6 +120,7 @@ void tLightingShaderPointLightsBuffer::Bind(void)
 	glBindBufferBase(GL_UNIFORM_BUFFER, tLightingShader::point_light_binding_point, buffer);
 }
 
+#endif
 
 
 
