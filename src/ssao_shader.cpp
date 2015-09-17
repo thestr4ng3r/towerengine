@@ -1,6 +1,7 @@
 
 #include "towerengine.h"
 #include "tresources.h"
+#include "shader_source.h"
 
 using namespace std;
 
@@ -14,7 +15,6 @@ void tSSAOShader::Init(void)
 	noise_tex_scale_uniform = GetUniformLocation("noise_tex_scale_uni");
 
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
-	position_tex_uniform = GetUniformLocation("position_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
 
 	projection_matrix_uniform = GetUniformLocation("projection_matrix_uni");
@@ -25,11 +25,13 @@ void tSSAOShader::Init(void)
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 	cam_dir_uniform = GetUniformLocation("cam_dir_uni");
 
+	GLuint position_restore_data_block_index = glGetUniformBlockIndex(program, "PositionRestoreDataBlock");
+	glUniformBlockBinding(program, position_restore_data_block_index, position_restore_data_binding_point);
+
 	Bind();
 	glUniform1i(noise_tex_uniform, 0);
 	glUniform1i(depth_tex_uniform, 1);
-	glUniform1i(position_tex_uniform, 2);
-	glUniform1i(normal_tex_uniform, 3);
+	glUniform1i(normal_tex_uniform, 2);
 }
 
 void tSSAOShader::SetKernel(int kernel_size, float *kernel)
@@ -48,15 +50,12 @@ void tSSAOShader::SetNoiseTex(GLuint tex, tVector2 tex_scale)
 	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
-void tSSAOShader::SetTextures(GLuint depth, GLuint pos, GLuint normal)
+void tSSAOShader::SetTextures(GLuint depth, GLuint normal)
 {
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depth);
 
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, pos);
-
-	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, normal);
 }
 

@@ -44,7 +44,6 @@ class tRenderer
 
 		GLuint fbo;
 		GLuint *color_tex;
-		GLuint depth_tex;
 
 		tVBO<float> *screen_quad_vbo;
 		tVAO *screen_quad_vao;
@@ -66,7 +65,7 @@ class tRenderer
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 		tLightingShaderPointLightsBuffer *point_lights_buffer;
 #endif
-
+		tPositionRestoreDataBuffer *position_restore_data_buffer;
 
 		tCubeMapReflection *cube_map_reflection;
 
@@ -139,7 +138,7 @@ class tRenderer
 
 		tGBuffer *GetGBuffer(void)			{ return gbuffer; }
 
-		GLuint GetDepthTexture(void)		{ return depth_tex; }
+		//GLuint GetDepthTexture(void)		{ return depth_tex; }
 		GLuint GetCurrentReadColorTexture(void)			{ return color_tex[current_read_color_tex]; }
 		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
 

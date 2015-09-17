@@ -6,7 +6,7 @@ void tFogShader::Init(void)
 {
 	InitScreenShader(fog_shader_frag, "Fog Shader");
 
-	position_tex_uniform = GetUniformLocation("position_tex_uni");
+	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	color_tex_uniform = GetUniformLocation("color_tex_uni");
 
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
@@ -17,16 +17,16 @@ void tFogShader::Init(void)
 	color_uniform = GetUniformLocation("color_uni");
 
 	Bind();
-	glUniform1i(position_tex_uniform, 0);
-	glUniform1i(color_tex_uniform, 1);
+	glUniform1i(depth_tex_uniform, depth_tex_unit = 0);
+	glUniform1i(color_tex_uniform, color_tex_unit = 1);
 }
 
 void tFogShader::SetTextures(GLuint position, GLuint color)
 {
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0 + depth_tex_unit);
 	glBindTexture(GL_TEXTURE_2D, position);
 
-	glActiveTexture(GL_TEXTURE1);
+	glActiveTexture(GL_TEXTURE1 + color_tex_unit);
 	glBindTexture(GL_TEXTURE_2D, color);
 }
 

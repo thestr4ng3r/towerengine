@@ -8,7 +8,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	this->screen_width = width;
 	this->screen_height = height;
 
-	this->bindless_textures_enabled = tEngine::GetARBShadingLanguage420PackSupported() && tEngine::GetARBBindlessTextureSupported() && bindless_textures;
+	this->bindless_textures_enabled = tEngine::GetARBBindlessTextureSupported() && bindless_textures;
 
 	geometry_pass_shader = new tGeometryPassShader();
 	geometry_pass_shader->Init();
@@ -117,16 +117,6 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, color_tex[1], 0);
 
-	glGenTextures(1, &depth_tex);
-	glBindTexture(GL_TEXTURE_2D, depth_tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, screen_width, screen_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -137,6 +127,8 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 		point_lights_buffer = new tLightingShaderPointLightsBuffer();
 	}
 #endif
+
+	position_restore_data_buffer = new tPositionRestoreDataBuffer();
 
 
 	screen_quad_vao = new tVAO();
@@ -160,6 +152,10 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 
 tRenderer::~tRenderer(void)
 {
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteTextures(2, color_tex);
+	delete [] color_tex;
+
 	delete screen_quad_vbo;
 
 	delete ssao;
@@ -269,10 +265,15 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 	GeometryPass();
 
 
-	if(ssao)
-		ssao->Render(); // binds its own fbo
+	position_restore_data_buffer->UpdateBuffer(current_rendering_camera);
+	position_restore_data_buffer->Bind();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo); // rebind fbo
+	if(ssao)
+	{
+		ssao->Render(); // binds its own fbo
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo); // rebind fbo
+	}
+
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	LightPass();
 
@@ -294,7 +295,7 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 		glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
 
 		fog_shader->Bind();
-		fog_shader->SetTextures(gbuffer->GetTexture(tGBuffer::POSITION_TEX), color_tex[current_read_color_tex]);
+		fog_shader->SetTextures(gbuffer->GetTexture(tGBuffer::DEPTH_TEX), color_tex[current_read_color_tex]);
 		fog_shader->SetCameraPosition(camera->GetPosition());
 
 		RenderScreenQuad();
@@ -391,7 +392,7 @@ void tRenderer::GeometryPass(void)
 
 	glClear(GL_DEPTH_BUFFER_BIT);
 	float clear_color[] = { 0.0, 0.0, 0.0, 0.0 };
-	glClearBufferfv(GL_COLOR, tGBuffer::DIFFUSE_TEX, clear_color);
+	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::DIFFUSE_TEX), clear_color);
 
 	glViewport(0, 0, screen_width, screen_height);
 
@@ -504,7 +505,7 @@ void tRenderer::BindlessTexturesLightPass(void)
 		lighting_shader->SetSSAO(true, ssao->GetTextureHandle());
 	else
 		lighting_shader->SetSSAO(false, 0);
-
+	//lighting_shader->SetPositionData(depth_tex);
 
 	RenderScreenQuad();
 
@@ -653,9 +654,6 @@ void tRenderer::ChangeScreenSize(int width, int height)
 
 	glBindTexture(GL_TEXTURE_2D, color_tex[1]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
-	glBindTexture(GL_TEXTURE_2D, depth_tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 
 	gbuffer->ChangeSize(width, height);
 

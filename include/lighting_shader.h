@@ -7,10 +7,13 @@
 #include <vector>
 #include "material.h"
 
+/**
+ * Lighting Shader used if ARB_bindless_texture is supported
+ */
 class tLightingShader : public tScreenShader
 {
 	private:
-		GLint position_tex_uniform;
+		GLint depth_tex_uniform;
 		GLint diffuse_tex_uniform;
 		GLint normal_tex_uniform;
 		GLint specular_tex_uniform;
@@ -24,8 +27,8 @@ class tLightingShader : public tScreenShader
 		// ambient lighting
 		GLint light_ambient_color_uniform;
 
+
 	public:
-		static const int point_light_binding_point = 0;
 
 		static const int max_point_lights_count = 32;
 
@@ -36,14 +39,8 @@ class tLightingShader : public tScreenShader
 		void SetSSAO(bool enabled, GLuint64 tex_handle);
 };
 
-class tLightingShaderPointLightsBuffer
+class tLightingShaderPointLightsBuffer : public tUniformBuffer
 {
-	private:
-		unsigned int size;
-		unsigned char *data;
-
-		GLuint buffer;
-
 	public:
 		tLightingShaderPointLightsBuffer(void);
 		~tLightingShaderPointLightsBuffer(void);

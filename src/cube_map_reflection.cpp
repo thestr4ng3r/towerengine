@@ -28,13 +28,6 @@ tCubeMapReflection::tCubeMapReflection(tRenderer *renderer, int resolution, tVec
 		glTexImage2D(CubeTex(i), 0, GL_RGBA, resolution, resolution, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-	glGenRenderbuffers(1, &depth_rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, resolution, resolution);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
-
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	camera = new tCamera();
@@ -55,7 +48,6 @@ tCubeMapReflection::~tCubeMapReflection(void)
 	glDeleteFramebuffers(1, &fbo);
 
 	glDeleteTextures(1, &color_tex);
-	glDeleteRenderbuffers(1, &depth_rbo);
 
 	delete gbuffer;
 }

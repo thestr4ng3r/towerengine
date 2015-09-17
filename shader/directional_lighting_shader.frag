@@ -14,7 +14,7 @@ uniform int directional_light_shadow_splits_count_uni;
 uniform float directional_light_shadow_splits_z_uni[MAX_DIRECTIONAL_SHADOW_SPLITS+1];
 uniform sampler2DArray directional_light_shadow_map_uni;
 
-uniform sampler2D position_tex_uni;
+uniform sampler2D depth_tex_uni;
 uniform sampler2D diffuse_tex_uni;
 uniform sampler2D normal_tex_uni;
 uniform sampler2D specular_tex_uni;
@@ -22,6 +22,31 @@ uniform sampler2D specular_tex_uni;
 in vec2 uv_coord_var;
 
 out vec4 color_out;
+
+
+
+
+layout(std140) uniform PositionRestoreDataBlock
+{
+	mat4 modelview_projection_matrix_inv;
+	vec2 projection_params;	
+} position_restore_data_uni;
+
+vec3 CalculateWorldPosition(void)
+{
+	float depth = texture(depth_tex_uni, uv_coord_var).x;
+	
+	vec3 ndc_pos;
+	ndc_pos.xy = 2.0 * uv_coord_var - vec2(1.0);
+	ndc_pos.z = 2.0 * depth - 1.0;
+ 
+	vec4 clip_pos;
+	clip_pos.w = position_restore_data_uni.projection_params.x / (ndc_pos.z - position_restore_data_uni.projection_params.y);
+	clip_pos.xyz = ndc_pos * clip_pos.w;
+ 
+	return (position_restore_data_uni.modelview_projection_matrix_inv * clip_pos).xyz;
+}
+
 
 
 
@@ -40,7 +65,7 @@ void main(void)
 	if(diffuse.a == 0.0)
 		discard;
 		
-	vec3 position = texelFetch(position_tex_uni, texel_uv, 0).rgb; 	
+	vec3 position = CalculateWorldPosition(); 	
 	vec3 normal = normalize(texelFetch(normal_tex_uni, texel_uv, 0).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
 	vec4 specular = texelFetch(specular_tex_uni, texel_uv, 0).rgba;
 	

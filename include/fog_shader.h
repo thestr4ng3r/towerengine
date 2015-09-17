@@ -6,7 +6,7 @@
 class tFogShader : public tScreenShader
 {
 	private:
-		GLint position_tex_uniform;
+		GLint depth_tex_uniform;
 		GLint color_tex_uniform;
 
 		GLint cam_pos_uniform;
@@ -16,10 +16,13 @@ class tFogShader : public tScreenShader
 		GLint exp_uniform;
 		GLint color_uniform;
 
+		int depth_tex_unit;
+		int color_tex_unit;
+
 	public:
 		void Init(void);
 
-		void SetTextures(GLuint position, GLuint color);
+		void SetTextures(GLuint depth_tex, GLuint color);
 		void SetCameraPosition(tVector cam_pos);
 		void SetFog(float start_dist, float end_dist, float exp, tVector color);
 };

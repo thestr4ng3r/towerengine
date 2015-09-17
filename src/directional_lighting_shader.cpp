@@ -1,13 +1,14 @@
 
 #include "towerengine.h"
 #include "tresources.h"
+#include "shader_source.h"
 
 
 void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 {
 	InitScreenShader(directional_lighting_shader_frag, "Directional Lighting Shader");
 
-	position_tex_uniform = GetUniformLocation("position_tex_uni");
+	depth_tex_uniform = GetUniformLocation("position_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
 	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
@@ -23,8 +24,12 @@ void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 	directional_light_shadow_splits_z_uniform = GetUniformLocation("directional_light_shadow_splits_z_uni");
 	directional_light_shadow_map_uniform = GetUniformLocation("directional_light_shadow_map_uni");
 
+
+	GLuint position_restore_data_block_index = glGetUniformBlockIndex(program, "PositionRestoreDataBlock");
+	glUniformBlockBinding(program, position_restore_data_block_index, position_restore_data_binding_point);
+
 	Bind();
-	glUniform1i(position_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::POSITION_TEX));
+	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
 	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
 	glUniform1i(specular_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_TEX));

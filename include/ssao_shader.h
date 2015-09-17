@@ -13,7 +13,6 @@ class tSSAOShader : public tScreenShader
 		GLint noise_tex_scale_uniform;
 
 		GLint depth_tex_uniform;
-		GLint position_tex_uniform;
 		GLint normal_tex_uniform;
 
 		GLint projection_matrix_uniform;
@@ -29,7 +28,7 @@ class tSSAOShader : public tScreenShader
 
 		void SetKernel(int kernel_size, float *kernel);
 		void SetNoiseTex(GLuint tex, tVector2 tex_scale);
-		void SetTextures(GLuint depth, GLuint pos, GLuint normal);
+		void SetTextures(GLuint depth, GLuint normal);
 		void SetMatrices(float *proj, float *modelview);
 		void SetRadius(float radius);
 		void SetCamera(tVector pos, tVector dir);

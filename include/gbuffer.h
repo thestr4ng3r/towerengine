@@ -8,7 +8,7 @@ class tGBuffer
 	public:
 		enum BufferType
 		{
-			POSITION_TEX,
+			DEPTH_TEX,
 			DIFFUSE_TEX,
 			NORMAL_TEX,
 			FACE_NORMAL_TEX,
@@ -43,6 +43,8 @@ class tGBuffer
 		int GetLastTextureUnit(void)						{ return tex_count-1; }
 
 		static int GetTexCount(void)						{ return tex_count; }
+
+		GLuint GetDrawBufferIndex(BufferType type)			{ return type-1; }
 };
 
 

@@ -38,12 +38,11 @@ in vec3 cam_dir_var;
 in vec3 reflection_center_var;
 in float reflection_radius_var;
 
-layout (location = 0) out vec4 position_out;
-layout (location = 1) out vec4 diffuse_out;
-layout (location = 2) out vec4 normal_out;
-layout (location = 3) out vec4 face_normal_out;
-layout (location = 4) out vec4 specular_out; 
-layout (location = 5) out vec4 self_illumination_out;
+layout (location = 0) out vec4 diffuse_out;
+layout (location = 1) out vec4 normal_out;
+layout (location = 2) out vec4 face_normal_out;
+layout (location = 3) out vec4 specular_out; 
+layout (location = 4) out vec4 self_illumination_out;
 
 vec2 ParallaxUV(void);
 vec2 ParallaxOcclusionUV(mat3 tang_mat);
@@ -126,7 +125,6 @@ void main(void)
 	
 	// out
 	
-	position_out = vec4(pos_var, 1.0);
 	diffuse_out = diffuse_color;
 	specular_out = vec4(specular_color, specular_size_uni);
 	self_illumination_out = vec4(self_illumination, 1.0);

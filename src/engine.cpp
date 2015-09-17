@@ -6,7 +6,7 @@
 
 
 bool tEngine::arb_bindless_texture_supported = false;
-bool tEngine::arb_shading_language_420pack_supported = false;
+//bool tEngine::arb_shading_language_420pack_supported = false;
 
 void tEngine::Init(void)
 {
@@ -38,16 +38,16 @@ void tEngine::Init(void)
 
 		if(strcmp((const char *)ext_name, "GL_ARB_bindless_texture") == 0)
 			arb_bindless_texture_supported = true;
-		else if(strcmp((const char *)ext_name, "GL_ARB_shading_language_420pack") == 0)
-			arb_shading_language_420pack_supported = true;
+		//else if(strcmp((const char *)ext_name, "GL_ARB_shading_language_420pack") == 0)
+		//	arb_shading_language_420pack_supported = true;
 
 		//printf("%s\n", ext_name);
 	}
 
 	if(!arb_bindless_texture_supported)
 		printf("ARB_bindless_texture is not supported by the graphics card or driver! This might have a negative impact on performance.\n");
-	if(!arb_shading_language_420pack_supported)
-		printf("GL_ARB_shading_language_420pack is not supported by the graphics card or driver! This might have a negative impact on performance.\n");
+	//if(!arb_shading_language_420pack_supported)
+	//	printf("GL_ARB_shading_language_420pack is not supported by the graphics card or driver! This might have a negative impact on performance.\n");
 #endif
 
 

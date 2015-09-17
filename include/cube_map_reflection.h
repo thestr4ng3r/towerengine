@@ -15,7 +15,6 @@ class tCubeMapReflection
 
 		GLuint fbo;
 		GLuint color_tex;
-		GLuint depth_rbo;
 
 		tCamera *camera;
 		tRenderSpace *render_space;

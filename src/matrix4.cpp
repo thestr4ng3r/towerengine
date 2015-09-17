@@ -10,7 +10,7 @@ const float tMatrix4::identity_matrix[16] = { 1.0, 0.0, 0.0, 0.0,
 
 
 
-void MultiplyMatrix4(float a[16], float b[16], float *r)
+inline void MultiplyMatrix4(float a[16], float b[16], float *r)
 {
 	int i;
 
@@ -23,26 +23,134 @@ void MultiplyMatrix4(float a[16], float b[16], float *r)
 	}
 }
 
-void InverseMatrix4(float m[16], float *r)
+inline bool InverseMatrix4(const float m[16], float invOut[16])
 {
-	r[0] = m[0];
-	r[1] = m[4];
-	r[2] = m[8];
-	r[4] = m[1];
-	r[5] = m[5];
-	r[6] = m[9];
-	r[8] = m[2];
-	r[9] = m[6];
-	r[10] = m[10];
+	float inv[16], det;
+    int i;
 
-	r[12] = r[0]*-m[12]+r[4]*-m[13]+r[8]*-m[14];
-	r[13] = r[1]*-m[12]+r[5]*-m[13]+r[9]*-m[14];
-	r[14] = r[2]*-m[12]+r[6]*-m[13]+r[10]*-m[14];
+    inv[0] = m[5]  * m[10] * m[15] -
+             m[5]  * m[11] * m[14] -
+             m[9]  * m[6]  * m[15] +
+             m[9]  * m[7]  * m[14] +
+             m[13] * m[6]  * m[11] -
+             m[13] * m[7]  * m[10];
 
-	r[3] = 0.0f;
-	r[7] = 0.0f;
-	r[11] = 0.0f;
-	r[15] = 1.0f;
+    inv[4] = -m[4]  * m[10] * m[15] +
+              m[4]  * m[11] * m[14] +
+              m[8]  * m[6]  * m[15] -
+              m[8]  * m[7]  * m[14] -
+              m[12] * m[6]  * m[11] +
+              m[12] * m[7]  * m[10];
+
+    inv[8] = m[4]  * m[9] * m[15] -
+             m[4]  * m[11] * m[13] -
+             m[8]  * m[5] * m[15] +
+             m[8]  * m[7] * m[13] +
+             m[12] * m[5] * m[11] -
+             m[12] * m[7] * m[9];
+
+    inv[12] = -m[4]  * m[9] * m[14] +
+               m[4]  * m[10] * m[13] +
+               m[8]  * m[5] * m[14] -
+               m[8]  * m[6] * m[13] -
+               m[12] * m[5] * m[10] +
+               m[12] * m[6] * m[9];
+
+    inv[1] = -m[1]  * m[10] * m[15] +
+              m[1]  * m[11] * m[14] +
+              m[9]  * m[2] * m[15] -
+              m[9]  * m[3] * m[14] -
+              m[13] * m[2] * m[11] +
+              m[13] * m[3] * m[10];
+
+    inv[5] = m[0]  * m[10] * m[15] -
+             m[0]  * m[11] * m[14] -
+             m[8]  * m[2] * m[15] +
+             m[8]  * m[3] * m[14] +
+             m[12] * m[2] * m[11] -
+             m[12] * m[3] * m[10];
+
+    inv[9] = -m[0]  * m[9] * m[15] +
+              m[0]  * m[11] * m[13] +
+              m[8]  * m[1] * m[15] -
+              m[8]  * m[3] * m[13] -
+              m[12] * m[1] * m[11] +
+              m[12] * m[3] * m[9];
+
+    inv[13] = m[0]  * m[9] * m[14] -
+              m[0]  * m[10] * m[13] -
+              m[8]  * m[1] * m[14] +
+              m[8]  * m[2] * m[13] +
+              m[12] * m[1] * m[10] -
+              m[12] * m[2] * m[9];
+
+    inv[2] = m[1]  * m[6] * m[15] -
+             m[1]  * m[7] * m[14] -
+             m[5]  * m[2] * m[15] +
+             m[5]  * m[3] * m[14] +
+             m[13] * m[2] * m[7] -
+             m[13] * m[3] * m[6];
+
+    inv[6] = -m[0]  * m[6] * m[15] +
+              m[0]  * m[7] * m[14] +
+              m[4]  * m[2] * m[15] -
+              m[4]  * m[3] * m[14] -
+              m[12] * m[2] * m[7] +
+              m[12] * m[3] * m[6];
+
+    inv[10] = m[0]  * m[5] * m[15] -
+              m[0]  * m[7] * m[13] -
+              m[4]  * m[1] * m[15] +
+              m[4]  * m[3] * m[13] +
+              m[12] * m[1] * m[7] -
+              m[12] * m[3] * m[5];
+
+    inv[14] = -m[0]  * m[5] * m[14] +
+               m[0]  * m[6] * m[13] +
+               m[4]  * m[1] * m[14] -
+               m[4]  * m[2] * m[13] -
+               m[12] * m[1] * m[6] +
+               m[12] * m[2] * m[5];
+
+    inv[3] = -m[1] * m[6] * m[11] +
+              m[1] * m[7] * m[10] +
+              m[5] * m[2] * m[11] -
+              m[5] * m[3] * m[10] -
+              m[9] * m[2] * m[7] +
+              m[9] * m[3] * m[6];
+
+    inv[7] = m[0] * m[6] * m[11] -
+             m[0] * m[7] * m[10] -
+             m[4] * m[2] * m[11] +
+             m[4] * m[3] * m[10] +
+             m[8] * m[2] * m[7] -
+             m[8] * m[3] * m[6];
+
+    inv[11] = -m[0] * m[5] * m[11] +
+               m[0] * m[7] * m[9] +
+               m[4] * m[1] * m[11] -
+               m[4] * m[3] * m[9] -
+               m[8] * m[1] * m[7] +
+               m[8] * m[3] * m[5];
+
+    inv[15] = m[0] * m[5] * m[10] -
+              m[0] * m[6] * m[9] -
+              m[4] * m[1] * m[10] +
+              m[4] * m[2] * m[9] +
+              m[8] * m[1] * m[6] -
+              m[8] * m[2] * m[5];
+
+    det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+
+    if (det == 0)
+        return false;
+
+    det = 1.0 / det;
+
+    for(i = 0; i < 16; i++)
+        invOut[i] = inv[i] * det;
+
+    return true;
 }
 
 tMatrix4::tMatrix4(float v[16])
@@ -129,10 +237,39 @@ void tMatrix4::SetMultiply(tMatrix4 m)
 	memcpy(v, temp, sizeof(float) * 16);
 }
 
-/*void tMatrix4::GLMultMatrix(void)
+void tMatrix4::SetInverse(void)
 {
-	glMultTransposeMatrixf(v);
-}*/
+	float temp[16];
+	InverseMatrix4(v, temp);
+	memcpy(v, temp, sizeof(float) * 16);
+}
+
+void tMatrix4::GetDataTranspose(float *out)
+{
+	out[0] = v[0];
+	out[1] = v[4];
+	out[2] = v[8];
+	out[3] = v[12];
+	out[4] = v[1];
+	out[5] = v[5];
+	out[6] = v[9];
+	out[7] = v[13];
+	out[8] = v[2];
+	out[9] = v[6];
+	out[10] = v[10];
+	out[11] = v[14];
+	out[12] = v[3];
+	out[13] = v[7];
+	out[14] = v[11];
+	out[15] = v[15];
+}
+
+tMatrix4 tMatrix4::GetInverse(void)
+{
+	tMatrix4 r;
+	InverseMatrix4(v, r.GetData());
+	return r;
+}
 
 
 tMatrix4 operator*(tMatrix4 &a, tMatrix4 &b)

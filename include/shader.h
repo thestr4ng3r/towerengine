@@ -18,10 +18,29 @@ class tShader
 	public:
 		static const int vertex_attribute = 0;
 
+		static const int position_restore_data_binding_point = 1;
+		static const int point_light_binding_point = 2;
+
 		void Bind(void);
 		static void Unbind(void);
 
 		virtual ~tShader(void) {};
+};
+
+
+class tUniformBuffer
+{
+	protected:
+		unsigned int size;
+		unsigned char *data;
+
+		GLuint buffer;
+
+		tUniformBuffer(unsigned int size);
+		virtual ~tUniformBuffer(void);
+
+		void UploadData(GLenum usage = GL_DYNAMIC_DRAW);
+		void Bind(GLuint binding_point);
 };
 
 

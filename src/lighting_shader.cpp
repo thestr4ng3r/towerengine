@@ -4,6 +4,7 @@
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 
 #include "tresources.h"
+#include "shader_source.h"
 
 
 using namespace std;
@@ -11,9 +12,12 @@ using namespace std;
 
 void tLightingShader::Init(tGBuffer *gbuffer)
 {
-	InitScreenShader(lighting_shader_frag, "Lighting Shader");
+	tShaderSource *src = new tShaderSource(lighting_shader_frag);
+	src->SetParameter("max_point_lights_count", new tShaderSourceVariable(max_point_lights_count));
+	InitScreenShader(src->BuildSource().c_str(), "Lighting Shader");
+	delete src;
 
-	position_tex_uniform = GetUniformLocation("position_tex_uni");
+	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
 	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
@@ -29,8 +33,15 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 
 
+	GLuint point_light_block_index = glGetUniformBlockIndex(program, "PointLightBlock");
+	glUniformBlockBinding(program, point_light_block_index, point_light_binding_point);
+
+	GLuint position_restore_data_block_index = glGetUniformBlockIndex(program, "PositionRestoreDataBlock");
+	glUniformBlockBinding(program, position_restore_data_block_index, position_restore_data_binding_point);
+
+
 	Bind();
-	glUniform1i(position_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::POSITION_TEX));
+	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
 	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
 	glUniform1i(specular_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_TEX));
@@ -61,17 +72,12 @@ void tLightingShader::SetSSAO(bool enabled, GLuint64 tex_handle)
 // -------------------------------
 
 tLightingShaderPointLightsBuffer::tLightingShaderPointLightsBuffer(void)
+	: tUniformBuffer(16+4*16*tLightingShader::max_point_lights_count)
 {
-	size = 16+4*16*tLightingShader::max_point_lights_count;
-	data = new unsigned char[size];
-
-	glGenBuffers(1, &buffer);
 }
 
 tLightingShaderPointLightsBuffer::~tLightingShaderPointLightsBuffer(void)
 {
-	glDeleteBuffers(1, &buffer);
-	delete [] data;
 }
 
 
@@ -111,14 +117,14 @@ void tLightingShaderPointLightsBuffer::UpdateBuffer(std::vector<tPointLight *> l
 		((GLuint64 *)(&data[buffer_pos+3*16]))[0] = shadow_handle;
 	}
 
-	glBindBuffer(GL_UNIFORM_BUFFER, buffer);
-	glBufferData(GL_UNIFORM_BUFFER, size, data, GL_DYNAMIC_DRAW);
+	UploadData();
 }
 
 void tLightingShaderPointLightsBuffer::Bind(void)
 {
-	glBindBufferBase(GL_UNIFORM_BUFFER, tLightingShader::point_light_binding_point, buffer);
+	tUniformBuffer::Bind(tShader::point_light_binding_point);
 }
+
 
 #endif
 

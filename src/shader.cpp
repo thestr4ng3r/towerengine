@@ -53,6 +53,40 @@ void tShader::Unbind(void)
 	glUseProgram(0);
 }
 
+
+// ------------------------
+
+
+
+tUniformBuffer::tUniformBuffer(unsigned int size)
+{
+	this->size = size;
+	data = new unsigned char[this->size];
+
+	glGenBuffers(1, &buffer);
+}
+
+tUniformBuffer::~tUniformBuffer()
+{
+	glDeleteBuffers(1, &buffer);
+	delete [] data;
+}
+
+void tUniformBuffer::UploadData(GLenum usage)
+{
+	glBindBuffer(GL_UNIFORM_BUFFER, buffer);
+	glBufferData(GL_UNIFORM_BUFFER, size, data, usage);
+}
+
+void tUniformBuffer::Bind(GLuint binding_point)
+{
+	glBindBufferBase(GL_UNIFORM_BUFFER, binding_point, buffer);
+}
+
+
+
+// ------------------------
+
 void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_name = 0)
 {
 	GLchar *string;

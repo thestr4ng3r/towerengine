@@ -55,9 +55,9 @@ class tCamera : public tCulling
 
 		void CalculateModelViewProjectionMatrix(void);
 
-		tMatrix4 GetModelViewMatrix(void)				{ return modelview_matrix; }
-		tMatrix4 GetProjectionMatrix(void)				{ return projection_matrix; }
-		tMatrix4 GetModelViewProjectionMatrix(void)		{ return modelview_projection_matrix; }
+		tMatrix4 &GetModelViewMatrix(void)					{ return modelview_matrix; }
+		tMatrix4 &GetProjectionMatrix(void)					{ return projection_matrix; }
+		tMatrix4 &GetModelViewProjectionMatrix(void)		{ return modelview_projection_matrix; }
 };
 
 #endif

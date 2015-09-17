@@ -1,11 +1,10 @@
 #version 330
 
 #extension GL_ARB_bindless_texture : require
-#extension GL_ARB_shading_language_420pack : require
 
 uniform vec3 cam_pos_uni;
 
-uniform sampler2D position_tex_uni;
+uniform sampler2D depth_tex_uni;
 uniform sampler2D diffuse_tex_uni;
 uniform sampler2D normal_tex_uni;
 uniform sampler2D specular_tex_uni;
@@ -24,7 +23,7 @@ uniform vec3 light_ambient_color_uni;
 
 // point lights
 
-#define MAX_POINT_LIGHTS_COUNT 32
+#define MAX_POINT_LIGHTS_COUNT $(param max_point_lights_count)
 
 struct PointLight
 {
@@ -36,11 +35,39 @@ struct PointLight
 };
 
 
-layout(std140, binding = 0) uniform PointLightBlock
+layout(std140) uniform PointLightBlock
 {	
 	int count;
 	PointLight light[MAX_POINT_LIGHTS_COUNT];
 } point_light_uni;
+
+
+
+
+layout(std140) uniform PositionRestoreDataBlock
+{
+	mat4 modelview_projection_matrix_inv;
+	vec2 projection_params;	
+} position_restore_data_uni;
+
+vec3 CalculateWorldPosition(void)
+{
+	float depth = texture(depth_tex_uni, uv_coord_var).x;
+	
+	vec3 ndc_pos;
+	ndc_pos.xy = 2.0 * uv_coord_var - vec2(1.0);
+	ndc_pos.z = 2.0 * depth - 1.0;
+ 
+	vec4 clip_pos;
+	clip_pos.w = position_restore_data_uni.projection_params.x / (ndc_pos.z - position_restore_data_uni.projection_params.y);
+	clip_pos.xyz = ndc_pos * clip_pos.w;
+ 
+	return (position_restore_data_uni.modelview_projection_matrix_inv * clip_pos).xyz;
+}
+
+
+
+
 
 float linstep(float min, float max, float v)
 {
@@ -48,17 +75,15 @@ float linstep(float min, float max, float v)
 }
 
 void main(void)
-{
-	ivec2 texel_uv = ivec2(uv_coord_var * textureSize(position_tex_uni, 0).xy);
-	
-	vec4 diffuse = texelFetch(diffuse_tex_uni, texel_uv, 0).rgba;
+{	
+	vec4 diffuse = texture(diffuse_tex_uni, uv_coord_var).rgba;
 
 	if(diffuse.a == 0.0)
 		discard;
 	
-	vec3 position = texelFetch(position_tex_uni, texel_uv, 0).rgb; 	
-	vec3 normal = normalize(texelFetch(normal_tex_uni, texel_uv, 0).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
-	vec4 specular = texelFetch(specular_tex_uni, texel_uv, 0).rgba;
+	vec3 position = CalculateWorldPosition();
+	vec3 normal = normalize(texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
+	vec4 specular = texture(specular_tex_uni, uv_coord_var).rgba;
 		
 	vec3 cam_dir = normalize(cam_pos_uni - position.xyz);
 	
@@ -74,7 +99,7 @@ void main(void)
 		color *= occlusion;
 	}
 	
-	vec3 self_illumination = texelFetch(self_illumination_tex_uni, texel_uv, 0).rgb;
+	vec3 self_illumination = texture(self_illumination_tex_uni, uv_coord_var).rgb;
 	color += self_illumination;
 	
 	

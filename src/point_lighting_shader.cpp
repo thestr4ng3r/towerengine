@@ -18,13 +18,11 @@ tPointLightingShader::~tPointLightingShader(void)
 void tPointLightingShader::Init(tGBuffer *gbuffer)
 {
 	tShaderSource *src = new tShaderSource(string(point_lighting_shader_frag));
-
 	src->SetParameter("LIGHTS_COUNT", new tShaderSourceVariable(lights_count));
-
 	InitScreenShader(src->BuildSource().c_str(), "Point Lighting Shader");
 	delete src;
 
-	position_tex_uniform = GetUniformLocation("position_tex_uni");
+	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
 	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
@@ -37,8 +35,12 @@ void tPointLightingShader::Init(tGBuffer *gbuffer)
 	point_light_shadow_map_uniform = GetUniformLocation("point_light_shadow_map_uni");
 	point_light_shadow_enabled_uniform = GetUniformLocation("point_light_shadow_enabled_uni");
 
+
+	GLuint position_restore_data_block_index = glGetUniformBlockIndex(program, "PositionRestoreDataBlock");
+	glUniformBlockBinding(program, position_restore_data_block_index, position_restore_data_binding_point);
+
 	Bind();
-	glUniform1i(position_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::POSITION_TEX));
+	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
 	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
 	glUniform1i(specular_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_TEX));

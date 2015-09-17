@@ -11,4 +11,18 @@ class tScreenShader : public tShader
 };
 
 
+
+class tPositionRestoreDataBuffer : public tUniformBuffer
+{
+	public:
+		tPositionRestoreDataBuffer(void);
+		~tPositionRestoreDataBuffer(void);
+
+		void UpdateBuffer(tCamera *camera);
+
+		void Bind(void);
+};
+
+
+
 #endif
