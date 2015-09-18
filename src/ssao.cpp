@@ -173,7 +173,7 @@ void tSSAO::Render(void)
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 void tSSAO::MakeTextureHandleResident(bool resident)
 {
-	if(tex_handle == 0 || tex_handle_resident == resident)
+	if(tex_handle == 0 || tex_handle_resident == resident)
 		return;
 
 	if(resident)
