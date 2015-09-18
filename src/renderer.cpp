@@ -45,8 +45,13 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	refraction_shader->Init();
 
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
-	lighting_shader = new tLightingShader();
-	lighting_shader->Init(gbuffer);
+	if(bindless_textures_enabled)
+	{
+		lighting_shader = new tLightingShader();
+		lighting_shader->Init(gbuffer);
+	}
+	else
+		lighting_shader = 0;
 #endif
 
 	///if(!bindless_textures_enabled)

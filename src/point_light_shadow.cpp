@@ -30,7 +30,9 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
-	tex_handle = glGetTextureHandleARB(tex);
+	tex_handle = 0;
+	if(tEngine::GetARBBindlessTextureSupported())
+		tex_handle = glGetTextureHandleARB(tex);
 	tex_resident = false;
 #endif
 
@@ -202,7 +204,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 void tPointLightShadow::MakeTextureHandleResident(bool resident)
 {
-	if(tex_resident == resident)
+	if(tex_handle == 0 || tex_resident == resident)
 		return;
 
 	if(resident)

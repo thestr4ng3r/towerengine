@@ -30,7 +30,7 @@ void tShader::InitShader(const char *vert_src, const char *frag_src, const char 
 {
 	name = shader_name;
 	program = glCreateProgram();
-#ifdef GL_PROGRAM
+#ifdef TOWERENGINE_SHADER_LABELS
 	if(name)
 		glObjectLabel(GL_PROGRAM, program, strlen(name), name);
 #endif

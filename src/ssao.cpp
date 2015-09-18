@@ -90,7 +90,9 @@ tSSAO::tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_s
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
-	tex_handle = glGetTextureHandleARB(tex);
+	tex_handle = 0;
+	if(tEngine::GetARBBindlessTextureSupported())
+		tex_handle = glGetTextureHandleARB(tex);
 	tex_handle_resident = false;
 #endif
 }
@@ -171,7 +173,7 @@ void tSSAO::Render(void)
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 void tSSAO::MakeTextureHandleResident(bool resident)
 {
-	if(tex_handle_resident == resident)
+	if(tex_handle == 0 || tex_handle_resident == resident)
 		return;
 
 	if(resident)
