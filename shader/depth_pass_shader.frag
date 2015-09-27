@@ -1,12 +1,12 @@
 #version 330
 
-//uniform bool diffuse_tex_enabled_uni;
-//uniform sampler2D diffuse_tex_uni;
+uniform bool diffuse_tex_enabled_uni;
+uniform sampler2D diffuse_tex_uni;
 
 //uniform vec3 clip_vec_uni;
 //uniform float clip_dist_uni;
 
-//in vec2 uv_var;
+in vec2 uv_var;
 
 
 void main(void)
@@ -21,18 +21,10 @@ void main(void)
 			discard;
 	}*/
 
-	/*vec2 uv;
-	uv = uv_var;
-				
-	
-	// diffuse
-	
-	vec4 diffuse_color = vec4(1.0, 1.0, 1.0, 1.0);
 	
 	if(diffuse_tex_enabled_uni)
-		diffuse_color = texture(diffuse_tex_uni, uv).rgba;
-		
-	if(diffuse_color.a < 0.5)
-		discard;*/
-
+	{
+		if(texture(diffuse_tex_uni, uv_var).a < 0.5)
+			discard;
+	}
 }

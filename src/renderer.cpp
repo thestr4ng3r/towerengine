@@ -263,11 +263,14 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 	current_rendering_camera = camera;
 	current_rendering_render_space = render_space;
 
+	matrix_buffer->Bind();
+	position_restore_data_buffer->Bind();
+
 	RenderShadowMaps();
 
 	if(cube_map_reflection)
 	{
-		if(cube_map_reflection->GetInvalid())
+		//if(cube_map_reflection->GetInvalid())
 			cube_map_reflection->Render();
 	}
 
@@ -276,7 +279,6 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 	glViewport(0, 0, screen_width, screen_height);
 
 	matrix_buffer->UpdateBuffer(current_rendering_camera->GetModelViewProjectionMatrix());
-	matrix_buffer->Bind();
 
 	if(depth_prepass_enabled)
 		DepthPrePass();
@@ -284,7 +286,6 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 
 
 	position_restore_data_buffer->UpdateBuffer(current_rendering_camera);
-	position_restore_data_buffer->Bind();
 
 	if(ssao)
 	{
@@ -475,7 +476,6 @@ void tRenderer::LightPass(void)
 	if(sky_box)
 	{
 		skybox_shader->Bind();
-		skybox_shader->SetModelViewProjectionMatrix(current_rendering_camera->GetModelViewProjectionMatrix().GetData());
 		skybox_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 		sky_box->Paint(this, current_rendering_camera->GetPosition());
 	}

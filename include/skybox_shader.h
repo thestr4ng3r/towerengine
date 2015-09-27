@@ -4,7 +4,6 @@
 class tSkyBoxShader : public tShader
 {
 	private:
-		GLint modelview_projection_matrix_uniform;
 		GLint cam_pos_uniform;
 
 		GLint tex_uniform;
@@ -14,7 +13,6 @@ class tSkyBoxShader : public tShader
 
 		void Init(void);
 		void SetCubeMap(GLuint tex);
-		void SetModelViewProjectionMatrix(float m[16]);
 		void SetCameraPosition(tVector pos);
 };
 

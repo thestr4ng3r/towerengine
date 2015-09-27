@@ -7,7 +7,7 @@ void tDepthPassShader::Init(void)
 	InitShader(depth_pass_shader_vert, depth_pass_shader_frag, "Depth Pass Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
-	//glBindAttribLocation(program, uvcoord_attribute, "uv_attr");
+	glBindAttribLocation(program, uvcoord_attribute, "uv_attr");
 
 	LinkProgram();
 
@@ -22,7 +22,7 @@ void tDepthPassShader::Init(void)
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
 
 	//Bind();
-	//glUniform1i(diffuse_tex_uniform, diffuse_tex_unit);
+	glUniform1i(diffuse_tex_uniform, diffuse_tex_unit);
 }
 
 

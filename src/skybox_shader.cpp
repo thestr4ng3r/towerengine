@@ -12,10 +12,12 @@ void tSkyBoxShader::Init(void)
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	LinkProgram();
 
-	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
 	tex_uniform = GetUniformLocation("cube_map_uni");
+
+
+	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
 
 	Bind();
 	glUniform1i(tex_uniform, 0);
@@ -25,11 +27,6 @@ void tSkyBoxShader::SetCubeMap(GLuint tex)
 {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
-}
-
-void tSkyBoxShader::SetModelViewProjectionMatrix(float m[16])
-{
-	glUniformMatrix4fv(modelview_projection_matrix_uniform, 1, GL_TRUE, m);
 }
 
 void tSkyBoxShader::SetCameraPosition(tVector pos)

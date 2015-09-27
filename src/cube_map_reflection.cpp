@@ -37,8 +37,6 @@ tCubeMapReflection::tCubeMapReflection(tRenderer *renderer, int resolution, tVec
 
 	render_space = new tRenderSpace();
 
-	matrix_buffer = new tMatrixBuffer();
-
 	invalid = true;
 }
 
@@ -60,7 +58,6 @@ void tCubeMapReflection::Render(void)
 	tWorld *world = renderer->GetWorld();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	matrix_buffer->Bind();
 
 	//glClearColor(0.0, 0.0, 0.0, 0.0);
 	glViewport(0, 0, resolution, resolution);
@@ -100,7 +97,8 @@ void tCubeMapReflection::GeometryPass(int side, tWorld *world)
 
 	camera->SetUp(cam_up);
 	camera->CalculateModelViewProjectionMatrix();
-	matrix_buffer->UpdateBuffer(camera->GetModelViewProjectionMatrix());
+	renderer->GetMatrixBuffer()->UpdateBuffer(camera->GetModelViewProjectionMatrix());
+	renderer->GetPositionRestoreDataBuffer()->UpdateBuffer(camera);
 
 	world->FillRenderSpace(render_space, camera);
 
@@ -140,7 +138,6 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 	{
 		tSkyBoxShader *skybox_shader = renderer->GetSkyBoxShader();
 		skybox_shader->Bind();
-		skybox_shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
 		skybox_shader->SetCameraPosition(camera->GetPosition());
 		sky_box->Paint(renderer, camera->GetPosition());
 	}

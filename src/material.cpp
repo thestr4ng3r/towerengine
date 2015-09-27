@@ -5,7 +5,7 @@ using namespace std;
 tDefaultMaterial::tDefaultMaterial(void)
 {
 	diffuse.color.Set(1.0, 1.0, 1.0);
-    //transparent = false;
+    transparent = false;
 
 	specular.color.Set(1.0, 1.0, 1.0);
 	specular.exponent = 64.0;
@@ -74,7 +74,11 @@ void tDefaultMaterial::LoadTexture(TextureType type, string file)
 		//	glMakeTextureHandleNonResidentARB(tex_handle[type]);
 	}
 
-	tex[type] = LoadGLTexture(file.c_str());
+	bool *transparent = 0;
+	if(type == DIFFUSE)
+		transparent = &(this->transparent);
+	tex[type] = LoadGLTexture(file.c_str(), transparent);
+
 	//tex_handle[type] = glGetTextureHandleARB(tex[type]);
 
 	//if(tex_handles_resident)
@@ -90,7 +94,10 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 		//	glMakeTextureHandleNonResidentARB(tex_handle[type]);
 	}
 
-	tex[type] = LoadGLTextureBinary(extension, data, size);
+	bool *transparent = 0;
+	if(type == DIFFUSE)
+		transparent = &(this->transparent);
+	tex[type] = LoadGLTextureBinary(extension, data, size, transparent);
 	//tex_handle[type] = glGetTextureHandleARB(tex[type]);
 
 	//if(tex_handles_resident)
@@ -116,6 +123,14 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 
 	tex_handles_resident = resident;
 }*/
+
+
+bool tDefaultMaterial::InitDepthPrePass(tRenderer *renderer)
+{
+	renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
+	return true;
+}
+
 
 bool tDefaultMaterial::InitGeometryPass(tRenderer *renderer)
 {

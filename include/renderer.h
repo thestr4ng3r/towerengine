@@ -150,6 +150,9 @@ class tRenderer
 
 		void SetDepthPrePassEnabled(bool enabled)		{ this->depth_prepass_enabled = enabled; }
 		bool GetDepthPrePassEnabled(void)				{ return depth_prepass_enabled; }
+
+		tMatrixBuffer *GetMatrixBuffer(void)							{ return matrix_buffer; }
+		tPositionRestoreDataBuffer *GetPositionRestoreDataBuffer(void)	{ return position_restore_data_buffer; }
 };
 
 

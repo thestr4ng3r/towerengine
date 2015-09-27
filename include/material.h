@@ -6,6 +6,7 @@ class tMaterial
 	public:
 		virtual ~tMaterial(void) {}
 
+		virtual bool InitDepthPrePass(tRenderer *renderer)						{ return false; }
 		virtual bool InitGeometryPass(tRenderer *renderer)						{ return false; }
 		virtual bool InitForwardPass(tRenderer *renderer, float *transform)		{ return false; }
 		virtual bool InitRefractionPass(tRenderer *renderer, float *transform)	{ return false; }
@@ -57,7 +58,7 @@ class tDefaultMaterial : public tMaterial
 			tVector color;
 		} cube_map_reflection;
 
-		//bool transparent;
+		bool transparent;
 
 		GLuint tex[tex_count];
 		//GLuint64 tex_handle[tex_count];
@@ -82,6 +83,7 @@ class tDefaultMaterial : public tMaterial
 
 		//bool GetTransparent(void)	{ return transparent; }
 
+		bool InitDepthPrePass(tRenderer *renderer);
 		bool InitGeometryPass(tRenderer *renderer);
 
 		bool GetCubeMapReflectionEnabled(void)	{ return cube_map_reflection.enabled; }

@@ -19,8 +19,6 @@ class tCubeMapReflection
 		tCamera *camera;
 		tRenderSpace *render_space;
 
-		tMatrixBuffer *matrix_buffer;
-
 		bool invalid;
 
 		void GeometryPass(int side, tWorld *world);

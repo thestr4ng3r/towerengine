@@ -104,7 +104,7 @@ void tMesh::DeleteVBOData(void)
 	{
 		delete vao;
 		vao = 0;
-		//delete vertex_vbo;
+		delete vertex_vbo;
 		delete normal_vbo;
 		delete tang_vbo;
 		delete bitang_vbo;
@@ -525,7 +525,7 @@ void tMesh::DepthPrePass(tRenderer *renderer)
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
-		if(i->first->InitGeometryPass(renderer))
+		if(i->first->InitDepthPrePass(renderer))
 			i->second->ibo->Draw(GL_TRIANGLES);
 	}
 }

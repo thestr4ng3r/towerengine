@@ -297,7 +297,7 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 		*transparent = false;
 		for(i=0; i<width*height; i++)
 		{
-			if(data[i*4 + alpha_channel] < 255)
+			if(data[i*4 + alpha_channel] < 128)
 			{
 				*transparent = true;
 				break;
