@@ -16,6 +16,7 @@ class tObject
 		tObject(void);
 		virtual ~tObject(void) {}
 
+		virtual void DepthPrePass(tRenderer *) {}
 		virtual void GeometryPass(tRenderer *) {}
 		virtual void ForwardPass(tRenderer *) {}
 		virtual void RefractionPass(tRenderer *) {}

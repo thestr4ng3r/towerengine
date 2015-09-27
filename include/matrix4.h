@@ -27,7 +27,7 @@ class tMatrix4
 
 		tMatrix4 GetInverse(void);
 
-		void GetDataTranspose(float *out);
+		void GetDataTranspose(float *out) const;
 
 		void SetMultiply(tMatrix4 m);
 

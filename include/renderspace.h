@@ -11,6 +11,7 @@ struct tRenderObjectSpace
 
 	virtual void Clear(void);
 
+	void DepthPrePass(tRenderer *renderer);
 	void GeometryPass(tRenderer *renderer);
 	void ForwardPass(tRenderer *renderer);
 	void RefractionPass(tRenderer *renderer);

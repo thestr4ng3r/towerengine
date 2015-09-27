@@ -37,6 +37,7 @@ class tMesh
 		bool refresh_ibos;
 
 		tVAO *vao;
+		tVBO<float> *vertex_vbo;
 		tVBO<float> *normal_vbo;
 		tVBO<float> *tang_vbo;
 		tVBO<float> *bitang_vbo;
@@ -73,7 +74,7 @@ class tMesh
 
 		void (*refresh_func)(void);
 
-		void CallRefresh(void) { if(refresh_func != 0) (*refresh_func)(); }
+		//void CallRefresh(void) { if(refresh_func != 0) (*refresh_func)(); }
 
 
 		void RefreshAllVBOs(void);
@@ -93,11 +94,6 @@ class tMesh
 		static tRefractionMaterial *ParseXMLRefractionMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 
 	public:
-		static float color[4];
-
-		static void Color(tVector c, float a = 1.0);
-
-
 		static tMaterial *ParseXMLMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 
 
@@ -107,6 +103,7 @@ class tMesh
 		bool LoadFromData(char *data, std::string path = "", tMaterialManager *material_manager = 0);
 		bool LoadFromXML(rapidxml::xml_document<char> *doc, std::string path, tMaterialManager *material_manager = 0);
 
+		void DepthPrePass(tRenderer *renderer);
 		void GeometryPass(tRenderer *renderer);
 		void ForwardPass(tRenderer *renderer, float *transform);
 		void RefractionPass(tRenderer *renderer, float *transform);

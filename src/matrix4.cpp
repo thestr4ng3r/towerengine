@@ -244,7 +244,7 @@ void tMatrix4::SetInverse(void)
 	memcpy(v, temp, sizeof(float) * 16);
 }
 
-void tMatrix4::GetDataTranspose(float *out)
+void tMatrix4::GetDataTranspose(float *out) const
 {
 	out[0] = v[0];
 	out[1] = v[4];

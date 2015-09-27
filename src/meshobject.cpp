@@ -97,7 +97,7 @@ tBoundingBox tMeshObject::GetBoundingBox(void)
 	return b;
 }
 
-void tMeshObject::GeometryPass(tRenderer *renderer)
+void tMeshObject::DepthPrePass(tRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
@@ -106,7 +106,30 @@ void tMeshObject::GeometryPass(tRenderer *renderer)
 
 	renderer->GetCurrentFaceShader()->SetTransformation(temp);
 
-	tMesh::Color(color, alpha);
+	if(animation_mode && animation)
+	{
+		mesh->ChangeAnimation(animation);
+		mesh->SetAnimationLoop(0);
+		animation->SetTime(time);
+	}
+	else
+	{
+		if(pose)
+			mesh->ChangePose(pose);
+		else
+			mesh->ChangePose("Idle");
+	}
+	mesh->DepthPrePass(renderer);
+}
+
+void tMeshObject::GeometryPass(tRenderer *renderer)
+{
+	if(!visible || alpha <= 0.0 || !mesh)
+		return;
+
+	float *temp = transform.GetMatrix(transform_matrix);
+
+	renderer->GetCurrentFaceShader()->SetTransformation(temp);
 
 	if(animation_mode && animation)
 	{
@@ -128,8 +151,6 @@ void tMeshObject::ForwardPass(tRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
-
-	tMesh::Color(color, alpha);
 
 	if(animation_mode && animation)
 	{
@@ -154,8 +175,6 @@ void tMeshObject::RefractionPass(tRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
-
-	tMesh::Color(color, alpha);
 
 	if(animation_mode && animation)
 	{

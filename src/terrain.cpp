@@ -167,11 +167,8 @@ void tTerrain::Paint(tRenderer *renderer)
 	tang_vbo->SetAttribute(tFaceShader::tang_attribute, GL_FLOAT);
 	bitang_vbo->SetAttribute(tFaceShader::bitang_attribute, GL_FLOAT);
 	uvcoord_vbo->SetAttribute(tFaceShader::uvcoord_attribute, GL_FLOAT);
-	renderer->GetCurrentFaceShader()->SetVertexMix(0.0);
 
 	renderer->GetCurrentFaceShader()->SetTransformation(tMatrix4::identity_matrix);
-
-	renderer->GetCurrentFaceShader()->SetDiffuseColor2(Vec(1.0, 1.0, 1.0), 1.0);
 
 	if(material)
 		material->InitGeometryPass(renderer);

@@ -7,7 +7,6 @@ void tGeometryPassShader::Init(void)
 	InitShader(geometry_pass_shader_vert, geometry_pass_shader_frag, "Geometry Pass Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
-	glBindAttribLocation(program, vertex2_attribute, "vertex2_attr");
 	glBindAttribLocation(program, normal_attribute, "normal_attr");
 	glBindAttribLocation(program, tang_attribute, "tang_attr");
 	glBindAttribLocation(program, bitang_attribute, "bitang_attr");
@@ -15,13 +14,9 @@ void tGeometryPassShader::Init(void)
 
 	LinkProgram();
 
-	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
-	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
-
 	diffuse_color_uniform = GetUniformLocation("diffuse_color_uni");
-	diffuse_color2_uniform = GetUniformLocation("diffuse_color2_uni");
 	specular_color_uniform = GetUniformLocation("specular_color_uni");
 	specular_size_uniform = GetUniformLocation("specular_size_uni");
 	self_illumination_color_uniform = GetUniformLocation("self_illumination_color_uni");
@@ -46,9 +41,10 @@ void tGeometryPassShader::Init(void)
 
 	transformation_uniform = GetUniformLocation("transformation_uni");
 
-	clip_uniform = GetUniformLocation("clip_vec_uni");
-	clip_dist_uniform = GetUniformLocation("clib_dist_uni");
+	//clip_uniform = GetUniformLocation("clip_vec_uni");
+	//clip_dist_uniform = GetUniformLocation("clib_dist_uni");
 
+	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
 
 	Bind();
 	glUniform1i(diffuse_tex_uniform, diffuse_tex_unit);
@@ -59,11 +55,6 @@ void tGeometryPassShader::Init(void)
 	glUniform1i(cube_map_reflection_tex_uniform, cube_map_reflection_tex_unit);
 }
 
-
-void tGeometryPassShader::SetModelViewProjectionMatrix(float m[16])
-{
-	glUniformMatrix4fv(modelview_projection_matrix_uniform, 1, GL_TRUE, m);
-}
 
 void tGeometryPassShader::SetCameraPosition(tVector pos)
 {
@@ -78,11 +69,6 @@ void tGeometryPassShader::SetTransformation(const float m[16])
 void tGeometryPassShader::SetDiffuseColor(tVector color)
 {
 	glUniform3f(diffuse_color_uniform, color.x, color.y, color.z);
-}
-
-void tGeometryPassShader::SetDiffuseColor2(tVector color, float alpha)
-{
-	glUniform4f(diffuse_color2_uniform, color.x, color.y, color.z, alpha);
 }
 
 void tGeometryPassShader::SetSpecularColor(tVector color)
@@ -166,16 +152,12 @@ void tGeometryPassShader::SetCubeMapReflectionTexture(GLuint tex)
 }
 
 
-void tGeometryPassShader::SetClip(tVector c, float d)
+/*void tGeometryPassShader::SetClip(tVector c, float d)
 {
 	glUniform3f(clip_uniform, c.x, c.y, c.z);
 	glUniform1f(clip_dist_uniform, d);
-}
+}*/
 
-void tGeometryPassShader::SetVertexMix(float m)
-{
-	glUniform1f(vertex_mix_uniform, m);
-}
 
 void tGeometryPassShader::SetSelfIlluminationColor(tVector color)
 {

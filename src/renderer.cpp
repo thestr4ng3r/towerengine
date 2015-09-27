@@ -10,6 +10,9 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 
 	this->bindless_textures_enabled = tEngine::GetARBBindlessTextureSupported() && bindless_textures;
 
+	depth_pass_shader = new tDepthPassShader();
+	depth_pass_shader->Init();
+
 	geometry_pass_shader = new tGeometryPassShader();
 	geometry_pass_shader->Init();
 	//SetCurrentFaceShader(geometry_pass_shader);
@@ -97,6 +100,8 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 
 	fxaa_enabled = false;
 
+	depth_prepass_enabled = true;
+
 	cube_map_reflection = 0;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -133,6 +138,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	}
 #endif
 
+	matrix_buffer = new tMatrixBuffer();
 	position_restore_data_buffer = new tPositionRestoreDataBuffer();
 
 
@@ -142,10 +148,10 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	screen_quad_vbo = new tVBO<float>(2, 4);
 
 	float *screen_quad_data = screen_quad_vbo->GetData();
-	screen_quad_data[0] = -1.0; screen_quad_data[1] = 1.0;
-	screen_quad_data[2] = -1.0; screen_quad_data[3] = -1.0;
-	screen_quad_data[4] = 1.0; screen_quad_data[5] = 1.0;
-	screen_quad_data[6] = 1.0; screen_quad_data[7] = -1.0;
+	screen_quad_data[0] = -1.0f; screen_quad_data[1] = 1.0f;
+	screen_quad_data[2] = -1.0f; screen_quad_data[3] = -1.0f;
+	screen_quad_data[4] = 1.0f; screen_quad_data[5] = 1.0f;
+	screen_quad_data[6] = 1.0f; screen_quad_data[7] = -1.0f;
 
 	screen_quad_vbo->AssignData();
 	screen_quad_vbo->SetAttribute(tShader::vertex_attribute, GL_FLOAT);
@@ -266,7 +272,14 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	gbuffer->BindDrawBuffers();
+	glViewport(0, 0, screen_width, screen_height);
 
+	matrix_buffer->UpdateBuffer(current_rendering_camera->GetModelViewProjectionMatrix());
+	matrix_buffer->Bind();
+
+	if(depth_prepass_enabled)
+		DepthPrePass();
 	GeometryPass();
 
 
@@ -391,31 +404,61 @@ void tRenderer::RenderShadowMaps(void)
 }
 
 
+
+void tRenderer::DepthPrePass(void)
+{
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
+
+	SetCurrentFaceShader(depth_pass_shader);
+	BindCurrentFaceShader();
+
+	current_rendering_render_space->DepthPrePass(this);
+}
+
+
 void tRenderer::GeometryPass(void)
 {
-	gbuffer->BindDrawBuffers();
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	if(depth_prepass_enabled)
+	{
+		glDepthMask(GL_FALSE);
+		glDepthFunc(GL_EQUAL);
+	}
+	else
+	{
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
+		glEnable(GL_DEPTH_TEST);
+	}
 
-	glClear(GL_DEPTH_BUFFER_BIT);
-	float clear_color[] = { 0.0, 0.0, 0.0, 0.0 };
+	float clear_color[] = {0.0, 0.0, 0.0, 0.0};
 	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::DIFFUSE_TEX), clear_color);
 
-	glViewport(0, 0, screen_width, screen_height);
 
-	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
 	SetCurrentFaceShader(geometry_pass_shader);
 	BindCurrentFaceShader();
 
-	geometry_pass_shader->SetModelViewProjectionMatrix(current_rendering_camera->GetModelViewProjectionMatrix().GetData());
 	geometry_pass_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 
-	if(cube_map_reflection)
+	if (cube_map_reflection)
 		geometry_pass_shader->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());
 	else
 		geometry_pass_shader->SetCubeMapReflectionTexture(0);
 
 	current_rendering_render_space->GeometryPass(this);
+
+	if (depth_prepass_enabled)
+	{
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
+	}
 }
 
 void tRenderer::LightPass(void)

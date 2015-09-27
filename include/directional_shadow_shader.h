@@ -13,8 +13,6 @@ class tDirectionalShadowShader : public tFaceShader
 
 		GLint transformation_uniform;
 
-		GLint vertex_mix_uniform;
-
 		GLint diffuse_tex_enabled_uniform;
 		GLint diffuse_tex_uniform;
 
@@ -25,7 +23,6 @@ class tDirectionalShadowShader : public tFaceShader
 		void SetLightDir(tVector v);
 		void SetClip(float near, float far);
 		void SetTransformation(const float m[16]);
-		void SetVertexMix(float m = 0.0);
 		void SetDiffuseTexture(bool enabled, GLuint tex = 0);
 		void SetCamPos(tVector v);
 };
@@ -37,8 +34,6 @@ class tDirectionalShadowBlurShader : public tShader
 		GLint tex_layers_count_uniform;
 		GLint blur_factors_uniform;
 		GLint blur_dir_uniform;
-
-		GLint blur_mode_uniform;
 
 	public:
 		static const GLint vertex_attribute = 0;

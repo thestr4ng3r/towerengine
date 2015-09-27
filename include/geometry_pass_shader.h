@@ -6,13 +6,11 @@
 class tGeometryPassShader : public tFaceShader
 {
 	private:
-		GLint modelview_projection_matrix_uniform;
 		GLint cam_pos_uniform;
 
 		GLint transformation_uniform;
 
 		GLint diffuse_color_uniform;
-		GLint diffuse_color2_uniform;
 		GLint specular_color_uniform;
 		GLint specular_size_uniform; // TODO: in exponent umbenennen
 		GLint self_illumination_color_uniform;
@@ -35,19 +33,15 @@ class tGeometryPassShader : public tFaceShader
 		GLint cube_map_reflection_color_uniform;
 		GLint cube_map_reflection_tex_uniform;
 
-		GLint clip_uniform;
-		GLint clip_dist_uniform;
-
-		GLint vertex_mix_uniform;
+		//GLint clip_uniform;
+		//GLint clip_dist_uniform;
 
 	public:
 		void Init(void);
 
-		void SetModelViewProjectionMatrix(float m[16]);
 		void SetCameraPosition(tVector pos);
-		void SetClip(tVector c, float d);
+		//void SetClip(tVector c, float d);
 		void SetDiffuseColor(tVector color);
-		void SetDiffuseColor2(tVector color, float alpha);
 		void SetSpecularColor(tVector color);
 		void SetSpecular(float size);
 		void SetDiffuseTexture(bool enabled, GLuint tex = 0);
@@ -56,7 +50,6 @@ class tGeometryPassShader : public tFaceShader
 		void SetBumpTexture(bool enabled, GLuint tex = 0);
 		void SetBumpDepth(float depth);
 		void SetTransformation(const float m[16]);
-		void SetVertexMix(float m = 0.0);
 		void SetSelfIlluminationColor(tVector color);
 		void SetSelfIlluminationTexture(bool enabled, GLuint tex =0);
 		void SetCubeMapReflectionEnabled(bool enabled);

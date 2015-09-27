@@ -6,14 +6,14 @@ tMeshPose::tMeshPose(tMesh *mesh)
 {
 	id = 0;
 	this->mesh = mesh;
-	vbo = mesh->CreateFloatVBO(3);
+	//vbo = mesh->CreateFloatVBO(3);
 }
 
 tMeshPose::~tMeshPose(void)
 {
 	if(mesh->GetCurrentPose() == this)
 		mesh->ChangePose(mesh->GetIdlePose());
-	delete vbo;
+	//delete vbo;
 }
 
 void tMeshPose::CopyFromVertices(void)
@@ -28,8 +28,6 @@ void tMeshPose::CopyFromVertices(void)
 		p = v->pos;
 		vertices.insert(pair<tVertex *, tVector>(v, p));
 	}
-
-	RefreshVBO();
 }
 
 void tMeshPose::Clear(void)
@@ -54,7 +52,6 @@ void tMeshPose::CopyFromData(int c, int *vert, tVector *vec)
 			continue;
 		vertices.insert(pair<tVertex *, tVector>(v, vec[i]));
 	}
-	RefreshVBO();
 }
 
 
@@ -82,7 +79,7 @@ void tMeshPose::ApplyMixedPoseToVertices(tMeshPose *o, float mix)
 }
 
 
-void tMeshPose::RefreshVBO(void)
+void tMeshPose::RefreshVBO(tVBO<float> *vbo)
 {
 	vector<tVertex *>::iterator v;
 	tVertex *vt;

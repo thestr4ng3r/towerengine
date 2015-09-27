@@ -30,6 +30,7 @@ class t2DRenderer;
 #include "shader.h"
 #include "face_shader.h"
 #include "geometry_pass_shader.h"
+#include "depth_pass_shader.h"
 #include "simple_forward_shader.h"
 #include "refraction_shader.h"
 #include "2d_sprite_shader.h"

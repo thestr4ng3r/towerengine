@@ -7,6 +7,14 @@ void tRenderObjectSpace::Clear(void)
 	objects.clear();
 }
 
+void tRenderObjectSpace::DepthPrePass(tRenderer *renderer)
+{
+	set<tObject *>::iterator i;
+
+	for(i=objects.begin(); i!=objects.end(); i++)
+		(*i)->DepthPrePass(renderer);
+}
+
 void tRenderObjectSpace::GeometryPass(tRenderer *renderer)
 {
 	set<tObject *>::iterator i;

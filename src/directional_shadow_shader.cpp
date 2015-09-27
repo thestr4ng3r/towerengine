@@ -6,7 +6,6 @@ void tDirectionalShadowShader::Init(void)
 {
 	InitShader(directional_shadow_shader_vert, directional_shadow_shader_frag, "Directional Shadow Shader");
 	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
-	glBindAttribLocation(program, tFaceShader::vertex2_attribute, "vertex2_attr");
 	glBindAttribLocation(program, tFaceShader::uvcoord_attribute, "uv_attr");
 	LinkProgram();
 
@@ -15,7 +14,6 @@ void tDirectionalShadowShader::Init(void)
 	light_dir_uniform = GetUniformLocation("light_dir_uni");
 	clip_uniform = GetUniformLocation("clip_uni");
 	transformation_uniform = GetUniformLocation("transformation_uni");
-	vertex_mix_uniform = GetUniformLocation("vertex_mix_uni");
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
 	diffuse_tex_enabled_uniform = GetUniformLocation("diffuse_tex_enabled_uni");
@@ -40,10 +38,6 @@ void tDirectionalShadowShader::SetTransformation(const float m[16])
 	glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void tDirectionalShadowShader::SetVertexMix(float m)
-{
-	glUniform1f(vertex_mix_uniform, m);
-}
 
 void tDirectionalShadowShader::SetClip(float near_clip, float far_clip)
 {

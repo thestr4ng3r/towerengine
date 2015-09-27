@@ -7,6 +7,7 @@ class tRenderer
 {
 	protected:
 		tGeometryPassShader *geometry_pass_shader;
+		tDepthPassShader *depth_pass_shader;
 		tSimpleForwardShader *simple_forward_shader;
 		tRefractionShader *refraction_shader;
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
@@ -54,6 +55,7 @@ class tRenderer
 		tSSAO *ssao;
 		bool ssao_ambient_only;
 
+		bool depth_prepass_enabled;
 
 		bool bindless_textures_enabled;
 
@@ -61,10 +63,11 @@ class tRenderer
 
 		
 		std::list<tPointLight *> render_point_light_shadows;
-
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 		tLightingShaderPointLightsBuffer *point_lights_buffer;
 #endif
+
+		tMatrixBuffer *matrix_buffer;
 		tPositionRestoreDataBuffer *position_restore_data_buffer;
 
 		tCubeMapReflection *cube_map_reflection;
@@ -78,6 +81,7 @@ class tRenderer
 		void Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height);
 
 		void RenderShadowMaps(void);
+		void DepthPrePass(void);
 		void GeometryPass(void);
 		void LightPass(void);
 		void ForwardPass(void);
@@ -143,6 +147,9 @@ class tRenderer
 		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
 
 		void SetPointLightShadowRenderLimit(int limit)	{ this->point_light_shadow_limit = limit; }
+
+		void SetDepthPrePassEnabled(bool enabled)		{ this->depth_prepass_enabled = enabled; }
+		bool GetDepthPrePassEnabled(void)				{ return depth_prepass_enabled; }
 };
 
 

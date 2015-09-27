@@ -18,6 +18,7 @@ class tShader
 	public:
 		static const int vertex_attribute = 0;
 
+		static const int matrix_binding_point = 0;
 		static const int position_restore_data_binding_point = 1;
 		static const int point_light_binding_point = 2;
 
@@ -41,6 +42,19 @@ class tUniformBuffer
 
 		void UploadData(GLenum usage = GL_DYNAMIC_DRAW);
 		void Bind(GLuint binding_point);
+};
+
+
+
+class tMatrixBuffer : public tUniformBuffer
+{
+	public:
+		tMatrixBuffer(void);
+		~tMatrixBuffer(void);
+
+		void UpdateBuffer(const tMatrix4 &matrix);
+
+		void Bind(void);
 };
 
 

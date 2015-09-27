@@ -1,17 +1,18 @@
 #version 330
 
 in vec3 vertex_attr;
-in vec3 vertex2_attr; // vertex of next keyframe
 in vec2 uv_attr;
 in vec3 normal_attr;
 in vec3 tang_attr;
 in vec3 bitang_attr;
 
-uniform mat4 modelview_projection_matrix_uni;
+layout(std140) uniform MatrixBlock
+{
+	mat4 modelview_projection_matrix;
+} matrix_uni;
 
 uniform vec3 cam_pos_uni;
 
-uniform float vertex_mix_uni;
 uniform mat4 transformation_uni;
 
 out vec3 pos_var;
@@ -29,8 +30,7 @@ out float reflection_radius_var;
 void main(void)
 {
 	vec3 vertex_pos = vertex_attr;
-	if(vertex_mix_uni > 0.0)
-		vertex_pos = vertex_pos * (1.0 - vertex_mix_uni) + vertex2_attr * vertex_mix_uni;
+
 	vec4 pos = vec4(vertex_pos, 1.0) * transformation_uni;
 	pos_var = pos.xyz;
 	normal_var = normalize(normal_attr * mat3(transformation_uni)); // TODO: correct transformation of normals
@@ -42,5 +42,5 @@ void main(void)
 	reflection_center_var = (vec4(0.0, 0.0, 0.0, 1.0) * transformation_uni).xyz;
 	reflection_radius_var = 1.0;
 	
-	gl_Position = modelview_projection_matrix_uni * pos;
+	gl_Position = matrix_uni.modelview_projection_matrix * pos;
 }

@@ -87,6 +87,35 @@ void tUniformBuffer::Bind(GLuint binding_point)
 
 // ------------------------
 
+
+
+tMatrixBuffer::tMatrixBuffer(void)
+		: tUniformBuffer(4*16)
+{
+}
+
+tMatrixBuffer::~tMatrixBuffer(void)
+{
+}
+
+
+
+void tMatrixBuffer::UpdateBuffer(const tMatrix4 &matrix)
+{
+	matrix.GetDataTranspose((float *)data);
+	UploadData();
+}
+
+void tMatrixBuffer::Bind(void)
+{
+	tUniformBuffer::Bind(tShader::matrix_binding_point);
+}
+
+
+
+
+// ------------------------
+
 void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_name = 0)
 {
 	GLchar *string;

@@ -23,7 +23,7 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 
 	vao = new tVAO();
 	current_pose = idle_pose = new tMeshPose(this);
-	//vertex_vbo = new VBO<float>(3, vao);
+	vertex_vbo = new tVBO<float>(3);
 	normal_vbo = new tVBO<float>(3);
 	tang_vbo = new tVBO<float>(3);
 	bitang_vbo = new tVBO<float>(3);
@@ -31,6 +31,7 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 	uvcoord_vbo = new tVBO<float>(2);
 
 	vao->Bind();
+	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
 	normal_vbo->SetAttribute(tFaceShader::normal_attribute, GL_FLOAT);
 	tang_vbo->SetAttribute(tFaceShader::tang_attribute, GL_FLOAT);
 	bitang_vbo->SetAttribute(tFaceShader::bitang_attribute, GL_FLOAT);
@@ -85,17 +86,6 @@ tMesh::~tMesh(void)
 	DeleteVBOData();
 
 	delete physics_triangle_mesh;
-}
-
-float tMesh::color[4] = { 1.0, 1.0, 1.0, 1.0 };
-
-
-void tMesh::Color(tVector c, float a)
-{
-	color[0] = c.x;
-	color[1] = c.y;
-	color[2] = c.z;
-	color[3] = a;
 }
 
 
@@ -431,31 +421,29 @@ void tMesh::RefreshAllVBOs(void)
 	vector<tVertex *>::iterator v;
 	tVertex *vt;
 	int d;
-	float *normal_data;
-	float *tang_data;
-	float *bitang_data;
-	float *face_normal_data;
-	float *uvcoord_data;
 
 	AssignVertexArrayPositions();
 
 	data_count = GetVertexCount();
+	vertex_vbo->SetSize(data_count);
 	normal_vbo->SetSize(data_count);
 	tang_vbo->SetSize(data_count);
 	bitang_vbo->SetSize(data_count);
 	face_normal_vbo->SetSize(data_count);
 	uvcoord_vbo->SetSize(data_count);
 
-	normal_data = normal_vbo->GetData();
-	tang_data = tang_vbo->GetData();
-	bitang_data = bitang_vbo->GetData();
-	face_normal_data = face_normal_vbo->GetData();
-	uvcoord_data = uvcoord_vbo->GetData();
+	float *vertex_data = vertex_vbo->GetData();
+	float *normal_data = normal_vbo->GetData();
+	float *tang_data = tang_vbo->GetData();
+	float *bitang_data = bitang_vbo->GetData();
+	float *face_normal_data = face_normal_vbo->GetData();
+	float *uvcoord_data = uvcoord_vbo->GetData();
 
 	for(v=vertices.begin(); v!=vertices.end(); v++)
 	{
 		vt = *v;
 		d = vt->index * 3;
+		memcpy(vertex_data + d, vt->pos.v, 3 * sizeof(float));
 		memcpy(normal_data + d, vt->normal.v, 3 * sizeof(float));
 		memcpy(tang_data + d, vt->tang.v, 3 * sizeof(float));
 		memcpy(bitang_data + d, vt->bitang.v, 3 * sizeof(float));
@@ -464,6 +452,7 @@ void tMesh::RefreshAllVBOs(void)
 
 	}
 
+	vertex_vbo->AssignData();
 	normal_vbo->AssignData();
 	tang_vbo->AssignData();
 	bitang_vbo->AssignData();
@@ -522,51 +511,35 @@ void tMesh::RefreshIBOs(void)
 	refresh_ibos = false;
 }
 
-void tMesh::GeometryPass(tRenderer *renderer)
+
+void tMesh::DepthPrePass(tRenderer *renderer)
 {
-	tVBO<float> *vertex_vbo, *vertex2_vbo;
-	tKeyFrame *a, *b;
-	float mix;
-
-	vertex2_vbo = 0;
-	if(animation_mode)
-	{
-		current_animation->GetKeyframePair(&a, &b, &mix);
-		if(!a)
-		{
-			vertex_vbo = current_pose->vbo;
-		}
-		else
-		{
-			vertex_vbo = a->vbo;
-			if(b)
-				vertex2_vbo = b->vbo;
-		}
-	}
-	else
-	{
-		vertex_vbo = current_pose->vbo;
-	}
-
 	if(refresh_vbos)
 		RefreshAllVBOs();
 
 	vao->Bind();
 
-	vertex_vbo->SetAttribute(tFaceShader::vertex_attribute, GL_FLOAT);
-	if(vertex2_vbo)
-	{
-		renderer->GetCurrentFaceShader()->SetVertexMix(mix);
-		vertex2_vbo->SetAttribute(tFaceShader::vertex2_attribute, GL_FLOAT);
-	}
-	else
-		renderer->GetCurrentFaceShader()->SetVertexMix(0.0);
-
 	if(refresh_ibos)
 		RefreshIBOs();
 
-	//CEngine::GetFaceShader()->BindShader();
-	renderer->GetCurrentFaceShader()->SetDiffuseColor2(Vec(color[0], color[1], color[2]), color[3]);
+
+	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
+	{
+		if(i->first->InitGeometryPass(renderer))
+			i->second->ibo->Draw(GL_TRIANGLES);
+	}
+}
+
+
+void tMesh::GeometryPass(tRenderer *renderer)
+{
+	if(refresh_vbos)
+		RefreshAllVBOs();
+
+	vao->Bind();
+
+	if(refresh_ibos)
+		RefreshIBOs();
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{

@@ -12,8 +12,6 @@ class tPointShadowShader : public tFaceShader
 
 		GLint transformation_uniform;
 
-		GLint vertex_mix_uniform;
-
 	public:
 		void Init(void);
 
@@ -21,7 +19,6 @@ class tPointShadowShader : public tFaceShader
 		void SetLightPos(tVector v);
 		void SetLightDist(float d);
 		void SetTransformation(const float m[16]);
-		void SetVertexMix(float m = 0.0);
 };
 
 class tPointShadowBlurShader : public tShader

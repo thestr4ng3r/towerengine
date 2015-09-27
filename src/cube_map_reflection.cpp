@@ -37,6 +37,8 @@ tCubeMapReflection::tCubeMapReflection(tRenderer *renderer, int resolution, tVec
 
 	render_space = new tRenderSpace();
 
+	matrix_buffer = new tMatrixBuffer();
+
 	invalid = true;
 }
 
@@ -58,9 +60,16 @@ void tCubeMapReflection::Render(void)
 	tWorld *world = renderer->GetWorld();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	matrix_buffer->Bind();
 
-	glClearColor(0.0, 0.0, 0.0, 0.0);
+	//glClearColor(0.0, 0.0, 0.0, 0.0);
 	glViewport(0, 0, resolution, resolution);
+
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
 
 	for(int s=0; s<6; s++)
 	{
@@ -90,14 +99,17 @@ void tCubeMapReflection::GeometryPass(int side, tWorld *world)
 		cam_up = Vec(0.0, 0.0, -1.0);
 
 	camera->SetUp(cam_up);
-
 	camera->CalculateModelViewProjectionMatrix();
+	matrix_buffer->UpdateBuffer(camera->GetModelViewProjectionMatrix());
 
 	world->FillRenderSpace(render_space, camera);
 
 	gbuffer->BindDrawBuffers();
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	float clear_color[] = {0.0, 0.0, 0.0, 0.0};
+	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::DIFFUSE_TEX), clear_color);
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
@@ -107,7 +119,6 @@ void tCubeMapReflection::GeometryPass(int side, tWorld *world)
 	renderer->SetCurrentFaceShader(renderer->GetGeometryPassShader());
 	renderer->BindCurrentFaceShader();
 
-	shader->SetModelViewProjectionMatrix(camera->GetModelViewProjectionMatrix().GetData());
 	shader->SetCameraPosition(camera->GetPosition());
 
 	render_space->GeometryPass(renderer);

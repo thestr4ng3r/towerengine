@@ -33,11 +33,8 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 
 
-	GLuint point_light_block_index = glGetUniformBlockIndex(program, "PointLightBlock");
-	glUniformBlockBinding(program, point_light_block_index, point_light_binding_point);
-
-	GLuint position_restore_data_block_index = glGetUniformBlockIndex(program, "PositionRestoreDataBlock");
-	glUniformBlockBinding(program, position_restore_data_block_index, position_restore_data_binding_point);
+	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "PointLightBlock"), point_light_binding_point);
+	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "PositionRestoreDataBlock"), position_restore_data_binding_point);
 
 
 	Bind();
