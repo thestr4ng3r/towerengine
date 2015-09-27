@@ -52,6 +52,14 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	{
 		lighting_shader = new tLightingShader();
 		lighting_shader->Init(gbuffer);
+
+		if(!lighting_shader->GetStatus())
+		{
+			delete lighting_shader;
+			lighting_shader = 0;
+			bindless_textures_enabled = false;
+			printf("failed to compile lighting shader. using fallback lighting.");
+		}
 	}
 	else
 		lighting_shader = 0;

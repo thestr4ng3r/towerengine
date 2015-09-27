@@ -5,6 +5,7 @@ class tShader
 {
 	private:
 		const char *name;
+		bool status;
 
 	protected:
 		GLuint program;
@@ -26,6 +27,8 @@ class tShader
 		static void Unbind(void);
 
 		virtual ~tShader(void) {};
+
+		bool GetStatus(void)	{ return status; }
 };
 
 

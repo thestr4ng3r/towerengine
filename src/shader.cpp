@@ -18,16 +18,20 @@ void tShader::CreateAndAttachShader(GLenum type, const char *src)
 
 void tShader::LinkProgram(void)
 {
+	status = false;
 	glLinkProgram(program);
 
 	GLint param;
 	glGetProgramiv(program, GL_LINK_STATUS, &param);
 	if(param != GL_TRUE)
 		printf("failed to link %s\n", name);
+
+	status = param == GL_TRUE;
 }
 
 void tShader::InitShader(const char *vert_src, const char *frag_src, const char *shader_name)
 {
+	status = false;
 	name = shader_name;
 	program = glCreateProgram();
 #ifdef TOWERENGINE_SHADER_LABELS
