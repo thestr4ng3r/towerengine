@@ -270,7 +270,7 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 
 	if(cube_map_reflection)
 	{
-		//if(cube_map_reflection->GetInvalid())
+		if(cube_map_reflection->GetInvalid())
 			cube_map_reflection->Render();
 	}
 

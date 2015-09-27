@@ -10,4 +10,5 @@ void main(void)
 {
 	vec3 color = texture(cube_map_uni, normalize(pos_var)).xyz;
 	color_out = vec4(color, 0.0);
+	gl_FragDepth = 1.0;
 }

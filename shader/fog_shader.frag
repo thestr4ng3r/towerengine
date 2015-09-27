@@ -22,10 +22,8 @@ layout(std140) uniform PositionRestoreDataBlock
 	vec2 projection_params;	
 } position_restore_data_uni;
 
-vec3 CalculateWorldPosition(void)
+vec3 CalculateWorldPosition(in float depth)
 {
-	float depth = texture(depth_tex_uni, uv_coord_var).x;
-	
 	vec3 ndc_pos;
 	ndc_pos.xy = 2.0 * uv_coord_var - vec2(1.0);
 	ndc_pos.z = 2.0 * depth - 1.0;
@@ -40,10 +38,14 @@ vec3 CalculateWorldPosition(void)
 
 void main(void)
 {
+	float depth = texture(depth_tex_uni, uv_coord_var).x;
+	if(depth == 1.0)
+		discard;
+	
 	vec4 src_color = texture(color_tex_uni, uv_coord_var);
 	vec3 color = src_color.rgb;
 	
-	vec3 pos = CalculateWorldPosition();
+	vec3 pos = CalculateWorldPosition(depth);
 	
 	vec3 dir = pos - cam_pos_uni;
 	float dist = length(dir);//dir.x*dir.x + dir.y*dir.y + dir.z*dir.z;

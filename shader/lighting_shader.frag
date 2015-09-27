@@ -50,10 +50,8 @@ layout(std140) uniform PositionRestoreDataBlock
 	vec2 projection_params;	
 } position_restore_data_uni;
 
-vec3 CalculateWorldPosition(void)
+vec3 CalculateWorldPosition(in float depth)
 {
-	float depth = texture(depth_tex_uni, uv_coord_var).x;
-	
 	vec3 ndc_pos;
 	ndc_pos.xy = 2.0 * uv_coord_var - vec2(1.0);
 	ndc_pos.z = 2.0 * depth - 1.0;
@@ -76,12 +74,13 @@ float linstep(float min, float max, float v)
 
 void main(void)
 {	
-	vec4 diffuse = texture(diffuse_tex_uni, uv_coord_var).rgba;
-
-	if(diffuse.a == 0.0)
-		discard;
+	float depth = texture(depth_tex_uni, uv_coord_var).x;
 	
-	vec3 position = CalculateWorldPosition();
+	if(depth == 1.0)
+		discard;
+
+	vec3 diffuse = texture(diffuse_tex_uni, uv_coord_var).rgb;	
+	vec3 position = CalculateWorldPosition(depth);
 	vec3 normal = normalize(texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
 	vec4 specular = texture(specular_tex_uni, uv_coord_var).rgba;
 		
