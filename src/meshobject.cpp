@@ -202,7 +202,7 @@ void tMeshObject::InitMeshRigidBody(float mass)
 	if(mass > 0.0)
 	{
 		btVector3 inertia;
-		//btBoxShape *shape = new btBoxShape(btVector3(1.0, 1.0, 1.0));
+		//btBoxShape *shape = new btBoxShape(btVector3(0.2, 0.2, 0.2));
 
 		btCollisionShape *shape;
 		if(mesh->GetPhysicsMesh())
@@ -229,11 +229,14 @@ void tMeshObject::InitMeshRigidBody(float mass)
 		rigid_body = new btRigidBody(0.0, motion_state, shape, btVector3(0.0, 0.0, 0.0));
 	}
 
-	rigid_body->setUserPointer(this);
+	if(rigid_body)
+	{
+		rigid_body->setUserPointer(this);
 
-	tWorld *world = GetWorld();
-	if(world)
-		world->GetDynamicsWorld()->addRigidBody(rigid_body);
+		tWorld *world = GetWorld();
+		if(world)
+			world->GetDynamicsWorld()->addRigidBody(rigid_body);
+	}
 }
 
 void tMeshObject::DeleteRigidBody(void)
@@ -276,7 +279,7 @@ void tMeshObjectMotionState::getWorldTransform(btTransform &trans) const
 
 void tMeshObjectMotionState::setWorldTransform(const btTransform &trans)
 {
-	object->SetTransform(tTransform::FromBtTransform(trans));
+	object->SetTransformWithoutRigidBody(tTransform::FromBtTransform(trans));
 }
 
 

@@ -115,8 +115,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glViewport(0, 0, size, size);
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	glClearColor(1.0, 1.0, 1.0, 1.0);
+	//glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
 	/*glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -157,8 +156,6 @@ void tPointLightShadow::Render(tRenderer *renderer)
 
 		render_object_space->GeometryPass(renderer);
 	}
-	tShader::Unbind(); // TODO: remove this if possible
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
 	if(!blur_enabled)
@@ -175,7 +172,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	for(s=0; s<6; s++)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, blur_tex, 0);
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT);
 
 	renderer->GetPointShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0, 0.0) * blur_size);
 
@@ -188,7 +185,7 @@ void tPointLightShadow::Render(tRenderer *renderer)
 	for(s=0; s<6; s++)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, blur_draw_buffers[s], GL_TEXTURE_CUBE_MAP_POSITIVE_X+s, tex, 0);
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT);
 
 	renderer->GetPointShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0, 0.0) * blur_size);
 
@@ -196,9 +193,9 @@ void tPointLightShadow::Render(tRenderer *renderer)
 
 	renderer->RenderScreenQuad();
 
-	tShader::Unbind();
+	//tShader::Unbind();
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
