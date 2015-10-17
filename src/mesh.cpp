@@ -1247,17 +1247,17 @@ void tMesh::ParseMeshDataNode(xml_node<> *cur, tMaterialManager *material_manage
 			{
 				if(i >= data_size)
 					break;
-				if(data[i] == '\n')
+				if(data[i] == '\n' || data[i] == '\r')
 					break;
 			}
 		}
 
-		if(c == '\n' || i == data_size-1)
+		if(c == '\n' || c == '\r' || i == data_size-1)
 		{
 			if(values_count < max_values_count)
 			{
 				values[values_count] = data + value_start;
-				if(c == '\n')
+				if(c == '\n' || c == '\r')
 					c = 0;
 				values_count++;
 			}
