@@ -35,9 +35,9 @@ class tScene
 		void ParseCubeMapAssetNode(rapidxml::xml_node<char> *cur);
 
 		void ParseObjectsNode(rapidxml::xml_node<char> *cur);
-		void ParseMeshObjectNode(rapidxml::xml_node<char> *cur);
-		void ParseDirectionalLightObjectNode(rapidxml::xml_node<char> *cur);
-		void ParsePointLightObjectNode(rapidxml::xml_node<char> *cur);
+		tSceneObject *ParseMeshObjectNode(rapidxml::xml_node<char> *cur);
+		tSceneObject *ParseDirectionalLightObjectNode(rapidxml::xml_node<char> *cur);
+		tSceneObject *ParsePointLightObjectNode(rapidxml::xml_node<char> *cur);
 
 		static float ParseFloatNode(rapidxml::xml_node<char> *cur, const char *p = "v");
 		static tTransform ParseTransformNode(rapidxml::xml_node<char> *cur);
@@ -60,6 +60,8 @@ class tScene
 		std::list<tSceneObject *> *GetObjectsByTag(std::string tag);
 		tSceneObject *GetObjectWhereTagStartsWith(std::string start);
 		std::list<tSceneObject *> *GetObjectsWhereTagStartsWith(std::string start);
+
+		void GetObjectsMapByTag(std::string tag, std::string attribute, std::multimap<std::string, tSceneObject *> &result);
 };
 
 

@@ -206,35 +206,50 @@ void tScene::ParseObjectsNode(xml_node<> *cur)
 {
 	for(xml_node<> *child = cur->first_node(); child; child=child->next_sibling())
 	{
+		tSceneObject *scene_object = 0;
+		xml_attribute<> *attr;
+
+		if(!(attr = child->first_attribute("name")))
+			continue;
+		string name = string(attr->value());
+
 		if(strcmp(child->name(), "mesh") == 0)
-			ParseMeshObjectNode(child);
+			scene_object = ParseMeshObjectNode(child);
 		else if(strcmp(child->name(), "dir_light") == 0)
-			ParseDirectionalLightObjectNode(child);
+			scene_object = ParseDirectionalLightObjectNode(child);
 		else if(strcmp(child->name(), "point_light") == 0)
-			ParsePointLightObjectNode(child);
+			scene_object = ParsePointLightObjectNode(child);
+
+		if(!scene_object)
+			continue;
+
+		if((attr = child->first_attribute("tag")))
+			scene_object->SetTag(string(attr->value()));
+
+		for(xml_node<> *child3 = child->first_node("attribute"); child3; child3=child3->next_sibling("attribute"))
+		{
+			if(!(attr = child3->first_attribute("name")))
+				continue;
+			string attr_name = string(attr->value());
+
+			if(!(attr = child3->first_attribute("value")))
+				continue;
+			string attr_value = string(attr->value());
+
+			scene_object->SetAttribute(attr_name, attr_value);
+		}
+
+		AddObject(name, scene_object);
 	}
 }
 
-void tScene::ParseMeshObjectNode(xml_node<> *cur)
+tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 {
-	string name;
-	string tag;
 	string mesh_asset_name;
 	tTransform transform;
 	xml_attribute<> *attr;
 	bool rigid_body_enabled = false;
 	float rigid_body_mass = 0.0;
-
-
-	if(!(attr = cur->first_attribute("name")))
-		return;
-	name = string(attr->value());
-
-	if((attr = cur->first_attribute("tag")))
-		tag = string(attr->value());
-	else
-		tag = "";
-
 
 	xml_node<> *child = cur->first_node();
 	for(; child; child = child->next_sibling())
@@ -261,11 +276,11 @@ void tScene::ParseMeshObjectNode(xml_node<> *cur)
 	tAsset *asset;
 
 	if((asset_i = assets.find(mesh_asset_name)) == assets.end())
-		return;
+		return 0;
 	asset = asset_i->second;
 
 	if(asset->GetType() != T_ASSET_TYPE_MESH)
-		return;
+		return 0;
 
 	tMeshObject *object = new tMeshObject(((tMeshAsset *)asset)->GetMesh());
 	//object->SetTag(tag);
@@ -276,25 +291,16 @@ void tScene::ParseMeshObjectNode(xml_node<> *cur)
 		object->UpdateRigidBodyTransformation();
 	}
 	tObjectSceneObject *scene_object = new tObjectSceneObject(object);
-	scene_object->SetTag(tag);
-	AddObject(name, scene_object);
+
+
+
+
+	return scene_object;
 }
 
-void tScene::ParseDirectionalLightObjectNode(xml_node<> *cur)
+tSceneObject *tScene::ParseDirectionalLightObjectNode(xml_node<> *cur)
 {
-	string name;
-	string tag;
 	tVector direction, color;
-	xml_attribute<> *attr;
-
-	if(!(attr = cur->first_attribute("name")))
-		return;
-	name = string(attr->value());
-
-	if((attr = cur->first_attribute("tag")))
-		tag = string(attr->value());
-	else
-		tag = "";
 
 	for(xml_node<> *child=cur->first_node(); child; child=child->next_sibling())
 	{
@@ -306,26 +312,14 @@ void tScene::ParseDirectionalLightObjectNode(xml_node<> *cur)
 
 	tDirectionalLight *dir_light = new tDirectionalLight(direction, color);
 	tDirectionalLightSceneObject *scene_object = new tDirectionalLightSceneObject(dir_light);
-	scene_object->SetTag(tag);
-	AddObject(name, scene_object);
+
+	return scene_object;
 }
 
-void tScene::ParsePointLightObjectNode(xml_node<> *cur)
+tSceneObject *tScene::ParsePointLightObjectNode(xml_node<> *cur)
 {
-	string name;
-	string tag;
 	tVector position, color;
 	float distance = 5.0;
-	xml_attribute<> *attr;
-
-	if(!(attr = cur->first_attribute("name")))
-		return;
-	name = string(attr->value());
-
-	if((attr = cur->first_attribute("tag")))
-		tag = string(attr->value());
-	else
-		tag = "";
 
 	for(xml_node<> *child=cur->first_node(); child; child=child->next_sibling())
 	{
@@ -339,8 +333,8 @@ void tScene::ParsePointLightObjectNode(xml_node<> *cur)
 
 	tPointLight *point_light = new tPointLight(position, color, distance);
 	tPointLightSceneObject *scene_object = new tPointLightSceneObject(point_light);
-	scene_object->SetTag(tag);
-	AddObject(name, scene_object);
+
+	return scene_object;
 }
 
 void tScene::ParseSceneNode(xml_node<> *cur)
@@ -494,4 +488,21 @@ list<tSceneObject *> *tScene::GetObjectsWhereTagStartsWith(string start)
 
 	return r;
 }
+
+void tScene::GetObjectsMapByTag(string tag, string attribute, multimap<string, tSceneObject*> &result)
+{
+	map<string, tSceneObject *>::iterator i;
+
+	for(i=objects.begin(); i!=objects.end(); i++)
+		if(i->second->GetTag().compare(tag) == 0)
+		{
+			tSceneObject *object = i->second;
+			string attr_value = object->GetAttribute(attribute);
+			result.insert(pair<string, tSceneObject *>(attr_value, object));
+		}
+}
+
+
+
+
 

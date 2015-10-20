@@ -11,6 +11,7 @@ class tSceneObject
 {
 	private:
 		std::string tag;
+		std::map<std::string, std::string> attributes;
 
 	public:
 		tSceneObject(void)			{ tag = ""; }
@@ -23,6 +24,12 @@ class tSceneObject
 
 		void SetTag(std::string tag)		{ this->tag = tag; }
 		std::string GetTag(void)			{ return tag; }
+
+		void SetAttribute(std::string name, std::string value);
+		std::string GetAttribute(std::string name);
+		std::string GetAttribute(std::string name, std::string default_v);
+		int GetAttributeInt(std::string name, int default_v = 0);
+		float GetAttributeFloat(std::string name, float default_v = 0.0f);
 };
 
 class tObjectSceneObject : public tSceneObject

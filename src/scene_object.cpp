@@ -1,6 +1,57 @@
 
 #include "towerengine.h"
 
+using namespace std;
+
+
+
+void tSceneObject::SetAttribute(string name, string value)
+{
+	attributes.insert(pair<string, string>(name, value));
+}
+
+string tSceneObject::GetAttribute(string name)
+{
+	map<string, string>::iterator i = attributes.find(name);
+
+	if(i != attributes.end())
+		return i->second;
+
+	return string();
+}
+
+string tSceneObject::GetAttribute(string name, string default_v)
+{
+	map<string, string>::iterator i = attributes.find(name);
+
+	if(i != attributes.end())
+		return i->second;
+
+	return default_v;
+}
+
+int tSceneObject::GetAttributeInt(string name, int default_v)
+{
+	map<string, string>::iterator i = attributes.find(name);
+
+	if(i != attributes.end())
+		return atoi(i->second.c_str());
+
+	return default_v;
+}
+
+float tSceneObject::GetAttributeFloat(string name, float default_v)
+{
+	map<string, string>::iterator i = attributes.find(name);
+
+	if(i != attributes.end())
+		return atof(i->second.c_str());
+
+	return default_v;
+}
+
+// ---------------------------------------------
+
 tObjectSceneObject::tObjectSceneObject(tObject *object)
 {
 	this->object = object;
