@@ -28,19 +28,20 @@ tVRRenderer::~tVRRenderer(void)
 	}
 }
 
-void tVRRenderer::Render(GLuint dst_fbo)
+void tVRRenderer::Render(int eye, GLuint dst_fbo)
 {
-	printf("%d, %d, %d, %d\n", width[0], height[0], width[1], height[1]);
-	for(int i=0; i<2; i++)
-	{
-		tCamera *cam = camera[i];
-		tRenderSpace *render_space = camera_render_space[i];
+	//printf("%d, %d, %d, %d\n", width[0], height[0], width[1], height[1]);
 
-		cam->SetAspect((float)width[i] / (float)height[i]);
-		cam->CalculateModelViewProjectionMatrix();
+	tCamera *cam = camera[eye];
+	tRenderSpace *render_space = camera_render_space[eye];
 
-		world->FillRenderSpace(render_space, cam);
+	cam->SetAspect((float)width[eye] / (float)height[eye]);
+	cam->CalculateModelViewProjectionMatrix();
 
-		tRenderer::Render(cam, render_space, dst_fbo, i*width[0], 0, width[i], height[i]);
-	}
+	world->FillRenderSpace(render_space, cam);
+
+	int render_width = screen_width / 2;
+
+	//tRenderer::Render(cam, render_space, dst_fbo, eye*render_width, 0, render_width, screen_height);
+	tRenderer::Render(cam, render_space, dst_fbo, 0, 0, width[eye], height[eye]);
 }
