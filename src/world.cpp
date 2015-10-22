@@ -114,26 +114,39 @@ void tWorld::RemoveParticleSystem(tParticleSystem *ps)
 
 
 
-void tWorld::FillRenderObjectSpace(tRenderObjectSpace *space, tCulling *culling, bool clear, bool init_culling)
+void tWorld::FillRenderObjectSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool clear, bool init_cullings)
 {
 	if(clear)
 		space->Clear();
 
-	if(init_culling)
-		culling->InitCulling();
+	if(init_cullings)
+		for(int c=0; c<cullings_count; c++)
+			cullings[c]->InitCulling();
 
 	vector<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 	{
-		if(culling->TestBoundingBoxCulling((*i)->GetBoundingBox()))
+		bool cull = true;
+
+		for(int c=0; c<cullings_count; c++)
+		{
+			if(!cullings[c]->TestBoundingBoxCulling((*i)->GetBoundingBox()))
+			{
+				cull = false;
+				break;
+			}
+		}
+
+		if(cull)
 			continue;
+
 		space->objects.insert((*i));
 	}
 }
 
 
-void tWorld::FillRenderSpace(tRenderSpace *space, tCulling *culling, bool init_culling)
+void tWorld::FillRenderSpace(tRenderSpace *space, tCulling **cullings, int cullings_count, bool init_cullings)
 {
 	tBoundingBox b;
 	//tVector minv, maxv;
@@ -141,12 +154,13 @@ void tWorld::FillRenderSpace(tRenderSpace *space, tCulling *culling, bool init_c
 	float light_dist;
 	vector<tObject *>::iterator i;
 
-	if(init_culling)
-		culling->InitCulling();
+	if(init_cullings)
+		for(int c=0; c<cullings_count; c++)
+			cullings[c]->InitCulling();
 
 	space->Clear();
 
-	FillRenderObjectSpace(space, culling, false, false);
+	FillRenderObjectSpace(space, cullings, cullings_count, false, false);
 
 	vector<tPointLight *>::iterator pi;
 
@@ -160,7 +174,18 @@ void tWorld::FillRenderSpace(tRenderSpace *space, tCulling *culling, bool init_c
 			light_pos = (*pi)->GetPosition();
 			light_dist = (*pi)->GetDistance();
 
-			if(culling->TestSphereCulling(light_pos, light_dist))
+			bool cull = true;
+
+			for(int c=0; c<cullings_count; c++)
+			{
+				if(!cullings[c]->TestSphereCulling(light_pos, light_dist))
+				{
+					cull = false;
+					break;
+				}
+			}
+
+			if(cull)
 				continue;
 		}
 

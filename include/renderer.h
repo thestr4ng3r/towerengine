@@ -78,6 +78,7 @@ class tRenderer
 		tRenderSpace *current_rendering_render_space;
 
 		void InitRenderer(int width, int height, tWorld *world, bool bindless_textures);
+		void PrepareRender(tCamera *camera, tRenderSpace *render_space);
 		void Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height);
 
 		void RenderShadowMaps(void);

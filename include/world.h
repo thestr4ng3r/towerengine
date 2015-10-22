@@ -65,8 +65,8 @@ class tWorld
 
 		void Step(float time);
 
-		void FillRenderObjectSpace(tRenderObjectSpace *space, tCulling *culling, bool clear = true, bool init_culling = true);
-		void FillRenderSpace(tRenderSpace *space, tCulling *culling, bool init_culling = true);
+		void FillRenderObjectSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool clear = true, bool init_cullings = true);
+		void FillRenderSpace(tRenderSpace *space, tCulling **cullings, int cullings_count, bool init_cullings = true);
 		//tRenderSpace *GetCameraRenderSpace(void)		{ return camera_render_space; }
 		tSkyBox *GetSkyBox(void)						{ return sky_box; }
 

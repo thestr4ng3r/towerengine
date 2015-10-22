@@ -21,7 +21,8 @@ void tDefaultRenderer::Render(GLuint dst_fbo, int viewport_x, int viewport_y, in
 	camera->SetAspect((float)screen_width / (float)screen_height);
 	camera->CalculateModelViewProjectionMatrix();
 
-	world->FillRenderSpace(camera_render_space, camera);
+	world->FillRenderSpace(camera_render_space, (tCulling **)&camera, 1);
 
+	tRenderer::PrepareRender(camera, camera_render_space);
 	tRenderer::Render(camera, camera_render_space, dst_fbo, viewport_x, viewport_y, viewport_width, viewport_height);
 }

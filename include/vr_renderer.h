@@ -8,12 +8,13 @@ class tVRRenderer : public tRenderer
 		int width[2], height[2];
 
 		tCamera *camera[2];
-		tRenderSpace *camera_render_space[2];
+		tRenderSpace *camera_render_space;
 		
 	public:
 		tVRRenderer(int left_width, int left_height, int right_width, int right_height, tWorld *world);
 		~tVRRenderer(void);
 
+		void PrepareRender(void);
 		void Render(int eye, GLuint dst_fbo);
 
 		tCamera *GetLeftCamera(void)	{ return camera[0]; }

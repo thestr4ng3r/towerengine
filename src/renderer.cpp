@@ -266,13 +266,11 @@ void tRenderer::InitCubeMapReflection(int resolution, tVector position)
 }
 
 
-void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
+void tRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
 {
 	current_rendering_camera = camera;
 	current_rendering_render_space = render_space;
 
-	matrix_buffer->Bind();
-	position_restore_data_buffer->Bind();
 
 	RenderShadowMaps();
 
@@ -282,6 +280,19 @@ void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_f
 			cube_map_reflection->Render();
 	}
 
+}
+
+
+void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
+{
+	current_rendering_camera = camera;
+	current_rendering_render_space = render_space;
+
+	matrix_buffer->Bind();
+	position_restore_data_buffer->Bind();
+
+
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	gbuffer->BindDrawBuffers();
 	glViewport(0, 0, screen_width, screen_height);
@@ -398,7 +409,9 @@ void tRenderer::RenderShadowMaps(void)
 
 
 	for(pli=render_point_light_shadows.begin(); pli!=render_point_light_shadows.end(); pli++)
-		world->FillRenderObjectSpace((*pli)->GetShadow()->GetRenderObjectSpace(), *pli);
+	{
+		world->FillRenderObjectSpace((*pli)->GetShadow()->GetRenderObjectSpace(), (tCulling **)&(*pli), 1);
+	}
 
 
 
