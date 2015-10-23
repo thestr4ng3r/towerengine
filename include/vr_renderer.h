@@ -15,7 +15,7 @@ class tVRRenderer : public tRenderer
 		~tVRRenderer(void);
 
 		void PrepareRender(void);
-		void Render(int eye, GLuint dst_fbo);
+		void Render(int eye, GLuint dst_fbo, bool single_texture);
 
 		tCamera *GetLeftCamera(void)	{ return camera[0]; }
 		tCamera *GetRightCamera(void)	{ return camera[1]; }
