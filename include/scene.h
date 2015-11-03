@@ -38,6 +38,7 @@ class tScene
 		tSceneObject *ParseMeshObjectNode(rapidxml::xml_node<char> *cur);
 		tSceneObject *ParseDirectionalLightObjectNode(rapidxml::xml_node<char> *cur);
 		tSceneObject *ParsePointLightObjectNode(rapidxml::xml_node<char> *cur);
+		tSceneObject *ParseEmptyObjectNode(rapidxml::xml_node<char> *cur);
 
 		static float ParseFloatNode(rapidxml::xml_node<char> *cur, const char *p = "v");
 		static tTransform ParseTransformNode(rapidxml::xml_node<char> *cur);
@@ -57,9 +58,9 @@ class tScene
 		void RemoveFromWorld(void);
 
 		tSceneObject *GetObjectByTag(std::string tag);
-		std::list<tSceneObject *> *GetObjectsByTag(std::string tag);
+		void GetObjectsByTag(std::string tag, std::list<tSceneObject *> &result);
 		tSceneObject *GetObjectWhereTagStartsWith(std::string start);
-		std::list<tSceneObject *> *GetObjectsWhereTagStartsWith(std::string start);
+		void GetObjectsWhereTagStartsWith(std::string start, std::list<tSceneObject *> &result);
 
 		void GetObjectsMapByTag(std::string tag, std::string attribute, std::multimap<std::string, tSceneObject *> &result);
 };

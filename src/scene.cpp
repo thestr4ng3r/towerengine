@@ -219,6 +219,8 @@ void tScene::ParseObjectsNode(xml_node<> *cur)
 			scene_object = ParseDirectionalLightObjectNode(child);
 		else if(strcmp(child->name(), "point_light") == 0)
 			scene_object = ParsePointLightObjectNode(child);
+		else if(strcmp(child->name(), "empty") == 0)
+			scene_object = ParseEmptyObjectNode(child);
 
 		if(!scene_object)
 			continue;
@@ -337,6 +339,22 @@ tSceneObject *tScene::ParsePointLightObjectNode(xml_node<> *cur)
 	return scene_object;
 }
 
+tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
+{
+	tTransform transform;
+	//xml_attribute<> *attr;
+
+	xml_node<> *child = cur->first_node();
+	for(; child; child = child->next_sibling())
+	{
+		if(strcmp(child->name(), "transform") == 0)
+			transform = ParseTransformNode(child);
+	}
+
+	tEmptySceneObject *scene_object = new tEmptySceneObject(transform);
+	return scene_object;
+}
+
 void tScene::ParseSceneNode(xml_node<> *cur)
 {
 	map<string, tAsset *>::iterator asset_i;
@@ -450,17 +468,13 @@ tSceneObject *tScene::GetObjectByTag(string tag)
 	return 0;
 }
 
-list<tSceneObject *> *tScene::GetObjectsByTag(string tag)
+void tScene::GetObjectsByTag(string tag, list<tSceneObject *> &result)
 {
-	list<tSceneObject *> *r = new list<tSceneObject *>();
-
 	map<string, tSceneObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		if(i->second->GetTag().compare(tag) == 0)
-			r->push_back(i->second);
-
-	return r;
+			result.push_back(i->second);
 }
 
 
@@ -476,17 +490,13 @@ tSceneObject *tScene::GetObjectWhereTagStartsWith(string start)
 }
 
 
-list<tSceneObject *> *tScene::GetObjectsWhereTagStartsWith(string start)
+void tScene::GetObjectsWhereTagStartsWith(string start, list<tSceneObject *> &result)
 {
-	list<tSceneObject *> *r = new list<tSceneObject *>();
-
 	map<string, tSceneObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		if(i->second->GetTag().substr(0, start.size()).compare(start) == 0)
-			r->push_back(i->second);
-
-	return r;
+			result.push_back(i->second);
 }
 
 void tScene::GetObjectsMapByTag(string tag, string attribute, multimap<string, tSceneObject*> &result)

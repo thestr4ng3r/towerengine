@@ -72,6 +72,7 @@ void tObjectSceneObject::RemoveFromWorld(tWorld *world)
 	world->RemoveObject(object);
 }
 
+// ---------------------------------------------
 
 tDirectionalLightSceneObject::tDirectionalLightSceneObject(tDirectionalLight *light)
 {
@@ -93,6 +94,7 @@ void tDirectionalLightSceneObject::RemoveFromWorld(tWorld *world)
 	world->RemoveDirectionalLight(light);
 }
 
+// ---------------------------------------------
 
 tPointLightSceneObject::tPointLightSceneObject(tPointLight *light)
 {
@@ -112,4 +114,15 @@ void tPointLightSceneObject::AddToWorld(tWorld *world)
 void tPointLightSceneObject::RemoveFromWorld(tWorld *world)
 {
 	world->RemovePointLight(light);
+}
+
+// ---------------------------------------------
+
+tEmptySceneObject::tEmptySceneObject(tTransform transform)
+{
+	this->transform = transform;
+}
+
+tEmptySceneObject::~tEmptySceneObject(void)
+{
 }

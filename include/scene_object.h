@@ -6,6 +6,7 @@
 #define T_SCENE_OBJECT_TYPE_OBJECT 1
 #define T_SCENE_OBJECT_TYPE_DIRECTIONAL_LIGHT 2
 #define T_SCENE_OBJECT_TYPE_POINT_LIGHT 3
+#define T_SCENE_OBJECT_TYPE_EMPTY 4
 
 class tSceneObject
 {
@@ -82,6 +83,23 @@ class tPointLightSceneObject : public tSceneObject
 		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_POINT_LIGHT; }
 
 		tPointLight *GetLight(void)		{ return light; }
+};
+
+class tEmptySceneObject : public tSceneObject
+{
+	private:
+		tTransform transform;
+
+	public:
+		tEmptySceneObject(tTransform transform);
+		~tEmptySceneObject(void);
+
+		void AddToWorld(tWorld *world)		{}
+		void RemoveFromWorld(tWorld *world)	{}
+
+		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_EMPTY; }
+
+		tTransform GetTransform(void)		{ return transform; }
 };
 
 
