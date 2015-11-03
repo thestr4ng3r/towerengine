@@ -1,16 +1,26 @@
 #version 330
 
-uniform vec3 diffuse_color_uni;
-uniform vec3 specular_color_uni;
-uniform float specular_size_uni;
-uniform float bump_depth_uni;
-uniform vec3 self_illumination_color_uni;
 
-uniform bool diffuse_tex_enabled_uni;
-uniform bool specular_tex_enabled_uni;
-uniform bool normal_tex_enabled_uni;
-uniform bool bump_tex_enabled_uni;
-uniform bool self_illumination_tex_enabled_uni;
+layout(std140) uniform MaterialBlock
+{
+	uniform vec3 diffuse_color;
+	uniform float specular_size;
+	
+	uniform vec3 specular_color;
+	uniform float bump_depth;
+	
+	uniform vec3 self_illumination_color;
+	uniform bool diffuse_tex_enabled;
+	
+	uniform vec3 cube_map_reflection_color;
+	uniform bool specular_tex_enabled;
+	
+	uniform bool normal_tex_enabled;
+	uniform bool bump_tex_enabled;
+	uniform bool self_illumination_tex_enabled;
+	uniform bool cube_map_reflection_enabled;
+} material_uni;
+
 
 uniform sampler2D diffuse_tex_uni;
 uniform sampler2D normal_tex_uni;
@@ -18,13 +28,10 @@ uniform sampler2D specular_tex_uni;
 uniform sampler2D bump_tex_uni;
 uniform sampler2D self_illumination_tex_uni;
 
-uniform bool cube_map_reflection_enabled_uni;
-uniform vec3 cube_map_reflection_color_uni;
 uniform samplerCube cube_map_reflection_tex_uni;
 
 
-//uniform vec3 clip_vec_uni;
-//uniform float clip_dist_uni;
+
 
 in vec3 pos_var;
 in vec3 normal_var;
@@ -48,21 +55,15 @@ vec2 ParallaxOcclusionUV(mat3 tang_mat);
 
 void main(void)
 {
-	if(!gl_FrontFacing) // backface culling
-		discard;
-		
-	/*if(clip_vec_uni != vec3(0.0, 0.0, 0.0)) // face clipping for water
-	{
-		vec3 clip = pos_var - clip_vec_uni * clip_dist_uni;
-		if(dot(clip, clip_vec_uni) >= 0.0)
-			discard;
-	}*/
+	//if(!gl_FrontFacing) // backface culling
+	//	discard;
+	
 
 	mat3 tang_mat = mat3(normalize(tang_var), normalize(bitang_var), normalize(normal_var));
 	
 	vec2 uv;
 	
-	if(bump_tex_enabled_uni)
+	if(material_uni.bump_tex_enabled)
 		uv = ParallaxOcclusionUV(tang_mat);
 	else
 		uv = uv_var;
@@ -72,19 +73,19 @@ void main(void)
 	
 	vec4 diffuse_color = vec4(1.0, 1.0, 1.0, 1.0);
 	
-	if(diffuse_tex_enabled_uni)
+	if(material_uni.diffuse_tex_enabled)
 		diffuse_color = texture(diffuse_tex_uni, uv).rgba;
 
 	if(diffuse_color.a < 0.5)
 		discard;
 		
-	diffuse_color *= vec4(diffuse_color_uni.rgb, 1.0);
+	diffuse_color *= vec4(material_uni.diffuse_color.rgb, 1.0);
 	
 	
 	//normal
 	
 	vec3 normal;
-	if(normal_tex_enabled_uni)
+	if(material_uni.normal_tex_enabled)
 	{
 		vec3 normal_tex_color = texture(normal_tex_uni, uv).rgb;
 		normal = tang_mat * ((normal_tex_color - vec3(0.5, 0.5, 0.5)) * 2.0);
@@ -99,40 +100,40 @@ void main(void)
 	
 	// specular
 			
-	vec3 specular_color = specular_color_uni;
-	if(specular_tex_enabled_uni)
+	vec3 specular_color = material_uni.specular_color;
+	if(material_uni.specular_tex_enabled)
 		specular_color *= texture(specular_tex_uni, uv).rgb;
 	
 		
 	// self illumination
 	
-	vec3 self_illumination = self_illumination_color_uni;
+	vec3 self_illumination = material_uni.self_illumination_color;
 	
-	if(self_illumination_tex_enabled_uni)
+	if(material_uni.self_illumination_tex_enabled)
 		self_illumination *= texture(self_illumination_tex_uni, uv).rgb;
 		
 	
 	// cube map reflection
 	
-	if(cube_map_reflection_enabled_uni)
+	if(material_uni.cube_map_reflection_enabled)
 	{
 		vec3 cam_reflected = reflect(-cam_dir_var, normal);
 		cam_reflected += (pos_var - reflection_center_var) / reflection_radius_var;
-		self_illumination += texture(cube_map_reflection_tex_uni, cam_reflected).rgb * cube_map_reflection_color_uni;
+		self_illumination += texture(cube_map_reflection_tex_uni, cam_reflected).rgb * material_uni.cube_map_reflection_color;
 	}
 		
 	
 	// out
 
 	diffuse_out = diffuse_color;
-	specular_out = vec4(specular_color, specular_size_uni);
+	specular_out = vec4(specular_color, material_uni.specular_size);
 	self_illumination_out = vec4(self_illumination, 1.0);
 }
 
 
 vec2 ParallaxUV(void)
 {
-	float height = texture(bump_tex_uni, uv_var).r * bump_depth_uni;
+	float height = texture(bump_tex_uni, uv_var).r * material_uni.bump_depth;
 	vec3 cam_offset = height * normalize(cam_dir_var);
 	vec2 uv_offset;
 	uv_offset.x = dot(cam_offset, tang_var);
@@ -148,7 +149,7 @@ vec2 ParallaxOcclusionUV(mat3 tang_mat)
 	vec3 cam_dir_tang = cam_dir_var * tang_mat;
 	
 	float parallax_limit = -length(cam_dir_tang.xy) / cam_dir_tang.z;
-	parallax_limit *= bump_depth_uni;
+	parallax_limit *= material_uni.bump_depth;
 	
 	vec2 offset_dir = normalize(cam_dir_tang.xy);
 		

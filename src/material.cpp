@@ -2,6 +2,9 @@
 
 using namespace std;
 
+
+
+
 tDefaultMaterial::tDefaultMaterial(void)
 {
 	diffuse.color.Set(1.0, 1.0, 1.0);
@@ -19,23 +22,20 @@ tDefaultMaterial::tDefaultMaterial(void)
 	cube_map_reflection.color = Vec(0.0, 0.0, 0.0);
 
 	for(int i=0; i<tex_count; i++)
-	{
 		tex[i] = 0;
-		//tex_handle[i] = 0;
-	}
 
-	//tex_handles_resident = false;
+	uniform_buffer = new tUniformBuffer(20 * 4);
 }
 
 tDefaultMaterial::~tDefaultMaterial(void)
 {
-	//MakeTextureHandlesResident(false);
-
 	for(int i=0; i<tex_count; i++)
 	{
 		if(tex[i] != 0)
 			glDeleteTextures(1, &tex[i]);
 	}
+
+	delete uniform_buffer;
 }
 
 void tDefaultMaterial::SetDiffuse(tVector color)
@@ -70,19 +70,12 @@ void tDefaultMaterial::LoadTexture(TextureType type, string file)
 	if(tex[type] != 0)
 	{
 		glDeleteTextures(1, &tex[type]);
-		//if(tex_handles_resident)
-		//	glMakeTextureHandleNonResidentARB(tex_handle[type]);
 	}
 
 	bool *transparent = 0;
 	if(type == DIFFUSE)
 		transparent = &(this->transparent);
 	tex[type] = LoadGLTexture(file.c_str(), transparent);
-
-	//tex_handle[type] = glGetTextureHandleARB(tex[type]);
-
-	//if(tex_handles_resident)
-	//	glMakeTextureHandleResidentARB(tex_handle[type]);
 }
 
 void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, const void *data, unsigned int size)
@@ -90,67 +83,91 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 	if(tex[type] != 0)
 	{
 		glDeleteTextures(1, &tex[type]);
-		//if(tex_handles_resident)
-		//	glMakeTextureHandleNonResidentARB(tex_handle[type]);
 	}
 
 	bool *transparent = 0;
 	if(type == DIFFUSE)
 		transparent = &(this->transparent);
 	tex[type] = LoadGLTextureBinary(extension, data, size, transparent);
-	//tex_handle[type] = glGetTextureHandleARB(tex[type]);
-
-	//if(tex_handles_resident)
-	//	glMakeTextureHandleResidentARB(tex_handle[type]);
 }
-
-
-/*void tDefaultMaterial::MakeTextureHandlesResident(bool resident)
-{
-	if(tex_handles_resident == resident)
-		return;
-
-	for(int i=0; i<tex_count; i++)
-	{
-		if(tex_handle[i] == 0)
-			continue;
-
-		if(resident)
-			glMakeTextureHandleResidentARB(tex_handle[i]);
-		else
-			glMakeTextureHandleNonResidentARB(tex_handle[i]);
-	}
-
-	tex_handles_resident = resident;
-}*/
 
 
 bool tDefaultMaterial::InitDepthPrePass(tRenderer *renderer)
 {
-	renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
+	//renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
+	renderer->GetDepthPassShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
 	return true;
+}
+
+
+/*layout(std140) uniform MaterialBlock
+{
+	uniform vec3 diffuse_color;
+	uniform float specular_size;
+
+	uniform vec3 specular_color;
+	uniform float bump_depth;
+
+	uniform vec3 self_illumination_color;
+	uniform bool diffuse_tex_enabled;
+
+	uniform vec3 cube_map_reflection_color;
+	uniform bool specular_tex_enabled;
+
+	uniform bool normal_tex_enabled;
+	uniform bool bump_tex_enabled;
+	uniform bool self_illumination_tex_enabled;
+	uniform bool cube_map_reflection_enabled;
+} material_uni;*/
+
+
+void tDefaultMaterial::UpdateUniformBuffer(void)
+{
+	float *data = (float *)uniform_buffer->GetData();
+
+	memcpy(data, diffuse.color.v, 3 * sizeof(float));
+	data[3] = specular.exponent;
+
+	data += 4;
+	memcpy(data, specular.color.v, 3 * sizeof(float));
+	data[3] = bump.depth;
+
+	data += 4;
+	memcpy(data, self_illum.color.v, 3 * sizeof(float));
+	*((int *)(data+3)) = tex[DIFFUSE] != 0 ? 1 : 0;
+
+	data += 4;
+	memcpy(data, cube_map_reflection.color.v, 3 * sizeof(float));
+	*((int *)(data+3)) = tex[SPECULAR] != 0 ? 1 : 0;
+
+	data += 4;
+	*((int *)(data+0)) = tex[NORMAL] != 0 ? 1 : 0;
+	*((int *)(data+1)) = tex[BUMP] != 0 ? 1 : 0;
+	*((int *)(data+2)) = tex[SELF_ILLUMINATION] != 0 ? 1 : 0;
+	*((int *)(data+3)) = cube_map_reflection.enabled != 0 ? 1 : 0;
+
+	uniform_buffer->UploadData();
 }
 
 
 bool tDefaultMaterial::InitGeometryPass(tRenderer *renderer)
 {
-	//int index = renderer->InitDefaultMaterialRender(this);
-	//renderer->GetCurrentFaceShader()->SetMaterialIndex(index);
+	uniform_buffer->Bind(tShader::material_binding_point);
 
-	renderer->GetCurrentFaceShader()->SetDiffuseTexture(tex[DIFFUSE] != 0, tex[DIFFUSE]);
-	renderer->GetCurrentFaceShader()->SetSpecularTexture(tex[SPECULAR] != 0, tex[SPECULAR]);
-	renderer->GetCurrentFaceShader()->SetNormalTexture(tex[NORMAL] != 0, tex[NORMAL]);
-	renderer->GetCurrentFaceShader()->SetBumpTexture(tex[BUMP] != 0, tex[BUMP]);
-	renderer->GetCurrentFaceShader()->SetDiffuseColor(diffuse.color);
-	renderer->GetCurrentFaceShader()->SetSpecularColor(specular.color);
-	renderer->GetCurrentFaceShader()->SetSpecular(specular.exponent);
-	renderer->GetCurrentFaceShader()->SetBumpDepth(bump.depth);
-	renderer->GetCurrentFaceShader()->SetSelfIlluminationColor(self_illum.color);
-	renderer->GetCurrentFaceShader()->SetSelfIlluminationTexture(tex[SELF_ILLUMINATION] != 0, tex[SELF_ILLUMINATION]);
+	if(tex[DIFFUSE])
+		renderer->GetCurrentFaceShader()->SetDiffuseTexture(tex[DIFFUSE]);
 
-	renderer->GetCurrentFaceShader()->SetCubeMapReflectionEnabled(cube_map_reflection.enabled);
-	if(cube_map_reflection.enabled)
-		renderer->GetCurrentFaceShader()->SetCubeMapReflectionColor(cube_map_reflection.color);
+	if(tex[SPECULAR])
+		renderer->GetCurrentFaceShader()->SetSpecularTexture(tex[SPECULAR]);
+
+	if(tex[NORMAL])
+		renderer->GetCurrentFaceShader()->SetNormalTexture(tex[NORMAL]);
+
+	if(tex[BUMP])
+		renderer->GetCurrentFaceShader()->SetBumpTexture(tex[BUMP]);
+
+	if(tex[SELF_ILLUMINATION])
+		renderer->GetCurrentFaceShader()->SetSelfIlluminationTexture(tex[SELF_ILLUMINATION]);
 
 	return true;
 }

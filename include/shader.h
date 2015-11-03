@@ -20,8 +20,9 @@ class tShader
 		static const int vertex_attribute = 0;
 
 		static const int matrix_binding_point = 0;
-		static const int position_restore_data_binding_point = 1;
-		static const int point_light_binding_point = 2;
+		static const int material_binding_point = 1;
+		static const int position_restore_data_binding_point = 2;
+		static const int point_light_binding_point = 3;
 
 		void Bind(void);
 		static void Unbind(void);
@@ -40,8 +41,11 @@ class tUniformBuffer
 
 		GLuint buffer;
 
+	public:
 		tUniformBuffer(unsigned int size);
 		virtual ~tUniformBuffer(void);
+
+		unsigned char *GetData(void)	{ return data; }
 
 		void UploadData(GLenum usage = GL_DYNAMIC_DRAW);
 		void Bind(GLuint binding_point);

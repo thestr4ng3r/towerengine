@@ -174,14 +174,14 @@ void tTerrain::Paint(tRenderer *renderer)
 		material->InitGeometryPass(renderer);
 	else
 	{
-		renderer->GetCurrentFaceShader()->SetDiffuseTexture(true, height_map->GetHeightTex());
+		/*renderer->GetCurrentFaceShader()->SetDiffuseTexture(true, height_map->GetHeightTex());
 		renderer->GetCurrentFaceShader()->SetSpecularTexture(false);
 		renderer->GetCurrentFaceShader()->SetNormalTexture(false);
 		//CEngine::GetCurrentFaceShader()->SetHeightTexture(false);
 		renderer->GetCurrentFaceShader()->SetDiffuseColor(Vec(1.0, 1.0, 1.0));
 		renderer->GetCurrentFaceShader()->SetSpecularColor(Vec(0.0, 0.0, 0.0));
 		renderer->GetCurrentFaceShader()->SetSpecular(0.0);
-		//CEngine::GetCurrentFaceShader()->SetHeightFactor(Vec(0.0, 0.0, 0.0));
+		//CEngine::GetCurrentFaceShader()->SetHeightFactor(Vec(0.0, 0.0, 0.0));*/
 	}
 
 	ibo->Draw(GL_TRIANGLES);

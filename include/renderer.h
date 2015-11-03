@@ -130,6 +130,7 @@ class tRenderer
 		tColorShader *GetColorShader(void)									{ return color_shader; }
 		tSSAOShader *GetSSAOShader(void)									{ return ssao_shader; }
 		tParticleShader *GetParticleShader(void)							{ return particle_shader; }
+		tDepthPassShader *GetDepthPassShader(void)							{ return depth_pass_shader; }
 
 		int GetScreenWidth(void)	{ return screen_width; }
 		int GetScreenHeight(void)	{ return screen_height; }

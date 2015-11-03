@@ -16,27 +16,12 @@ void tGeometryPassShader::Init(void)
 
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
-	diffuse_color_uniform = GetUniformLocation("diffuse_color_uni");
-	specular_color_uniform = GetUniformLocation("specular_color_uni");
-	specular_size_uniform = GetUniformLocation("specular_size_uni");
-	self_illumination_color_uniform = GetUniformLocation("self_illumination_color_uni");
-
-	bump_depth_uniform = GetUniformLocation("bump_depth_uni");
-
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
 	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
 	bump_tex_uniform = GetUniformLocation("bump_tex_uni");
 	self_illumination_tex_uniform = GetUniformLocation("self_illumination_tex_uni");
 
-	diffuse_tex_enabled_uniform = GetUniformLocation("diffuse_tex_enabled_uni");
-	normal_tex_enabled_uniform = GetUniformLocation("normal_tex_enabled_uni");
-	specular_tex_enabled_uniform = GetUniformLocation("specular_tex_enabled_uni");
-	bump_tex_enabled_uniform = GetUniformLocation("bump_tex_enabled_uni");
-	self_illumination_tex_enabled_uniform = GetUniformLocation("self_illumination_tex_enabled_uni");
-
-	cube_map_reflection_enabled_uniform = GetUniformLocation("cube_map_reflection_enabled_uni");
-	cube_map_reflection_color_uniform = GetUniformLocation("cube_map_reflection_color_uni");
 	cube_map_reflection_tex_uniform = GetUniformLocation("cube_map_reflection_tex_uni");
 
 	transformation_uniform = GetUniformLocation("transformation_uni");
@@ -45,6 +30,7 @@ void tGeometryPassShader::Init(void)
 	//clip_dist_uniform = GetUniformLocation("clib_dist_uni");
 
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
+	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MaterialBlock"), material_binding_point);
 
 	Bind();
 	glUniform1i(diffuse_tex_uniform, diffuse_tex_unit);
@@ -66,84 +52,32 @@ void tGeometryPassShader::SetTransformation(const float m[16])
 	glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void tGeometryPassShader::SetDiffuseColor(tVector color)
+void tGeometryPassShader::SetDiffuseTexture(GLuint tex)
 {
-	glUniform3f(diffuse_color_uniform, color.x, color.y, color.z);
+	glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
+	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
-void tGeometryPassShader::SetSpecularColor(tVector color)
+void tGeometryPassShader::SetSpecularTexture(GLuint tex)
 {
-	glUniform3f(specular_color_uniform, color.x, color.y, color.z);
+	glActiveTexture(GL_TEXTURE0 + specular_tex_unit);
+	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
-
-void tGeometryPassShader::SetSpecular(float size)
+void tGeometryPassShader::SetNormalTexture(GLuint tex)
 {
-	glUniform1f(specular_size_uniform, size);
-}
-
-
-void tGeometryPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
-{
-	glUniform1i(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
-
-	if(enabled)
-	{
-		glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
-		glBindTexture(GL_TEXTURE_2D, tex);
-	}
-}
-
-void tGeometryPassShader::SetSpecularTexture(bool enabled, GLuint tex)
-{
-	glUniform1i(specular_tex_enabled_uniform, enabled ? 1 : 0);
-
-	if(enabled)
-	{
-		glActiveTexture(GL_TEXTURE0 + specular_tex_unit);
-		glBindTexture(GL_TEXTURE_2D, tex);
-	}
-
-}
-
-void tGeometryPassShader::SetNormalTexture(bool enabled, GLuint tex)
-{
-	glUniform1i(normal_tex_enabled_uniform, enabled ? 1 : 0);
-
-	if(enabled)
-	{
-		glActiveTexture(GL_TEXTURE0 + normal_tex_unit);
-		glBindTexture(GL_TEXTURE_2D, tex);
-	}
-
-}
-
-void tGeometryPassShader::SetBumpDepth(float depth)
-{
-	glUniform1f(bump_depth_uniform, depth);
-}
-
-void tGeometryPassShader::SetBumpTexture(bool enabled, GLuint tex)
-{
-	glUniform1i(bump_tex_enabled_uniform, enabled ? 1 : 0);
-
-	if(enabled)
-	{
-		glActiveTexture(GL_TEXTURE0 + bump_tex_unit);
-		glBindTexture(GL_TEXTURE_2D, tex);
-	}
+	glActiveTexture(GL_TEXTURE0 + normal_tex_unit);
+	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
 
-void tGeometryPassShader::SetCubeMapReflectionEnabled(bool enabled)
+void tGeometryPassShader::SetBumpTexture(GLuint tex)
 {
-	glUniform1i(cube_map_reflection_enabled_uniform, enabled ? 1 : 0);
+	glActiveTexture(GL_TEXTURE0 + bump_tex_unit);
+	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
-void tGeometryPassShader::SetCubeMapReflectionColor(tVector color)
-{
-	glUniform3f(cube_map_reflection_color_uniform, color.x, color.y, color.z);
-}
+
 
 void tGeometryPassShader::SetCubeMapReflectionTexture(GLuint tex)
 {
@@ -152,25 +86,9 @@ void tGeometryPassShader::SetCubeMapReflectionTexture(GLuint tex)
 }
 
 
-/*void tGeometryPassShader::SetClip(tVector c, float d)
+
+void tGeometryPassShader::SetSelfIlluminationTexture(GLuint tex)
 {
-	glUniform3f(clip_uniform, c.x, c.y, c.z);
-	glUniform1f(clip_dist_uniform, d);
-}*/
-
-
-void tGeometryPassShader::SetSelfIlluminationColor(tVector color)
-{
-	glUniform3f(self_illumination_color_uniform, color.x, color.y, color.z);
-}
-
-void tGeometryPassShader::SetSelfIlluminationTexture(bool enabled, GLuint tex)
-{
-	glUniform1i(self_illumination_tex_enabled_uniform, enabled ? 1 : 0);
-
-	if(enabled)
-	{
-		glActiveTexture(GL_TEXTURE0 + self_illumination_tex_unit);
-		glBindTexture(GL_TEXTURE_2D, tex);
-	}
+	glActiveTexture(GL_TEXTURE0 + self_illumination_tex_unit);
+	glBindTexture(GL_TEXTURE_2D, tex);
 }

@@ -61,9 +61,9 @@ class tDefaultMaterial : public tMaterial
 		bool transparent;
 
 		GLuint tex[tex_count];
-		//GLuint64 tex_handle[tex_count];
 
-		//bool tex_handles_resident;
+
+		tUniformBuffer *uniform_buffer;
 
 	public:
 		tDefaultMaterial(void);
@@ -78,10 +78,7 @@ class tDefaultMaterial : public tMaterial
 		void LoadTexture(TextureType type, std::string file);
 		void LoadTexture(TextureType type, const char *extension, const void *data, unsigned int size);
 
-		//void MakeTextureHandlesResident(bool resident);
-		//GLuint64 GetTextureHandle(TextureType type)		{ return tex_handle[type]; }
-
-		//bool GetTransparent(void)	{ return transparent; }
+		void UpdateUniformBuffer(void);
 
 		bool InitDepthPrePass(tRenderer *renderer);
 		bool InitGeometryPass(tRenderer *renderer);

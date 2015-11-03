@@ -1001,6 +1001,8 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 	else if(self_illum_mode == TEXTURE_DATA)
 		r->LoadTexture(tDefaultMaterial::SELF_ILLUMINATION, self_illum_ext, self_illum_data, self_illum_size);
 
+	r->UpdateUniformBuffer();
+
 	return r;
 }
 
