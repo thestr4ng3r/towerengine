@@ -25,6 +25,8 @@ class tMeshObject : public tTransformObject
 		btRigidBody *rigid_body;
 		btMotionState *motion_state;
 
+		std::map<tMaterial *, tMaterial *> *replace_materials;
+
 	protected:
 		void TransformChanged(void);
 
@@ -46,6 +48,9 @@ class tMeshObject : public tTransformObject
 		void SetColor(tVector c, float a)				{ SetColor(c); SetAlpha(a); }
 		void SetVisible(bool visible)					{ this->visible = visible; }
 
+		void ReplaceMaterial(std::string name, tMaterial *material);
+		void RestoreReplaceMaterial(std::string name);
+
 		void DeleteRigidBody(void);
 		void InitMeshRigidBody(float mass);
 		void UpdateRigidBodyTransformation(void);
@@ -59,6 +64,7 @@ class tMeshObject : public tTransformObject
 		//bool GetCubeMapReflectionEnabled(void)	{ return mesh->GetCubeMapReflectionEnabled(); }
 
 		btRigidBody *GetRigidBody(void)		{ return rigid_body; }
+		tMesh *GetMesh(void)				{ return mesh; }
 
 		void SetTransformWithoutRigidBody(tTransform transform);
 };

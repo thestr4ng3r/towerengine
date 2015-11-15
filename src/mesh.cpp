@@ -512,7 +512,7 @@ void tMesh::RefreshIBOs(void)
 }
 
 
-void tMesh::DepthPrePass(tRenderer *renderer)
+void tMesh::DepthPrePass(tRenderer *renderer, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	if(refresh_vbos)
 		RefreshAllVBOs();
@@ -525,13 +525,21 @@ void tMesh::DepthPrePass(tRenderer *renderer)
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
-		if(i->first->InitDepthPrePass(renderer))
+		tMaterial *mat = i->first;
+		if(replace_materials)
+		{
+			map<tMaterial *, tMaterial *>::iterator ri = replace_materials->find(mat);
+			if(ri != replace_materials->end())
+				mat = ri->second;
+		}
+
+		if(mat->InitDepthPrePass(renderer))
 			i->second->ibo->Draw(GL_TRIANGLES);
 	}
 }
 
 
-void tMesh::GeometryPass(tRenderer *renderer)
+void tMesh::GeometryPass(tRenderer *renderer, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	if(refresh_vbos)
 		RefreshAllVBOs();
@@ -543,18 +551,34 @@ void tMesh::GeometryPass(tRenderer *renderer)
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
-		if(i->first->InitGeometryPass(renderer))
+		tMaterial *mat = i->first;
+		if(replace_materials)
+		{
+			map<tMaterial *, tMaterial *>::iterator ri = replace_materials->find(mat);
+			if(ri != replace_materials->end())
+				mat = ri->second;
+		}
+
+		if(mat->InitGeometryPass(renderer))
 			i->second->ibo->Draw(GL_TRIANGLES);
 	}
 }
 
-void tMesh::ForwardPass(tRenderer *renderer, float *transform)
+void tMesh::ForwardPass(tRenderer *renderer, float *transform, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	bool vao_bound = false;
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
-		if(i->first->InitForwardPass(renderer, transform))
+		tMaterial *mat = i->first;
+		if(replace_materials)
+		{
+			map<tMaterial *, tMaterial *>::iterator ri = replace_materials->find(mat);
+			if(ri != replace_materials->end())
+				mat = ri->second;
+		}
+
+		if(mat->InitForwardPass(renderer, transform))
 		{
 			if(!vao_bound)
 			{
@@ -569,13 +593,21 @@ void tMesh::ForwardPass(tRenderer *renderer, float *transform)
 }
 
 
-void tMesh::RefractionPass(tRenderer *renderer, float *transform)
+void tMesh::RefractionPass(tRenderer *renderer, float *transform, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	bool vao_bound = false;
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
-		if(i->first->InitRefractionPass(renderer, transform))
+		tMaterial *mat = i->first;
+		if(replace_materials)
+		{
+			map<tMaterial *, tMaterial *>::iterator ri = replace_materials->find(mat);
+			if(ri != replace_materials->end())
+				mat = ri->second;
+		}
+
+		if(mat->InitRefractionPass(renderer, transform))
 		{
 			if(!vao_bound)
 			{

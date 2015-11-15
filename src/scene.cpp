@@ -9,18 +9,29 @@ using namespace std;
 using namespace rapidxml;
 
 
-tScene::tScene(tWorld *world)
+tScene::tScene(tWorld *world, tMaterialManager *material_manager)
 {
 	sky_cubemap = 0;
 	skybox = 0;
 	this->world = world;
-	material_manager = new tMaterialManager();
+
+	if(material_manager)
+	{
+		this->material_manager = material_manager;
+		own_material_manager = false;
+	}
+	else
+	{
+		this->material_manager = new tMaterialManager();
+		own_material_manager = true;
+	}
 }
 
 tScene::~tScene(void)
 {
 	// TODO: delete assets, objects, ...
-	delete material_manager;
+	if(own_material_manager)
+		delete material_manager;
 }
 
 bool tScene::LoadFromFile(string file)

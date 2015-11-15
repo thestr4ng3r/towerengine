@@ -276,6 +276,8 @@ void tRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
 
 	RenderShadowMaps();
 
+
+	shadow_pass = false;
 	if(cube_map_reflection)
 	{
 		if(cube_map_reflection->GetInvalid())

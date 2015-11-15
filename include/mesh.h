@@ -103,10 +103,10 @@ class tMesh
 		bool LoadFromData(char *data, std::string path = "", tMaterialManager *material_manager = 0);
 		bool LoadFromXML(rapidxml::xml_document<char> *doc, std::string path, tMaterialManager *material_manager = 0);
 
-		void DepthPrePass(tRenderer *renderer);
-		void GeometryPass(tRenderer *renderer);
-		void ForwardPass(tRenderer *renderer, float *transform);
-		void RefractionPass(tRenderer *renderer, float *transform);
+		void DepthPrePass(tRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
+		void GeometryPass(tRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
+		void ForwardPass(tRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
+		void RefractionPass(tRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
 
 		//bool GetCubeMapReflectionEnabled(void);
 

@@ -97,7 +97,9 @@ void tCubeMapReflection::GeometryPass(int side, tWorld *world)
 
 	camera->SetUp(cam_up);
 	camera->CalculateModelViewProjectionMatrix();
+	renderer->GetMatrixBuffer()->Bind();
 	renderer->GetMatrixBuffer()->UpdateBuffer(camera->GetModelViewProjectionMatrix());
+	renderer->GetPositionRestoreDataBuffer()->Bind();
 	renderer->GetPositionRestoreDataBuffer()->UpdateBuffer(camera);
 
 	world->FillRenderSpace(render_space, (tCulling **)&camera, 1);

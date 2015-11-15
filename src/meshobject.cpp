@@ -22,6 +22,8 @@ tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 	motion_state = new tMeshObjectMotionState(this);
 
 	rigid_body = 0;
+
+	replace_materials = 0;
 }
 
 void tMeshObject::TransformChanged(void)
@@ -97,6 +99,32 @@ tBoundingBox tMeshObject::GetBoundingBox(void)
 	return b;
 }
 
+void tMeshObject::ReplaceMaterial(string name, tMaterial *mat)
+{
+	if(!replace_materials)
+		replace_materials = new map<tMaterial *, tMaterial *>();
+
+	tMaterial *original_mat = mesh->GetMaterialByName(name);
+	if(!original_mat)
+		return;
+
+	(*replace_materials)[original_mat] = mat;
+}
+
+void tMeshObject::RestoreReplaceMaterial(string name)
+{
+	if(!replace_materials)
+		return;
+
+	tMaterial *original_mat = mesh->GetMaterialByName(name);
+	if(!original_mat)
+		return;
+
+	map<tMaterial *, tMaterial *>::iterator i = replace_materials->find(original_mat);
+	if(i != replace_materials->end())
+		replace_materials->erase(i);
+}
+
 void tMeshObject::DepthPrePass(tRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
@@ -119,7 +147,7 @@ void tMeshObject::DepthPrePass(tRenderer *renderer)
 		else
 			mesh->ChangePose("Idle");
 	}
-	mesh->DepthPrePass(renderer);
+	mesh->DepthPrePass(renderer, replace_materials);
 }
 
 void tMeshObject::GeometryPass(tRenderer *renderer)
@@ -144,7 +172,7 @@ void tMeshObject::GeometryPass(tRenderer *renderer)
 		else
 			mesh->ChangePose("Idle");
 	}
-	mesh->GeometryPass(renderer);
+	mesh->GeometryPass(renderer, replace_materials);
 }
 
 void tMeshObject::ForwardPass(tRenderer *renderer)
@@ -167,7 +195,7 @@ void tMeshObject::ForwardPass(tRenderer *renderer)
 	}
 
 	float *temp = transform.GetMatrix(transform_matrix);
-	mesh->ForwardPass(renderer, temp);
+	mesh->ForwardPass(renderer, temp, replace_materials);
 }
 
 
@@ -191,7 +219,7 @@ void tMeshObject::RefractionPass(tRenderer *renderer)
 	}
 
 	float *temp = transform.GetMatrix(transform_matrix);
-	mesh->RefractionPass(renderer, temp);
+	mesh->RefractionPass(renderer, temp, replace_materials);
 }
 
 

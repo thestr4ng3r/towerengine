@@ -18,6 +18,7 @@ class tScene
 		tWorld *world;
 
 		tMaterialManager *material_manager;
+		bool own_material_manager;
 
 		std::string load_path;
 
@@ -49,7 +50,7 @@ class tScene
 		void AddObject(std::string name, tSceneObject *object);
 
 	public:
-		tScene(tWorld *world);
+		tScene(tWorld *world, tMaterialManager *material_manager = 0);
 		~tScene(void);
 
 		bool LoadFromFile(std::string file);
