@@ -65,6 +65,11 @@ void tDefaultMaterial::SetSelfIlluminationColor(tVector color)
 	self_illum.color = color;
 }
 
+void tDefaultMaterial::SetShadowCast(bool enabled)
+{
+	shadow.cast = enabled;
+}
+
 void tDefaultMaterial::LoadTexture(TextureType type, string file)
 {
 	if(tex[type] != 0)
@@ -152,6 +157,9 @@ void tDefaultMaterial::UpdateUniformBuffer(void)
 
 bool tDefaultMaterial::InitGeometryPass(tRenderer *renderer)
 {
+	if(renderer->GetShadowPass() && !shadow.cast)
+		return false;
+
 	uniform_buffer->Bind(tShader::material_binding_point);
 
 	if(tex[DIFFUSE])

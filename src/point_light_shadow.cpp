@@ -129,7 +129,6 @@ void tPointLightShadow::Render(tRenderer *renderer)
 
 	renderer->SetCurrentFaceShader(renderer->GetPointShadowShader()); // TODO: bind once in tRenderer before rendering all pointlights
 	renderer->BindCurrentFaceShader();
-	renderer->GetPointShadowShader()->Bind();
 	renderer->GetPointShadowShader()->SetLightPos(pos);
 	renderer->GetPointShadowShader()->SetLightDist(light->GetDistance());
 

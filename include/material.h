@@ -58,6 +58,11 @@ class tDefaultMaterial : public tMaterial
 			tVector color;
 		} cube_map_reflection;
 
+		struct Shadow
+		{
+			bool cast;
+		} shadow;
+
 		bool transparent;
 
 		GLuint tex[tex_count];
@@ -74,6 +79,7 @@ class tDefaultMaterial : public tMaterial
 		void SetBump(float depth);
 		void SetSelfIlluminationColor(tVector color);
 		void SetCubeMapReflection(bool enabled, tVector color);
+		void SetShadowCast(bool enabled);
 
 		void LoadTexture(TextureType type, std::string file);
 		void LoadTexture(TextureType type, const char *extension, const void *data, unsigned int size);

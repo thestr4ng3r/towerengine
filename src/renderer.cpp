@@ -17,6 +17,8 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	geometry_pass_shader->Init();
 	//SetCurrentFaceShader(geometry_pass_shader);
 
+	shadow_pass = false;
+
 	glGenFramebuffers(1, &fbo);
 
 	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 2);
@@ -369,6 +371,8 @@ bool CompareFloatComparable(tComparable<float> *a, tComparable<float> *b)
 
 void tRenderer::RenderShadowMaps(void)
 {
+	shadow_pass = true;
+
 	// fill render spaces
 
 	render_point_light_shadows.clear();
@@ -429,6 +433,8 @@ void tRenderer::RenderShadowMaps(void)
 
 void tRenderer::DepthPrePass(void)
 {
+	shadow_pass = false;
+
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glDepthMask(GL_TRUE);
@@ -444,6 +450,8 @@ void tRenderer::DepthPrePass(void)
 
 void tRenderer::GeometryPass(void)
 {
+	shadow_pass = false;
+
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	if(depth_prepass_enabled)
 	{
@@ -485,6 +493,8 @@ void tRenderer::GeometryPass(void)
 
 void tRenderer::LightPass(void)
 {
+	shadow_pass = false;
+
 	tSkyBox *sky_box = world->GetSkyBox();
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -683,6 +693,8 @@ void tRenderer::LegacyLightPass(void)
 
 void tRenderer::ForwardPass(void)
 {
+	shadow_pass = false;
+
 	current_rendering_render_space->ForwardPass(this);
 	glDepthMask(GL_TRUE);
 
@@ -705,6 +717,7 @@ void tRenderer::ForwardPass(void)
 
 void tRenderer::RefractionPass(void)
 {
+	shadow_pass = false;
 	current_rendering_render_space->RefractionPass(this);
 }
 

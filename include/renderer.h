@@ -36,6 +36,7 @@ class tRenderer
 		float fog_start, fog_end, fog_exp;
 
 		tFaceShader *current_face_shader;
+		bool shadow_pass;
 
 		int screen_width, screen_height;
 
@@ -113,6 +114,7 @@ class tRenderer
 		tFaceShader *GetCurrentFaceShader(void)		{ return current_face_shader; }
 		void BindCurrentFaceShader(void)			{ current_face_shader->Bind(); }
 		void SetCurrentFaceShader(tFaceShader *s)	{ current_face_shader = s; }
+		bool GetShadowPass(void)					{ return shadow_pass; }
 
 		tGeometryPassShader *GetGeometryPassShader(void)					{ return geometry_pass_shader; }
 		tSimpleForwardShader *GetSimpleForwardShader(void)					{ return simple_forward_shader; }

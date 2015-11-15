@@ -796,6 +796,8 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 	tVector self_illum_color = Vec(0.0, 0.0, 0.0);
 	string self_illum_file;
 
+	bool shadow_cast = true;
+
 	unsigned char *diffuse_data, *specular_data, *normal_data, *bump_data, *self_illum_data;
 	size_t diffuse_size, specular_size, normal_size, bump_size, self_illum_size;
 	char *diffuse_ext, *specular_ext, *normal_ext, *bump_ext, *self_illum_ext;
@@ -964,6 +966,11 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 			if((attr = child->first_attribute("b")))
 				cube_map_reflection_color.b = atof(attr->value());
 		}
+		else if(strcmp(name_temp, "shadow") == 0)
+		{
+			if((attr = child->first_attribute("cast")))
+				shadow_cast = atoi(attr->value()) != 0;
+		}
 
 		child = child->next_sibling();
 	}
@@ -975,6 +982,7 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 	r->SetBump(bump_depth);
 	r->SetCubeMapReflection(cube_map_reflection_enabled, cube_map_reflection_color);
 	r->SetSelfIlluminationColor(self_illum_color);
+	r->SetShadowCast(shadow_cast);
 
 	if(diffuse_mode == TEXTURE_FILE)
 		r->LoadTexture(tDefaultMaterial::DIFFUSE, path + diffuse_file);
