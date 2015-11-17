@@ -5,7 +5,6 @@
 class tObject
 {
 	private:
-	//	string tag;
 		tWorld *world;
 
 	protected:
@@ -17,7 +16,7 @@ class tObject
 		virtual ~tObject(void) {}
 
 		virtual void DepthPrePass(tRenderer *) {}
-		virtual void GeometryPass(tRenderer *) {}
+		virtual void GeometryPass(tRenderer *, bool cube_map_reflection_enabled) {}
 		virtual void ForwardPass(tRenderer *) {}
 		virtual void RefractionPass(tRenderer *) {}
 		virtual tBoundingBox GetBoundingBox(void) = 0;
@@ -26,8 +25,6 @@ class tObject
 		void RemovedObjectFromWorld(tWorld *world);
 
 		tWorld *GetWorld(void)	{ return world; }
-
-		virtual bool GetCubeMapReflectionEnabled(void)	{ return false; }
 };
 
 class tTransformObject : public tObject

@@ -9,12 +9,8 @@ class tWorld
 		std::vector<tPointLight *> point_lights;
 		std::vector<tDirectionalLight *> dir_lights;
 		std::vector<tParticleSystem *> particle_systems;
+		std::vector<tCubeMapReflection *> cube_map_reflections;
 		tSkyBox *sky_box;
-
-		//tRenderSpace *camera_render_space;
-		//set<tPointLight *> camera_render_point_lights;
-		//set<tDirectionalLight *> camera_render_dir_lights;
-		//list<tPointLight *> render_point_light_shadows;
 
 		tVector ambient_color;
 
@@ -63,17 +59,20 @@ class tWorld
 		int GetParticleSystemsCount(void)				{ return particle_systems.size(); }
 		tParticleSystem *GetParticleSystem(int i)		{ return particle_systems.at(i); }
 
+		void AddCubeMapReflection(tCubeMapReflection *r);
+		void RemoveCubeMapReflection(tCubeMapReflection *r);
+
+		int GetCubeMapReflectionsCount(void)			{ return cube_map_reflections.size(); }
+		tCubeMapReflection *GetCubeMapReflection(int i)	{ return cube_map_reflections.at(i); }
+
 		void Step(float time);
 
 		void FillRenderObjectSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool clear = true, bool init_cullings = true);
 		void FillRenderSpace(tRenderSpace *space, tCulling **cullings, int cullings_count, bool init_cullings = true);
-		//tRenderSpace *GetCameraRenderSpace(void)		{ return camera_render_space; }
+
 		tSkyBox *GetSkyBox(void)						{ return sky_box; }
 
-		//set<tPointLight *> *GetCameraRenderPointLights(void)				{ return &camera_render_point_lights; }
-		//set<tDirectionalLight *> *GetCameraRenderDirectionalLights(void)	{ return &camera_render_dir_lights; }
-
-		//list<tPointLight *> *GetRenderPointLightShadows(void)				{ return &render_point_light_shadows; }
+		void AssignUnsetCubeMapReflections(void);
 };
 
 

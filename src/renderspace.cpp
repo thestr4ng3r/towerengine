@@ -15,12 +15,12 @@ void tRenderObjectSpace::DepthPrePass(tRenderer *renderer)
 		(*i)->DepthPrePass(renderer);
 }
 
-void tRenderObjectSpace::GeometryPass(tRenderer *renderer)
+void tRenderObjectSpace::GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled)
 {
 	set<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
-		(*i)->GeometryPass(renderer);
+		(*i)->GeometryPass(renderer, cube_map_reflection_enabled);
 }
 
 void tRenderObjectSpace::ForwardPass(tRenderer *renderer)

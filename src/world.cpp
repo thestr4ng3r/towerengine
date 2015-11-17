@@ -29,6 +29,21 @@ tWorld::~tWorld(void)
 	delete physics.collision_dispatcher;
 	delete physics.collision_configuration;
 	delete physics.broadphase;
+
+	/*for(vector<tObject *>::iterator i=objects.begin(); i!=objects.end(); i++)
+		delete *i;
+
+	for(vector<tPointLight *>::iterator i=point_lights.begin(); i!=point_lights.end(); i++)
+		delete *i;
+
+	for(vector<tDirectionalLight *>::iterator i=dir_lights.begin(); i!=dir_lights.end(); i++)
+		delete *i;
+
+	for(vector<tParticleSystem *>::iterator i=particle_systems.begin(); i!=particle_systems.end(); i++)
+		delete *i;
+
+	for(vector<tCubeMapReflection *>::iterator i=cube_map_reflections.begin(); i!=cube_map_reflections.end(); i++)
+		delete *i;*/
 }
 
 void tWorld::AddObject(tObject *o)
@@ -108,6 +123,26 @@ void tWorld::RemoveParticleSystem(tParticleSystem *ps)
 		if(*i == ps)
 		{
 			particle_systems.erase(i);
+			return;
+		}
+}
+
+
+void tWorld::AddCubeMapReflection(tCubeMapReflection *r)
+{
+	for(vector<tCubeMapReflection *>::iterator i = cube_map_reflections.begin(); i != cube_map_reflections.end(); i++)
+		if(*i == r)
+			return;
+	cube_map_reflections.push_back(r);
+
+}
+
+void tWorld::RemoveCubeMapReflection(tCubeMapReflection *r)
+{
+	for(vector<tCubeMapReflection *>::iterator i = cube_map_reflections.begin(); i != cube_map_reflections.end(); i++)
+		if(*i == r)
+		{
+			cube_map_reflections.erase(i);
 			return;
 		}
 }
@@ -203,6 +238,37 @@ void tWorld::FillRenderSpace(tRenderSpace *space, tCulling **cullings, int culli
 
 		for(i=objects.begin(); i!=objects.end(); i++)
 			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i)); // TODO: move to tRenderer
+	}
+}
+
+
+void tWorld::AssignUnsetCubeMapReflections(void)
+{
+	for(vector<tObject *>::iterator i=objects.begin(); i!=objects.end(); i++)
+	{
+		tMeshObject *mesh_object = dynamic_cast<tMeshObject *>(*i);
+		if(!mesh_object)
+			continue;
+
+		if(mesh_object->GetCubeMapReflection() // Reflection already set
+				|| !mesh_object->GetCubeMapReflectionEnabled()) // or not needed
+			continue;
+
+		tCubeMapReflection *min = 0;
+		float min_v = FLT_MAX;
+		for(vector<tCubeMapReflection *>::iterator ri=cube_map_reflections.begin(); ri!=cube_map_reflections.end(); ri++)
+		{
+			tCubeMapReflection *reflection = *ri;
+			float v = (reflection->GetPosition() - mesh_object->GetTransform().GetPosition()).SquaredLen();
+			if(v < min_v)
+			{
+				min_v = v;
+				min = reflection;
+			}
+		}
+
+		if(min)
+			mesh_object->SetCubeMapReflection(min);
 	}
 }
 

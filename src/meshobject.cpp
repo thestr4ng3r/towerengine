@@ -24,6 +24,8 @@ tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 	rigid_body = 0;
 
 	replace_materials = 0;
+
+	cube_map_reflection = 0;
 }
 
 void tMeshObject::TransformChanged(void)
@@ -150,7 +152,7 @@ void tMeshObject::DepthPrePass(tRenderer *renderer)
 	mesh->DepthPrePass(renderer, replace_materials);
 }
 
-void tMeshObject::GeometryPass(tRenderer *renderer)
+void tMeshObject::GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
@@ -158,6 +160,8 @@ void tMeshObject::GeometryPass(tRenderer *renderer)
 	float *temp = transform.GetMatrix(transform_matrix);
 
 	renderer->GetCurrentFaceShader()->SetTransformation(temp);
+	if(cube_map_reflection_enabled && cube_map_reflection)
+		renderer->GetCurrentFaceShader()->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());
 
 	if(animation_mode && animation)
 	{

@@ -621,16 +621,14 @@ void tMesh::RefractionPass(tRenderer *renderer, float *transform, map<tMaterial 
 	}
 }
 
-/*bool tMesh::GetCubeMapReflectionEnabled(void)
+bool tMesh::GetCubeMapReflectionEnabled(void)
 {
-	vector<tMeshMaterial *>::iterator i;
-
-	for(i=materials.begin(); i!=materials.end(); i++)
-		if((*i)->GetCubeMapReflectionEnabled())
+	for(map<string, tMaterial *>::iterator i=materials.begin(); i!=materials.end(); i++)
+		if(i->second->GetCubeMapReflectionEnabled())
 			return true;
 
 	return false;
-}*/
+}
 
 bool tMesh::LoadFromFile(const char *file, tMaterialManager *material_manager)
 {

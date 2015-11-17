@@ -2,11 +2,14 @@
 #ifndef _MESHOBJECT_H
 #define _MESHOBJECT_H
 
+class tCubeMapReflection;
 
 class tMeshObject : public tTransformObject
 {
 	private:
 		tMesh *mesh;
+
+		tCubeMapReflection *cube_map_reflection;
 
 		bool visible;
 
@@ -47,6 +50,7 @@ class tMeshObject : public tTransformObject
 		void SetAlpha(float a)							{ alpha = a; }
 		void SetColor(tVector c, float a)				{ SetColor(c); SetAlpha(a); }
 		void SetVisible(bool visible)					{ this->visible = visible; }
+		void SetCubeMapReflection(tCubeMapReflection *reflection)	{ this->cube_map_reflection = reflection; }
 
 		void ReplaceMaterial(std::string name, tMaterial *material);
 		void RestoreReplaceMaterial(std::string name);
@@ -56,12 +60,13 @@ class tMeshObject : public tTransformObject
 		void UpdateRigidBodyTransformation(void);
 
 		void DepthPrePass(tRenderer *renderer);
-		void GeometryPass(tRenderer *renderer);
+		void GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled);
 		void ForwardPass(tRenderer *renderer);
 		void RefractionPass(tRenderer *renderer);
 		tBoundingBox GetBoundingBox(void);
 
-		//bool GetCubeMapReflectionEnabled(void)	{ return mesh->GetCubeMapReflectionEnabled(); }
+		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
+		bool GetCubeMapReflectionEnabled(void)			{ return mesh->GetCubeMapReflectionEnabled(); }
 
 		btRigidBody *GetRigidBody(void)		{ return rigid_body; }
 		tMesh *GetMesh(void)				{ return mesh; }

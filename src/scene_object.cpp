@@ -126,3 +126,25 @@ tEmptySceneObject::tEmptySceneObject(tTransform transform)
 tEmptySceneObject::~tEmptySceneObject(void)
 {
 }
+
+// ---------------------------------------------
+
+tCubeMapReflectionSceneObject::tCubeMapReflectionSceneObject(tCubeMapReflection *reflection)
+{
+	this->reflection = reflection;
+}
+
+tCubeMapReflectionSceneObject::~tCubeMapReflectionSceneObject()
+{
+	delete reflection;
+}
+
+void tCubeMapReflectionSceneObject::AddToWorld(tWorld *world)
+{
+	world->AddCubeMapReflection(reflection);
+}
+
+void tCubeMapReflectionSceneObject::RemoveFromWorld(tWorld *world)
+{
+	world->RemoveCubeMapReflection(reflection);
+}

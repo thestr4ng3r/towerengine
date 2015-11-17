@@ -12,7 +12,7 @@ struct tRenderObjectSpace
 	virtual void Clear(void);
 
 	void DepthPrePass(tRenderer *renderer);
-	void GeometryPass(tRenderer *renderer);
+	void GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled = true);
 	void ForwardPass(tRenderer *renderer);
 	void RefractionPass(tRenderer *renderer);
 };

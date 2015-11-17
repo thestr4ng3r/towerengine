@@ -6,8 +6,6 @@
 class tCubeMapReflection
 {
 	private:
-		tRenderer *renderer;
-
 		tVector position;
 
 		int resolution;
@@ -19,16 +17,19 @@ class tCubeMapReflection
 		tCamera *camera;
 		tRenderSpace *render_space;
 
+		bool initialized;
 		bool invalid;
 
-		void GeometryPass(int side, tWorld *world);
-		void LightPass(int side, tWorld *world);
+		void GeometryPass(tRenderer *renderer, int side, tWorld *world);
+		void LightPass(tRenderer *renderer, int side, tWorld *world);
 
 	public:
-		tCubeMapReflection(tRenderer *renderer, int resolution, tVector position);
+		tCubeMapReflection(tVector position);
 		~tCubeMapReflection(void);
 
-		void Render(void);
+		void Init(int resolution);
+
+		void Render(tRenderer *renderer);
 
 		void Invalidate(void)			{ invalid = true; }
 

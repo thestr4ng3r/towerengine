@@ -3,11 +3,38 @@
 
 using namespace std;
 
-tCubeMapReflection::tCubeMapReflection(tRenderer *renderer, int resolution, tVector position)
+tCubeMapReflection::tCubeMapReflection(tVector position)
 {
-	this->renderer = renderer;
-	this->resolution = resolution;
+	this->initialized = false;
+	this->resolution = 0;
 	this->position = position;
+
+	camera = new tCamera();
+	camera->SetAngle(90.0);
+	camera->SetAspect(1.0);
+	// TODO: near/far clip other than default
+
+	render_space = new tRenderSpace();
+
+	fbo = 0;
+	color_tex = 0;
+}
+
+tCubeMapReflection::~tCubeMapReflection(void)
+{
+	delete camera;
+	delete render_space;
+
+	glDeleteFramebuffers(1, &fbo);
+
+	glDeleteTextures(1, &color_tex);
+
+	delete gbuffer;
+}
+
+void tCubeMapReflection::Init(int resolution)
+{
+	this->resolution = resolution;
 
 	glGenFramebuffers(1, &fbo);
 
@@ -30,31 +57,15 @@ tCubeMapReflection::tCubeMapReflection(tRenderer *renderer, int resolution, tVec
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	camera = new tCamera();
-	camera->SetAngle(90.0);
-	camera->SetAspect(1.0);
-	// TODO: near/far clip other than default
-
-	render_space = new tRenderSpace();
-
 	invalid = true;
+	initialized = true;
 }
 
-tCubeMapReflection::~tCubeMapReflection(void)
+void tCubeMapReflection::Render(tRenderer *renderer)
 {
-	delete camera;
-	delete render_space;
+	if(!initialized)
+		return;
 
-	glDeleteFramebuffers(1, &fbo);
-
-	glDeleteTextures(1, &color_tex);
-
-	delete gbuffer;
-}
-
-
-void tCubeMapReflection::Render(void)
-{
 	tWorld *world = renderer->GetWorld();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -70,8 +81,8 @@ void tCubeMapReflection::Render(void)
 
 	for(int s=0; s<6; s++)
 	{
-		GeometryPass(s, world);
-		LightPass(s, world);
+		GeometryPass(renderer, s, world);
+		LightPass(renderer, s, world);
 	}
 
 	glEnable(GL_DEPTH_TEST);
@@ -84,7 +95,7 @@ void tCubeMapReflection::Render(void)
 	invalid = false;
 }
 
-void tCubeMapReflection::GeometryPass(int side, tWorld *world)
+void tCubeMapReflection::GeometryPass(tRenderer *renderer, int side, tWorld *world)
 {
 	camera->SetPosition(position);
 	camera->SetDirection(CubeVecS(side));
@@ -119,12 +130,14 @@ void tCubeMapReflection::GeometryPass(int side, tWorld *world)
 	renderer->SetCurrentFaceShader(renderer->GetGeometryPassShader());
 	renderer->BindCurrentFaceShader();
 
+	shader->SetCubeMapReflectionTexture(0);
+
 	shader->SetCameraPosition(camera->GetPosition());
 
-	render_space->GeometryPass(renderer);
+	render_space->GeometryPass(renderer, false);
 }
 
-void tCubeMapReflection::LightPass(int side, tWorld *world)
+void tCubeMapReflection::LightPass(tRenderer *renderer, int side, tWorld *world)
 {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+side, color_tex, 0);
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -244,6 +257,8 @@ void tCubeMapReflection::LightPass(int side, tWorld *world)
 	delete[] point_lights_dist;
 	delete[] point_lights_shadow_enabled;
 	delete[] point_lights_shadow_maps;
+
+
 
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

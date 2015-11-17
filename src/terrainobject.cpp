@@ -9,7 +9,7 @@ tTerrainObject::tTerrainObject(tTerrain *terrain)
 	rigid_body->setRestitution(0.0);
 }
 
-void tTerrainObject::GeometryPass(tRenderer *renderer)
+void tTerrainObject::GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled)
 {
 	terrain->Paint(renderer);
 }

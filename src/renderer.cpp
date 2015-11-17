@@ -112,7 +112,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 
 	depth_prepass_enabled = true;
 
-	cube_map_reflection = 0;
+	//cube_map_reflection = 0;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -206,7 +206,7 @@ tRenderer::~tRenderer(void)
 
 	delete particle_shader;
 	
-	delete cube_map_reflection;
+	//delete cube_map_reflection;
 }
 
 void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int noise_tex_size)
@@ -261,11 +261,11 @@ void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp
 }
 
 
-void tRenderer::InitCubeMapReflection(int resolution, tVector position)
+/*void tRenderer::InitCubeMapReflection(int resolution, tVector position)
 {
 	delete cube_map_reflection;
 	cube_map_reflection = new tCubeMapReflection(this, resolution, position);
-}
+}*/
 
 
 void tRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
@@ -278,12 +278,12 @@ void tRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
 
 
 	shadow_pass = false;
-	if(cube_map_reflection)
+	for(int i=0; i<world->GetCubeMapReflectionsCount(); i++)
 	{
-		if(cube_map_reflection->GetInvalid())
-			cube_map_reflection->Render();
+		tCubeMapReflection *reflection = world->GetCubeMapReflection(i);
+		if(reflection->GetInvalid())
+			reflection->Render(this);
 	}
-
 }
 
 
@@ -479,10 +479,14 @@ void tRenderer::GeometryPass(void)
 
 	geometry_pass_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 
-	if (cube_map_reflection)
-		geometry_pass_shader->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());
-	else
-		geometry_pass_shader->SetCubeMapReflectionTexture(0);
+	//tCubeMapReflection *cube_map_reflection = 0;
+	//if(world->GetCubeMapReflectionsCount() > 0)
+	//	cube_map_reflection = world->GetCubeMapReflection(0);
+
+	//if (cube_map_reflection)
+	//	geometry_pass_shader->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());
+	//else
+	//	geometry_pass_shader->SetCubeMapReflectionTexture(0);
 
 	current_rendering_render_space->GeometryPass(this);
 

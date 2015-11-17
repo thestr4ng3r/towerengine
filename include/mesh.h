@@ -108,7 +108,7 @@ class tMesh
 		void ForwardPass(tRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
 		void RefractionPass(tRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
 
-		//bool GetCubeMapReflectionEnabled(void);
+		bool GetCubeMapReflectionEnabled(void);
 
 		int GetVertexCount(void)					{ return vertices.size(); }
 		int GetTriangleCount(void)					{ return triangles.size(); }

@@ -77,6 +77,8 @@ bool tScene::LoadFromFile(string file)
 	return true;
 }
 
+
+
 void tScene::ParseAssetsNode(xml_node<> *cur)
 {
 	xml_node<> *child = cur->first_node();
@@ -353,7 +355,13 @@ tSceneObject *tScene::ParsePointLightObjectNode(xml_node<> *cur)
 tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 {
 	tTransform transform;
-	//xml_attribute<> *attr;
+	xml_attribute<> *attr;
+
+	bool cube_map_reflection = false;
+
+	if((attr = cur->first_attribute("tag")))
+		if(strcmp(attr->value(), "T_cube_map_reflection") == 0)
+			cube_map_reflection = true;
 
 	xml_node<> *child = cur->first_node();
 	for(; child; child = child->next_sibling())
@@ -362,8 +370,17 @@ tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 			transform = ParseTransformNode(child);
 	}
 
-	tEmptySceneObject *scene_object = new tEmptySceneObject(transform);
-	return scene_object;
+	if(!cube_map_reflection)
+	{
+		tEmptySceneObject *scene_object = new tEmptySceneObject(transform);
+		return scene_object;
+	}
+	else
+	{
+		tCubeMapReflection *reflection = new tCubeMapReflection(transform.GetPosition());
+		tCubeMapReflectionSceneObject *scene_object = new tCubeMapReflectionSceneObject(reflection);
+		return scene_object;
+	}
 }
 
 void tScene::ParseSceneNode(xml_node<> *cur)
@@ -455,6 +472,7 @@ void tScene::AddToWorld(void)
 	for(i=objects.begin(); i!=objects.end(); i++)
 		i->second->AddToWorld(world);
 
+	world->AssignUnsetCubeMapReflections();
 }
 
 void tScene::RemoveFromWorld(void)

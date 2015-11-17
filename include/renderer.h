@@ -49,7 +49,6 @@ class tRenderer
 
 		tVBO<float> *screen_quad_vbo;
 		tVAO *screen_quad_vao;
-		//tIBO *screen_quad_ibo;
 
 		bool fxaa_enabled;
 
@@ -70,8 +69,6 @@ class tRenderer
 
 		tMatrixBuffer *matrix_buffer;
 		tPositionRestoreDataBuffer *position_restore_data_buffer;
-
-		tCubeMapReflection *cube_map_reflection;
 
 		int current_read_color_tex;
 
@@ -107,7 +104,7 @@ class tRenderer
 
 		void SetFog(bool enabled, float start_dist = 0.0, float end_dist = 100.0, float exp = 1.0, tVector color = Vec(0.0, 0.0, 0.0));
 
-		void InitCubeMapReflection(int resolution, tVector position);
+		//void InitCubeMapReflection(int resolution, tVector position);
 
 		void RenderScreenQuad(void);
 
@@ -148,7 +145,7 @@ class tRenderer
 
 		//GLuint GetDepthTexture(void)		{ return depth_tex; }
 		GLuint GetCurrentReadColorTexture(void)			{ return color_tex[current_read_color_tex]; }
-		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
+		//tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
 
 		void SetPointLightShadowRenderLimit(int limit)	{ this->point_light_shadow_limit = limit; }
 
