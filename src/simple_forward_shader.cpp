@@ -11,8 +11,6 @@ void tSimpleForwardShader::Init(void)
 
 	LinkProgram();
 
-	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
-
 	color_uniform = GetUniformLocation("color_uni");
 
 	tex_uniform = GetUniformLocation("tex_uni");
@@ -20,15 +18,12 @@ void tSimpleForwardShader::Init(void)
 
 	transformation_uniform = GetUniformLocation("transformation_uni");
 
+	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
+
 	Bind();
 	glUniform1i(tex_uniform, diffuse_tex_unit);
 }
 
-
-void tSimpleForwardShader::SetModelViewProjectionMatrix(float m[16])
-{
-	glUniformMatrix4fv(modelview_projection_matrix_uniform, 1, GL_TRUE, m);
-}
 
 
 void tSimpleForwardShader::SetTransformation(const float m[16])

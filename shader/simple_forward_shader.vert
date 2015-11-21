@@ -3,7 +3,10 @@
 in vec3 vertex_attr;
 in vec2 uv_attr;
 
-uniform mat4 modelview_projection_matrix_uni;
+layout(std140) uniform MatrixBlock
+{
+	mat4 modelview_projection_matrix;
+} matrix_uni;
 
 uniform vec3 cam_pos_uni;
 
@@ -20,5 +23,5 @@ void main(void)
 	
 	uv_var = uv_attr;
 	
-	gl_Position = modelview_projection_matrix_uni * pos;
+	gl_Position = matrix_uni.modelview_projection_matrix * pos;
 }

@@ -2,15 +2,26 @@
 
 in vec3 vertex_attr;
 in vec2 uv_attr;
+in vec3 normal_attr;
+in vec3 tang_attr;
+in vec3 bitang_attr;
 
-uniform mat4 modelview_projection_matrix_uni;
+layout(std140) uniform MatrixBlock
+{
+	mat4 modelview_projection_matrix;
+} matrix_uni;
 
 uniform vec3 cam_pos_uni;
 
 uniform mat4 transformation_uni;
 
+out vec3 pos_var;
+out vec3 normal_var;
+out vec3 tang_var;
+out vec3 bitang_var;
+
 out vec2 uv_var;
-noperspective out vec3 screen_uv_var;
+out vec3 cam_dir_var;
 
 
 void main(void)
@@ -18,10 +29,15 @@ void main(void)
 	vec3 vertex_pos = vertex_attr;
 
 	vec4 pos = vec4(vertex_pos, 1.0) * transformation_uni;
-	pos = modelview_projection_matrix_uni * pos;
+	cam_dir_var = pos.xyz - cam_pos_uni;	
+	pos_var = pos.xyz;
+	pos = matrix_uni.modelview_projection_matrix * pos;
+	
+	normal_var = normalize(normal_attr * mat3(transformation_uni)); // TODO: correct transformation of normals
+	tang_var = normalize(tang_attr * mat3(transformation_uni));
+	bitang_var = normalize(bitang_attr * mat3(transformation_uni));
 	
 	uv_var = uv_attr;
-	screen_uv_var = vec3((pos.xy / pos.w) * 0.5 + vec2(0.5), pos.w);
 	
 	gl_Position = pos;
 }

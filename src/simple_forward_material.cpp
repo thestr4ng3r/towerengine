@@ -66,7 +66,6 @@ bool tSimpleForwardMaterial::InitForwardPass(tRenderer *renderer, float *transfo
 
 	tSimpleForwardShader *shader = renderer->GetSimpleForwardShader();
 	shader->Bind();
-	shader->SetModelViewProjectionMatrix(renderer->GetCurrentRenderingCamera()->GetModelViewProjectionMatrix().GetData());
 	shader->SetColor(color, alpha);
 	shader->SetTexture(tex != 0 ? true : false, tex);
 	shader->SetTransformation(transform);

@@ -4,6 +4,8 @@
 tRefractionMaterial::tRefractionMaterial(void)
 {
 	color = Vec(1.0, 1.0, 1.0);
+	edge_color = Vec(1.0, 1.0, 1.0);
+	edge_alpha = 0.0;
 	color_tex = 0;
 	normal_tex = 0;
 }
@@ -22,6 +24,12 @@ tRefractionMaterial::~tRefractionMaterial(void)
 void tRefractionMaterial::SetColor(tVector color)
 {
 	this->color = color;
+}
+
+void tRefractionMaterial::SetEdgeColor(tVector edge_color, float alpha)
+{
+	this->edge_color = edge_color;
+	this->edge_alpha = alpha;
 }
 
 void tRefractionMaterial::LoadColorTexture(std::string file)
@@ -60,11 +68,11 @@ bool tRefractionMaterial::InitRefractionPass(tRenderer *renderer, float *transfo
 {
 	tRefractionShader *shader = renderer->GetRefractionShader();
 	shader->Bind();
-	shader->SetModelViewProjectionMatrix(renderer->GetCurrentRenderingCamera()->GetModelViewProjectionMatrix().GetData());
-	shader->SetColor(color);
-	shader->SetColorTexture(color_tex != 0 ? true : false, color_tex);
-	shader->SetNormalTexture(normal_tex);
+	shader->SetColor(color, edge_color, edge_alpha);
+	shader->SetColorTexture(color_tex != 0, color_tex);
+	shader->SetNormalTexture(normal_tex != 0, normal_tex);
 	shader->SetTransformation(transform);
+	shader->SetCameraPosition(renderer->GetCurrentRenderingCamera()->GetPosition());
 	shader->SetScreenTexture(renderer->GetCurrentReadColorTexture());
 
 	glBlendFunc(GL_ONE, GL_ZERO);

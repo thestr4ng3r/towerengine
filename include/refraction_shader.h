@@ -5,16 +5,18 @@
 class tRefractionShader : public tFaceShader
 {
 	private:
-		GLint modelview_projection_matrix_uniform;
-
 		GLint transformation_uniform;
 
 		GLint color_uniform;
+		GLint edge_color_uniform;
 
 		GLint color_tex_enabled_uniform;
 		GLint color_tex_uniform;
 
+		GLint normal_tex_enabled_uniform;
 		GLint normal_tex_uniform;
+
+		GLint cam_pos_uniform;
 
 		GLint screen_tex_uniform;
 
@@ -23,12 +25,12 @@ class tRefractionShader : public tFaceShader
 
 		void Init(void);
 
-		void SetModelViewProjectionMatrix(float m[16]);
-		void SetColor(tVector color);
+		void SetColor(tVector color, tVector edge, float edge_alpha);
 		void SetColorTexture(bool enabled, GLuint tex = 0);
-		void SetNormalTexture(GLuint tex);
+		void SetNormalTexture(bool enabled, GLuint tex = 0);
 		void SetScreenTexture(GLuint tex);
 		void SetTransformation(const float m[16]);
+		void SetCameraPosition(tVector pos);
 };
 
 

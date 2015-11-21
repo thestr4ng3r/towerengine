@@ -5,8 +5,6 @@
 class tSimpleForwardShader : public tFaceShader
 {
 	private:
-		GLint modelview_projection_matrix_uniform;
-
 		GLint transformation_uniform;
 
 		GLint color_uniform;
@@ -17,7 +15,6 @@ class tSimpleForwardShader : public tFaceShader
 	public:
 		void Init(void);
 
-		void SetModelViewProjectionMatrix(float m[16]);
 		void SetColor(tVector color, float alpha);
 		void SetTexture(bool enabled, GLuint tex = 0);
 		void SetTransformation(const float m[16]);

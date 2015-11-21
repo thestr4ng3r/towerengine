@@ -7,6 +7,9 @@ class tRefractionMaterial : public tMaterial
 {
 	protected:
 		tVector color;
+		tVector edge_color;
+		float edge_alpha;
+
 		GLuint color_tex;
 
 		GLuint normal_tex;
@@ -16,6 +19,7 @@ class tRefractionMaterial : public tMaterial
 		~tRefractionMaterial(void);
 
 		void SetColor(tVector color);
+		void SetEdgeColor(tVector edge_color, float alpha);
 
 		void LoadColorTexture(std::string file);
 		void LoadColorTexture(const char *extension, const void *data, unsigned int size);

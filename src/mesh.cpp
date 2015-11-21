@@ -1145,6 +1145,9 @@ tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, stri
 	string normal_tex_file;
 	tVector color = Vec(1.0, 1.0, 1.0);
 
+	tVector edge_color = Vec(0.0, 0.0, 0.0);
+	float edge_alpha = 0.0;
+
 	unsigned char *color_tex_data = 0;
 	size_t color_tex_size = 0;
 	char *color_tex_ext = 0;
@@ -1218,6 +1221,17 @@ tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, stri
 				color_tex_mode = TEXTURE_DATA;
 			}
 		}
+		else if(strcmp(name_temp, "edge_color") == 0)
+		{
+			if((attr = child->first_attribute("r")))
+				edge_color.r = atof(attr->value());
+			if((attr = child->first_attribute("g")))
+				edge_color.g = atof(attr->value());
+			if((attr = child->first_attribute("b")))
+				edge_color.b = atof(attr->value());
+			if((attr = child->first_attribute("a")))
+				edge_alpha = atof(attr->value());
+		}
 
 		child = child->next_sibling();
 	}
@@ -1226,6 +1240,7 @@ tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, stri
 	tRefractionMaterial *r = new tRefractionMaterial();
 
 	r->SetColor(color);
+	r->SetEdgeColor(edge_color, edge_alpha);
 
 	if(color_tex_mode == TEXTURE_FILE)
 		r->LoadColorTexture(path + color_tex_file);
