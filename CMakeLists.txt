@@ -5,8 +5,8 @@ set(towerengine_VERSION 1.0.0)
 
 set(CMAKE_BUILD_TYPE Release)
 
-OPTION(BUILD_STATIC_LIB "Build static instead of shared" OFF)
-
+option(BUILD_STATIC_LIB "Build static instead of shared" OFF)
+option(RUN_STRINGRES "Run stringres to generate shader resources before build" OFF)
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
 IF(MSVC)
@@ -59,9 +59,10 @@ IF(MSVC)
 ENDIF(MSVC)
 
 
+set (towerengine_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-file(GLOB towerengine_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB towerengine_INCLUDES "${towerengine_INCLUDE_DIR}/*.h")
 
 set(towerengine_SRC 
 	src/animation.cpp 
@@ -86,8 +87,7 @@ set(towerengine_SRC
 	src/mesh.cpp 
 	src/meshobject.cpp 
 	src/object.cpp 
-	src/pose.cpp 
-	src/resources.cpp 
+	src/pose.cpp
 	src/shader.cpp 
 	src/triangle.cpp 
 	src/utils.cpp 
@@ -134,15 +134,42 @@ set(towerengine_SRC
 	src/lighting_shader.cpp
 	src/depth_pass_shader.cpp)
 
+
+set(RESOURCES_HEADERS ${towerengine_INCLUDE_DIR}/tresources.h)
+set(RESOURCES_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.cpp)
+set(RESOURCES_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources)
+set(RESOURCES_SOURCE_INFO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/shader/resources)
+file(GLOB RESOURCES_SHADER_FILES
+		"${CMAKE_CURRENT_SOURCE_DIR}/shader/*.vert"
+		"${CMAKE_CURRENT_SOURCE_DIR}/shader/*.frag")
+
+
+
 add_definitions(-g -Wall)
 
-
-
 if(BUILD_STATIC_LIB)
-	add_library(towerengine STATIC ${towerengine_SRC} ${towerengine_INCLUDES})
+	add_library(towerengine STATIC ${towerengine_SRC} ${towerengine_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 else()
-	add_library(towerengine SHARED ${towerengine_SRC} ${towerengine_INCLUDES})
+	add_library(towerengine SHARED ${towerengine_SRC} ${towerengine_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 endif()
+
+
+
+if(RUN_STRINGRES)
+	add_custom_command(OUTPUT ${RESOURCES_HEADERS}
+			COMMAND stringres -h ${RESOURCES_FILE}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			MAIN_DEPENDENCY ${RESOURCES_FILE}
+			DEPENDS ${RESOURCES_SOURCE_INFO_FILE})
+
+	add_custom_command(OUTPUT ${RESOURCES_SRC}
+			COMMAND stringres -s ${RESOURCES_FILE}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			MAIN_DEPENDENCY ${RESOURCES_FILE}
+			DEPENDS ${RESOURCES_SOURCE_INFO_FILE} ${RESOURCES_SHADER_FILES})
+endif()
+
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/rapidxml)
 
@@ -164,13 +191,6 @@ include_directories(${BULLET_INCLUDE_DIRS})
 target_link_libraries(towerengine ${BULLET_LIBRARIES})
 
 
-#include(GenerateExportHeader)
-#generate_export_header(towerengine)
-#set_property(TARGET towerengine PROPERTY VERSION ${towerengine_VERSION})
-#set_property(TARGET towerengine PROPERTY SOVERSION 3)
-#set_property(TARGET towerengine PROPERTY INTERFACE_towerengine_MAJOR_VERSION 3)
-#set_property(TARGET towerengine APPEND PROPERTY COMPATIBLE_INTERFACE_STRING towerengine_MAJOR_VERSION)
-
 
 
 install(TARGETS towerengine #EXPORT towerengine_targets
@@ -179,43 +199,6 @@ install(TARGETS towerengine #EXPORT towerengine_targets
 	INCLUDES DESTINATION include/towerengine)
 
 install(FILES ${towerengine_INCLUDES} DESTINATION include/towerengine)
-
-
-#config
-#include(CMakePackageConfigHelpers)
-#write_basic_package_version_file(
-#  "${CMAKE_CURRENT_BINARY_DIR}/towerengine/towerengine-config-version.cmake"
-#  VERSION ${towerengine_VERSION}
-#  COMPATIBILITY AnyNewerVersion
-#)
-#
-#
-#
-#export(TARGETS towerengine FILE "${CMAKE_CURRENT_BINARY_DIR}/towerengine/towerengine-targets.cmake")
-#
-#configure_file(towerengine-config.cmake
-#  "${CMAKE_CURRENT_BINARY_DIR}/towerengine/towerengine-config.cmake"
-#  COPYONLY
-#)
-#
-#set(ConfigPackageLocation lib/cmake/towerengine)
-#install(EXPORT towerengine_targets
-#  FILE
-#    towerengine-targets.cmake
-#  NAMESPACE
-#    Upstream::
-#  DESTINATION
-#    ${ConfigPackageLocation}
-#)
-#install(
-#  FILES
-#    towerengine-config.cmake
-#    "${CMAKE_CURRENT_BINARY_DIR}/towerengine/towerengine-config-version.cmake"
-#  DESTINATION
-#    ${ConfigPackageLocation}
-#  COMPONENT
-#    Devel
-#)
 
 # uninstall target
 configure_file(
