@@ -29,9 +29,16 @@ tScene::tScene(tWorld *world, tMaterialManager *material_manager)
 
 tScene::~tScene(void)
 {
-	// TODO: delete assets, objects, ...
+	for(map<string, tSceneObject *>::iterator i=objects.begin(); i!=objects.end(); i++)
+		delete i->second;
+
+	for(map<string, tAsset *>::iterator i=assets.begin(); i!=assets.end(); i++)
+		delete i->second;
+
 	if(own_material_manager)
 		delete material_manager;
+
+	delete skybox;
 }
 
 bool tScene::LoadFromFile(string file)
@@ -70,6 +77,31 @@ bool tScene::LoadFromFile(string file)
 
 		cur = cur->next_sibling();
 	}
+
+
+	for(map<string, tSceneObject *>::iterator i=objects.begin(); i!=objects.end(); i++)
+	{
+		tSceneObject *so = i->second;
+		string reflection_name = so->GetAttribute("T_cube_map_reflection");
+
+		if(reflection_name.empty())
+			continue;
+
+		tObjectSceneObject *oso = dynamic_cast<tObjectSceneObject *>(so);
+		if(!oso)
+			continue;
+
+		tMeshObject *mesh_object = dynamic_cast<tMeshObject *>(oso->GetObject());
+		if(!mesh_object)
+			continue;
+
+		map<string, tCubeMapReflectionSceneObject *>::iterator reflection_i = cube_map_reflection_scene_objects.find(reflection_name);
+		if(reflection_i == cube_map_reflection_scene_objects.end())
+			continue;
+
+		mesh_object->SetCubeMapReflection(reflection_i->second->GetReflection());
+	}
+
 
 	delete doc;
 	delete [] data;
@@ -252,6 +284,15 @@ void tScene::ParseObjectsNode(xml_node<> *cur)
 			string attr_value = string(attr->value());
 
 			scene_object->SetAttribute(attr_name, attr_value);
+
+			if(scene_object->GetType() == T_SCENE_OBJECT_TYPE_CUBE_MAP_REFLECTION && attr_name == "T_cube_map_reflection_name")
+			{
+				tCubeMapReflectionSceneObject *cube_map_reflection_object = dynamic_cast<tCubeMapReflectionSceneObject *>(scene_object);
+				if(!cube_map_reflection_object)
+					continue;
+
+				cube_map_reflection_scene_objects.insert(pair<string, tCubeMapReflectionSceneObject *>(attr_value, cube_map_reflection_object));
+			}
 		}
 
 		AddObject(name, scene_object);
@@ -400,6 +441,7 @@ void tScene::ParseSceneNode(xml_node<> *cur)
 			if(asset->GetType() == T_ASSET_TYPE_CUBE_MAP)
 			{
 				sky_cubemap = (tCubeMapAsset *)asset;
+				delete skybox;
 				skybox = new tSkyBox(sky_cubemap->GetCubeMap());
 			}
 		}

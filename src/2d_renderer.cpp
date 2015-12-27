@@ -28,6 +28,15 @@ t2DRenderer::t2DRenderer(void)
 	ibo->AssignData();
 }
 
+t2DRenderer::~t2DRenderer(void)
+{
+	delete ibo;
+	delete vao;
+	delete vertex_vbo;
+
+	delete sprite_shader;
+}
+
 void t2DRenderer::InitRender(int screen_width, int screen_height)
 {
 	sprite_shader->Bind();

@@ -40,6 +40,13 @@ tSkyBox::tSkyBox(GLuint cube_map, float size)
 	SetCubeMap(cube_map);
 }
 
+tSkyBox::~tSkyBox(void)
+{
+	delete vao;
+	delete vbo;
+	delete ibo;
+}
+
 void tSkyBox::Paint(tRenderer *renderer, tVector pos)
 {
 	renderer->GetSkyBoxShader()->SetCubeMap(cube_map);

@@ -21,6 +21,8 @@ tDefaultMaterial::tDefaultMaterial(void)
 	cube_map_reflection.enabled = false;
 	cube_map_reflection.color = Vec(0.0, 0.0, 0.0);
 
+	shadow.cast = true;
+
 	for(int i=0; i<tex_count; i++)
 		tex[i] = 0;
 

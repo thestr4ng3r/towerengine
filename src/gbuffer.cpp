@@ -7,9 +7,6 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	this->first_attachment = first_attachment;
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	draw_buffers = new GLenum[tex_count-1];
-	tex_units = new int[tex_count];
-
 	glGenTextures(tex_count, tex);
 
 	glBindTexture(GL_TEXTURE_2D, tex[DEPTH_TEX]);
@@ -43,6 +40,7 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 
 tGBuffer::~tGBuffer(void)
 {
+	glDeleteTextures(tex_count, tex);
 }
 
 

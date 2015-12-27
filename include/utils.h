@@ -7,6 +7,7 @@
 
 char *ftoa(float f, int len = 50);
 char *itoa(int v, int len = 50);
+std::string itos(int v);
 char *cstr(const char *);
 
 std::string PathOfFile(std::string file);

@@ -11,8 +11,8 @@ tSSAO::tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_s
 	render_width = renderer->GetScreenWidth() / 2;
 	render_height = renderer->GetScreenHeight() / 2;
 
-	kernel = new float[kernel_size*3];
 	this->kernel_size = kernel_size;
+	kernel = new float[kernel_size*3];
 
 	this->radius = radius;
 
@@ -63,6 +63,8 @@ tSSAO::tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_s
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, noise_tex_size, noise_tex_size, 0, GL_RGB, GL_UNSIGNED_BYTE, noise_tex_data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	delete [] noise_tex_data;
+
 
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -106,6 +108,8 @@ tSSAO::~tSSAO(void)
 	glDeleteTextures(1, &blur_tex);
 	glDeleteFramebuffers(1, &fbo);
 	delete blur_shader;
+
+	delete [] kernel;
 }
 
 

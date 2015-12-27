@@ -28,17 +28,22 @@ tShaderSourceVariable::tShaderSourceVariable(string v)
 
 string tShaderSourceVariable::GetString(void)
 {
+	ostringstream ss;
+
 	switch(type)
 	{
 		case INT:
-			return string(itoa(int_v));
+			ss << int_v;
+			break;
 		case FLOAT:
-			return string(ftoa(float_v));
+			ss << float_v;
+			break;
 		case STRING:
-			return string_v;
+			ss << string_v;
+			break;
 	}
 
-	return string();
+	return ss.str();
 }
 
 
@@ -161,7 +166,7 @@ class tShaderSourceForLoop : public tShaderSourceBlock
 				int var_offset = 0;
 				for(vector<int>::iterator it = var_pos.begin(); it != var_pos.end(); it++)
 				{
-					string var = string(itoa(i));
+					string var = itos(i);
 					inside_v.insert(*it + var_offset, var);
 					var_offset += var.length();
 				}
@@ -352,6 +357,7 @@ string tShaderSource::BuildSource(void)
 
 		tShaderSourceForLoop *loop = new tShaderSourceForLoop(start_bc.cmd_pos, end_bc.cmd_pos - (start_bc.cmd_end - start_bc.cmd_pos + 1), var_name, from, to);
 		loop->Resolve(final, after_offset);
+		delete loop;
 
 		for(vector<tSourceBlockCommand>::iterator obi=bi+1; obi!=block_cmds.end(); obi++)
 		{

@@ -25,6 +25,8 @@ class tScene
 		std::map<std::string, tAsset *> assets;
 		std::map<std::string, tSceneObject *> objects;
 
+		std::map<std::string, tCubeMapReflectionSceneObject *> cube_map_reflection_scene_objects;
+
 		tCubeMapAsset *sky_cubemap;
 		tSkyBox *skybox;
 

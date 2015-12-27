@@ -24,8 +24,8 @@ class tGBuffer
 
 		int first_attachment;
 
-		GLenum *draw_buffers;
-		int *tex_units;
+		GLenum draw_buffers[tex_count-1];
+		int tex_units[tex_count];
 
 		void CreateTexImage(BufferType type, int width, int height);
 

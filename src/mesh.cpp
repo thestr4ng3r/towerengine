@@ -56,46 +56,33 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 
 tMesh::~tMesh(void)
 {
-	map<string, tMeshPose *>::iterator cpi;
-
-	for(cpi=custom_pose.begin(); cpi!=custom_pose.end(); cpi++)
+	for(map<string, tMeshPose *>::iterator cpi=custom_pose.begin(); cpi!=custom_pose.end(); cpi++)
 		delete custom_pose.begin()->second;
 
-	while(!animations.empty())
-		delete animations.back();
+	for(vector<tAnimation *>::iterator i=animations.begin(); i!=animations.end(); i++)
+		delete *i;
 
 	if(idle_pose)
 		delete idle_pose;
 	
-	while(!triangles.empty())
-		delete triangles.back();
+	for(vector<tTriangle *>::iterator i=triangles.begin(); i!=triangles.end(); i++)
+		delete *i;
 	
-	set<tMaterial *>::iterator mi;
-	for(mi=own_materials.begin(); mi!=own_materials.end(); mi++)
+	for(set<tMaterial *>::iterator mi=own_materials.begin(); mi!=own_materials.end(); mi++)
 		delete *mi;
 
-	while(!vertices.empty())
-		delete vertices.back();
+	for(vector<tVertex *>::iterator i=vertices.begin(); i!=vertices.end(); i++)
+		delete *i;
 
-	while(!entities.empty())
-	{
-		delete entities.back();
-		entities.pop_back();
-	}
+	for(vector<tEntity *>::iterator i=entities.begin(); i!=entities.end(); i++)
+		delete *i;
+
 
 	DeleteVBOData();
 
 	delete physics_triangle_mesh;
+	delete idle_material;
 }
-
-
-/*void tMesh::ApplyMatrix(float m[16])
-{
-	vector<tVertex *>::iterator v;
-
-	for(v=vertices.begin(); v!=vertices.end(); v++)
-		(*v)->pos = ApplyMatrix4(m, (*v)->pos);
-}*/
 
 
 void tMesh::DeleteVBOData(void)
@@ -122,7 +109,8 @@ tVBO<float> *tMesh::CreateFloatVBO(int components)
 tVertex *tMesh::CreateVertex(tVector v)
 {
 	tVertex *o;
-	o = new tVertex(v, this);
+	o = new tVertex(v);
+	AddVertex(o);
 	refresh_vbos = false;
 	return o;
 }
@@ -131,7 +119,9 @@ tTriangle *tMesh::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector 
 {
 	refresh_ibos = true;
 
-    return tTriangle::CreateTriangle(v1, v2, v3, color, material, this);
+    tTriangle *t = tTriangle::CreateTriangle(v1, v2, v3, color, material);
+    AddTriangle(t);
+    return t;
 }
 
 /*tTriangle *tMesh::CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, string material, tVector t1, tVector t2, tVector t3)
@@ -208,11 +198,8 @@ tVertex *tMesh::GetVertexByID(int id)
 
 void tMesh::SetVertexId(tVertex *v, int id)
 {
-	if(v->id != -1)
-		vertex_indices.erase(v->id);
-
 	v->id = id;
-	vertex_indices.insert(pair<int, tVertex *>(id, v));
+	vertex_indices[id] = v;
 }
 
 void tMesh::AddVertex(tVertex *v)
@@ -780,7 +767,8 @@ tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 	normal.y = atof(cur->first_attribute("ny")->value());
 	normal.z = atof(cur->first_attribute("nz")->value());
 
-	r = new tVertex(p, this);
+	r = new tVertex(p);
+	AddVertex(r);
 	SetVertexId(r, id);
 	//r->uv_set = file_version >= TEM_VERSION_0_2;
 	r->uv = uv;
@@ -1349,7 +1337,8 @@ void tMesh::ParseMeshDataNode(xml_node<> *cur, tMaterialManager *material_manage
 						normal.y = atof(values[7]);
 						normal.z = atof(values[8]);
 
-						r = new tVertex(p, this);
+						r = new tVertex(p);
+						AddVertex(r);
 						SetVertexId(r, id);
 						//r->uv_set = file_version >= TEM_VERSION_0_2;
 						r->uv = uv;

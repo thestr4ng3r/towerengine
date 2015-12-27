@@ -1,6 +1,7 @@
 #include "towerengine.h"
 
 #include <fstream>
+#include <sstream>
 
 #ifdef _MSC_VER
 #define snprintf sprintf_s
@@ -23,6 +24,13 @@ char *itoa(int v, int len)
 	char *buf = new char[len + 1];
 	snprintf(buf, len + 1, "%d", v);
 	return buf;
+}
+
+std::string itos(int v)
+{
+	std::ostringstream ss;
+	ss << v;
+	return ss.str();
 }
 
 char *cstr(const char *str)

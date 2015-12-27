@@ -19,7 +19,8 @@ tWorld::tWorld(void)
 	physics.dynamics_world->setGravity(btVector3(0, -10, 0));
 	//physics.dynamics_world->getDispatchInfo().m_allowedCcdPenetration=0.0001f;
 
-	physics.broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
+	physics.ghost_pair_callback = new btGhostPairCallback();
+	physics.broadphase->getOverlappingPairCache()->setInternalGhostPairCallback(physics.ghost_pair_callback);
 }
 
 tWorld::~tWorld(void)
@@ -29,6 +30,7 @@ tWorld::~tWorld(void)
 	delete physics.collision_dispatcher;
 	delete physics.collision_configuration;
 	delete physics.broadphase;
+	delete physics.ghost_pair_callback;
 
 	/*for(vector<tObject *>::iterator i=objects.begin(); i!=objects.end(); i++)
 		delete *i;
@@ -278,7 +280,7 @@ void tWorld::Step(float time)
 	if(time < 0.001)
 		time = 0.001;
 
-	physics.dynamics_world->stepSimulation(time, 10);
+	physics.dynamics_world->stepSimulation(time, 10, 1.0 / 240.0);
 	//CProfileManager::dumpAll();
 
 	for(vector<tParticleSystem *>::iterator psi = particle_systems.begin(); psi != particle_systems.end(); psi++)

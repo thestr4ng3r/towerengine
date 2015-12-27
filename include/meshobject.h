@@ -18,13 +18,14 @@ class tMeshObject : public tTransformObject
 		tAnimation *animation;
 		float time;
 
-		char *pose;
+		std::string pose;
 
 		tVector color;
 		float alpha;
 
 		float *transform_matrix;
 
+		btCollisionShape *collision_shape;
 		btRigidBody *rigid_body;
 		btMotionState *motion_state;
 
@@ -38,6 +39,7 @@ class tMeshObject : public tTransformObject
 
 	public:
 		tMeshObject(tMesh *mesh);
+		~tMeshObject(void);
 
 		void SetAnimation(const char *animation);
 		void Play(float time);
@@ -45,7 +47,7 @@ class tMeshObject : public tTransformObject
 		void SetAnimationLoop(bool l)					{ loop = l; }
 		void SetAnimationMode(bool a)					{ animation_mode = a; }
 		void SetAnimationTime(float t)					{ time = t; }
-		void SetPose(const char *pose);
+		void SetPose(std::string pose);
 		void SetColor(tVector c)						{ color = c; }
 		void SetAlpha(float a)							{ alpha = a; }
 		void SetColor(tVector c, float a)				{ SetColor(c); SetAlpha(a); }
@@ -55,7 +57,6 @@ class tMeshObject : public tTransformObject
 		void ReplaceMaterial(std::string name, tMaterial *material);
 		void RestoreReplaceMaterial(std::string name);
 
-		void DeleteRigidBody(void);
 		void InitMeshRigidBody(float mass);
 		void UpdateRigidBodyTransformation(void);
 

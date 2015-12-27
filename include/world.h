@@ -21,6 +21,7 @@ class tWorld
 			btCollisionDispatcher *collision_dispatcher;
 			btSequentialImpulseConstraintSolver *solver;
 			btDiscreteDynamicsWorld *dynamics_world;
+			btOverlappingPairCallback *ghost_pair_callback;
 		} physics;
 
 	public:

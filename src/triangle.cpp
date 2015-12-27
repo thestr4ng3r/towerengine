@@ -2,29 +2,14 @@
 
 using namespace std;
 
-tTriangle::tTriangle(tMesh *mesh)
+tTriangle::tTriangle(void)
 {
-	v = new tVertex *[3];
-    if(mesh)
-    {
-        this->mesh = mesh;
-        mesh->AddTriangle(this);
-    }
-    else
-    {
-        mesh = 0;
-    }
-
     cam_dist = 0.0;
     mat = 0;
 }
 
 tTriangle::~tTriangle()
 {
-    if(!mesh)
-        return;
-
-    mesh->RemoveTriangle(this);
 }
 
 void tTriangle::SetMaterial(tMaterial *material)
@@ -40,11 +25,11 @@ void tTriangle::Set(tVertex *v1, tVertex *v2, tVertex *v3, tVector color)
     this->color = color;
 }
 
-tTriangle *tTriangle::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material, tMesh *chain)
+tTriangle *tTriangle::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material)
 {
     tTriangle *t;
 
-    t = new tTriangle(chain);
+    t = new tTriangle();
 
     t->Create(v1, v2, v3, color);
     t->SetMaterial(material);

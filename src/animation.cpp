@@ -27,10 +27,6 @@ tAnimation::~tAnimation(void)
 {
 	while(key_first)
 		delete key_first;
-
-	mesh->RemoveAnimation(this);
-
-
 }
 
 int tAnimation::Play(float t, int loop)

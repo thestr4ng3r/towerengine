@@ -40,7 +40,9 @@ tCoordinateSystemObject::tCoordinateSystemObject(bool depth_test) : tObject()
 
 tCoordinateSystemObject::~tCoordinateSystemObject(void)
 {
-
+	delete vao;
+	delete vertex_vbo;
+	delete color_vbo;
 }
 
 void tCoordinateSystemObject::ForwardPass(tRenderer *renderer)

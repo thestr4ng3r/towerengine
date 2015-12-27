@@ -65,6 +65,8 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	}
 	else
 		lighting_shader = 0;
+#else
+	lighting_shader = 0;
 #endif
 
 	///if(!bindless_textures_enabled)
@@ -141,6 +143,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
+	point_lights_buffer = 0;
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 	if(bindless_textures_enabled)
 	{
@@ -178,6 +181,7 @@ tRenderer::~tRenderer(void)
 	delete [] color_tex;
 
 	delete screen_quad_vbo;
+	delete screen_quad_vao;
 
 	delete ssao;
 	delete gbuffer;
@@ -187,6 +191,8 @@ tRenderer::~tRenderer(void)
 	delete refraction_shader;
 	delete ambient_lighting_shader;
 	delete directional_lighting_shader;
+	delete depth_pass_shader;
+	delete lighting_shader;
 
 	for(vector<tPointLightingShader *>::iterator psi=point_lighting_shaders.begin(); psi!=point_lighting_shaders.end(); psi++)
 		delete *psi;
@@ -206,7 +212,9 @@ tRenderer::~tRenderer(void)
 
 	delete particle_shader;
 	
-	//delete cube_map_reflection;
+	delete matrix_buffer;
+	delete position_restore_data_buffer;
+	delete point_lights_buffer;
 }
 
 void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int noise_tex_size)

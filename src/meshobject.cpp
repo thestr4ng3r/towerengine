@@ -11,7 +11,7 @@ tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 	rigid_body = 0;
 	motion_state = 0;
 	animation = 0;
-	pose = cstr("Idle");
+	pose = "Idle";
 	animation_mode = 0;
 	loop = false;
 	color = Vec(1.0, 1.0, 1.0);
@@ -22,10 +22,20 @@ tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 	motion_state = new tMeshObjectMotionState(this);
 
 	rigid_body = 0;
+	collision_shape = 0;
 
 	replace_materials = 0;
 
 	cube_map_reflection = 0;
+}
+
+tMeshObject::~tMeshObject(void)
+{
+	delete replace_materials;
+	delete motion_state;
+
+	delete rigid_body;
+	delete collision_shape;
 }
 
 void tMeshObject::TransformChanged(void)
@@ -80,11 +90,9 @@ bool tMeshObject::GetAnimationFinished(void)
 	return !loop && this->time >= animation->GetLength();
 }
 
-void tMeshObject::SetPose(const char *pose)
+void tMeshObject::SetPose(string pose)
 {
-	if(this->pose)
-		delete [] this->pose;
-	this->pose = cstr(pose);
+	this->pose = pose;
 }
 
 tBoundingBox tMeshObject::GetBoundingBox(void)
@@ -144,10 +152,7 @@ void tMeshObject::DepthPrePass(tRenderer *renderer)
 	}
 	else
 	{
-		if(pose)
-			mesh->ChangePose(pose);
-		else
-			mesh->ChangePose("Idle");
+		mesh->ChangePose(pose);
 	}
 	mesh->DepthPrePass(renderer, replace_materials);
 }
@@ -171,10 +176,7 @@ void tMeshObject::GeometryPass(tRenderer *renderer, bool cube_map_reflection_ena
 	}
 	else
 	{
-		if(pose)
-			mesh->ChangePose(pose);
-		else
-			mesh->ChangePose("Idle");
+		mesh->ChangePose(pose);
 	}
 	mesh->GeometryPass(renderer, replace_materials);
 }
@@ -192,10 +194,7 @@ void tMeshObject::ForwardPass(tRenderer *renderer)
 	}
 	else
 	{
-		if(pose)
-			mesh->ChangePose(pose);
-		else
-			mesh->ChangePose("Idle");
+		mesh->ChangePose(pose);
 	}
 
 	float *temp = transform.GetMatrix(transform_matrix);
@@ -216,10 +215,7 @@ void tMeshObject::RefractionPass(tRenderer *renderer)
 	}
 	else
 	{
-		if(pose)
-			mesh->ChangePose(pose);
-		else
-			mesh->ChangePose("Idle");
+		mesh->ChangePose(pose);
 	}
 
 	float *temp = transform.GetMatrix(transform_matrix);
@@ -229,41 +225,42 @@ void tMeshObject::RefractionPass(tRenderer *renderer)
 
 void tMeshObject::InitMeshRigidBody(float mass)
 {
-	DeleteRigidBody();
+	if(rigid_body)
+		return;
 
 	if(mass > 0.0)
 	{
 		btVector3 inertia;
 		//btBoxShape *shape = new btBoxShape(btVector3(0.2, 0.2, 0.2));
 
-		btCollisionShape *shape;
 		if(mesh->GetPhysicsMesh())
-			shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
+			collision_shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
 		else
-			shape = new btEmptyShape();
+			collision_shape = new btEmptyShape();
 
-		shape->setMargin(0.01);
-		shape->calculateLocalInertia(mass, inertia);
+		collision_shape->setMargin(0.01);
+		collision_shape->calculateLocalInertia(mass, inertia);
 
-		rigid_body = new btRigidBody(mass, motion_state, shape, inertia);
+		rigid_body = new btRigidBody(mass, motion_state, collision_shape, inertia);
 		//rigid_body->setActivationState(DISABLE_DEACTIVATION);
 	}
 	else if(mass == 0.0)
 	{
-		btCollisionShape *shape;
 		if(mesh->GetPhysicsMesh())
-			shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), true);
+			collision_shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), true);
 		else
-			shape = new btEmptyShape();
+			collision_shape = new btEmptyShape();
 
-		shape->setMargin(0.01);
+		collision_shape->setMargin(0.01);
 
-		rigid_body = new btRigidBody(0.0, motion_state, shape, btVector3(0.0, 0.0, 0.0));
+		rigid_body = new btRigidBody(0.0, motion_state, collision_shape, btVector3(0.0, 0.0, 0.0));
 	}
 
 	if(rigid_body)
 	{
 		rigid_body->setUserPointer(this);
+
+		rigid_body->setFriction(0.8);
 
 		tWorld *world = GetWorld();
 		if(world)
@@ -271,18 +268,6 @@ void tMeshObject::InitMeshRigidBody(float mass)
 	}
 }
 
-void tMeshObject::DeleteRigidBody(void)
-{
-	if(!rigid_body)
-		return;
-
-	tWorld *world = GetWorld();
-	if(world)
-		world->GetDynamicsWorld()->removeRigidBody(rigid_body);
-
-	delete rigid_body;
-	rigid_body = 0;
-}
 
 void tMeshObject::UpdateRigidBodyTransformation(void)
 {
