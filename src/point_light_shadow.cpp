@@ -90,6 +90,8 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 tPointLightShadow::~tPointLightShadow(void)
 {
+	delete render_object_space;
+
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 	MakeTextureHandleResident(false);
 #endif

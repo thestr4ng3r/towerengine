@@ -23,7 +23,7 @@ class tMeshObject : public tTransformObject
 		tVector color;
 		float alpha;
 
-		float *transform_matrix;
+		float transform_matrix[16];
 
 		btCollisionShape *collision_shape;
 		btRigidBody *rigid_body;

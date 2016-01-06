@@ -36,10 +36,8 @@ void tBoundingBox::AddPoint(tVector p)
 	maxv.z = max(maxv.z, p.z);
 }
 
-tVector *tBoundingBox::GetCornerPoints(void)
+void tBoundingBox::GetCornerPoints(tVector *p)
 {
-	tVector *p = new tVector[8];
-
 	p[0] = Vec(minv.x, maxv.y, minv.z);
 	p[1] = Vec(minv.x, maxv.y, maxv.z);
 	p[2] = Vec(maxv.x, maxv.y, maxv.z);
@@ -48,8 +46,6 @@ tVector *tBoundingBox::GetCornerPoints(void)
 	p[5] = Vec(minv.x, minv.y, maxv.z);
 	p[6] = Vec(maxv.x, minv.y, maxv.z);
 	p[7] = Vec(maxv.x, minv.y, minv.z);
-
-	return p;
 }
 
 tBoundingBox operator+(tBoundingBox a, const tVector &b)

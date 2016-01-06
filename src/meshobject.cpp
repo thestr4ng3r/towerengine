@@ -18,7 +18,6 @@ tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 	alpha = 1.0;
 	visible = true;
 	time = 0.0;
-	transform_matrix = new float[16];
 	motion_state = new tMeshObjectMotionState(this);
 
 	rigid_body = 0;
@@ -98,7 +97,8 @@ void tMeshObject::SetPose(string pose)
 tBoundingBox tMeshObject::GetBoundingBox(void)
 {
 	tBoundingBox b;
-	tVector *p = mesh->GetBoundingBox().GetCornerPoints();
+	tVector p[8];
+	mesh->GetBoundingBox().GetCornerPoints(p);
 
 	//btTransform trans(btMatrix3x3(mat[0], mat[1], mat[2], mat[4], mat[5], mat[6], mat[8], mat[9], mat[10]), btVector3(mat[3], mat[7], mat[11]));
 	//rigid_body->setWorldTransform(trans);

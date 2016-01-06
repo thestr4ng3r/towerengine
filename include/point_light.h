@@ -19,6 +19,7 @@ class tPointLight: public tComparable<float>, public tCulling
 
 	public:
 		tPointLight(tVector pos, tVector color, float distance);
+		~tPointLight(void);
 
 		void SetPosition(tVector pos)		{ this->pos = pos; }
 		void SetColor(tVector color)		{ this->color = color; }

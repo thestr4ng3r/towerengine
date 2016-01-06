@@ -66,6 +66,9 @@ tParticleSystem::tParticleSystem(tVector center, GLuint tex, int tex_count)
 
 tParticleSystem::~tParticleSystem(void)
 {
+	delete vao;
+	glDeleteBuffers(1, &vertex_data_vbo);
+	glDeleteBuffers(1, &texture_index_vbo);
 }
 
 void tParticleSystem::Step(float time)

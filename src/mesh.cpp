@@ -56,20 +56,21 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 
 tMesh::~tMesh(void)
 {
-	for(map<string, tMeshPose *>::iterator cpi=custom_pose.begin(); cpi!=custom_pose.end(); cpi++)
-		delete custom_pose.begin()->second;
+	delete idle_pose;
+	for(map<string, tMeshPose *>::iterator i=custom_pose.begin(); i!=custom_pose.end(); i++)
+		delete i->second;
 
 	for(vector<tAnimation *>::iterator i=animations.begin(); i!=animations.end(); i++)
 		delete *i;
 
-	if(idle_pose)
-		delete idle_pose;
-	
 	for(vector<tTriangle *>::iterator i=triangles.begin(); i!=triangles.end(); i++)
 		delete *i;
 	
 	for(set<tMaterial *>::iterator mi=own_materials.begin(); mi!=own_materials.end(); mi++)
 		delete *mi;
+
+	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
+		delete i->second;
 
 	for(vector<tVertex *>::iterator i=vertices.begin(); i!=vertices.end(); i++)
 		delete *i;
@@ -82,6 +83,7 @@ tMesh::~tMesh(void)
 
 	delete physics_triangle_mesh;
 	delete idle_material;
+
 }
 
 
@@ -634,6 +636,7 @@ bool tMesh::LoadFromFile(const char *file, tMaterialManager *material_manager)
 	doc->parse<0>(data);
 	r = LoadFromXML(doc, path, material_manager);
 
+	delete doc;
 	delete [] data;
 
 	refresh_vbos = true;
