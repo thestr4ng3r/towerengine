@@ -10,5 +10,4 @@ tMaterialIBO::tMaterialIBO(tMesh *mesh)
 tMaterialIBO::~tMaterialIBO(void)
 {
 	delete ibo;
-	delete [] ibo_data;
 }

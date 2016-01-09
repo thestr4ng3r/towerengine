@@ -292,7 +292,10 @@ void tMesh::RemoveMaterial(string name)
 	{
 		map<tMaterial *, tMaterialIBO *>::iterator ii = material_ibos.find(i->second);
 		if(ii != material_ibos.end())
+		{
+			delete ii->second;
 			material_ibos.erase(ii);
+		}
 
 		materials.erase(i);
 	}
