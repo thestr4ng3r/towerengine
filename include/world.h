@@ -66,7 +66,7 @@ class tWorld
 		int GetCubeMapReflectionsCount(void)			{ return cube_map_reflections.size(); }
 		tCubeMapReflection *GetCubeMapReflection(int i)	{ return cube_map_reflections.at(i); }
 
-		void Step(float time);
+		void Step(float time, int max_sub_steps = 1, float fixed_time_step = 1.0f / 60.0f);
 
 		void FillRenderObjectSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool clear = true, bool init_cullings = true);
 		void FillRenderSpace(tRenderSpace *space, tCulling **cullings, int cullings_count, bool init_cullings = true);

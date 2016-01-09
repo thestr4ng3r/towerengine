@@ -275,12 +275,12 @@ void tWorld::AssignUnsetCubeMapReflections(void)
 }
 
 
-void tWorld::Step(float time)
+void tWorld::Step(float time, int max_sub_steps, float fixed_time_step)
 {
 	if(time < 0.001)
 		time = 0.001;
 
-	physics.dynamics_world->stepSimulation(time, 10, 1.0 / 240.0);
+	physics.dynamics_world->stepSimulation(time, max_sub_steps, fixed_time_step);
 	//CProfileManager::dumpAll();
 
 	for(vector<tParticleSystem *>::iterator psi = particle_systems.begin(); psi != particle_systems.end(); psi++)
