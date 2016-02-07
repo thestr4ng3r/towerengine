@@ -59,7 +59,7 @@ class tMeshObject : public tTransformObject
 		void ReplaceMaterial(std::string name, tMaterial *material);
 		void RestoreReplaceMaterial(std::string name);
 
-		void InitMeshRigidBody(float mass, bool convex);
+		void InitMeshRigidBody(float mass, bool convex, bool hull = true);
 		void InitBoxRigidBody(tVector half_extents, float mass);
 		void UpdateRigidBodyTransformation(void);
 

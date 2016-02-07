@@ -223,7 +223,7 @@ void tMeshObject::RefractionPass(tRenderer *renderer)
 }
 
 
-void tMeshObject::InitMeshRigidBody(float mass, bool convex)
+void tMeshObject::InitMeshRigidBody(float mass, bool convex, bool hull_enabled)
 {
 	if(rigid_body)
 		return;
@@ -233,14 +233,34 @@ void tMeshObject::InitMeshRigidBody(float mass, bool convex)
 	if(convex || mass > 0.0)
 	{
 		if(mesh->GetPhysicsMesh())
-			collision_shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
+		{
+			btConvexTriangleMeshShape *original_shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
+			original_shape->setMargin(0.01);
+
+			if(hull_enabled)
+			{
+				btShapeHull *hull = new btShapeHull(original_shape);
+				hull->buildHull(original_shape->getMargin());
+
+				btConvexHullShape *hull_shape = new btConvexHullShape();
+
+				for (int i = 0; i < hull->numVertices(); i++)
+					hull_shape->addPoint(hull->getVertexPointer()[i], false);
+				hull_shape->recalcLocalAabb();
+
+				delete original_shape;
+				delete hull;
+
+				collision_shape = hull_shape;
+			}
+			else
+				collision_shape = original_shape;
+
+			collision_shape->setMargin(0.01);
+			collision_shape->calculateLocalInertia(mass, inertia);
+		}
 		else
 			collision_shape = new btEmptyShape();
-
-		collision_shape->setMargin(0.01);
-		collision_shape->calculateLocalInertia(mass, inertia);
-
-		rigid_body = new btRigidBody(mass, motion_state, collision_shape, inertia);
 	}
 	else
 	{
@@ -250,8 +270,6 @@ void tMeshObject::InitMeshRigidBody(float mass, bool convex)
 			collision_shape = new btEmptyShape();
 
 		collision_shape->setMargin(0.01);
-
-		rigid_body = new btRigidBody(0.0, motion_state, collision_shape, btVector3(0.0, 0.0, 0.0));
 	}
 
 	CreateRigidBody(mass, inertia);
@@ -268,7 +286,7 @@ void tMeshObject::InitBoxRigidBody(tVector half_extents, float mass)
 	btVector3 inertia;
 	collision_shape->calculateLocalInertia(mass, inertia);
 
-	collision_shape->setMargin(0.002);
+	collision_shape->setMargin(0.01);
 
 	CreateRigidBody(mass, inertia);
 }
