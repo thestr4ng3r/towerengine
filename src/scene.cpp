@@ -4,9 +4,34 @@
 
 #include "rapidxml.hpp"
 
+#include <string>
+#include <sstream>
 
 using namespace std;
 using namespace rapidxml;
+
+
+
+template<typename T> T inline GetXMLAttribute(rapidxml::xml_node<char> *node, const char *attr_name, T default_v)
+{
+	rapidxml::xml_attribute<> *attr = node->first_attribute(attr_name);
+
+	if(!attr)
+		return default_v;
+
+	std::string str = attr->value();
+	std::istringstream iss(str);
+	T v;
+
+	iss >> v;
+
+	if(!iss.eof())
+		return default_v;
+
+	return v;
+}
+
+
 
 
 tScene::tScene(tWorld *world, tMaterialManager *material_manager)
@@ -306,6 +331,8 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 	xml_attribute<> *attr;
 	bool rigid_body_enabled = false;
 	float rigid_body_mass = 0.0;
+	enum { MESH, CONVEX, BOX } collision_shape_type = MESH;
+	tVector collision_shape_half_extents;
 
 	xml_node<> *child = cur->first_node();
 	for(; child; child = child->next_sibling())
@@ -323,6 +350,32 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 				rigid_body_mass = atof(attr->value());
 			else
 				continue;
+
+			xml_node<> *collision_shape_node = child->first_node("collision_shape");
+
+			if(collision_shape_node)
+			{
+				if((attr = collision_shape_node->first_attribute("type")))
+				{
+					if(strcmp(attr->value(), "mesh") == 0)
+						collision_shape_type = MESH;
+					else if(strcmp(attr->value(), "convex") == 0)
+						collision_shape_type = CONVEX;
+					else if(strcmp(attr->value(), "box") == 0)
+						collision_shape_type = BOX;
+				}
+
+				if(collision_shape_type == BOX)
+				{
+					xml_node<> *half_extents_node = collision_shape_node->first_node("half_extents");
+					if(half_extents_node)
+					{
+						collision_shape_half_extents.x = GetXMLAttribute<float>(half_extents_node, "x", 0.0);
+						collision_shape_half_extents.y = GetXMLAttribute<float>(half_extents_node, "y", 0.0);
+						collision_shape_half_extents.z = GetXMLAttribute<float>(half_extents_node, "z", 0.0);
+					}
+				}
+			}
 
 			rigid_body_enabled = true;
 		}
@@ -343,7 +396,10 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 	object->SetTransform(transform);
 	if(rigid_body_enabled)
 	{
-		object->InitMeshRigidBody(rigid_body_mass);
+		if(collision_shape_type == MESH || collision_shape_type == CONVEX)
+			object->InitMeshRigidBody(rigid_body_mass, collision_shape_type == CONVEX);
+		else if(collision_shape_type == BOX)
+			object->InitBoxRigidBody(collision_shape_half_extents, rigid_body_mass);
 		object->UpdateRigidBodyTransformation();
 	}
 	tObjectSceneObject *scene_object = new tObjectSceneObject(object);

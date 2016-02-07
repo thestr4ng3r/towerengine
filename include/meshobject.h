@@ -31,6 +31,8 @@ class tMeshObject : public tTransformObject
 
 		std::map<tMaterial *, tMaterial *> *replace_materials;
 
+		void CreateRigidBody(btScalar mass, btVector3 inertia);
+
 	protected:
 		void TransformChanged(void);
 
@@ -57,7 +59,8 @@ class tMeshObject : public tTransformObject
 		void ReplaceMaterial(std::string name, tMaterial *material);
 		void RestoreReplaceMaterial(std::string name);
 
-		void InitMeshRigidBody(float mass);
+		void InitMeshRigidBody(float mass, bool convex);
+		void InitBoxRigidBody(tVector half_extents, float mass);
 		void UpdateRigidBodyTransformation(void);
 
 		void DepthPrePass(tRenderer *renderer);

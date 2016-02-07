@@ -82,7 +82,14 @@ void tDefaultMaterial::LoadTexture(TextureType type, string file)
 	bool *transparent = 0;
 	if(type == DIFFUSE)
 		transparent = &(this->transparent);
-	tex[type] = LoadGLTexture(file.c_str(), transparent);
+
+	int channels = 3;
+	if(type == DIFFUSE)
+		channels = 4;
+	else if(type == BUMP)
+		channels = 1;
+
+	tex[type] = LoadGLTexture(file.c_str(), channels, transparent);
 }
 
 void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, const void *data, unsigned int size)
@@ -95,7 +102,14 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 	bool *transparent = 0;
 	if(type == DIFFUSE)
 		transparent = &(this->transparent);
-	tex[type] = LoadGLTextureBinary(extension, data, size, transparent);
+
+	int channels = 3;
+	if(type == DIFFUSE)
+		channels = 4;
+	else if(type == BUMP)
+		channels = 1;
+
+	tex[type] = LoadGLTextureBinary(extension, data, size, channels, transparent);
 }
 
 

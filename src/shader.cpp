@@ -193,9 +193,9 @@ GLuint CreateShader(GLenum type, const char *src, const char *name)
 	//PrintGLInfoLog("Link", program);
 }*/
 
-GLuint LoadGLTextureIL(ILuint image, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
+GLuint LoadGLTextureIL(ILuint image, int channels, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 
-GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, int alpha_channel)
+GLuint LoadGLTexture(const char *filename, int channels, int *w, int *h, bool *transparent, int alpha_channel)
 {
 	ILuint imageID;
 	ILboolean success;
@@ -213,14 +213,14 @@ GLuint LoadGLTexture(const char *filename, int *w, int *h, bool *transparent, in
 		return 0;
 	}
 
-	r_tex = LoadGLTextureIL(imageID, w, h, transparent, alpha_channel);
+	r_tex = LoadGLTextureIL(imageID, channels, w, h, transparent, alpha_channel);
 
 	ilDeleteImages(1, &imageID);
 
 	return r_tex;
 }
 
-GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int *w, int *h, bool *transparent, int alpha_channel)
+GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int channels, int *w, int *h, bool *transparent, int alpha_channel)
 {
 	ILuint imageID;
 	ILboolean success;
@@ -246,16 +246,16 @@ GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size,
 		return 0;
 	}
 
-	r_tex = LoadGLTextureIL(imageID, w, h, transparent, alpha_channel);
+	r_tex = LoadGLTextureIL(imageID, channels, w, h, transparent, alpha_channel);
 
 	ilDeleteImages(1, &imageID);
 
 	return r_tex;
 }
 
-GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int alpha_channel) // from http://r3dux.org/2010/11/single-call-opengl-texture-loader-in-devil/
+GLuint LoadGLTextureIL(ILuint imageID, int channels, int *w, int *h, bool *transparent, int alpha_channel)
 {
-	GLuint textureID;
+	GLuint gl_tex;
 	ILboolean success;
 	ILinfo ImageInfo;
 	ILint width, height;
@@ -268,7 +268,25 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 	{
 		iluFlipImage();
 	}
-	success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+
+	ILenum il_format;
+
+	switch(channels)
+	{
+		case 1:
+			il_format = IL_LUMINANCE;
+			break;
+		case 2:
+		case 3:
+			il_format = IL_RGB;
+			break;
+		case 4:
+		default:
+			il_format = IL_RGBA;
+			break;
+	}
+
+	success = ilConvertImage(il_format, IL_UNSIGNED_BYTE);
 
 	if (!success)
 	{
@@ -277,9 +295,9 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 		return 0;
 	}
 
-	glGenTextures(1, &textureID);
+	glGenTextures(1, &gl_tex);
 
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glBindTexture(GL_TEXTURE_2D, gl_tex);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -296,7 +314,7 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 	if(h != 0)
 		*h = height;
 
-	if(transparent != 0)
+	if(transparent != 0 && channels == 4)
 	{
 		*transparent = false;
 		for(i=0; i<width*height; i++)
@@ -309,19 +327,24 @@ GLuint LoadGLTextureIL(ILuint imageID, int *w, int *h, bool *transparent, int al
 		}
 	}
 
+
+	GLenum gl_format = (GLenum)ilGetInteger(IL_IMAGE_FORMAT);
+	if(il_format == IL_LUMINANCE)
+		gl_format = GL_RED;
+
 	glTexImage2D(GL_TEXTURE_2D, 				// Type of texture
 				 0,								// Pyramid level (for mip-mapping) - 0 is the top level
-				 ilGetInteger(IL_IMAGE_FORMAT),	// Image colour depth
+				 gl_format,						// Image colour depth
 				 width,							// Image width
 				 height,						// Image height
 				 0,								// Border width in pixels (can either be 1 or 0)
-				 ilGetInteger(IL_IMAGE_FORMAT),	// Image format (i.e. RGB, RGBA, BGR etc.)
+				 gl_format,	// Image format (i.e. RGB, RGBA, BGR etc.)
 				 GL_UNSIGNED_BYTE,				// Image data type
 				 data);							// The actual image data itself
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	return textureID;
+	return gl_tex;
 }
 
 

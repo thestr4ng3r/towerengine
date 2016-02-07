@@ -223,16 +223,15 @@ void tMeshObject::RefractionPass(tRenderer *renderer)
 }
 
 
-void tMeshObject::InitMeshRigidBody(float mass)
+void tMeshObject::InitMeshRigidBody(float mass, bool convex)
 {
 	if(rigid_body)
 		return;
 
-	if(mass > 0.0)
-	{
-		btVector3 inertia;
-		//btBoxShape *shape = new btBoxShape(btVector3(0.2, 0.2, 0.2));
+	btVector3 inertia(0.0, 0.0, 0.0);
 
+	if(convex || mass > 0.0)
+	{
 		if(mesh->GetPhysicsMesh())
 			collision_shape = new btConvexTriangleMeshShape(mesh->GetPhysicsMesh());
 		else
@@ -242,9 +241,8 @@ void tMeshObject::InitMeshRigidBody(float mass)
 		collision_shape->calculateLocalInertia(mass, inertia);
 
 		rigid_body = new btRigidBody(mass, motion_state, collision_shape, inertia);
-		//rigid_body->setActivationState(DISABLE_DEACTIVATION);
 	}
-	else if(mass == 0.0)
+	else
 	{
 		if(mesh->GetPhysicsMesh())
 			collision_shape = new btBvhTriangleMeshShape(mesh->GetPhysicsMesh(), true);
@@ -256,16 +254,35 @@ void tMeshObject::InitMeshRigidBody(float mass)
 		rigid_body = new btRigidBody(0.0, motion_state, collision_shape, btVector3(0.0, 0.0, 0.0));
 	}
 
+	CreateRigidBody(mass, inertia);
+}
+
+
+void tMeshObject::InitBoxRigidBody(tVector half_extents, float mass)
+{
 	if(rigid_body)
-	{
-		rigid_body->setUserPointer(this);
+		return;
 
-		rigid_body->setFriction(0.8);
+	collision_shape = new btBoxShape(BtVec(half_extents));
 
-		tWorld *world = GetWorld();
-		if(world)
-			world->GetDynamicsWorld()->addRigidBody(rigid_body);
-	}
+	btVector3 inertia;
+	collision_shape->calculateLocalInertia(mass, inertia);
+
+	collision_shape->setMargin(0.002);
+
+	CreateRigidBody(mass, inertia);
+}
+
+void tMeshObject::CreateRigidBody(btScalar mass, btVector3 inertia)
+{
+	btRigidBody::btRigidBodyConstructionInfo info(mass, motion_state, collision_shape, inertia);
+
+	rigid_body = new btRigidBody(info);
+	rigid_body->setUserPointer(this);
+
+	tWorld *world = GetWorld();
+	if(world)
+		world->GetDynamicsWorld()->addRigidBody(rigid_body);
 }
 
 
