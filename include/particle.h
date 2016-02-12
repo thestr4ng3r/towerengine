@@ -30,10 +30,14 @@ class tParticleSystem
 {
 	public:
 		enum BlendType { ADD, ALPHA };
-		enum SpawnAreaType { CUBOID, ELLIPSOID };
+
+	protected:
+		std::vector<tParticle> particles;
+
+		tParticleSystem(tVector position, GLuint tex, int tex_count);
 
 	private:
-		std::vector<tParticle> particles;
+		tVector position;
 
 		tVAO *vao;
 		GLuint vertex_data_vbo;
@@ -42,8 +46,36 @@ class tParticleSystem
 		std::vector<float> vertex_data;
 		std::vector<float> texture_index_data;
 
+		BlendType blend_type;
+
+		GLuint tex;
+		int tex_count;
+
+	public:
+		virtual ~tParticleSystem(void);
+
+		virtual void Step(float time) 				{}
+
+		void Render(tRenderer *renderer);
+
+		void SetPosition(tVector pos)				{ this->position = pos; }
+		void SetBlendType(BlendType type)			{ this->blend_type = type; }
+
+		tVector GetPosition(void)					{ return position; }
+		int GetTexturesCount(void)					{ return tex_count; }
+		unsigned int GetParticlesCount(void)		{ return particles.size(); }
+};
+
+
+
+class tDefaultParticleSystem : public tParticleSystem
+{
+	public:
+		enum SpawnAreaType { CUBOID, ELLIPSOID };
+
+	private:
 		SpawnAreaType spawn_area_type;
-		tVector center;
+
 		tVector spawn_size;
 		float spawn_time;
 
@@ -64,29 +96,19 @@ class tParticleSystem
 
 		tVector color;
 
+		float last_spawn_time;
+
 		bool gravity_enabled;
 		tVector gravity;
 
-		BlendType blend_type;
-
 		float max_dist;
 
-		float last_spawn_time;
-
-		GLuint tex;
-		int tex_count;
-
 	public:
-		tParticleSystem(tVector center, GLuint tex, int tex_count);
-		~tParticleSystem(void);
+		tDefaultParticleSystem(tVector position, GLuint tex, int tex_count);
+		~tDefaultParticleSystem(void);
 
-		void Step(float time);
+		virtual void Step(float time);
 
-		void Render(tRenderer *renderer);
-
-		void SetGravity(tVector gravity)							{ this->gravity = gravity; this->gravity_enabled = gravity.SquaredLen() > 0.0; }
-		void SetMaxParticleDistance(float dist)						{ this->max_dist = dist; }
-		void SetBlendType(BlendType type)							{ this->blend_type = type; }
 		void SetSpawnArea(SpawnAreaType area_type, tVector size)	{ this->spawn_area_type = area_type; this->spawn_size = size; }
 		void SetVelocity(float min, float max)						{ this->velocity_min = min; this->velocity_max = max; }
 		void SetRotationVelocity(float min, float max)				{ this->rotation_velocity_min = min; this->rotation_velocity_max = max; }
@@ -96,8 +118,19 @@ class tParticleSystem
 		void SetFadeOut(float time)									{ this->fade_out_time = time; }
 		void SetLifetime(float min, float max)						{ this->lifetime_min = min; this->lifetime_max = max; }
 		void SetColor(tVector color)								{ this->color = color; }
+		void SetGravity(tVector gravity)							{ this->gravity = gravity; this->gravity_enabled = gravity.SquaredLen() > 0.0; }
+		void SetMaxParticleDistance(float dist)						{ this->max_dist = dist; }
+};
 
-		int GetParticlesCount(void)									{ return particles.size(); }
+
+
+class tStaticParticleSystem : public tParticleSystem
+{
+	public:
+		tStaticParticleSystem(tVector position, GLuint tex, int tex_count);
+		~tStaticParticleSystem(void);
+
+		void AddParticle(tVector position, float size, float rotation, tVector color, float alpha, int tex);
 };
 
 
