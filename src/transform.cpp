@@ -4,7 +4,8 @@
 
 tTransform::tTransform(tMatrix3 basis, tVector position)
 {
-	Set(basis, position);
+	this->basis = basis;
+	this->position = position;
 }
 
 tTransform::tTransform(void)
@@ -14,9 +15,9 @@ tTransform::tTransform(void)
 
 float *tTransform::GetMatrix(float *matrix)
 {
-	memcpy(matrix, basis.GetX().v, sizeof(float)*3);
-	memcpy(matrix+4, basis.GetY().v, sizeof(float)*3);
-	memcpy(matrix+8, basis.GetZ().v, sizeof(float)*3);
+	memcpy(matrix, basis.x.v, sizeof(float)*3);
+	memcpy(matrix+4, basis.y.v, sizeof(float)*3);
+	memcpy(matrix+8, basis.z.v, sizeof(float)*3);
 	matrix[3] = position.x; matrix[7] = position.y; matrix[11] = position.z;
 	//matrix[0] = basis.GetX().x; matrix[1] = basis.GetY().x; matrix[2] = basis.GetZ().x;		matrix[3] = position.x;
 	//matrix[4] = basis.GetX().y; matrix[5] = basis.GetY().y; matrix[6] = basis.GetZ().y;		matrix[7] = position.y;
@@ -42,12 +43,6 @@ void tTransform::SetIdentity(void)
 	basis = tMatrix3::GetIdentity();
 	position = Vec(0.0, 0.0, 0.0);
 }
-
-btTransform tTransform::ToBtTransform(void)
-{
-	return btTransform(basis.ToBtMatrix(), BtVec(position));
-}
-
 
 tTransform tTransform::FromBtTransform(const btTransform &trans)
 {

@@ -30,7 +30,23 @@ class tTransform
 
 		void SetIdentity(void);
 
-		btTransform ToBtTransform(void);
+		btTransform ToBtTransform(void)
+		{
+			return btTransform(basis.ToBtMatrix(), BtVec(position));
+		}
+
+		btTransform &ToBtTransform(btTransform &bt_trans)
+		{
+			bt_trans.getOrigin().setValue(position.x, position.y, position.z);
+			basis.ToBtMatrix(bt_trans.getBasis());
+			return bt_trans;
+		}
+
+		void SetFromBtTransform(const btTransform &bt_trans)
+		{
+			basis = tMatrix3::FromBtMatrix(bt_trans.getBasis());
+			position = Vec(bt_trans.getOrigin());
+		}
 
 		static tTransform GetIdentity(void)	{ return tTransform(); }
 		static tTransform FromBtTransform(const btTransform &trans);

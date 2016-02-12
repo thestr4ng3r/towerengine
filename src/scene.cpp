@@ -528,11 +528,11 @@ tTransform tScene::ParseTransformNode(xml_node<> *cur)
 		if(strcmp(child->name(), "position") == 0)
 			position = ParseVectorNode(child);
 		else if(strcmp(child->name(), "basis_x") == 0)
-			basis.SetX(ParseVectorNode(child));
+			basis.x = ParseVectorNode(child);
 		else if(strcmp(child->name(), "basis_y") == 0)
-			basis.SetY(ParseVectorNode(child));
+			basis.y = ParseVectorNode(child);
 		else if(strcmp(child->name(), "basis_z") == 0)
-			basis.SetZ(ParseVectorNode(child));
+			basis.z = ParseVectorNode(child);
 	}
 
 	return tTransform(basis, position);

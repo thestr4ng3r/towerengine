@@ -55,10 +55,14 @@ btMatrix3x3 tMatrix3::ToBtMatrix(void)
 	return btMatrix3x3(	x.x, x.y, x.z,
 						y.x, y.y, y.z,
 						z.x, z.y, z.z);
+}
 
-	//return btMatrix3x3(	x.x, y.x, z.x,
-	//					x.y, y.y, z.y,
-	//					x.z, y.z, z.z);
+btMatrix3x3 &tMatrix3::ToBtMatrix(btMatrix3x3 &bt_matrix)
+{
+	bt_matrix.setValue(x.x, x.y, x.z,
+					   y.x, y.y, y.z,
+					   z.x, z.y, z.z);
+	return bt_matrix;
 }
 
 tMatrix3 tMatrix3::FromBtMatrix(const btMatrix3x3 &matrix)
@@ -69,13 +73,10 @@ tMatrix3 tMatrix3::FromBtMatrix(const btMatrix3x3 &matrix)
 tMatrix3 operator*(tMatrix3 a, tMatrix3 b)
 {
 	tMatrix3 r;
-	tVector ax, ay, az, bx, by, bz;
-	ax = a.GetX(); ay = a.GetY(); az = a.GetZ();
-	bx = b.GetX(); by = b.GetY(); bz = b.GetZ();
 
-	r.SetX(Vec(ax.x*bx.x + ax.y*by.x + ax.z*bz.x,	ax.x*bx.y + ax.y*by.y + ax.z*bz.y,	ax.x*bx.z + ax.y*by.z + ax.z*bz.z));
-	r.SetY(Vec(ay.x*bx.x + ay.y*by.x + ay.z*bz.x,	ay.x*bx.y + ay.y*by.y + ay.z*bz.y,	ay.x*bx.z + ay.y*by.z + ay.z*bz.z));
-	r.SetZ(Vec(az.x*bx.x + az.y*by.x + az.z*bz.x,	az.x*bx.y + az.y*by.y + az.z*bz.y,	az.x*bx.z + az.y*by.z + az.z*bz.z));
+	r.x = Vec(a.x.x*b.x.x + a.x.y*b.y.x + a.x.z*b.z.x,	a.x.x*b.x.y + a.x.y*b.y.y + a.x.z*b.z.y,	a.x.x*b.x.z + a.x.y*b.y.z + a.x.z*b.z.z);
+	r.y = Vec(a.y.x*b.x.x + a.y.y*b.y.x + a.y.z*b.z.x,	a.y.x*b.x.y + a.y.y*b.y.y + a.y.z*b.z.y,	a.y.x*b.x.z + a.y.y*b.y.z + a.y.z*b.z.z);
+	r.z = Vec(a.z.x*b.x.x + a.z.y*b.y.x + a.z.z*b.z.x,	a.z.x*b.x.y + a.z.y*b.y.y + a.z.z*b.z.y,	a.z.x*b.x.z + a.z.y*b.y.z + a.z.z*b.z.z);
 
 	return r;
 }
