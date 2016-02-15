@@ -96,8 +96,11 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	post_process_shader = new tPostProcessShader();
 	post_process_shader->Init();
 
-	particle_shader = new tParticleShader();
-	particle_shader->Init(gbuffer);
+	particle_forward_shader = new tParticleForwardShader();
+	particle_forward_shader->Init(gbuffer);
+
+	particle_deferred_shader = new tParticleDeferredShader();
+	particle_deferred_shader->Init(gbuffer);
 
 	this->world = world;
 
@@ -210,7 +213,8 @@ tRenderer::~tRenderer(void)
 	delete post_process_shader;
 	delete fog_shader;
 
-	delete particle_shader;
+	delete particle_forward_shader;
+	delete particle_deferred_shader;
 	
 	delete matrix_buffer;
 	delete position_restore_data_buffer;
@@ -498,11 +502,30 @@ void tRenderer::GeometryPass(void)
 
 	current_rendering_render_space->GeometryPass(this);
 
-	if (depth_prepass_enabled)
-	{
-		glDepthMask(GL_TRUE);
+	if(depth_prepass_enabled)
 		glDepthFunc(GL_LESS);
+
+	bool particle_rendering_initialized = false;
+	for(int i=0; i<world->GetParticleSystemsCount(); i++)
+	{
+		tParticleSystem *particle_system = world->GetParticleSystem(i);
+
+		if(particle_system->GetRenderType() != tParticleSystem::DEFERRED_LIT)
+			continue;
+
+		if(!particle_rendering_initialized)
+		{
+			particle_deferred_shader->Bind();
+			particle_deferred_shader->SetModelViewProjectionMatrices(current_rendering_camera->GetModelViewMatrix().GetData(), current_rendering_camera->GetProjectionMatrix().GetData());
+			particle_deferred_shader->SetFaceNormal(-current_rendering_camera->GetDirection());
+			particle_rendering_initialized = true;
+		}
+
+		particle_system->Render(this, particle_deferred_shader);
 	}
+
+	if(particle_rendering_initialized || depth_prepass_enabled)
+		glDepthMask(GL_TRUE);
 }
 
 void tRenderer::LightPass(void)
@@ -710,23 +733,29 @@ void tRenderer::ForwardPass(void)
 	shadow_pass = false;
 
 	current_rendering_render_space->ForwardPass(this);
-	glDepthMask(GL_TRUE);
 
-	if(world->GetParticleSystemsCount() > 0)
+	bool particle_render_initialized = false;
+	for(int i=0; i<world->GetParticleSystemsCount(); i++)
 	{
-		glEnable(GL_DEPTH_TEST);
+		tParticleSystem *ps = world->GetParticleSystem(i);
 
-		particle_shader->Bind();
-		particle_shader->SetModelViewProjectionMatrices(current_rendering_camera->GetModelViewMatrix().GetData(), current_rendering_camera->GetProjectionMatrix().GetData());
+		if(ps->GetRenderType() != tParticleSystem::FORWARD_ADD && ps->GetRenderType() != tParticleSystem::FORWARD_ALPHA)
+			continue;
 
-		for(int i=0; i<world->GetParticleSystemsCount(); i++)
+		if(!particle_render_initialized)
 		{
-			tParticleSystem *ps = world->GetParticleSystem(i);
-			ps->Render(this);
+			glEnable(GL_DEPTH_TEST);
+
+			particle_forward_shader->Bind();
+			particle_forward_shader->SetModelViewProjectionMatrices(current_rendering_camera->GetModelViewMatrix().GetData(), current_rendering_camera->GetProjectionMatrix().GetData());
+
+			particle_render_initialized = true;
 		}
 
-		glDepthMask(GL_TRUE);
+		ps->Render(this, particle_forward_shader);
 	}
+
+	glDepthMask(GL_TRUE);
 }
 
 void tRenderer::RefractionPass(void)

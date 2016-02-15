@@ -52,7 +52,7 @@ void tGeometryPassShader::SetTransformation(const float m[16])
 	glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void tGeometryPassShader::SetDiffuseTexture(GLuint tex)
+void tGeometryPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
 {
 	glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
 	glBindTexture(GL_TEXTURE_2D, tex);

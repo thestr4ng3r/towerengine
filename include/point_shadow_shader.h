@@ -12,6 +12,9 @@ class tPointShadowShader : public tFaceShader
 
 		GLint transformation_uniform;
 
+		GLint diffuse_tex_enabled_uniform;
+		GLint diffuse_tex_uniform;
+
 	public:
 		void Init(void);
 
@@ -19,6 +22,7 @@ class tPointShadowShader : public tFaceShader
 		void SetLightPos(tVector v);
 		void SetLightDist(float d);
 		void SetTransformation(const float m[16]);
+		void SetDiffuseTexture(bool enabled, GLuint tex = 0);
 };
 
 class tPointShadowBlurShader : public tShader

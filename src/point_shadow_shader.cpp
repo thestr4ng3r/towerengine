@@ -6,6 +6,7 @@ void tPointShadowShader::Init(void)
 {
 	InitShader(point_shadow_shader_vert, point_shadow_shader_frag, "Point Shadow Shader");
 	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
+	glBindAttribLocation(program, tFaceShader::uvcoord_attribute, "uv_attr");
 	LinkProgram();
 
 	modelview_projection_matrix_uniform = GetUniformLocation("modelview_projection_matrix_uni");
@@ -13,6 +14,12 @@ void tPointShadowShader::Init(void)
 	light_pos_uniform = GetUniformLocation("light_pos_uni");
 	light_dist_uniform = GetUniformLocation("light_dist_uni");
 	transformation_uniform = GetUniformLocation("transformation_uni");
+
+	diffuse_tex_enabled_uniform = GetUniformLocation("diffuse_tex_enabled_uni");
+	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
+
+	Bind();
+	glUniform1i(diffuse_tex_uniform, 0);
 }
 
 void tPointShadowShader::SetModelViewProjectionMatrix(float m[16])
@@ -34,6 +41,17 @@ void tPointShadowShader::SetTransformation(const float m[16])
 {
 	if(transformation_uniform != -1)
 		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
+}
+
+void tPointShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
+{
+	glUniform1i(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
+
+	if(enabled)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex);
+	}
 }
 
 

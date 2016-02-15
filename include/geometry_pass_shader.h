@@ -22,7 +22,7 @@ class tGeometryPassShader : public tFaceShader
 		void Init(void);
 
 		void SetCameraPosition(tVector pos);
-		void SetDiffuseTexture(GLuint tex);
+		void SetDiffuseTexture(bool enabled, GLuint tex);
 		void SetSpecularTexture(GLuint tex);
 		void SetNormalTexture(GLuint tex);
 		void SetBumpTexture(GLuint tex);

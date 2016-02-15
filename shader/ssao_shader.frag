@@ -64,12 +64,12 @@ void main(void)
 	
 	for(int i=0; i<kernel_size_uni; i++)
 	{
-		vec3 sample = tang_mat * kernel_uni[i];
-		sample = sample * radius_uni + origin;
+		vec3 s = tang_mat * kernel_uni[i];
+		s = s * radius_uni + origin;
 		
-		float sample_z = (vec4(sample, 1.0) * transpose_modelview).z; //dot(sample - cam_pos_uni, cam_dir_uni);
+		float sample_z = (vec4(s, 1.0) * transpose_modelview).z; //dot(sample - cam_pos_uni, cam_dir_uni);
 		
-		vec4 offset = vec4(sample, 1.0) * transpose_modelview;
+		vec4 offset = vec4(s, 1.0) * transpose_modelview;
 		offset = projection_matrix_uni * offset;
 		offset.xy /= offset.w;
 		offset.xy = offset.xy * 0.5 + 0.5;

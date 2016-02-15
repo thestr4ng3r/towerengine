@@ -2,10 +2,10 @@
 #include "towerengine.h"
 #include "tresources.h"
 
-void tParticleShader::Init(tGBuffer *gbuffer)
+void tParticleShader::InitParticleShader(tGBuffer *gbuffer, const char *vertex_source, const char *geometry_source, const char *fragment_source)
 {
-	InitShader(particle_shader_vert, particle_shader_frag, "Particle Shader");
-	CreateAndAttachShader(GL_GEOMETRY_SHADER, particle_shader_geom);
+	InitShader(vertex_source, fragment_source, "Particle Shader");
+	CreateAndAttachShader(GL_GEOMETRY_SHADER, geometry_source);
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, size_attribute, "size_attr");
 	glBindAttribLocation(program, rotation_attribute, "rotation_attr");
@@ -34,4 +34,31 @@ void tParticleShader::SetTexture(GLuint texture)
 {
 	glActiveTexture(GL_TEXTURE0 + texture_unit);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
+}
+
+
+
+void tParticleForwardShader::Init(tGBuffer *gbuffer)
+{
+	InitParticleShader(gbuffer, particle_forward_shader_vert, particle_forward_shader_geom, particle_forward_shader_frag);
+}
+
+
+
+void tParticleDeferredShader::Init(tGBuffer *gbuffer)
+{
+	InitParticleShader(gbuffer, particle_deferred_shader_vert, particle_deferred_shader_geom, particle_deferred_shader_frag);
+
+	face_normal_uniform = GetUniformLocation("face_normal_uni");
+	lighting_normal_uniform = GetUniformLocation("lighting_normal_uni");
+}
+
+void tParticleDeferredShader::SetFaceNormal(tVector normal)
+{
+	glUniform3f(face_normal_uniform, normal.x, normal.y, normal.z);
+}
+
+void tParticleDeferredShader::SetLightingNormal(tVector normal)
+{
+	glUniform3f(lighting_normal_uniform, normal.x, normal.y, normal.z);
 }

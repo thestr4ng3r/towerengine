@@ -29,7 +29,7 @@ struct tParticle
 class tParticleSystem
 {
 	public:
-		enum BlendType { ADD, ALPHA };
+		enum RenderType { DEFERRED_LIT, FORWARD_ADD, FORWARD_ALPHA };
 
 	protected:
 		std::vector<tParticle> particles;
@@ -46,7 +46,8 @@ class tParticleSystem
 		std::vector<float> vertex_data;
 		std::vector<float> texture_index_data;
 
-		BlendType blend_type;
+		RenderType render_type;
+		tVector lighting_normal;
 
 		GLuint tex;
 		int tex_count;
@@ -56,12 +57,14 @@ class tParticleSystem
 
 		virtual void Step(float time) 				{}
 
-		void Render(tRenderer *renderer);
+		void Render(tRenderer *renderer, tParticleShader *shader);
 
 		void SetPosition(tVector pos)				{ this->position = pos; }
-		void SetBlendType(BlendType type)			{ this->blend_type = type; }
+		void SetRenderType(RenderType type)			{ this->render_type = type; }
+		void SetLightingNormal(tVector normal)		{ this->lighting_normal = normal; this->lighting_normal.Normalize(); }
 
 		tVector GetPosition(void)					{ return position; }
+		RenderType GetRenderType(void)				{ return render_type; }
 		int GetTexturesCount(void)					{ return tex_count; }
 		unsigned int GetParticlesCount(void)		{ return particles.size(); }
 };

@@ -179,7 +179,7 @@ bool tDefaultMaterial::InitGeometryPass(tRenderer *renderer)
 	uniform_buffer->Bind(tShader::material_binding_point);
 
 	if(tex[DIFFUSE])
-		renderer->GetCurrentFaceShader()->SetDiffuseTexture(tex[DIFFUSE]);
+		renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
 
 	if(tex[SPECULAR])
 		renderer->GetCurrentFaceShader()->SetSpecularTexture(tex[SPECULAR]);

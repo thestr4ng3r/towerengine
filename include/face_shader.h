@@ -18,7 +18,7 @@ class tFaceShader : public tShader
 		static const unsigned int self_illumination_tex_unit = 4;
 		static const unsigned int cube_map_reflection_tex_unit = 5;
 
-		virtual void SetDiffuseTexture(GLuint tex) {}
+		virtual void SetDiffuseTexture(bool enabled, GLuint tex) {}
 		virtual void SetSpecularTexture(GLuint tex) {}
 		virtual void SetNormalTexture(GLuint tex) {}
 		virtual void SetBumpTexture(GLuint tex) {}

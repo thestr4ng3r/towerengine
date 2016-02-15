@@ -6,6 +6,7 @@
 class tSSAOLightingShader : public tScreenShader
 {
 	private:
+		GLint depth_tex_uniform;
 		GLint ssao_tex_uniform;
 
 		int ssao_tex_unit;

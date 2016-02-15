@@ -2,7 +2,6 @@
 #ifndef _PARTICLE_SHADER_H
 #define _PARTICLE_SHADER_H
 
-
 class tParticleShader : public tShader
 {
 	private:
@@ -13,16 +12,38 @@ class tParticleShader : public tShader
 
 		int texture_unit;
 
+	protected:
+		void InitParticleShader(tGBuffer *gbuffer, const char *vertex_source, const char *geometry_source, const char *fragment_source);
+
 	public:
 		static const int size_attribute = 1;
 		static const int rotation_attribute = 2;
 		static const int color_attribute = 3;
 		static const int texture_index_attribute = 4;
 
-		void Init(tGBuffer *gbuffer);
+		virtual void Init(tGBuffer *gbuffer) =0;
 
 		void SetModelViewProjectionMatrices(float modelview[16], float projection[16]);
 		void SetTexture(GLuint texture);
+};
+
+class tParticleForwardShader : public tParticleShader
+{
+	public:
+		void Init(tGBuffer *gbuffer);
+};
+
+class tParticleDeferredShader : public tParticleShader
+{
+	private:
+		GLint face_normal_uniform;
+		GLint lighting_normal_uniform;
+
+	public:
+		void Init(tGBuffer *gbuffer);
+
+		void SetFaceNormal(tVector normal);
+		void SetLightingNormal(tVector normal);
 };
 
 

@@ -10,7 +10,9 @@ tParticleSystem::tParticleSystem(tVector position, GLuint tex, int tex_count)
 	this->tex_count = tex_count;
 	this->position = position;
 
-	blend_type = ALPHA;
+	lighting_normal = Vec(0.0, 1.0, 0.0);
+
+	render_type = FORWARD_ALPHA;
 
 	vao = new tVAO();
 	vao->Bind();
@@ -21,20 +23,20 @@ tParticleSystem::tParticleSystem(tVector position, GLuint tex, int tex_count)
 	glEnableVertexAttribArray(tShader::vertex_attribute);
 	glVertexAttribPointer(tShader::vertex_attribute, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), 0);
 
-	glEnableVertexAttribArray(tParticleShader::size_attribute);
-	glVertexAttribPointer(tParticleShader::size_attribute, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(3 * sizeof(float)));
+	glEnableVertexAttribArray(tParticleForwardShader::size_attribute);
+	glVertexAttribPointer(tParticleForwardShader::size_attribute, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(3 * sizeof(float)));
 
-	glEnableVertexAttribArray(tParticleShader::rotation_attribute);
-	glVertexAttribPointer(tParticleShader::rotation_attribute, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(4 * sizeof(float)));
+	glEnableVertexAttribArray(tParticleForwardShader::rotation_attribute);
+	glVertexAttribPointer(tParticleForwardShader::rotation_attribute, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(4 * sizeof(float)));
 
-	glEnableVertexAttribArray(tParticleShader::color_attribute);
-	glVertexAttribPointer(tParticleShader::color_attribute, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(5 * sizeof(float)));
+	glEnableVertexAttribArray(tParticleForwardShader::color_attribute);
+	glVertexAttribPointer(tParticleForwardShader::color_attribute, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(5 * sizeof(float)));
 
 	glGenBuffers(1, &texture_index_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, texture_index_vbo);
 
-	glEnableVertexAttribArray(tParticleShader::texture_index_attribute);
-	glVertexAttribPointer(tParticleShader::texture_index_attribute, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0);
+	glEnableVertexAttribArray(tParticleForwardShader::texture_index_attribute);
+	glVertexAttribPointer(tParticleForwardShader::texture_index_attribute, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -56,14 +58,14 @@ struct ParticleCompare
 	}
 };
 
-void tParticleSystem::Render(tRenderer *renderer)
+void tParticleSystem::Render(tRenderer *renderer, tParticleShader *shader)
 {
-	int particles_count = particles.size();
+	unsigned int particles_count = particles.size();
 
 	if(particles_count == 0)
 		return;
 
-	if(blend_type == ALPHA)
+	if(render_type == FORWARD_ALPHA)
 	{
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDepthMask(GL_TRUE);
@@ -79,10 +81,16 @@ void tParticleSystem::Render(tRenderer *renderer)
 
 		sort(particles.begin(), particles.end(), ParticleCompare());
 	}
-	else // if(blend_type == ADD)
+	else if(render_type == FORWARD_ADD)
 	{
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		glDepthMask(GL_FALSE);
+	}
+	else if(render_type == DEFERRED_LIT)
+	{
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDepthMask(GL_TRUE);
+		((tParticleDeferredShader* )shader)->SetLightingNormal(lighting_normal);
 	}
 
 	vertex_data.resize(particles_count * 9);
@@ -108,7 +116,7 @@ void tParticleSystem::Render(tRenderer *renderer)
 	glBufferData(GL_ARRAY_BUFFER, texture_index_data.size() * sizeof(float), texture_index_data_v, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	renderer->GetParticleShader()->SetTexture(tex);
+	shader->SetTexture(tex);
 
 	vao->Draw(GL_POINTS, 0, particles_count);
 

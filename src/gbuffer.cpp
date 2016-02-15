@@ -20,9 +20,16 @@ tGBuffer::tGBuffer(int width, int height, GLuint fbo, int first_attachment)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex[DEPTH_TEX], 0);
 	tex_units[DEPTH_TEX] = 0;
 
+	/*static const char *texture_labels[] = { "diffuse",
+										   	"normal",
+										   	"face normal",
+										   	"specular",
+										   	"self illumination" };*/
+
 	for(int i=1; i<tex_count; i++)
 	{
 		glBindTexture(GL_TEXTURE_2D, tex[i]);
+		//glObjectLabel(GL_TEXTURE, tex[i], strlen(texture_labels[i-1]), texture_labels[i-1]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

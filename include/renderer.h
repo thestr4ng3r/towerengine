@@ -27,7 +27,8 @@ class tRenderer
 		tColorShader *color_shader;
 		tPostProcessShader *post_process_shader;
 
-		tParticleShader *particle_shader;
+		tParticleForwardShader *particle_forward_shader;
+		tParticleDeferredShader *particle_deferred_shader;
 
 		tSSAOShader *ssao_shader;
 
@@ -128,7 +129,7 @@ class tRenderer
 		tSkyBoxShader *GetSkyBoxShader(void)								{ return skybox_shader; }
 		tColorShader *GetColorShader(void)									{ return color_shader; }
 		tSSAOShader *GetSSAOShader(void)									{ return ssao_shader; }
-		tParticleShader *GetParticleShader(void)							{ return particle_shader; }
+		//tParticleForwardShader *GetParticleShader(void)							{ return particle_shader; }
 		tDepthPassShader *GetDepthPassShader(void)							{ return depth_pass_shader; }
 
 		int GetScreenWidth(void)	{ return screen_width; }
