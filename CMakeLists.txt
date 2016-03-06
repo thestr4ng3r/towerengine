@@ -1,7 +1,13 @@
 cmake_minimum_required (VERSION 2.6)
 
 project(towerengine)
-set(towerengine_VERSION 1.0.0)
+
+set(TOWERENGINE_VERSION 1.0.0)
+
+set(INCLUDE_INSTALL_DIR include/towerengine)
+set(LIB_INSTALL_DIR lib)
+
+
 
 set(CMAKE_BUILD_TYPE Release)
 
@@ -13,23 +19,23 @@ IF(MSVC)
 	IF (NOT USE_MSVC_INCREMENTAL_LINKING)
 		#MESSAGE("MSVC_INCREMENTAL_DEFAULT"+${MSVC_INCREMENTAL_DEFAULT})
 		SET( MSVC_INCREMENTAL_YES_FLAG "/INCREMENTAL:NO")
-	
-		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags ${CMAKE_EXE_LINKER_FLAGS_DEBUG}) 
+
+		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags ${CMAKE_EXE_LINKER_FLAGS_DEBUG})
 		SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO ${replacementFlags}" )
 		MESSAGE("CMAKE_EXE_LINKER_FLAGS_DEBUG=${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
-	
-		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags2 ${CMAKE_EXE_LINKER_FLAGS}) 
-		
-		SET(CMAKE_EXE_LINKER_FLAGS ${replacementFlag2}) 
-		STRING(REPLACE "INCREMENTAL:YES" "" replacementFlags3 "${CMAKE_EXTRA_LINK_FLAGS}") 
 
-		SET(CMAKE_EXTRA_LINK_FLAGS ${replacementFlag3}) 
-		
-		
+		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags2 ${CMAKE_EXE_LINKER_FLAGS})
+
+		SET(CMAKE_EXE_LINKER_FLAGS ${replacementFlag2})
+		STRING(REPLACE "INCREMENTAL:YES" "" replacementFlags3 "${CMAKE_EXTRA_LINK_FLAGS}")
+
+		SET(CMAKE_EXTRA_LINK_FLAGS ${replacementFlag3})
+
+
 		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags3 "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}")
-		SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO ${replacementFlags3}) 
+		SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO ${replacementFlags3})
 		SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "/INCREMENTAL:NO ${replacementFlags3}" )
-	
+
 	ENDIF (NOT USE_MSVC_INCREMENTAL_LINKING)
 
 	IF (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
@@ -45,26 +51,26 @@ IF(MSVC)
 	ENDIF (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
 
 	IF (CMAKE_CL_64)
-	  ADD_DEFINITIONS(-D_WIN64)
+		ADD_DEFINITIONS(-D_WIN64)
 	ELSE()
-	  OPTION(USE_MSVC_SSE "Use MSVC /arch:sse option"	ON)
-	  IF (USE_MSVC_SSE)
-		ADD_DEFINITIONS(/arch:SSE)
-	  ENDIF()
+		OPTION(USE_MSVC_SSE "Use MSVC /arch:sse option"	ON)
+		IF (USE_MSVC_SSE)
+			ADD_DEFINITIONS(/arch:SSE)
+		ENDIF()
 	ENDIF()
 	OPTION(USE_MSVC_FAST_FLOATINGPOINT "Use MSVC /fp:fast option"	ON)
 	IF (USE_MSVC_FAST_FLOATINGPOINT)
 		ADD_DEFINITIONS(/fp:fast)
-  ENDIF()
+	ENDIF()
 ENDIF(MSVC)
 
 
-set (towerengine_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set (TOWERENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-file(GLOB towerengine_INCLUDES "${towerengine_INCLUDE_DIR}/*.h")
+file(GLOB TOWERENGINE_INCLUDES "${TOWERENGINE_INCLUDE_DIR}/*.h")
 
-set(towerengine_SRC 
+set(TOWERENGINE_SRC 
 	src/animation.cpp 
 	src/buffers.cpp 
 	src/camera.cpp 
@@ -86,7 +92,7 @@ set(towerengine_SRC
 	src/material.cpp 
 	src/mesh.cpp 
 	src/meshobject.cpp 
-	src/object.cpp 
+	src/object.cpp
 	src/pose.cpp
 	src/shader.cpp 
 	src/triangle.cpp 
@@ -135,7 +141,7 @@ set(towerengine_SRC
 	src/depth_pass_shader.cpp)
 
 
-set(RESOURCES_HEADERS ${towerengine_INCLUDE_DIR}/tresources.h)
+set(RESOURCES_HEADERS ${TOWERENGINE_INCLUDE_DIR}/tresources.h)
 set(RESOURCES_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.cpp)
 set(RESOURCES_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 set(RESOURCES_SOURCE_INFO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/shader/resources)
@@ -149,9 +155,9 @@ file(GLOB RESOURCES_SHADER_FILES
 add_definitions(-g -Wall)
 
 if(BUILD_STATIC_LIB)
-	add_library(towerengine STATIC ${towerengine_SRC} ${towerengine_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
+	add_library(towerengine STATIC ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 else()
-	add_library(towerengine SHARED ${towerengine_SRC} ${towerengine_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
+	add_library(towerengine SHARED ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 endif()
 
 
@@ -197,12 +203,31 @@ target_link_libraries(towerengine ${BULLET_LIBRARIES})
 
 
 
-install(TARGETS towerengine #EXPORT towerengine_targets
-	ARCHIVE DESTINATION lib
-	LIBRARY DESTINATION lib
-	INCLUDES DESTINATION include/towerengine)
 
-install(FILES ${towerengine_INCLUDES} DESTINATION include/towerengine)
+
+install(TARGETS towerengine
+		ARCHIVE DESTINATION lib
+		LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+		INCLUDES DESTINATION ${INCLUDE_INSTALL_DIR})
+
+install(FILES ${TOWERENGINE_INCLUDES} DESTINATION ${INCLUDE_INSTALL_DIR})
+
+
+
+
+# Config
+set(TOWERENGINE_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR})
+set(TOWERENGINE_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR})
+set(TOWERENGINE_LIBRARIES towerengine)
+
+configure_file(towerengine-config.cmake.in
+		"${CMAKE_CURRENT_BINARY_DIR}/towerengine-config.cmake"
+		@ONLY ESCAPE_QUOTES)
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/towerengine-config.cmake"
+		DESTINATION ${LIB_INSTALL_DIR}/cmake/towerengine)
+
+
 
 # uninstall target
 configure_file(

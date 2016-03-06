@@ -50,10 +50,13 @@ string PathOfFile(string file)
 		char c = file.at(i);
 
 		if(c == '/' || c == '\\')
+		{
+			i++;
 			break;
+		}
     }
 
-	return file.substr(0, i+1);
+	return file.substr(0, i);
 }
 
 

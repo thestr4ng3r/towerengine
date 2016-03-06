@@ -1,0 +1,19 @@
+#                                               -*- cmake -*-
+#
+#  towerengine-config.cmake(.in)
+#
+
+# Use the following variables to compile and link against towerengine:
+#  TOWERENGINE_FOUND          - True if towerengine was found on your system
+#  TOWERENGINE_INCLUDE_DIR    - towerengine headers location
+#  TOWERENGINE_LIBRARIES      - List of libraries to link against
+#  TOWERENGINE_LIBRARY_DIRS   - List of directories containing towerengine libraries
+#  TOWERENGINE_ROOT_DIR       - The base directory of towerengine
+#  TOWERENGINE_VERSION_STRING - A human-readable string containing the version
+
+set(TOWERENGINE_FOUND				1)
+set(TOWERENGINE_INCLUDE_DIR			"@TOWERENGINE_INCLUDE_DIR@")
+set(TOWERENGINE_LIBRARIES			"@TOWERENGINE_LIBRARIES@")
+set(TOWERENGINE_LIBRARY_DIRS		"@TOWERENGINE_LIBRARY_DIRS@")
+set(TOWERENGINE_ROOT_DIR			"@CMAKE_INSTALL_PREFIX@")
+set(TOWERENGINE_VERSION_STRING		"@TOWERENGINE_VERSION@")
