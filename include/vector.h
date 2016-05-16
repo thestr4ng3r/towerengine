@@ -2,7 +2,7 @@
 #define _VECTOR_H
 
 
-class tMatrix3;
+struct tMatrix3;
 class tTransform;
 
 struct tVector
@@ -36,7 +36,7 @@ struct tVector
 	void Set(float _x, float _y, float _z) { x = _x; y = _y; z = _z; }
 	float Len(void) const		{ return sqrt(x * x + y * y + z * z); }
 	float SquaredLen(void) const		{ return x * x + y * y + z * z; }
-	void Normalize(void)		{ float l; l = 1.0 / Len(); x *= l; y *= l; z *= l; }
+	void Normalize(void)		{ float l; l = 1.0f / Len(); x *= l; y *= l; z *= l; }
 
 	void SetFromPlane(const tVector2 &p, const tVector &n, float d);
 	tVector operator -(void) const	{tVector r; r.x = -x, r.y = -y, r.z = -z; return r; }

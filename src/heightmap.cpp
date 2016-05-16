@@ -39,7 +39,7 @@ bool tHeightMap::Load(const char *file)
 
 	for(x=0; x<size; x++)
 		for(y=0; y<size; y++)
-			data[y*size + x] = (float)image_data[y*size*3 + x*3] / 255.0;
+			data[y*size + x] = (float)image_data[y*size*3 + x*3] / 255.0f;
 
 
 	glGenTextures(1, &height_tex);

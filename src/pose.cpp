@@ -11,8 +11,6 @@ tMeshPose::tMeshPose(tMesh *mesh)
 
 tMeshPose::~tMeshPose(void)
 {
-	if(mesh->GetCurrentPose() == this)
-		mesh->ChangePose(mesh->GetIdlePose());
 	//delete vbo;
 }
 

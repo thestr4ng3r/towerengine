@@ -31,7 +31,7 @@ class tMeshObject : public tTransformObject
 
 		std::map<tMaterial *, tMaterial *> *replace_materials;
 
-		void CreateRigidBody(btScalar mass, btVector3 inertia);
+		void CreateRigidBody(btScalar &mass, btVector3 &inertia);
 
 	protected:
 		void TransformChanged(void);

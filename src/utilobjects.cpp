@@ -56,7 +56,12 @@ void tCoordinateSystemObject::ForwardPass(tRenderer *renderer)
 
 	renderer->GetColorShader()->Bind();
 	renderer->GetColorShader()->SetModelViewProjectionmatrix(renderer->GetCurrentRenderingCamera()->GetModelViewProjectionMatrix().GetData());
-	renderer->GetColorShader()->SetTransformation(tMatrix4::identity_matrix);
+
+	float m[16] = { size.x,	0.0f,	0.0f,	pos.x,
+					0.0f,	size.y,	0.0f,	pos.y,
+					0.0f,	0.0f,	size.z, pos.z,
+					0.0f,	0.0f,	0.0f,	1.0f };
+	renderer->GetColorShader()->SetTransformation(m);
 
 	glLineWidth(3.0);
 

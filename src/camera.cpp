@@ -6,30 +6,30 @@ tCamera::tCamera(void)
 	pos = Vec(0.0, 0.0, 0.0);
 	dir = Vec(0.0, 0.0, -1.0);
 	up = Vec(0.0, 1.0, 0.0);
-	aspect = 0.75;
-	angle = 60.0;
 	near_clip = 0.1;
 	far_clip = 300.0;
+
+	fov.top = -5.0f;
+	fov.bottom = 5.0f;
+	fov.left = -5.0f;
+	fov.right = 5.0f;
 }
 
 tVector *tCamera::GetRelativeFrustumCorners(float near_clip, float far_clip)
 {
 	tVector *c = new tVector[8];
-	float vert, horz;
 	tVector hvec = Cross(dir, up);
 	tVector vvec = Cross(hvec, dir);
 	hvec.Normalize();
 	vvec.Normalize();
 
-	vert = tan(degtorad(angle) / 2.0);
-	horz = vert * aspect;
 
 	c[0] = c[1] = c[2] = c[3] = dir;
-
-	c[0] += vert * vvec - hvec * horz;
-	c[1] += -vert * vvec - hvec * horz;
-	c[2] += -vert * vvec + hvec * horz;
-	c[3] += vert * vvec + hvec * horz;
+	
+	c[0] += fov.bottom * vvec		+ hvec * fov.left;
+	c[1] += fov.top * vvec			+ hvec * fov.left;
+	c[2] += fov.top * vvec			+ hvec * fov.right;
+	c[3] += fov.bottom * vvec		+ hvec * fov.right;
 
 	c[4] = c[0] * far_clip;
 	c[5] = c[1] * far_clip;
@@ -47,27 +47,18 @@ tVector *tCamera::GetRelativeFrustumCorners(float near_clip, float far_clip)
 tVector *tCamera::GetViewRays(void)
 {
 	tVector *c = new tVector[4];
-	float vert, horz;
-
-	vert = tan(degtorad(angle) / 2.0);
-	horz = vert * aspect;
-
-	c[0] = Vec(vert, -horz, 1.0);
-	c[1] = Vec(-vert, -horz, 1.0);
-	c[2] = Vec(-vert, horz, 1.0);
-	c[3] = Vec(vert, horz, 1.0);
+	
+	c[0] = Vec(fov.right,	fov.top, 1.0);
+	c[1] = Vec(fov.left,	fov.top, 1.0);
+	c[2] = Vec(fov.left,	fov.bottom, 1.0);
+	c[3] = Vec(fov.right,	fov.bottom, 1.0);
 
 	return c;
 }
 
 tVector tCamera::GetScreenRay(float x, float y)
 {
-	float vert, horz;
-
-	vert = tan(degtorad(angle) / 2.0);
-	horz = vert * aspect;
-
-	tVector r = Vec(x * horz, y * vert, 1.0);
+	tVector r = Vec(x * fov.right, y * fov.bottom, 1.0); // TODO: Fix for asymmetrical FOV
 	r *= far_clip;
 
 	tVector hvec = Cross(dir, up);
@@ -91,13 +82,12 @@ tVector2 tCamera::GetProjectedPoint(tVector point)
 	float dist = Dot(dir, point - pos);
 	tVector proj_center = pos + dir * dist;
 
-	float tang = tan(degtorad(angle) * 0.5);
-	float height = dist * tang;
-	float width = height * aspect;
+	float height = dist * fov.bottom; // TODO: Fix for asymmetrical fov
+	float width = dist * fov.right;
 
 	tVector2 proj;
-	proj.x = Dot(point - proj_center, hvec) / width;
-	proj.y = Dot(point - proj_center, vvec) / height;
+	proj.x = (float)Dot(point - proj_center, hvec) / width;
+	proj.y = (float)Dot(point - proj_center, vvec) / height;
 
 	return proj;
 }
@@ -113,10 +103,6 @@ void tCamera::CalculateFrustumPlanes(void)
 	hvec.Normalize();
 	vvec.Normalize();
 
-	float tang = tan(degtorad(angle) * 0.5);
-	float nh = near_clip * tang;
-	float nw = nh * aspect;
-
 	tVector aux;
 
 	points[0] = pos + dir * near_clip;
@@ -125,25 +111,25 @@ void tCamera::CalculateFrustumPlanes(void)
 	points[1] = pos + dir * far_clip;
 	normals[1] = -dir;
 
-	aux = (points[0] + vvec*nh) - pos;
+	aux = (points[0] + vvec * near_clip * fov.bottom) - pos;
 	aux.Normalize();
 	normals[2] = Cross(aux, hvec);
-	points[2] = points[0] + vvec*nh;
+	points[2] = points[0] + vvec * near_clip * fov.bottom;
 
-	aux = (points[0] - vvec*nh) - pos;
+	aux = (points[0] + vvec * near_clip * fov.top) - pos;
 	aux.Normalize();
 	normals[3] = Cross(hvec, aux);
-	points[3] = points[0] - vvec*nh;
+	points[3] = points[0] + vvec * near_clip * fov.top;
 
-	aux = (points[0] - hvec*nw) - pos;
+	aux = (points[0] + hvec * near_clip * fov.left) - pos;
 	aux.Normalize();
 	normals[4] = Cross(aux, vvec);
-	points[4] = points[0] - hvec*nw;
-
-	aux = (points[0] + hvec*nw) - pos;
+	points[4] = points[0] + hvec * near_clip * fov.left;
+	
+	aux = (points[0] + hvec * near_clip * fov.right) - pos;
 	aux.Normalize();
 	normals[5] = Cross(vvec, aux);
-	points[5] = points[0] + hvec*nw;
+	points[5] = points[0] + hvec * near_clip * fov.right;
 }
 
 void tCamera::InitCulling(void)
@@ -207,8 +193,31 @@ void tCamera::CalculateModelViewProjectionMatrix(void)
 {
 	tVector to = pos + dir;
 	modelview_matrix.SetLookAt(pos, to, up);
-	projection_matrix.SetPerspective(angle, aspect, near_clip, far_clip);
+
+	projection_matrix.SetFrustum(	fov.left * near_clip, 
+									fov.right * near_clip, 
+									fov.bottom * near_clip,
+									fov.top * near_clip, 
+									near_clip, 
+									far_clip);
+
 	modelview_projection_matrix = projection_matrix * modelview_matrix;
+}
+
+void tCamera::SetFOV(float left, float right, float bottom, float top)
+{
+	fov.left = left;
+	fov.right = right;
+	fov.bottom = bottom;
+	fov.top = top;
+}
+
+void tCamera::SetFOVVerticalAngle(float angle, float aspect)
+{
+	fov.bottom = tan(degtorad(angle) * 0.5);
+	fov.top = -fov.bottom;
+	fov.right = fov.bottom * aspect;
+	fov.left = -fov.right;
 }
 
 

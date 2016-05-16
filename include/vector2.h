@@ -18,7 +18,7 @@ struct tVector2
 	void Set(float _x, float _y)	{ x = _x; y = _y;};
 	float Len(void) const		{ return sqrt(x * x + y * y); };
 	float SquaredLen(void) const		{ return x * x + y * y; };
-	void Normalize(void)		{ float l; l = 1.0 / Len(); x *= l; y *= l; };
+	void Normalize(void)		{ float l; l = 1.0f / Len(); x *= l; y *= l; };
 	tVector2 &operator += (const tVector2 o) { x+=o.x; y+=o.y; return *this; };
 	tVector2 &operator -= (const tVector2 o) { x-=o.x; y-=o.y; return *this; };
 	tVector2 &operator *= (float f) { x*=f; y*=f; return *this; };

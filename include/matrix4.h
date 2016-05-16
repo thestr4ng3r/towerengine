@@ -23,6 +23,7 @@ class tMatrix4
 		void SetLookAt(tVector eye, tVector center, tVector up);
 		void SetOrtho(float left, float right, float top, float bottom, float near_clip, float far_clip);
 		void SetPerspective(float fovy, float aspect, float near_clip, float far_clip);
+		void SetFrustum(float left, float right, float bottom, float top, float near_clip, float far_clip);
 		void SetInverse(void);
 
 		tMatrix4 GetInverse(void);
