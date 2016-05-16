@@ -51,13 +51,6 @@ tVector2 operator*(float scalar, const tVector2 &a)
 
 }
 
-tVector2 &tVector2::operator=(const tVector &v)
-{
-	x = v.x;
-	y = -v.z;
-	return *this;
-}
-
 int operator==(const tVector2 a, const tVector2 b)
 {
     if(a.x == b.x && a.y == b.y)
