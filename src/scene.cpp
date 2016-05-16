@@ -54,16 +54,28 @@ tScene::tScene(tWorld *world, tMaterialManager *material_manager)
 
 tScene::~tScene(void)
 {
+	//printf("delete scene\n");
 	for(map<string, tSceneObject *>::iterator i=objects.begin(); i!=objects.end(); i++)
 		delete i->second;
 
+	//printf("deleted objects\n");
+
+	int ai=0;
 	for(map<string, tAsset *>::iterator i=assets.begin(); i!=assets.end(); i++)
+	{
+		//printf("asset %d\n", ai++);
 		delete i->second;
+	}
+
+	//printf("deleted assets\n");
 
 	if(own_material_manager)
 		delete material_manager;
+	//printf("deleted material manager\n");
 
 	delete skybox;
+
+	//printf("deleted skybox\n");
 }
 
 bool tScene::LoadFromFile(string file)
@@ -347,7 +359,7 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 		else if(strcmp(child->name(), "rigid_body") == 0)
 		{
 			if((attr = child->first_attribute("mass")))
-				rigid_body_mass = atof(attr->value());
+				rigid_body_mass = (float)atof(attr->value());
 			else
 				continue;
 
@@ -512,7 +524,7 @@ float tScene::ParseFloatNode(xml_node<> *node, const char *p)
 
 	xml_attribute<> *attr = node->first_attribute(p);
 	if(attr)
-		r = atof(attr->value());
+		r = (float)atof(attr->value());
 
 	return r;
 }
@@ -545,13 +557,13 @@ tVector tScene::ParseVectorNode(xml_node<> *cur, const char *x_p, const char *y_
 	xml_attribute<> *attr;
 
 	if((attr = cur->first_attribute(x_p)))
-		r.x = atof(attr->value());
+		r.x = (float)atof(attr->value());
 
 	if((attr = cur->first_attribute(y_p)))
-		r.y = atof(attr->value());
+		r.y = (float)atof(attr->value());
 
 	if((attr = cur->first_attribute(z_p)))
-		r.z = atof(attr->value());
+		r.z = (float)atof(attr->value());
 
 	return r;
 }

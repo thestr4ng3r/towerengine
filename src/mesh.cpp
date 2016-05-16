@@ -56,34 +56,49 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 
 tMesh::~tMesh(void)
 {
+	//printf("  delete mesh\n");
 	delete idle_pose;
 	for(map<string, tMeshPose *>::iterator i=custom_pose.begin(); i!=custom_pose.end(); i++)
 		delete i->second;
 
+	//printf("  deleted poses\n");
+
 	for(vector<tAnimation *>::iterator i=animations.begin(); i!=animations.end(); i++)
 		delete *i;
 
+	//printf("  deleted animations\n");
+
 	for(vector<tTriangle *>::iterator i=triangles.begin(); i!=triangles.end(); i++)
 		delete *i;
+
+	//printf("  deleted triangles\n");
 	
 	for(set<tMaterial *>::iterator mi=own_materials.begin(); mi!=own_materials.end(); mi++)
 		delete *mi;
 
+	//printf("  deleted own materials\n");
+
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 		delete i->second;
+
+	//printf("  deleted material_ibos\n");
 
 	for(vector<tVertex *>::iterator i=vertices.begin(); i!=vertices.end(); i++)
 		delete *i;
 
+	//printf("  deleted vertices\n");
+
 	for(vector<tEntity *>::iterator i=entities.begin(); i!=entities.end(); i++)
 		delete *i;
 
+	//printf("  deleted stuff\n");
 
 	DeleteVBOData();
 
+	//printf("  deleted vbo data\n");
+
 	delete physics_triangle_mesh;
 	delete idle_material;
-
 }
 
 
@@ -763,15 +778,15 @@ tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 	// TODO: check if attributes really are found
 
 	id = atoi(cur->first_attribute("id")->value());
-	p.x = atof(cur->first_attribute("x")->value());
-	p.y = atof(cur->first_attribute("y")->value());
-	p.z = atof(cur->first_attribute("z")->value());
+	p.x = (float)atof(cur->first_attribute("x")->value());
+	p.y = (float)atof(cur->first_attribute("y")->value());
+	p.z = (float)atof(cur->first_attribute("z")->value());
 
-	uv.x = atof(cur->first_attribute("u")->value());
-	uv.y = atof(cur->first_attribute("v")->value());
-	normal.x = atof(cur->first_attribute("nx")->value());
-	normal.y = atof(cur->first_attribute("ny")->value());
-	normal.z = atof(cur->first_attribute("nz")->value());
+	uv.x = (float)atof(cur->first_attribute("u")->value());
+	uv.y = (float)atof(cur->first_attribute("v")->value());
+	normal.x = (float)atof(cur->first_attribute("nx")->value());
+	normal.y = (float)atof(cur->first_attribute("ny")->value());
+	normal.z = (float)atof(cur->first_attribute("nz")->value());
 
 	r = new tVertex(p);
 	AddVertex(r);
@@ -873,11 +888,11 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 			}
 
 			if((attr = child->first_attribute("r")))
-				diffuse_color.r = atof(attr->value());
+				diffuse_color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				diffuse_color.g = atof(attr->value());
+				diffuse_color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				diffuse_color.b = atof(attr->value());
+				diffuse_color.b = (float)atof(attr->value());
 		}
 		else if(strcmp(name_temp, "specular") == 0)
 		{
@@ -900,13 +915,13 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 				specular_mode = TEXTURE_DATA;
 			}
 			if((attr = child->first_attribute("exponent")))
-				exponent = atof(attr->value());
+				exponent = (float)atof(attr->value());
 			if((attr = child->first_attribute("r")))
-				specular_color.r = atof(attr->value());
+				specular_color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				specular_color.g = atof(attr->value());
+				specular_color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				specular_color.b = atof(attr->value());
+				specular_color.b = (float)atof(attr->value());
 		}
 		else if(strcmp(name_temp, "normal") == 0)
 		{
@@ -950,11 +965,11 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 				self_illum_mode = TEXTURE_DATA;
 			}
 			if((attr = child->first_attribute("r")))
-				self_illum_color.r = atof(attr->value());
+				self_illum_color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				self_illum_color.g = atof(attr->value());
+				self_illum_color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				self_illum_color.b = atof(attr->value());
+				self_illum_color.b = (float)atof(attr->value());
 		}
 		else if(strcmp(name_temp, "bump") == 0)
 		{
@@ -977,18 +992,18 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 				bump_mode = TEXTURE_DATA;
 			}
 			if((attr = child->first_attribute("depth")))
-				bump_depth = atof(attr->value());
+				bump_depth = (float)atof(attr->value());
 		}
 		else if(strcmp(name_temp, "cube_map_reflection") == 0)
 		{
 			cube_map_reflection_enabled = true;
 
 			if((attr = child->first_attribute("r")))
-				cube_map_reflection_color.r = atof(attr->value());
+				cube_map_reflection_color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				cube_map_reflection_color.g = atof(attr->value());
+				cube_map_reflection_color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				cube_map_reflection_color.b = atof(attr->value());
+				cube_map_reflection_color.b = (float)atof(attr->value());
 		}
 		else if(strcmp(name_temp, "shadow") == 0)
 		{
@@ -1102,13 +1117,13 @@ tSimpleForwardMaterial *tMesh::ParseXMLSimpleForwardMaterialNode(xml_node<> *cur
 		else if(strcmp(name_temp, "color") == 0)
 		{
 			if((attr = child->first_attribute("r")))
-				color.r = atof(attr->value());
+				color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				color.g = atof(attr->value());
+				color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				color.b = atof(attr->value());
+				color.b = (float)atof(attr->value());
 			if((attr = child->first_attribute("a")))
-				alpha = atof(attr->value());
+				alpha = (float)atof(attr->value());
 		}
 
 		child = child->next_sibling();
@@ -1189,11 +1204,11 @@ tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, stri
 		else if(strcmp(name_temp, "color") == 0)
 		{
 			if((attr = child->first_attribute("r")))
-				color.r = atof(attr->value());
+				color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				color.g = atof(attr->value());
+				color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				color.b = atof(attr->value());
+				color.b = (float)atof(attr->value());
 
 
 			if((attr = child->first_attribute("file")))
@@ -1218,13 +1233,13 @@ tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, stri
 		else if(strcmp(name_temp, "edge_color") == 0)
 		{
 			if((attr = child->first_attribute("r")))
-				edge_color.r = atof(attr->value());
+				edge_color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				edge_color.g = atof(attr->value());
+				edge_color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				edge_color.b = atof(attr->value());
+				edge_color.b = (float)atof(attr->value());
 			if((attr = child->first_attribute("a")))
-				edge_alpha = atof(attr->value());
+				edge_alpha = (float)atof(attr->value());
 		}
 
 		child = child->next_sibling();
@@ -1333,15 +1348,15 @@ void tMesh::ParseMeshDataNode(xml_node<> *cur, tMaterialManager *material_manage
 
 						int id = current_vertex_id;
 						current_vertex_id++;
-						p.x = atof(values[1]);
-						p.y = atof(values[2]);
-						p.z = atof(values[3]);
+						p.x = (float)atof(values[1]);
+						p.y = (float)atof(values[2]);
+						p.z = (float)atof(values[3]);
 
-						uv.x = atof(values[4]);
-						uv.y = atof(values[5]);
-						normal.x = atof(values[6]);
-						normal.y = atof(values[7]);
-						normal.z = atof(values[8]);
+						uv.x = (float)atof(values[4]);
+						uv.y = (float)atof(values[5]);
+						normal.x = (float)atof(values[6]);
+						normal.y = (float)atof(values[7]);
+						normal.z = (float)atof(values[8]);
 
 						r = new tVertex(p);
 						AddVertex(r);
@@ -1478,9 +1493,9 @@ tMeshPose *tMesh::ParsePoseNode(xml_node<> *cur)
 	for(child = cur->first_node("vertex"), i=0; child && i<count; child = child->next_sibling("vertex"))
 	{
 		vert[i] = atoi(child->first_attribute("id")->value());
-		vec[i].x = atof(child->first_attribute("x")->value());
-		vec[i].y = atof(child->first_attribute("y")->value());
-		vec[i].z = atof(child->first_attribute("z")->value());
+		vec[i].x = (float)atof(child->first_attribute("x")->value());
+		vec[i].y = (float)atof(child->first_attribute("y")->value());
+		vec[i].z = (float)atof(child->first_attribute("z")->value());
 
 		i++;
 	}
@@ -1506,7 +1521,7 @@ tAnimation *tMesh::ParseAnimationNode(xml_node<> *cur)
 
 	if(!(attr = cur->first_attribute("len")))
 		return 0;
-	len = atof(attr->value());
+	len = (float)atof(attr->value());
 
 	r = new tAnimation(this, name, len, 0);
 
@@ -1531,7 +1546,7 @@ tKeyFrame *tMesh::ParseKeyFrameNode(xml_node<> *cur, tAnimation *anim)
 
 	if(!(attr = cur->first_attribute("time")))
 		return 0;
-	time = atof(attr->value());
+	time = (float)atof(attr->value());
 
 	child = cur->first_node("vertex");
 	count = 0;
@@ -1547,9 +1562,9 @@ tKeyFrame *tMesh::ParseKeyFrameNode(xml_node<> *cur, tAnimation *anim)
 	for(child = cur->first_node("vertex"), i=0; child && i<count; child = child->first_node("vertex"))
 	{
 		vert[i] = atoi(child->first_attribute("id")->value());
-		vec[i].x = atof(child->first_attribute("x")->value());
-		vec[i].y = atof(child->first_attribute("y")->value());
-		vec[i].z = atof(child->first_attribute("z")->value());
+		vec[i].x = (float)atof(child->first_attribute("x")->value());
+		vec[i].y = (float)atof(child->first_attribute("y")->value());
+		vec[i].z = (float)atof(child->first_attribute("z")->value());
 
 		i++;
 	}
@@ -1594,11 +1609,11 @@ tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 			tVector v;
 
 			if((attr = cur->first_attribute("x")))
-				v.x = atof(attr->value());
+				v.x = (float)atof(attr->value());
 			if((attr = cur->first_attribute("y")))
-				v.y = atof(attr->value());
+				v.y = (float)atof(attr->value());
 			if((attr = cur->first_attribute("z")))
-				v.z = atof(attr->value());
+				v.z = (float)atof(attr->value());
 
 			a->vec_v = v;
 		}
@@ -1609,9 +1624,9 @@ tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 			tVector2 v;
 
 			if((attr = cur->first_attribute("x")))
-				v.x = atof(attr->value());
+				v.x = (float)atof(attr->value());
 			if((attr = cur->first_attribute("y")))
-				v.y = atof(attr->value());
+				v.y = (float)atof(attr->value());
 
 			a->vec2_v = v;
 		}
@@ -1622,7 +1637,7 @@ tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 			float v = 0.0;
 
 			if((attr = cur->first_attribute("v")))
-				v = atof(attr->value());
+				v = (float)atof(attr->value());
 
 			a->float_v = v;
 		}

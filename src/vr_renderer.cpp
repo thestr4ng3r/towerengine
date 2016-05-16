@@ -35,7 +35,7 @@ void tVRRenderer::PrepareRender(void)
 	{
 		tCamera *cam = camera[eye];
 
-		cam->SetAspect((float)width[eye] / (float)height[eye]);
+		//cam->SetAspect((float)width[eye] / (float)height[eye]);
 		cam->CalculateModelViewProjectionMatrix();
 	}
 

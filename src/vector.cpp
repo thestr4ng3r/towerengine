@@ -60,7 +60,7 @@ int PointInRange(tVector p, tVector s, tVector b)
 tVector PointToLine(tVector p, tVector r, tVector n)
 {
 	float l = Dot(p, n) - Dot(n, r);
-	l /= Dot(n*n, Vec(1.0, 1.0, 1.0));
+	l /= (float)Dot(n*n, Vec(1.0, 1.0, 1.0));
 	tVector f = r + n*l;
 	return f-p;
 }

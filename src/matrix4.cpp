@@ -229,6 +229,34 @@ void tMatrix4::SetPerspective(float fovy, float aspect, float near_clip, float f
 	v[15] = 0.0;
 }
 
+void tMatrix4::SetFrustum(float left, float right, float bottom, float top, float near_clip, float far_clip)
+{
+	SetIdentity();
+
+	float idx = 1.0f / (right - left);
+	float idy = 1.0f / (bottom - top);
+	float idz = 1.0f / (far_clip - near_clip);
+	float sx = right + left;
+	float sy = top + bottom;
+
+	/*v[0] = (2.0f * near_clip) / (right - left);					v[2] = (right + left) / (right - left);
+	v[5] = (2.0f * near_clip) / (top - bottom);					v[6] = (top + bottom) / (top - bottom);
+	v[10] = -(far_clip + near_clip) / (far_clip - near_clip);	v[11] = (2.0f * far_clip * near_clip) / (far_clip - near_clip);
+	v[14] = -1.0f;*/
+
+	/*v[0] = 2.0f * idx;				v[2] = sx * idx;
+	v[5] = 2.0f * idy;				v[6] = sy * idy;
+	v[10] = -far_clip * idz;		v[11] = -far_clip * near_clip * idz;
+	v[14] = -1.0f;
+	v[15] = 0.0f;*/
+	
+	v[0] = 2.0f * near_clip * idx;				v[2] = sx * idx;
+	v[5] = 2.0f * near_clip * idy;				v[6] = -sy * idy;
+	v[10] = -(far_clip + near_clip) * idz;		v[11] = -2.0f * far_clip * near_clip * idz;
+	v[14] = -1.0f;
+	v[15] = 0.0f;
+}
+
 
 void tMatrix4::SetMultiply(tMatrix4 m)
 {

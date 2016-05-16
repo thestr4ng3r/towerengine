@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 
-project(towerengine)
+project(TowerEngine)
 
 set(TOWERENGINE_VERSION 1.0.0)
 
@@ -152,13 +152,17 @@ file(GLOB RESOURCES_SHADER_FILES
 
 
 
-add_definitions(-g -Wall)
+#add_definitions(-g -Wall)
 
 if(BUILD_STATIC_LIB)
 	add_library(towerengine STATIC ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 else()
 	add_library(towerengine SHARED ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 endif()
+
+
+set_target_properties(towerengine PROPERTIES
+			PROJECT_LABEL "TowerEngine")
 
 
 

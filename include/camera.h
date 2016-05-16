@@ -8,8 +8,18 @@ class tCamera : public tCulling
 		tVector pos;
 		tVector dir;
 		tVector up;
-		float angle;
-		float aspect;
+
+		struct fov
+		{
+			float left;
+			float right;
+			float bottom;
+			float top;
+		} fov;
+
+		//float fov_left, fov_right, fov_bottom, fov_top;
+
+		//float aspect;
 		float near_clip, far_clip;
 
 		tMatrix4 modelview_matrix;
@@ -25,8 +35,8 @@ class tCamera : public tCulling
 		tVector GetPosition(void)		{ return pos; }
 		tVector GetDirection(void)		{ return dir; }
 		tVector GetUp(void)				{ return up; }
-		float GetAngle(void)			{ return angle; }
-		float GetAspect(void)			{ return aspect; }
+		//float GetAngle(void)			{ return angle; }
+		//float GetAspect(void)			{ return aspect; }
 		float GetNearClip(void)			{ return near_clip; }
 		float GetFarClip(void)			{ return far_clip; }
 
@@ -47,8 +57,10 @@ class tCamera : public tCulling
 		void SetPosition(tVector p)		{ pos = p; }
 		void SetDirection(tVector d)	{ dir = d; }
 		void SetUp(tVector t)			{ up = t; }
-		void SetAngle(float a)			{ angle = a; }
-		void SetAspect(float a)			{ aspect = a; }
+		//void SetAngle(float a)			{ angle = a; }
+		void SetFOVVerticalAngle(float angle, float aspect);
+		void SetFOV(float left, float right, float bottom, float top);
+		//void SetAspect(float a)			{ aspect = a; }
 		void SetClip(float n, float f)	{ near_clip = n; far_clip = f; }
 		void SetNearClip(float n)		{ near_clip = n; }
 		void SetFarClip(float f)		{ far_clip = f; }

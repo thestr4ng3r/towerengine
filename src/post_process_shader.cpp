@@ -20,7 +20,7 @@ void tPostProcessShader::SetTextures(GLuint color, int width, int height)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, color);
 
-	glUniform2f(tex_pixel_uniform, 1.0 / (float)width, 1.0 / (float)height);
+	glUniform2f(tex_pixel_uniform, 1.0f / (float)width, 1.0f / (float)height);
 }
 
 void tPostProcessShader::SetFXAA(bool enabled)

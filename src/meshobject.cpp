@@ -291,7 +291,7 @@ void tMeshObject::InitBoxRigidBody(tVector half_extents, float mass)
 	CreateRigidBody(mass, inertia);
 }
 
-void tMeshObject::CreateRigidBody(btScalar mass, btVector3 inertia)
+void tMeshObject::CreateRigidBody(btScalar &mass, btVector3 &inertia)
 {
 	btRigidBody::btRigidBodyConstructionInfo info(mass, motion_state, collision_shape, inertia);
 

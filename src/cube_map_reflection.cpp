@@ -10,8 +10,7 @@ tCubeMapReflection::tCubeMapReflection(tVector position)
 	this->position = position;
 
 	camera = new tCamera();
-	camera->SetAngle(90.0);
-	camera->SetAspect(1.0);
+	camera->SetFOV(-1.0f, 1.0f, 1.0f, -1.0f);
 	// TODO: near/far clip other than default
 
 	render_space = new tRenderSpace();
