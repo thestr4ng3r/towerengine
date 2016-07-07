@@ -1,11 +1,11 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 
 void tSSAOBlurShader::Init(void)
 {
-	InitScreenShader(ssao_blur_shader_frag, "SSAO Blur Shader");
+	InitScreenShader(get_resource("ssao_blur_shader.frag"), "SSAO Blur Shader");
 
 	tex_uniform = GetUniformLocation("tex_uni");
 

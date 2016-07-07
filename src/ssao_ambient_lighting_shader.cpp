@@ -1,10 +1,10 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 void tSSAOAmbientLightingShader::Init(tGBuffer *gbuffer)
 {
-	InitScreenShader(ssao_ambient_lighting_shader_frag, "SSAO Ambient Lighting Shader");
+	InitScreenShader(get_resource("ssao_ambient_lighting_shader.frag"), "SSAO Ambient Lighting Shader");
 
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	ssao_tex_uniform = GetUniformLocation("ssao_tex_uni");

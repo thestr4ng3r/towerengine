@@ -1,10 +1,10 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 void tSimpleForwardShader::Init(void)
 {
-	InitShader(simple_forward_shader_vert, simple_forward_shader_frag, "Simple Forward Shader");
+	InitShader(get_resource("simple_forward_shader.vert"), get_resource("simple_forward_shader.frag"), "Simple Forward Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, uvcoord_attribute, "uv_attr");

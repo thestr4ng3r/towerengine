@@ -1,6 +1,6 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 void tParticleShader::InitParticleShader(tGBuffer *gbuffer, const char *vertex_source, const char *geometry_source, const char *fragment_source)
 {
@@ -40,14 +40,14 @@ void tParticleShader::SetTexture(GLuint texture)
 
 void tParticleForwardShader::Init(tGBuffer *gbuffer)
 {
-	InitParticleShader(gbuffer, particle_forward_shader_vert, particle_forward_shader_geom, particle_forward_shader_frag);
+	InitParticleShader(gbuffer, get_resource("particle_forward_shader.vert"), get_resource("particle_forward_shader.geom"), get_resource("particle_forward_shader.frag"));
 }
 
 
 
 void tParticleDeferredShader::Init(tGBuffer *gbuffer)
 {
-	InitParticleShader(gbuffer, particle_deferred_shader_vert, particle_deferred_shader_geom, particle_deferred_shader_frag);
+	InitParticleShader(gbuffer, get_resource("particle_deferred_shader.vert"), get_resource("particle_deferred_shader.geom"), get_resource("particle_deferred_shader.frag"));
 
 	face_normal_uniform = GetUniformLocation("face_normal_uni");
 	lighting_normal_uniform = GetUniformLocation("lighting_normal_uni");

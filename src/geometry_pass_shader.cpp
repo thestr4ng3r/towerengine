@@ -1,10 +1,10 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 void tGeometryPassShader::Init(void)
 {
-	InitShader(geometry_pass_shader_vert, geometry_pass_shader_frag, "Geometry Pass Shader");
+	InitShader(get_resource("geometry_pass_shader.vert"), get_resource("geometry_pass_shader.frag"), "Geometry Pass Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, normal_attribute, "normal_attr");
