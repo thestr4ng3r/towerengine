@@ -1,10 +1,10 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 void tPostProcessShader::Init(void)
 {
-	InitScreenShader(post_process_shader_frag, "Post Process Shader");
+	InitScreenShader(get_resource("post_process_shader.frag"), "Post Process Shader");
 
 	color_tex_uniform = GetUniformLocation("color_tex_uni");
 	tex_pixel_uniform = GetUniformLocation("tex_pixel_uni");

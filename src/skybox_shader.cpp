@@ -1,5 +1,5 @@
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 using namespace std;
 
@@ -8,7 +8,7 @@ using namespace std;
 
 void tSkyBoxShader::Init(void)
 {
-	InitShader(cube_env_shader_vert, cube_env_shader_frag, "SkyBox Shader");
+	InitShader(get_resource("cube_env_shader.vert"), get_resource("cube_env_shader.frag"), "SkyBox Shader");
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	LinkProgram();
 

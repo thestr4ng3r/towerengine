@@ -1,6 +1,6 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 #include "shader_source.h"
 
 using namespace std;
@@ -17,7 +17,7 @@ tPointLightingShader::~tPointLightingShader(void)
 
 void tPointLightingShader::Init(tGBuffer *gbuffer)
 {
-	tShaderSource *src = new tShaderSource(string(point_lighting_shader_frag));
+	tShaderSource *src = new tShaderSource(string(get_resource("point_lighting_shader.frag")));
 	src->SetParameter("LIGHTS_COUNT", new tShaderSourceVariable(lights_count));
 	InitScreenShader(src->BuildSource().c_str(), "Point Lighting Shader");
 	delete src;

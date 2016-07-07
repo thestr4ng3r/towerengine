@@ -1,12 +1,12 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 #include "shader_source.h"
 
 
 void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 {
-	InitScreenShader(directional_lighting_shader_frag, "Directional Lighting Shader");
+	InitScreenShader(get_resource("directional_lighting_shader.frag"), "Directional Lighting Shader");
 
 	depth_tex_uniform = GetUniformLocation("position_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");

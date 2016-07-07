@@ -1,13 +1,13 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 #include "shader_source.h"
 
 using namespace std;
 
 void tSSAOShader::Init(void)
 {
-	InitScreenShader(ssao_shader_frag, "SSAO Shader");
+	InitScreenShader(get_resource("ssao_shader.frag"), "SSAO Shader");
 
 	kernel_uniform = GetUniformLocation("kernel_uni");
 	kernel_size_uniform = GetUniformLocation("kernel_size_uni");

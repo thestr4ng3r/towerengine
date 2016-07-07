@@ -1,10 +1,10 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 void tDepthPassShader::Init(void)
 {
-	InitShader(depth_pass_shader_vert, depth_pass_shader_frag, "Depth Pass Shader");
+	InitShader(get_resource("depth_pass_shader.vert"), get_resource("depth_pass_shader.frag"), "Depth Pass Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, uvcoord_attribute, "uv_attr");

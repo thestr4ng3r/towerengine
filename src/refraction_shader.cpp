@@ -1,10 +1,10 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 void tRefractionShader::Init(void)
 {
-	InitShader(refraction_shader_vert, refraction_shader_frag, "Refraction Shader");
+	InitShader(get_resource("refraction_shader.vert"), get_resource("refraction_shader.frag"), "Refraction Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, normal_attribute, "normal_attr");

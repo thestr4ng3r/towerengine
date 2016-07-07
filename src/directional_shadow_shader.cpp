@@ -1,10 +1,10 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 void tDirectionalShadowShader::Init(void)
 {
-	InitShader(directional_shadow_shader_vert, directional_shadow_shader_frag, "Directional Shadow Shader");
+	InitShader(get_resource("directional_shadow_shader.vert"), get_resource("directional_shadow_shader.frag"), "Directional Shadow Shader");
 	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, tFaceShader::uvcoord_attribute, "uv_attr");
 	LinkProgram();
@@ -67,7 +67,7 @@ void tDirectionalShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
 
 void tDirectionalShadowBlurShader::Init(void)
 {
-	InitShader(directional_shadow_blur_shader_vert, directional_shadow_blur_shader_frag, "Directional Shadow Blur Shader");
+	InitShader(get_resource("directional_shadow_blur_shader.vert"), get_resource("directional_shadow_blur_shader.frag"), "Directional Shadow Blur Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, uv_coord_attribute, "uv_coord_attr");

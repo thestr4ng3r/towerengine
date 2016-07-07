@@ -1,11 +1,11 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 
 void tAmbientLightingShader::Init(tGBuffer *gbuffer)
 {
-	InitScreenShader(ambient_lighting_shader_frag, "Ambient Lighting Shader");
+	InitScreenShader(get_resource("ambient_lighting_shader.frag"), "Ambient Lighting Shader");
 
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");

@@ -141,10 +141,10 @@ set(TOWERENGINE_SRC
 	src/depth_pass_shader.cpp)
 
 
-set(RESOURCES_HEADERS ${TOWERENGINE_INCLUDE_DIR}/tresources.h)
-set(RESOURCES_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/resources.cpp)
-set(RESOURCES_FILE ${CMAKE_CURRENT_SOURCE_DIR}/resources)
-set(RESOURCES_SOURCE_INFO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/shader/resources)
+set(RESOURCES_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
+set(RESOURCES_HEADER "${RESOURCES_SRC_DIR}/resources.h")
+set(RESOURCES_SRC "${RESOURCES_SRC_DIR}/resources.cpp")
+set(RESOURCES_RELATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/shader")
 file(GLOB RESOURCES_SHADER_FILES
 		"${CMAKE_CURRENT_SOURCE_DIR}/shader/*.vert"
 		"${CMAKE_CURRENT_SOURCE_DIR}/shader/*.geom"
@@ -166,22 +166,40 @@ set_target_properties(towerengine PROPERTIES
 
 
 
-if(RUN_STRINGRES)
-	add_custom_command(OUTPUT ${RESOURCES_HEADERS}
-			COMMAND stringres -h ${RESOURCES_FILE}
-			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-			MAIN_DEPENDENCY ${RESOURCES_FILE}
-			DEPENDS ${RESOURCES_SOURCE_INFO_FILE})
+# resources
 
-	add_custom_command(OUTPUT ${RESOURCES_SRC}
-			COMMAND stringres -s ${RESOURCES_FILE}
-			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-			MAIN_DEPENDENCY ${RESOURCES_FILE}
-			DEPENDS ${RESOURCES_SOURCE_INFO_FILE} ${RESOURCES_SHADER_FILES})
+set(RESOURCE_GENERATOR_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ResourceGenerator.cmake")
 
-	add_custom_target(resources DEPENDS ${RESOURCES_HEADERS} ${RESOURCES_SRC})
-	add_dependencies(towerengine resources)
-endif()
+include(${RESOURCE_GENERATOR_INCLUDE})
+
+file(MAKE_DIRECTORY ${RESOURCES_SRC_DIR})
+include_directories(${RESOURCES_SRC_DIR})
+
+set(GENERATE_RESOURCES_ARGS
+		RELATIVE_PATH ${RESOURCES_RELATIVE_PATH}
+		HEADER_FILE ${RESOURCES_HEADER}
+		HEADER_FILE_RELATIVE_PATH ${RESOURCES_SRC_DIR}
+		SOURCE_FILE ${RESOURCES_SRC}
+		GET_FUNCTION_NAME "get_resource"
+		INCLUDE_GUARD "RESOURCES"
+		FILES ${RESOURCES_SHADER_FILES})
+
+generate_resources(GENERATE_HEADER ${GENERATE_RESOURCES_ARGS})
+
+configure_file(
+		"${CMAKE_CURRENT_SOURCE_DIR}/generate_resources_src.cmake.in"
+		"${CMAKE_CURRENT_BINARY_DIR}/generate_resources_src.cmake")
+
+add_custom_command(OUTPUT ${RESOURCES_SRC}
+		COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/generate_resources_src.cmake"
+		MAIN_DEPENDENCY ${RESOURCES_FILE}
+		DEPENDS ${RESOURCES_SOURCE_INFO_FILE} ${RESOURCES_SHADER_FILES})
+
+add_custom_target(resources DEPENDS ${RESOURCES_HEADERS} ${RESOURCES_SRC})
+add_dependencies(towerengine resources)
+
+
+
 
 
 
@@ -241,3 +259,6 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
+
+

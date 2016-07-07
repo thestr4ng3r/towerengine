@@ -1,11 +1,11 @@
 
 #include "towerengine.h"
-#include "tresources.h"
+#include "resources.h"
 
 
 void tColorShader::Init(void)
 {
-	InitShader(color_shader_vert, color_shader_frag);
+	InitShader(get_resource("color_shader.vert"), get_resource("color_shader.frag"));
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, color_attribute, "color_attr");
