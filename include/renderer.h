@@ -32,6 +32,8 @@ class tRenderer
 
 		tSSAOShader *ssao_shader;
 
+		tCubeMapBlurShader *cube_map_blur_shader;
+
 		tFogShader *fog_shader;
 		bool fog_enabled;
 		float fog_start, fog_end, fog_exp;
@@ -131,6 +133,7 @@ class tRenderer
 		tSSAOShader *GetSSAOShader(void)									{ return ssao_shader; }
 		//tParticleForwardShader *GetParticleShader(void)							{ return particle_shader; }
 		tDepthPassShader *GetDepthPassShader(void)							{ return depth_pass_shader; }
+		tCubeMapBlurShader *GetCubeMapBlurShader(void)						{ return cube_map_blur_shader; }
 
 		int GetScreenWidth(void)	{ return screen_width; }
 		int GetScreenHeight(void)	{ return screen_height; }

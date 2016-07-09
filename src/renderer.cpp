@@ -102,6 +102,9 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	particle_deferred_shader = new tParticleDeferredShader();
 	particle_deferred_shader->Init(gbuffer);
 
+	cube_map_blur_shader = new tCubeMapBlurShader();
+	cube_map_blur_shader->Init();
+
 	this->world = world;
 
 	ssao = 0;

@@ -8,11 +8,15 @@ class tCubeMapReflection
 	private:
 		tVector position;
 
-		int resolution;
+		unsigned int resolution;
+		unsigned int resolution_log;
 		tGBuffer *gbuffer;
 
 		GLuint fbo;
 		GLuint color_tex;
+
+		GLuint blur_fbo;
+		GLuint blur_tex;
 
 		tCamera *camera;
 		tRenderSpace *render_space;
@@ -22,12 +26,13 @@ class tCubeMapReflection
 
 		void GeometryPass(tRenderer *renderer, int side, tWorld *world);
 		void LightPass(tRenderer *renderer, int side, tWorld *world);
+		void BlurPass(tRenderer *renderer);
 
 	public:
 		tCubeMapReflection(tVector position);
 		~tCubeMapReflection(void);
 
-		void Init(int resolution);
+		void Init(unsigned int resolution_log);
 
 		void Render(tRenderer *renderer);
 

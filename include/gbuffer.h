@@ -35,6 +35,7 @@ class tGBuffer
 
 		void ChangeSize(int width, int height);
 
+		void BindAttachments(void);
 		void BindDrawBuffers(void);
 		void BindTextures(void);
 

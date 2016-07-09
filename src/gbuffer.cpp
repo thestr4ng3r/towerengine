@@ -50,6 +50,12 @@ tGBuffer::~tGBuffer(void)
 	glDeleteTextures(tex_count, tex);
 }
 
+void tGBuffer::BindAttachments()
+{
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, tex[DEPTH_TEX], 0);
+	for(int i=1; i<tex_count; i++)
+		glFramebufferTexture2D(GL_FRAMEBUFFER, draw_buffers[GetDrawBufferIndex((BufferType)i)], GL_TEXTURE_2D, tex[i], 0);
+}
 
 void tGBuffer::BindDrawBuffers(void)
 {

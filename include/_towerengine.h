@@ -45,6 +45,7 @@ class t2DRenderer;
 #include "point_lighting_shader.h"
 #include "ssao_lighting_shader.h"
 
+#include "cube_map_blur_shader.h"
 #include "skybox_shader.h"
 #include "point_shadow_shader.h"
 #include "directional_shadow_shader.h"

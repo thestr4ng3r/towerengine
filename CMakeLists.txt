@@ -12,7 +12,7 @@ set(LIB_INSTALL_DIR lib)
 set(CMAKE_BUILD_TYPE Release)
 
 option(BUILD_STATIC_LIB "Build static instead of shared" OFF)
-option(RUN_STRINGRES "Run stringres to generate shader resources before build" OFF)
+
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
 IF(MSVC)
@@ -138,7 +138,7 @@ set(TOWERENGINE_SRC
 	src/refraction_shader.cpp
 	src/refraction_material.cpp
 	src/lighting_shader.cpp
-	src/depth_pass_shader.cpp)
+	src/depth_pass_shader.cpp src/cube_map_blur_shader.cpp)
 
 
 set(RESOURCES_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")

@@ -31,15 +31,16 @@ tCubeMapReflection::~tCubeMapReflection(void)
 	delete gbuffer;
 }
 
-void tCubeMapReflection::Init(int resolution)
+void tCubeMapReflection::Init(unsigned int resolution_log)
 {
-	this->resolution = resolution;
+	this->resolution_log = resolution_log;
+	this->resolution = (unsigned int)1 << resolution_log;
 
 	glGenFramebuffers(1, &fbo);
 
 	gbuffer = new tGBuffer(resolution, resolution, fbo, 1);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
 
 	glGenTextures(1, &color_tex);
 
@@ -53,8 +54,23 @@ void tCubeMapReflection::Init(int resolution)
 	for(int i=0; i<6; i++)
 		glTexImage2D(CubeTex(i), 0, GL_RGBA, resolution, resolution, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
+
+	glGenTextures(1, &blur_tex);
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, blur_tex);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	for(int i=0; i<6; i++)
+		glTexImage2D(CubeTex(i), 0, GL_RGBA, resolution, resolution, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glGenFramebuffers(1, &blur_fbo);
 
 	invalid = true;
 	initialized = true;
@@ -69,7 +85,6 @@ void tCubeMapReflection::Render(tRenderer *renderer)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	//glClearColor(0.0, 0.0, 0.0, 0.0);
 	glViewport(0, 0, resolution, resolution);
 
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -84,14 +99,17 @@ void tCubeMapReflection::Render(tRenderer *renderer)
 		LightPass(renderer, s, world);
 	}
 
-	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, color_tex);
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	BlurPass(renderer);
 
-	invalid = false;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	//invalid = false;
 }
 
 void tCubeMapReflection::GeometryPass(tRenderer *renderer, int side, tWorld *world)
@@ -160,7 +178,6 @@ void tCubeMapReflection::LightPass(tRenderer *renderer, int side, tWorld *world)
 
 	renderer->GetAmbientLightingShader()->Bind();
 	renderer->GetAmbientLightingShader()->SetAmbientLight(world->GetAmbientColor());
-	//renderer->GetAmbientLightingShader()->SetAmbientLight(Vec(1.0, 1.0, 1.0));
 
 	renderer->RenderScreenQuad();
 
@@ -258,7 +275,57 @@ void tCubeMapReflection::LightPass(tRenderer *renderer, int side, tWorld *world)
 	delete[] point_lights_shadow_maps;
 
 
-
-
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+static const GLenum blur_draw_buffers[6] = {	GL_COLOR_ATTACHMENT0,
+												GL_COLOR_ATTACHMENT1,
+												GL_COLOR_ATTACHMENT2,
+												GL_COLOR_ATTACHMENT3,
+												GL_COLOR_ATTACHMENT4,
+												GL_COLOR_ATTACHMENT5 };
+
+
+void tCubeMapReflection::BlurPass(tRenderer *renderer)
+{
+	tCubeMapBlurShader *shader = renderer->GetCubeMapBlurShader();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, blur_fbo);
+
+	shader->Bind();
+	shader->SetTexture(color_tex);
+
+	glDisable(GL_DEPTH_TEST);
+
+	glDrawBuffers(6, blur_draw_buffers);
+
+	for(unsigned int direction=0; direction <= 1; direction++)
+	{
+		shader->SetTexture(direction ? color_tex : blur_tex);
+
+		for(unsigned int level = 0; level <= resolution_log - 2; level++)
+		{
+			for(unsigned int side = 0; side < 6; side++)
+				glFramebufferTexture2D(GL_FRAMEBUFFER,
+									   blur_draw_buffers[side],
+									   GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
+									   direction ? color_tex : blur_tex,
+									   level);
+			
+			tVector blur_dir;
+
+			int level_resolution = 1 << (resolution_log - level);
+			glViewport(0, 0, level_resolution, level_resolution);
+
+			if(direction == 0)
+				blur_dir = Vec(1.0, 0.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
+			else // direction == 1
+				blur_dir = Vec(0.0, 1.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
+
+			shader->SetBlurDir(blur_dir);
+			shader->SetMipmapLevel(level);
+
+			renderer->RenderScreenQuad();
+		}
+	}
 }
