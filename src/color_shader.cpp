@@ -5,7 +5,7 @@
 
 void tColorShader::Init(void)
 {
-	InitShader(get_resource("color_shader.vert"), get_resource("color_shader.frag"));
+	InitShader(resources_get("color_shader.vert"), resources_get("color_shader.frag"));
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, color_attribute, "color_attr");

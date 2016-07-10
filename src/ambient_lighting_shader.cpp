@@ -5,7 +5,7 @@
 
 void tAmbientLightingShader::Init(tGBuffer *gbuffer)
 {
-	InitScreenShader(get_resource("ambient_lighting_shader.frag"), "Ambient Lighting Shader");
+	InitScreenShader(resources_get("ambient_lighting_shader.frag"), "Ambient Lighting Shader");
 
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");

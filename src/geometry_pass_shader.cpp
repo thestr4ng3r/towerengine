@@ -4,7 +4,7 @@
 
 void tGeometryPassShader::Init(void)
 {
-	InitShader(get_resource("geometry_pass_shader.vert"), get_resource("geometry_pass_shader.frag"), "Geometry Pass Shader");
+	InitShader(resources_get("geometry_pass_shader.vert"), resources_get("geometry_pass_shader.frag"), "Geometry Pass Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, normal_attribute, "normal_attr");

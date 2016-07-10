@@ -4,7 +4,7 @@
 
 void tSSAOLightingShader::Init(tGBuffer *gbuffer)
 {
-	InitScreenShader(get_resource("ssao_lighting_shader.frag"), "SSAO Lighting Shader");
+	InitScreenShader(resources_get("ssao_lighting_shader.frag"), "SSAO Lighting Shader");
 
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	ssao_tex_uniform = GetUniformLocation("ssao_tex_uni");

@@ -4,7 +4,7 @@
 
 void tRefractionShader::Init(void)
 {
-	InitShader(get_resource("refraction_shader.vert"), get_resource("refraction_shader.frag"), "Refraction Shader");
+	InitShader(resources_get("refraction_shader.vert"), resources_get("refraction_shader.frag"), "Refraction Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, normal_attribute, "normal_attr");

@@ -40,14 +40,14 @@ void tParticleShader::SetTexture(GLuint texture)
 
 void tParticleForwardShader::Init(tGBuffer *gbuffer)
 {
-	InitParticleShader(gbuffer, get_resource("particle_forward_shader.vert"), get_resource("particle_forward_shader.geom"), get_resource("particle_forward_shader.frag"));
+	InitParticleShader(gbuffer, resources_get("particle_forward_shader.vert"), resources_get("particle_forward_shader.geom"), resources_get("particle_forward_shader.frag"));
 }
 
 
 
 void tParticleDeferredShader::Init(tGBuffer *gbuffer)
 {
-	InitParticleShader(gbuffer, get_resource("particle_deferred_shader.vert"), get_resource("particle_deferred_shader.geom"), get_resource("particle_deferred_shader.frag"));
+	InitParticleShader(gbuffer, resources_get("particle_deferred_shader.vert"), resources_get("particle_deferred_shader.geom"), resources_get("particle_deferred_shader.frag"));
 
 	face_normal_uniform = GetUniformLocation("face_normal_uni");
 	lighting_normal_uniform = GetUniformLocation("lighting_normal_uni");

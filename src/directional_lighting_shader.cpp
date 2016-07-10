@@ -6,7 +6,7 @@
 
 void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 {
-	InitScreenShader(get_resource("directional_lighting_shader.frag"), "Directional Lighting Shader");
+	InitScreenShader(resources_get("directional_lighting_shader.frag"), "Directional Lighting Shader");
 
 	depth_tex_uniform = GetUniformLocation("position_tex_uni");
 	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");

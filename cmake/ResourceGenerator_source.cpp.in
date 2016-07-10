@@ -4,8 +4,17 @@
 
 @RESOURCE_GENERATOR_RESOURCES_SOURCE@
 
-const char *@RESOURCE_GENERATOR_GET_FUNCTION_NAME@(const char *filename)
+const unsigned int resources_count = @RESOURCE_GENERATOR_RESOURCES_COUNT@;
+const char *all_resources[] = {@RESOURCE_GENERATOR_RESOURCES_ALL@};
+
+const char *@RESOURCE_GENERATOR_FUNCTION_PREFIX@_get(const char *filename)
 {
 @RESOURCE_GENERATOR_GET_FUNCTION_SOURCE@
 	return 0;
+}
+
+const char **@RESOURCE_GENERATOR_FUNCTION_PREFIX@_get_all(unsigned int *count)
+{
+	*count = resources_count;
+	return all_resources;
 }
