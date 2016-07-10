@@ -2,7 +2,7 @@
 
 uniform vec3 cam_pos_uni;
 
-#define LIGHTS_COUNT $(param LIGHTS_COUNT)
+#define LIGHTS_COUNT $(param lights_count)
 
 
 uniform vec3 point_light_pos_uni[LIGHTS_COUNT];
@@ -77,7 +77,7 @@ void main(void)
 	float specular_intensity;
 	vec3 color = vec3(0.0, 0.0, 0.0);
 	
-	$(for i from 0 ex param LIGHTS_COUNT)
+	$(for i from 0 ex param lights_count)
 		shadow = 1.0;
 	
 		light_dir = point_light_pos_uni[$(var i)] - position.xyz; // pos to light

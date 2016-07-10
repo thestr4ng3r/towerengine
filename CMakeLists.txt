@@ -193,8 +193,7 @@ configure_file(
 
 add_custom_command(OUTPUT ${RESOURCES_SRC}
 		COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/generate_resources_src.cmake"
-		MAIN_DEPENDENCY ${RESOURCES_FILE}
-		DEPENDS ${RESOURCES_SOURCE_INFO_FILE} ${RESOURCES_SHADER_FILES})
+		DEPENDS ${RESOURCES_SHADER_FILES})
 
 add_custom_target(resources DEPENDS ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 add_dependencies(towerengine resources)
