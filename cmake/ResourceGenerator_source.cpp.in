@@ -5,6 +5,7 @@
 @RESOURCE_GENERATOR_RESOURCES_SOURCE@
 
 const unsigned int resources_count = @RESOURCE_GENERATOR_RESOURCES_COUNT@;
+const char *all_resources_names[] = {@RESOURCE_GENERATOR_RESOURCES_ALL_NAMES@};
 const char *all_resources[] = {@RESOURCE_GENERATOR_RESOURCES_ALL@};
 
 const char *@RESOURCE_GENERATOR_FUNCTION_PREFIX@_get(const char *filename)
@@ -13,8 +14,9 @@ const char *@RESOURCE_GENERATOR_FUNCTION_PREFIX@_get(const char *filename)
 	return 0;
 }
 
-const char **@RESOURCE_GENERATOR_FUNCTION_PREFIX@_get_all(unsigned int *count)
+unsigned int @RESOURCE_GENERATOR_FUNCTION_PREFIX@_get_all(const char ***names, const char ***resources)
 {
-	*count = resources_count;
-	return all_resources;
+	*names = all_resources_names;
+	*resources = all_resources;
+	return resources_count;
 }

@@ -32,6 +32,7 @@ function(generate_resources)
 		set(RESOURCE_GENERATOR_RESOURCES_SOURCE "")
 		set(RESOURCE_GENERATOR_GET_FUNCTION_SOURCE "")
 		set(RESOURCE_GENERATOR_RESOURCES_ALL " ")
+		set(RESOURCE_GENERATOR_RESOURCES_ALL_NAMES " ")
 
 		set(resource_index 0)
 
@@ -39,6 +40,7 @@ function(generate_resources)
 			file(RELATIVE_PATH file_rel ${RESOURCE_GENERATOR_RELATIVE_PATH} ${file})
 
 			file(READ ${file} file_content)
+			string(REPLACE "\"" "\\\"" file_content "${file_content}")
 			string(REPLACE "\n" "\\n\"\n\t\"" file_content "${file_content}")
 
 			set(variable_name "resource_data_${resource_index}")
@@ -46,11 +48,12 @@ function(generate_resources)
 			set(RESOURCE_GENERATOR_RESOURCES_SOURCE "${RESOURCE_GENERATOR_RESOURCES_SOURCE}const char *${variable_name} =\n\t\"${file_content}\";\n\n")
 			set(RESOURCE_GENERATOR_GET_FUNCTION_SOURCE "${RESOURCE_GENERATOR_GET_FUNCTION_SOURCE}\tif(strcmp(filename, \"${file_rel}\") == 0)\n\t\treturn ${variable_name};\n")
 			set(RESOURCE_GENERATOR_RESOURCES_ALL "${RESOURCE_GENERATOR_RESOURCES_ALL}${variable_name}, ")
+			set(RESOURCE_GENERATOR_RESOURCES_ALL_NAMES "${RESOURCE_GENERATOR_RESOURCES_ALL_NAMES}\"${file_rel}\", ")
 
 			math(EXPR resource_index "${resource_index}+1")
 		endforeach()
 
-		list(LENGTH "${RESOURCE_GENERATOR_FILES}" RESOURCE_GENERATOR_RESOURCES_COUNT)
+		set(RESOURCE_GENERATOR_RESOURCES_COUNT ${resource_index})
 
 		file(RELATIVE_PATH RESOURCE_GENERATOR_HEADER_FILE_RELATIVE ${RESOURCE_GENERATOR_HEADER_FILE_RELATIVE_PATH} ${RESOURCE_GENERATOR_HEADER_FILE})
 

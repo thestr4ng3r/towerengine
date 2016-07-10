@@ -5,7 +5,7 @@
 void tParticleShader::InitParticleShader(tGBuffer *gbuffer, const char *vertex_source, const char *geometry_source, const char *fragment_source)
 {
 	InitShader(vertex_source, fragment_source, "Particle Shader");
-	CreateAndAttachShader(GL_GEOMETRY_SHADER, geometry_source);
+	CompileAndAttachShader(CreateShaderFromSource(GL_GEOMETRY_SHADER, geometry_source));
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, size_attribute, "size_attr");
 	glBindAttribLocation(program, rotation_attribute, "rotation_attr");

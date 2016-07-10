@@ -5,14 +5,13 @@ class tEngine
 {
 	private:
 		static bool arb_bindless_texture_supported;
-		//static bool arb_shading_language_420pack_supported;
+		static bool arb_shading_language_include_supported;
 
 	public:
-		static void Init(void);
-		static void Destroy(void);
+		static bool Init(std::string *error = 0);
 
-		static bool GetARBBindlessTextureSupported(void)			{ return arb_bindless_texture_supported; }
-		//static bool GetARBShadingLanguage420PackSupported(void)		{ return arb_shading_language_420pack_supported; }
+		static bool GetARBBindlessTextureSupported(void)				{ return arb_bindless_texture_supported; }
+		static bool GetARBShadingLanguageIncludeSupported(void)			{ return arb_shading_language_include_supported; }
 };
 
 #endif

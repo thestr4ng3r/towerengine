@@ -12,7 +12,7 @@ set(LIB_INSTALL_DIR lib)
 set(CMAKE_BUILD_TYPE Release)
 
 option(BUILD_STATIC_LIB "Build static instead of shared" OFF)
-option(RUN_STRINGRES "Run stringres to generate shader resources before build" OFF)
+
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
 IF(MSVC)
@@ -146,6 +146,7 @@ set(RESOURCES_HEADER "${RESOURCES_SRC_DIR}/resources.h")
 set(RESOURCES_SRC "${RESOURCES_SRC_DIR}/resources.cpp")
 set(RESOURCES_RELATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/shader")
 file(GLOB RESOURCES_SHADER_FILES
+		"${CMAKE_CURRENT_SOURCE_DIR}/shader/*.glsl"
 		"${CMAKE_CURRENT_SOURCE_DIR}/shader/*.vert"
 		"${CMAKE_CURRENT_SOURCE_DIR}/shader/*.geom"
 		"${CMAKE_CURRENT_SOURCE_DIR}/shader/*.frag")

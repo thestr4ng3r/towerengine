@@ -10,7 +10,9 @@ class tShader
 	protected:
 		GLuint program;
 
-		void CreateAndAttachShader(GLenum type, const char *src);
+		static GLuint CreateShaderFromSource(GLenum type, const char *src);
+		static GLuint CreateShaderFromNamedString(GLenum type, const char *name);
+		void CompileAndAttachShader(GLuint shader);
 		void LinkProgram(void);
 
 		void InitShader(const char *vert_src, const char *frag_src, const char *shader_name = 0);
@@ -23,6 +25,8 @@ class tShader
 		static const int material_binding_point = 1;
 		static const int position_restore_data_binding_point = 2;
 		static const int point_light_binding_point = 3;
+
+		static void InitSource(void);
 
 		void Bind(void);
 		static void Unbind(void);
@@ -64,9 +68,6 @@ class tMatrixBuffer : public tUniformBuffer
 		void Bind(void);
 };
 
-
-void PrintGLInfoLog(const char *log_title, GLuint handle);
-GLuint CreateShader(GLenum type, const char *src, const char *name);
 
 GLuint LoadGLTexture(const char *filename, int channels = 4, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int channels = 4, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
