@@ -68,6 +68,10 @@ class ExportMaterial():
         node2.setAttribute("g", str(material.diffuse_color.g * material.diffuse_intensity))
         node2.setAttribute("b", str(material.diffuse_color.b * material.diffuse_intensity))
         node2.setAttribute("ambient", str(material.ambient))
+
+        if material.raytrace_mirror.use:
+            node2.setAttribute("roughness", str(1.0 - material.raytrace_mirror.gloss_factor))
+
         node.appendChild(node2);
 
 
