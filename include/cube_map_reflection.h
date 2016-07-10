@@ -8,7 +8,8 @@ class tCubeMapReflection
 	private:
 		tVector position;
 
-		int resolution;
+		unsigned int resolution;
+		unsigned int resolution_log;
 		tGBuffer *gbuffer;
 
 		GLuint fbo;
@@ -27,7 +28,7 @@ class tCubeMapReflection
 		tCubeMapReflection(tVector position);
 		~tCubeMapReflection(void);
 
-		void Init(int resolution);
+		void Init(unsigned int resolution_log);
 
 		void Render(tRenderer *renderer);
 

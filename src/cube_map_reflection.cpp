@@ -31,9 +31,10 @@ tCubeMapReflection::~tCubeMapReflection(void)
 	delete gbuffer;
 }
 
-void tCubeMapReflection::Init(int resolution)
+void tCubeMapReflection::Init(unsigned int resolution_log)
 {
-	this->resolution = resolution;
+	this->resolution_log = resolution_log;
+	this->resolution = (unsigned int)1 << resolution_log;
 
 	glGenFramebuffers(1, &fbo);
 
