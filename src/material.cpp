@@ -21,12 +21,14 @@ tDefaultMaterial::tDefaultMaterial(void)
 	cube_map_reflection.enabled = false;
 	cube_map_reflection.color = Vec(0.0, 0.0, 0.0);
 
+	roughness = 0.0;
+
 	shadow.cast = true;
 
 	for(int i=0; i<tex_count; i++)
 		tex[i] = 0;
 
-	uniform_buffer = new tUniformBuffer(20 * 4);
+	uniform_buffer = new tUniformBuffer(21 * 4);
 }
 
 tDefaultMaterial::~tDefaultMaterial(void)
@@ -49,6 +51,11 @@ void tDefaultMaterial::SetSpecular(tVector color, float exponent)
 {
 	specular.color = color;
 	specular.exponent = exponent;
+}
+
+void tDefaultMaterial::SetRoughness(float rough)
+{
+	roughness = rough;
 }
 
 void tDefaultMaterial::SetBump(float depth)
@@ -139,6 +146,8 @@ bool tDefaultMaterial::InitDepthPrePass(tRenderer *renderer)
 	uniform bool bump_tex_enabled;
 	uniform bool self_illumination_tex_enabled;
 	uniform bool cube_map_reflection_enabled;
+
+ 	uniform float roughness;
 } material_uni;*/
 
 
@@ -166,6 +175,9 @@ void tDefaultMaterial::UpdateUniformBuffer(void)
 	*((int *)(data+1)) = tex[BUMP] != 0 ? 1 : 0;
 	*((int *)(data+2)) = tex[SELF_ILLUMINATION] != 0 ? 1 : 0;
 	*((int *)(data+3)) = cube_map_reflection.enabled != 0 ? 1 : 0;
+
+	data += 4;
+	*(data+0) = roughness;
 
 	uniform_buffer->UploadData();
 }

@@ -109,7 +109,7 @@ void tCubeMapReflection::Render(tRenderer *renderer)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-	//invalid = false;
+	invalid = false;
 }
 
 void tCubeMapReflection::GeometryPass(tRenderer *renderer, int side, tWorld *world)
@@ -311,7 +311,7 @@ void tCubeMapReflection::BlurPass(tRenderer *renderer)
 									   GL_TEXTURE_CUBE_MAP_POSITIVE_X + side,
 									   direction ? color_tex : blur_tex,
 									   level);
-			
+
 			tVector blur_dir;
 
 			int level_resolution = 1 << (resolution_log - level);

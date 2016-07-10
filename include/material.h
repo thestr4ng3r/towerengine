@@ -63,6 +63,8 @@ class tDefaultMaterial : public tMaterial
 			bool cast;
 		} shadow;
 
+		float roughness;
+
 		bool transparent;
 
 		GLuint tex[tex_count];
@@ -76,6 +78,7 @@ class tDefaultMaterial : public tMaterial
 
 		void SetDiffuse(tVector color);
 		void SetSpecular(tVector color, float exponent);
+		void SetRoughness(float rough);
 		void SetBump(float depth);
 		void SetSelfIlluminationColor(tVector color);
 		void SetCubeMapReflection(bool enabled, tVector color);

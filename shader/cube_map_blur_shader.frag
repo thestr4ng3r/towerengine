@@ -16,11 +16,20 @@ void main()
 	{
 		color = vec3(0.0);
 		
-		color += textureLod(tex_uni, coords_var[s] - blur_dir_var[s] * 2.0, mipmap_level_uni).rgb * 0.06136;
+		/*color += textureLod(tex_uni, coords_var[s] - blur_dir_var[s] * 2.0, mipmap_level_uni).rgb * 0.06136;
 		color += textureLod(tex_uni, coords_var[s] - blur_dir_var[s], 		mipmap_level_uni).rgb * 0.24477;
 		color += textureLod(tex_uni, coords_var[s], 						mipmap_level_uni).rgb * 0.38774;
 		color += textureLod(tex_uni, coords_var[s] + blur_dir_var[s], 		mipmap_level_uni).rgb * 0.24477;
-		color += textureLod(tex_uni, coords_var[s] + blur_dir_var[s] * 2.0, mipmap_level_uni).rgb * 0.06136;
+		color += textureLod(tex_uni, coords_var[s] + blur_dir_var[s] * 2.0, mipmap_level_uni).rgb * 0.06136;*/
+
+		color += textureLod(tex_uni, coords_var[s] - blur_dir_var[s] * 2.0, mipmap_level_uni).rgb * 0.00598;
+		color += textureLod(tex_uni, coords_var[s] - blur_dir_var[s] * 3.0, mipmap_level_uni).rgb * 0.060626;
+		color += textureLod(tex_uni, coords_var[s] - blur_dir_var[s], 		mipmap_level_uni).rgb * 0.241843;
+		color += textureLod(tex_uni, coords_var[s], 						mipmap_level_uni).rgb * 0.383103;
+		color += textureLod(tex_uni, coords_var[s] + blur_dir_var[s], 		mipmap_level_uni).rgb * 0.241843;
+		color += textureLod(tex_uni, coords_var[s] + blur_dir_var[s] * 2.0, mipmap_level_uni).rgb * 0.060626;
+		color += textureLod(tex_uni, coords_var[s] + blur_dir_var[s] * 3.0, mipmap_level_uni).rgb * 0.00598;
+
 
 		tex_out[s] = vec4(color, 1.0);
 	}

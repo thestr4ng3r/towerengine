@@ -854,6 +854,8 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 	exponent = 8.0;
 	bump_depth = 0.0;
 
+	float roughness = 0.0;
+
 	if(!(attr = cur->first_attribute("name")))
 		return 0;
 
@@ -922,6 +924,9 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 				specular_color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
 				specular_color.b = (float)atof(attr->value());
+
+			if((attr = child->first_attribute("roughness")))
+				roughness = (float)atof(attr->value());
 		}
 		else if(strcmp(name_temp, "normal") == 0)
 		{
@@ -1018,6 +1023,7 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 
 	r->SetDiffuse(diffuse_color);
 	r->SetSpecular(specular_color, exponent);
+	r->SetRoughness(roughness);
 	r->SetBump(bump_depth);
 	r->SetCubeMapReflection(cube_map_reflection_enabled, cube_map_reflection_color);
 	r->SetSelfIlluminationColor(self_illum_color);
