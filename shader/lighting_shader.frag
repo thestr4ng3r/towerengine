@@ -26,7 +26,7 @@ uniform vec3 light_ambient_color_uni;
 
 // point lights
 
-#define MAX_POINT_LIGHTS_COUNT $(param max_point_lights_count)
+#pragma define_param(MAX_POINT_LIGHTS_COUNT max_point_lights_count)
 
 struct PointLight
 {

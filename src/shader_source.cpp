@@ -100,6 +100,54 @@ vector<string> ParseSourceCommand(const string &source, size_t pos, size_t &end)
     return r;
 }
 
+vector<string> ParseParameterList(const string &source, unsigned long pos, unsigned long *end_pos)
+{
+	vector<string> r;
+
+	if(source.at(pos) != '(')
+		return r;
+
+	unsigned long length = source.length();
+	*end_pos = pos;
+
+	string param = "";
+
+	while(true)
+	{
+		(*end_pos)++;
+
+		if(*end_pos >= length)
+			return vector<string>();
+
+		char c = source.at(*end_pos);
+
+		if(c == '\n')
+			return vector<string>();
+
+		if(c == ')')
+		{
+			(*end_pos)++;
+			if(!param.empty())
+				r.push_back(param);
+			break;
+		}
+		else if(c == ' ')
+		{
+			if(!param.empty())
+			{
+				r.push_back(param);
+				param = "";
+			}
+		}
+		else
+		{
+			param.push_back(c);
+		}
+	}
+
+	return r;
+}
+
 
 
 class tShaderSourceBlock
@@ -132,47 +180,17 @@ class tShaderSourceForLoop : public tShaderSourceBlock
 		{
 			string inside = source.substr(begin, end-begin+1);
 			source.erase(begin, end-begin+1);
-			string inside_v;
-
-			vector<int> var_pos;
-			size_t vi;
-			vector<string> cmd;
-			size_t cmd_end;
-
-			vi = 0;
-			while((vi = inside.find('$', vi)) != string::npos)
-			{
-				cmd = ParseSourceCommand(inside, vi, cmd_end);
-
-				if(cmd.size() >= 2)
-				{
-					if(cmd.at(0).compare("var") == 0 && cmd.at(1).compare(var_name) == 0)
-					{
-						inside.erase(vi, (cmd_end - vi)+1);
-						var_pos.push_back(vi);
-					}
-				}
-
-				vi++;
-			}
-
 
 			int d = to < from ? -1 : 1;
 			int loop_offset = 0;
 			for(int i=from; i<=to; i+=d)
 			{
-				inside_v = inside;
+				string var_set = var_name + " = " + itos(i) + ";\n";
+				source.insert(begin + loop_offset, var_set);
+				loop_offset += var_set.length();
 
-				int var_offset = 0;
-				for(vector<int>::iterator it = var_pos.begin(); it != var_pos.end(); it++)
-				{
-					string var = itos(i);
-					inside_v.insert(*it + var_offset, var);
-					var_offset += var.length();
-				}
-
-				source.insert(begin + loop_offset, inside_v);
-				loop_offset += inside_v.length();
+				source.insert(begin + loop_offset, inside);
+				loop_offset += inside.length();
 			}
 
 			offset += loop_offset - (end - begin);
@@ -193,28 +211,30 @@ string tShaderSource::BuildSource(void)
 {
 	string final = source;
 
-	vector<string> cmd;
-	size_t cmd_end;
+	vector<string> cmd_params;
+	unsigned long cmd_end;
 
-	size_t vi = 0;
-	while((vi = final.find('$', vi)) != string::npos)
+	unsigned long vi = 0;
+	while((vi = final.find("#pragma define_param(", vi)) != string::npos)
 	{
-		cmd = ParseSourceCommand(final, vi, cmd_end);
+		cmd_params = ParseParameterList(final, vi+20, &cmd_end);
 
-		if(cmd.size() >= 2)
+		if(cmd_params.size() == 2)
 		{
-			if(cmd.at(0).compare("param") == 0)
-			{
-				map<string, tShaderSourceVariable *>::iterator pi = params.find(cmd.at(1));
-				if(pi == params.end())
-				{
-					printf("unknown parameter %s\n", cmd.at(1).c_str());
-					vi++;
-					continue;
-				}
+			map<string, tShaderSourceVariable *>::iterator pi = params.find(cmd_params.at(1));
 
-				final.replace(vi, cmd_end-vi+1, pi->second->GetString());
+			if(pi == params.end())
+			{
+				printf("unknown parameter %s\n", cmd_params.at(1).c_str());
+				vi++;
+				continue;
 			}
+
+			final.replace(vi, cmd_end-vi, "#define " + cmd_params.at(0) + " " + pi->second->GetString());
+		}
+		else
+		{
+			printf("wrong parameter count for define_param.\n");
 		}
 
 		vi++;
@@ -223,30 +243,26 @@ string tShaderSource::BuildSource(void)
 	vector<tSourceBlockCommand> block_cmds;
 
 	vi = 0;
-	while((vi = final.find('$', vi)) != string::npos)
+	while((vi = final.find("#pragma ", vi)) != string::npos)
 	{
-		cmd = ParseSourceCommand(final, vi, cmd_end);
-
-		if(cmd.size() >= 1)
+		if(final.compare(vi+8, 4, "for(") == 0)
 		{
-			if(cmd.at(0).compare("for") == 0)
-			{
-				tSourceBlockCommand bc;
-				bc.cmd = cmd;
-				bc.cmd_pos = vi;
-				bc.cmd_end = cmd_end;
-				bc.open = true;
-				block_cmds.push_back(bc);
-			}
-			else if(cmd.at(0).compare("end") == 0)
-			{
-				tSourceBlockCommand bc;
-				bc.cmd = cmd;
-				bc.cmd_pos = vi;
-				bc.cmd_end = cmd_end;
-				bc.open = false;
-				block_cmds.push_back(bc);
-			}
+			tSourceBlockCommand bc;
+			bc.cmd = ParseParameterList(final, vi+8+3, &cmd_end);
+			bc.cmd_pos = vi;
+			bc.cmd_end = cmd_end;
+			bc.open = true;
+			block_cmds.push_back(bc);
+		}
+		else if(final.compare(vi+8, 6, "endfor") == 0)
+		{
+			cmd_end = vi + 8 + 6;
+			tSourceBlockCommand bc;
+			bc.cmd = vector<string>();
+			bc.cmd_pos = vi;
+			bc.cmd_end = cmd_end;
+			bc.open = false;
+			block_cmds.push_back(bc);
 		}
 
 		vi++;
@@ -282,13 +298,13 @@ string tShaderSource::BuildSource(void)
 
 		vector<string>::iterator ci=start_bc.cmd.begin();
 
-		NEXT_PARAM(ci, start_bc.cmd)
+		//NEXT_PARAM(ci, start_bc.cmd)
 		var_name = *ci;
 
 		NEXT_PARAM(ci, start_bc.cmd)
 		if((*ci).compare("from") != 0)
 		{
-			printf("expected from in for command\n");
+			printf("expected from in for command, got %s\n", (*ci).c_str());
 			continue;
 		}
 

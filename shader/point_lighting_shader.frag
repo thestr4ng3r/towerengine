@@ -6,8 +6,7 @@
 
 uniform vec3 cam_pos_uni;
 
-#define LIGHTS_COUNT $(param lights_count)
-
+#pragma define_param(LIGHTS_COUNT lights_count)
 
 uniform vec3 point_light_pos_uni[LIGHTS_COUNT];
 uniform vec3 point_light_color_uni[LIGHTS_COUNT];
@@ -60,22 +59,23 @@ void main(void)
 	vec3 specular_color;
 	float specular_intensity;
 	vec3 color = vec3(0.0, 0.0, 0.0);
-	
-	$(for i from 0 ex param lights_count)
+
+	int i;
+	#pragma for(i from 0 ex param lights_count)
 		shadow = 1.0;
 	
-		light_dir = point_light_pos_uni[$(var i)] - position.xyz; // pos to light
+		light_dir = point_light_pos_uni[i] - position.xyz; // pos to light
 		light_dist_sq = light_dir.x * light_dir.x + light_dir.y * light_dir.y + light_dir.z * light_dir.z; // squared distance
-		if(light_dist_sq <= point_light_distance_uni[$(var i)] * point_light_distance_uni[$(var i)])
+		if(light_dist_sq <= point_light_distance_uni[i] * point_light_distance_uni[i])
 		{
 			light_dist = sqrt(light_dist_sq); // real distance
 			light_dir /= light_dist; // normalized dir
 			
-			if(point_light_shadow_enabled_uni[$(var i)])
+			if(point_light_shadow_enabled_uni[i])
 			{ 
-				vec2 moments = texture(point_light_shadow_map_uni[$(var i)], -light_dir).rg;
+				vec2 moments = texture(point_light_shadow_map_uni[i], -light_dir).rg;
 				
-				float light_depth = length(point_light_pos_uni[$(var i)] - position.xyz) - 0.01;
+				float light_depth = length(point_light_pos_uni[i] - position.xyz) - 0.01;
 										
 				// Surface is fully lit. as the current fragment is before the light occluder
 				if(light_depth <= moments.x)
@@ -94,16 +94,16 @@ void main(void)
 				shadow = 1.0;
 		
 		
-			light_dist_attenuation = (1.0 - light_dist / point_light_distance_uni[$(var i)]);
+			light_dist_attenuation = (1.0 - light_dist / point_light_distance_uni[i]);
 			light_intensity = max(dot(normal, light_dir), 0.0) *  light_dist_attenuation;
-			color += shadow * light_intensity * point_light_color_uni[$(var i)] * diffuse.rgb; // diffuse light
+			color += shadow * light_intensity * point_light_color_uni[i] * diffuse.rgb; // diffuse light
 		
 			//specular
-			specular_color = specular.rgb * point_light_color_uni[$(var i)];
+			specular_color = specular.rgb * point_light_color_uni[i];
 			specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0);
 			color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow * light_dist_attenuation;
 		}
-	$(end for)
+	#pragma endfor
 	
 	color_out = vec4(color, 1.0);
 }
