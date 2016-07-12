@@ -4,6 +4,7 @@
 #extension GL_ARB_shading_language_include : require
 
 #include "position_restore.glsl"
+#include "lighting.glsl"
 
 uniform vec3 cam_pos_uni;
 
@@ -48,10 +49,6 @@ layout(std140) uniform PointLightBlock
 
 
 
-float linstep(float min, float max, float v)
-{
-	return clamp((v - min) / (max - min), 0.0, 1.0);
-}
 
 void main(void)
 {	
@@ -60,7 +57,7 @@ void main(void)
 	if(depth == 1.0)
 		discard;
 
-	vec3 diffuse = texture(diffuse_tex_uni, uv_coord_var).rgb;	
+	vec3 diffuse = texture(diffuse_tex_uni, uv_coord_var).rgb;
 	vec3 position = CalculateWorldPosition(depth, uv_coord_var);
 	vec3 normal = normalize(texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
 	vec4 specular = texture(specular_tex_uni, uv_coord_var).rgba;
@@ -85,59 +82,18 @@ void main(void)
 	
 	// point lighting
 	
-	float shadow;
-	vec3 light_dir;
-	float light_dist_sq;
-	float light_dist;
-	float light_dist_attenuation;
-	float light_intensity;
-	vec3 specular_color;
-	float specular_intensity;
-	
 	for(int i=0; i<point_light_uni.count; i++)
 	{
-		shadow = 1.0;
-	
-		light_dir = point_light_uni.light[i].pos - position.xyz; // pos to light
-		light_dist_sq = light_dir.x * light_dir.x + light_dir.y * light_dir.y + light_dir.z * light_dir.z; // squared distance
-		if(light_dist_sq <= point_light_uni.light[i].dist * point_light_uni.light[i].dist)
-		{
-			light_dist = sqrt(light_dist_sq); // real distance
-			light_dir /= light_dist; // normalized dir
-			
-			if(point_light_uni.light[i].shadow_enabled != 0)
-			{ 
-				vec2 moments = texture(point_light_uni.light[i].shadow_map, -light_dir).rg;
-				//vec2 moments = vec2(0.0);
-				
-				float light_depth = length(point_light_uni.light[i].pos - position.xyz) - 0.01;
-							
-				// Surface is fully lit. as the current fragment is before the light occluder
-				if(light_depth <= moments.x)
-					shadow = 1.0;
-				else
-				{
-					float p = smoothstep(light_depth-0.00005, light_depth, moments.x);
-				    float variance = max(moments.y - moments.x*moments.x, -0.001);
-				    float d = light_depth - moments.x;
-				    float p_max = linstep(0.3, 1.0, variance / (variance + d*d));
-				    
-				    shadow = p_max;//clamp(max(p, p_max), 0.0, 1.0);
-				}
-			}
-			else
-				shadow = 1.0;
-		
-		
-			light_dist_attenuation = (1.0 - light_dist / point_light_uni.light[i].dist);
-			light_intensity = max(dot(normal, light_dir), 0.0) * light_dist_attenuation;
-			color += shadow * light_intensity * point_light_uni.light[i].color * diffuse.rgb; // diffuse light
-		
-			//specular
-			specular_color = specular.rgb * point_light_uni.light[i].color;
-			specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0);
-			color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, specular.a)) * shadow * light_dist_attenuation;
-		}
+		color += PointLightLighting(position.xyz,
+									diffuse.rgb,
+									specular.rgba,
+									cam_dir,
+									normal,
+									point_light_uni.light[i].pos,
+									point_light_uni.light[i].dist,
+									point_light_uni.light[i].color,
+									point_light_uni.light[i].shadow_enabled != 0,
+									point_light_uni.light[i].shadow_map);
 	}
 	
 	color_out = vec4(color, 1.0);
