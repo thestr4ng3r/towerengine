@@ -6,9 +6,14 @@
 
 
 bool tEngine::arb_bindless_texture_supported = false;
-//bool tEngine::arb_shading_language_420pack_supported = false;
+bool tEngine::arb_shading_language_include_supported = false;
 
-void tEngine::Init(void)
+
+const char *glew_init_error_msg = "Failed to initialize GLEW.";
+const char *arb_bindless_texture_error_msg = "ARB_bindless_texture is not supported by the graphics card or driver. This might have a negative impact on performance.";
+const char *arb_shading_language_include_error_msg = "ARB_shading_language_include is not supported by the graphics card or driver.";
+
+bool tEngine::Init(std::string *error)
 {
 	int v;
 	printf("Running with OpenGL version: %s\n", glGetString(GL_VERSION));
@@ -21,8 +26,9 @@ void tEngine::Init(void)
 	GLenum glew_r = glewInit();
 	if(glew_r != GLEW_OK)
 	{
-		printf("Failed to initialize glew: %s\n", glewGetErrorString(glew_r));
-		return;
+		*error = std::string("Failed to initialize GLEW: ") + glew_init_error_msg;
+		fprintf(stderr, "Failed to initialize GLEW: %s\n", glewGetErrorString(glew_r));
+		return false;
 	}
 
 
@@ -32,8 +38,22 @@ void tEngine::Init(void)
 	if(GLEW_ARB_bindless_texture)
 		arb_bindless_texture_supported = true;
 
+	if(GLEW_ARB_shading_language_include)
+		arb_shading_language_include_supported = true;
+
+
+
 	if(!arb_bindless_texture_supported)
-		printf("ARB_bindless_texture is not supported by the graphics card or driver! This might have a negative impact on performance.\n");
+		fprintf(stderr, "%s\n", arb_bindless_texture_error_msg);
+
+	if(!arb_shading_language_include_supported)
+	{
+		*error = std::string(arb_shading_language_include_error_msg);
+		fprintf(stderr, "%s\n", arb_shading_language_include_error_msg);
+		return false;
+	}
+
+	tShader::InitSource();
 
 
 	srand(time(0));
@@ -48,9 +68,6 @@ void tEngine::Init(void)
 	ilInit();
 	iluInit();
 
-}
 
-void tEngine::Destroy(void)
-{
+	return true;
 }
-

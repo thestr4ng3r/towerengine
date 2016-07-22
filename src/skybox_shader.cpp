@@ -8,7 +8,7 @@ using namespace std;
 
 void tSkyBoxShader::Init(void)
 {
-	InitShader(get_resource("skybox_shader.vert"), get_resource("skybox_shader.frag"), "SkyBox Shader");
+	InitShader(resources_get("skybox_shader.vert"), resources_get("skybox_shader.frag"), "SkyBox Shader");
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	LinkProgram();
 

@@ -4,7 +4,7 @@
 
 void tFogShader::Init(void)
 {
-	InitScreenShader(get_resource("fog_shader.frag"), "Fog Shader");
+	InitScreenShader(resources_get("fog_shader.frag"), "Fog Shader");
 
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	color_tex_uniform = GetUniformLocation("color_tex_uni");

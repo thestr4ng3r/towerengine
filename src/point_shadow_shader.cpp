@@ -4,7 +4,7 @@
 
 void tPointShadowShader::Init(void)
 {
-	InitShader(get_resource("point_shadow_shader.vert"), get_resource("point_shadow_shader.frag"), "Point Shadow Shader");
+	InitShader(resources_get("point_shadow_shader.vert"), resources_get("point_shadow_shader.frag"), "Point Shadow Shader");
 	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, tFaceShader::uvcoord_attribute, "uv_attr");
 	LinkProgram();
@@ -60,7 +60,7 @@ void tPointShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
 
 void tPointShadowBlurShader::Init(void)
 {
-	InitShader(get_resource("point_shadow_blur_shader.vert"), get_resource("point_shadow_blur_shader.frag"), "Point Shadow Blur Shader");
+	InitShader(resources_get("point_shadow_blur_shader.vert"), resources_get("point_shadow_blur_shader.frag"), "Point Shadow Blur Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 

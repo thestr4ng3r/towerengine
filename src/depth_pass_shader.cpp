@@ -4,7 +4,7 @@
 
 void tDepthPassShader::Init(void)
 {
-	InitShader(get_resource("depth_pass_shader.vert"), get_resource("depth_pass_shader.frag"), "Depth Pass Shader");
+	InitShader(resources_get("depth_pass_shader.vert"), resources_get("depth_pass_shader.frag"), "Depth Pass Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, uvcoord_attribute, "uv_attr");

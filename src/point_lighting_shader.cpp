@@ -17,8 +17,8 @@ tPointLightingShader::~tPointLightingShader(void)
 
 void tPointLightingShader::Init(tGBuffer *gbuffer)
 {
-	tShaderSource *src = new tShaderSource(string(get_resource("point_lighting_shader.frag")));
-	src->SetParameter("LIGHTS_COUNT", new tShaderSourceVariable(lights_count));
+	tShaderSource *src = new tShaderSource(string(resources_get("point_lighting_shader.frag")));
+	src->SetParameter("lights_count", new tShaderSourceVariable(lights_count));
 	InitScreenShader(src->BuildSource().c_str(), "Point Lighting Shader");
 	delete src;
 

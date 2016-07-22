@@ -2,6 +2,7 @@
 #ifndef _@RESOURCE_GENERATOR_INCLUDE_GUARD@_H
 #define _@RESOURCE_GENERATOR_INCLUDE_GUARD@_H
 
-const char *@RESOURCE_GENERATOR_GET_FUNCTION_NAME@(const char *filename);
+const char *@RESOURCE_GENERATOR_FUNCTION_PREFIX@_get(const char *filename);
+unsigned int @RESOURCE_GENERATOR_FUNCTION_PREFIX@_get_all(const char ***names, const char ***resources);
 
 #endif // _@RESOURCE_GENERATOR_INCLUDE_GUARD@_H

@@ -4,7 +4,7 @@
 
 void tSimpleForwardShader::Init(void)
 {
-	InitShader(get_resource("simple_forward_shader.vert"), get_resource("simple_forward_shader.frag"), "Simple Forward Shader");
+	InitShader(resources_get("simple_forward_shader.vert"), resources_get("simple_forward_shader.frag"), "Simple Forward Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, uvcoord_attribute, "uv_attr");

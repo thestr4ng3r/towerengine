@@ -4,15 +4,75 @@
 #include <IL/il.h>
 #include <IL/ilu.h>
 
-//#define CODEXL_WORKAROUND
+#include "resources.h"
 
 
 using namespace std;
 
+void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_name = 0);
 
-void tShader::CreateAndAttachShader(GLenum type, const char *src)
+
+void tShader::InitSource(void)
 {
-	GLuint shader = CreateShader(type, src, name);
+	const char **sources;
+	const char **names;
+	unsigned int source_count = resources_get_all(&names, &sources);
+
+	for(unsigned int i=0; i<source_count; i++)
+	{
+		string name = string("/") + names[i];
+		glNamedStringARB(GL_SHADER_INCLUDE_ARB, -1, name.c_str(), -1, sources[i]);
+	}
+}
+
+
+
+GLuint tShader::CreateShaderFromSource(GLenum type, const char *src)
+{
+	GLuint shader = glCreateShader(type);
+
+	GLint len = (GLint)strlen(src);
+	glShaderSource(shader, 1, &src, &len);
+
+	return shader;
+}
+
+
+GLuint tShader::CreateShaderFromNamedString(GLenum type, const char *name)
+{
+	int len;
+	glGetNamedStringivARB(-1, name, GL_NAMED_STRING_LENGTH_ARB, &len);
+
+	if(len <= 0)
+		return 0;
+
+	GLint stringlen;
+
+	GLchar *source = new char[len];
+	glGetNamedStringARB(-1, name, len, &stringlen, source);
+
+	GLuint shader = CreateShaderFromSource(type, source);
+
+	delete [] source;
+
+	return shader;
+}
+
+void tShader::CompileAndAttachShader(GLuint shader)
+{
+	//glCompileShader(shader);
+
+	const GLchar *search_path = "/";
+	const GLint search_path_len[] = { -1 };
+	glCompileShaderIncludeARB(shader, 1, &search_path, search_path_len);
+
+	GLint compile_status;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
+	if(compile_status != GL_TRUE)
+		printf("failed to compile shader of %s\n", name);
+
+	PrintGLInfoLog("Compile", shader, name);
+
 	glAttachShader(program, shader);
 }
 
@@ -38,8 +98,8 @@ void tShader::InitShader(const char *vert_src, const char *frag_src, const char 
 	if(name)
 		glObjectLabel(GL_PROGRAM, program, strlen(name), name);
 #endif
-	CreateAndAttachShader(GL_VERTEX_SHADER, vert_src);
-	CreateAndAttachShader(GL_FRAGMENT_SHADER, frag_src);
+	CompileAndAttachShader(CreateShaderFromSource(GL_VERTEX_SHADER, vert_src));
+	CompileAndAttachShader(CreateShaderFromSource(GL_FRAGMENT_SHADER, frag_src));
 }
 
 GLint tShader::GetUniformLocation(const char *uniform)
@@ -120,7 +180,7 @@ void tMatrixBuffer::Bind(void)
 
 // ------------------------
 
-void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_name = 0)
+void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_name)
 {
 	GLchar *string;
 	GLint size;
@@ -141,57 +201,6 @@ void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_nam
 }
 
 
-GLuint CreateShader(GLenum type, const char *src, const char *name)
-{
-	GLuint s;
-	GLint len;
-	
-	s = glCreateShader(type);
-	if(!s)
-	{
-		printf("Could not create shader!\n");
-		return 0;
-	}
-
-
-	len = strlen(src);
-
-#ifdef CODEXL_WORKAROUND
-	glShaderSourceARB(s, 1, &src, &len);
-	printf("WARNING: using glShaderSourceARB instead of glShaderSource as a workaround for CodeXL.\n");
-#else
-	glShaderSource(s, 1, &src, &len);
-#endif
-
-
-	glCompileShader(s);
-
-	GLint compile_status;
-	glGetShaderiv(s, GL_COMPILE_STATUS, &compile_status);
-	if(compile_status != GL_TRUE)
-		printf("failed to compile shader of %s\n", name);
-
-	PrintGLInfoLog("Compile", s, name);
-
-	return s;
-}
-
-/*GLuint CreateShaderProgram(GLuint vertex_shader, GLuint fragment_shader)
-{
-	GLuint p;
-
-	p = glCreateProgram();
-	glAttachShader(p, vertex_shader);
-	glAttachShader(p, fragment_shader);
-
-	return p;
-}*/
-
-/*void LinkShaderProgram(GLuint program)
-{
-	glLinkProgram(program);
-	//PrintGLInfoLog("Link", program);
-}*/
 
 GLuint LoadGLTextureIL(ILuint image, int channels, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 

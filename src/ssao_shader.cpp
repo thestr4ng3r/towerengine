@@ -7,7 +7,7 @@ using namespace std;
 
 void tSSAOShader::Init(void)
 {
-	InitScreenShader(get_resource("ssao_shader.frag"), "SSAO Shader");
+	InitScreenShader(resources_get("ssao_shader.frag"), "SSAO Shader");
 
 	kernel_uniform = GetUniformLocation("kernel_uni");
 	kernel_size_uniform = GetUniformLocation("kernel_size_uni");
