@@ -4,7 +4,7 @@
 
 void tCubeMapBlurShader::Init(void)
 {
-	InitShader(get_resource("cube_map_blur_shader.vert"), get_resource("cube_map_blur_shader.frag"), "Cube Map Blur Shader");
+	InitShader(resources_get("cube_map_blur_shader.vert"), resources_get("cube_map_blur_shader.frag"), "Cube Map Blur Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 

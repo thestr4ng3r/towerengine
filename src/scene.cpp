@@ -570,6 +570,7 @@ tVector tScene::ParseVectorNode(xml_node<> *cur, const char *x_p, const char *y_
 
 void tScene::AddObject(string name, tSceneObject *object)
 {
+	//printf("AddObject %s\n", name.c_str());
 	objects.insert(pair<string, tSceneObject *>(name, object));
 }
 

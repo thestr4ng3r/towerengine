@@ -68,7 +68,9 @@ void main(void)
 	
 	// ambient lighting, ssao and self illumination
 	
-	vec3 color = diffuse.rgb * light_ambient_color_uni;
+	vec3 color = vec3(0.0);
+
+	color += diffuse.rgb * light_ambient_color_uni;
 	
 	if(ssao_enabled_uni)
 	{
@@ -77,7 +79,7 @@ void main(void)
 	}
 	
 	vec3 self_illumination = texture(self_illumination_tex_uni, uv_coord_var).rgb;
-	color += self_illumination;
+	//color += self_illumination;
 	
 	
 	// point lighting

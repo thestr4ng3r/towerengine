@@ -1,63 +1,116 @@
 
 
-
+#define M_PI 3.1415926535897932384626433832795
 
 float linstep(float min, float max, float v)
 {
 	return clamp((v - min) / (max - min), 0.0, 1.0);
 }
 
-
-vec3 PointLightLighting(in vec3 position, in vec3 material_diffuse, in vec4 material_specular, in vec3 cam_dir, in vec3 normal,
-						in vec3 light_pos, in float point_light_dist, vec3 light_color, // TODO: better name for point_light_dist
-						in bool shadow_enabled, in samplerCube shadow_map)
+float BRDF_SpecularD_GGX(float roughness, float n_dot_h)
 {
-    float shadow = 1.0;
+	float alpha = roughness * roughness;
+	float alpha2 = alpha * alpha;
+	float n_dot_h2 = n_dot_h * n_dot_h;
+	float d = n_dot_h2 * (alpha2 - 1.0) + 1.0;
+	return alpha2 / (M_PI * d * d);
+}
 
-    vec3 light_dir = light_pos - position;
+float BRDF_SpecularG_Schlick(float roughness, float n_dot_l, float n_dot_v)
+{
+	float k = ((roughness + 1.0) * (roughness + 1.0)) / 8.0;
 
-    float light_dist_sq = light_dir.x * light_dir.x + light_dir.y * light_dir.y + light_dir.z * light_dir.z; // squared distance
+	float G_l = n_dot_l / (n_dot_l * (1.0 - k) + k);
+	float G_v = n_dot_v / (n_dot_v * (1.0 - k) + k);
 
-    if(light_dist_sq > point_light_dist * point_light_dist)
-        return vec3(0.0);
+	return G_l * G_v;
+}
+
+float BRDF_SpecularF_Schlick(float f0, float v_dot_h)
+{
+	float f = 1.0 - v_dot_h;
+	float f2 = f * f;
+	return f0 + (1.0 - f0) * f2 * f2 * f;
+}
+
+
+vec3 CalculateLighting(vec3 base_color, float roughness, float F0,
+						vec3 n, vec3 v, vec3 l, vec3 h)
+{
+
+	float n_dot_l = clamp(dot(n, l), 0.0, 1.0);
+	float n_dot_h = clamp(dot(n, h), 0.0, 1.0);
+	float n_dot_v = clamp(dot(n, v), 0.0, 1.0);
+	float v_dot_h = clamp(dot(v, h), 0.0, 1.0);
+
+
+	float D = BRDF_SpecularD_GGX(roughness, n_dot_h);
+	float G = BRDF_SpecularG_Schlick(roughness, n_dot_l, n_dot_v);
+	float F = BRDF_SpecularF_Schlick(F0, v_dot_h);
+
+	float specular = F * G * D;
+	specular /= 4.0 * n_dot_v; // * n_dot_l
+
+	vec3 color = specular * base_color; // * n_dot_l // specular
+
+	color += (1.0 - F) * base_color * n_dot_l; // diffuse
+
+	return color;
+}
+
+vec3 PointLightLighting(vec3 position, vec3 material_diffuse, vec4 material_specular, vec3 cam_dir, vec3 normal,
+						vec3 light_pos, float point_light_dist, vec3 light_color, // TODO: better name for point_light_dist
+						bool shadow_enabled, samplerCube shadow_map)
+{
+	float roughness = 0.5;
+	float F0 = 0.3;
+
+
+	vec3 point_to_light = light_pos - position;
+	float light_dist2 = dot(point_to_light, point_to_light);
+
+	if(light_dist2 > point_light_dist * point_light_dist)
+		return vec3(0.0);
+
+	float light_dist = sqrt(light_dist2); // real distance
+
+
+	vec3 l = point_to_light / light_dist;
+	vec3 v = normalize(cam_dir); // TODO: should be normalized before
+	vec3 n = normalize(normal); // TODO: should be normalized before
+	vec3 h = normalize(v + l);
 
 
 
-    float light_dist = sqrt(light_dist_sq); // real distance
-    light_dir /= light_dist; // normalized dir
 
-    if(shadow_enabled)
-    {
-        vec2 moments = texture(shadow_map, -light_dir).rg;
-        //vec2 moments = vec2(0.0);
+	float shadow = 1.0;
 
-        float light_depth = light_dist - 0.01;
+	if(shadow_enabled)
+	{
+		vec2 moments = texture(shadow_map, -l).rg;
 
-        // Surface is fully lit. as the current fragment is before the light occluder
-        if(light_depth <= moments.x)
-            shadow = 1.0;
-        else
-        {
-            float p = smoothstep(light_depth-0.00005, light_depth, moments.x);
-            float variance = max(moments.y - moments.x*moments.x, -0.001);
-            float d = light_depth - moments.x;
-            float p_max = linstep(0.3, 1.0, variance / (variance + d*d));
+		float light_depth = light_dist - 0.01;
 
-            shadow = p_max;//clamp(max(p, p_max), 0.0, 1.0);
-        }
-    }
-    else
-        shadow = 1.0;
+		if(light_depth <= moments.x)
+			shadow = 1.0;
+		else
+		{
+			float p = smoothstep(light_depth-0.00005, light_depth, moments.x);
+			float variance = max(moments.y - moments.x*moments.x, -0.001);
+			float d = light_depth - moments.x;
+			float p_max = linstep(0.3, 1.0, variance / (variance + d*d));
+
+			shadow = p_max; //clamp(max(p, p_max), 0.0, 1.0);
+		}
+	}
+	else
+		shadow = 1.0;
 
 
     float light_dist_attenuation = (1.0 - light_dist / point_light_dist);
-    float light_intensity = max(dot(normal, light_dir), 0.0) * light_dist_attenuation;
-    vec3 color = shadow * light_intensity * light_color * material_diffuse; // diffuse light
+    float light_intensity = max(dot(n, l), 0.0) * light_dist_attenuation;
 
-    //specular
-    vec3 specular_color = material_specular.rgb * light_color;
-    float specular_intensity = max(dot(normalize(reflect(-light_dir, normal)), cam_dir), 0.0); // TODO: reflect cam_dir instead of light_dir to avoid recalculating
-    color += max(vec3(0.0, 0.0, 0.0), specular_color * pow(specular_intensity, material_specular.a)) * shadow * light_dist_attenuation;
+    vec3 radiance = light_intensity * shadow * light_color;
 
-    return color;
+	return radiance * CalculateLighting(material_diffuse, roughness, F0, n, v, l, h);
 }
