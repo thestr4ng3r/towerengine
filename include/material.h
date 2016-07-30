@@ -20,37 +20,23 @@ class tDefaultMaterial : public tMaterial
 	public:
 		enum TextureType
 		{
-			DIFFUSE,
-			SPECULAR,
+			BASE_COLOR,
+			METALLIC_ROUGHNESS,
 			NORMAL,
-			SELF_ILLUMINATION,
+			EMISSION,
 			BUMP
 		};
 
 		static const int tex_count = 5;
 
 	protected:
-		struct Diffuse
-		{
-			tVector color;
-		} diffuse;
+		tVector base_color;
+		float metallic;
+		float roughness;
 
-		struct Specular
-		{
-			float exponent;
-			tVector color;
-		} specular;
+		tVector emission;
 
-		struct SelfIllumination
-		{
-			tVector color;
-		} self_illum;
-
-		struct Bump
-		{
-			bool enabled;
-			float depth;
-		} bump;
+		float bump_depth;
 
 		struct CubeMapReflection
 		{
@@ -58,12 +44,8 @@ class tDefaultMaterial : public tMaterial
 			tVector color;
 		} cube_map_reflection;
 
-		struct Shadow
-		{
-			bool cast;
-		} shadow;
+		bool shadow_cast;
 
-		float roughness;
 
 		bool transparent;
 
@@ -76,13 +58,14 @@ class tDefaultMaterial : public tMaterial
 		tDefaultMaterial(void);
 		~tDefaultMaterial(void);
 
-		void SetDiffuse(tVector color);
-		void SetSpecular(tVector color, float exponent);
-		void SetRoughness(float rough);
-		void SetBump(float depth);
-		void SetSelfIlluminationColor(tVector color);
+		void SetBaseColor(tVector color)	{ this->base_color = color; }
+		void SetMetallic(float metallic)	{ this->metallic = metallic; }
+		void SetRoughness(float roughness)	{ this->roughness = roughness; }
+		void SetEmission(tVector color)		{ this->emission = color; }
+		void SetBumpDepth(float depth)		{ this->bump_depth = depth; }
+		void SetShadowCast(bool enabled)	{ this->shadow_cast = enabled; }
+
 		void SetCubeMapReflection(bool enabled, tVector color);
-		void SetShadowCast(bool enabled);
 
 		void LoadTexture(TextureType type, std::string file);
 		void LoadTexture(TextureType type, const char *extension, const void *data, unsigned int size);

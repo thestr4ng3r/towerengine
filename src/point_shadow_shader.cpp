@@ -43,7 +43,7 @@ void tPointShadowShader::SetTransformation(const float m[16])
 		glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void tPointShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
+void tPointShadowShader::SetBaseColorTexture(bool enabled, GLuint tex)
 {
 	glUniform1i(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
 

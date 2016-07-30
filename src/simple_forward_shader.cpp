@@ -21,7 +21,7 @@ void tSimpleForwardShader::Init(void)
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
 
 	Bind();
-	glUniform1i(tex_uniform, diffuse_tex_unit);
+	glUniform1i(tex_uniform, base_color_tex_unit);
 }
 
 
@@ -43,7 +43,7 @@ void tSimpleForwardShader::SetTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
+		glActiveTexture(GL_TEXTURE0 + base_color_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
 }

@@ -7,28 +7,27 @@ using namespace std;
 
 tDefaultMaterial::tDefaultMaterial(void)
 {
-	diffuse.color.Set(1.0, 1.0, 1.0);
+	base_color = Vec(1.0, 1.0, 1.0);
+	metallic = 0.2;
+	roughness = 0.3;
+
+	emission = Vec(0.0, 0.0, 0.0);
+
     transparent = false;
 
-	specular.color.Set(1.0, 1.0, 1.0);
-	specular.exponent = 64.0;
-
-	bump.enabled = false;
-	bump.depth = 0;
-
-	self_illum.color.Set(0.0, 0.0, 0.0);
+	bump_depth = 0;
 
 	cube_map_reflection.enabled = false;
 	cube_map_reflection.color = Vec(0.0, 0.0, 0.0);
 
 	roughness = 0.0;
 
-	shadow.cast = true;
+	shadow_cast = true;
 
 	for(int i=0; i<tex_count; i++)
 		tex[i] = 0;
 
-	uniform_buffer = new tUniformBuffer(21 * 4);
+	uniform_buffer = new tUniformBuffer(18 * 4);
 }
 
 tDefaultMaterial::~tDefaultMaterial(void)
@@ -42,26 +41,8 @@ tDefaultMaterial::~tDefaultMaterial(void)
 	delete uniform_buffer;
 }
 
-void tDefaultMaterial::SetDiffuse(tVector color)
-{
-	diffuse.color = color;
-}
 
-void tDefaultMaterial::SetSpecular(tVector color, float exponent)
-{
-	specular.color = color;
-	specular.exponent = exponent;
-}
 
-void tDefaultMaterial::SetRoughness(float rough)
-{
-	roughness = rough;
-}
-
-void tDefaultMaterial::SetBump(float depth)
-{
-	bump.depth = depth;
-}
 
 void tDefaultMaterial::SetCubeMapReflection(bool enabled, tVector color)
 {
@@ -69,15 +50,6 @@ void tDefaultMaterial::SetCubeMapReflection(bool enabled, tVector color)
 	cube_map_reflection.color = color;
 }
 
-void tDefaultMaterial::SetSelfIlluminationColor(tVector color)
-{
-	self_illum.color = color;
-}
-
-void tDefaultMaterial::SetShadowCast(bool enabled)
-{
-	shadow.cast = enabled;
-}
 
 void tDefaultMaterial::LoadTexture(TextureType type, string file)
 {
@@ -87,11 +59,11 @@ void tDefaultMaterial::LoadTexture(TextureType type, string file)
 	}
 
 	bool *transparent = 0;
-	if(type == DIFFUSE)
+	if(type == BASE_COLOR)
 		transparent = &(this->transparent);
 
 	int channels = 3;
-	if(type == DIFFUSE)
+	if(type == BASE_COLOR)
 		channels = 4;
 	else if(type == BUMP)
 		channels = 1;
@@ -107,11 +79,11 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 	}
 
 	bool *transparent = 0;
-	if(type == DIFFUSE)
+	if(type == BASE_COLOR)
 		transparent = &(this->transparent);
 
 	int channels = 3;
-	if(type == DIFFUSE)
+	if(type == BASE_COLOR)
 		channels = 4;
 	else if(type == BUMP)
 		channels = 1;
@@ -123,7 +95,7 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 bool tDefaultMaterial::InitDepthPrePass(tRenderer *renderer)
 {
 	//renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
-	renderer->GetDepthPassShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
+	renderer->GetDepthPassShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);
 	return true;
 }
 
@@ -150,34 +122,53 @@ bool tDefaultMaterial::InitDepthPrePass(tRenderer *renderer)
  	uniform float roughness;
 } material_uni;*/
 
+/*
+layout(std140) uniform MaterialBlock
+{
+	uniform vec3 base_color;
+	uniform float metallic;
+
+	uniform vec3 emission;
+	uniform float roughness;
+
+	uniform vec3 cube_map_reflection_color;
+	uniform float bump_depth;
+
+	uniform bool base_color_tex_enabled;
+	uniform bool metallic_roughness_tex_enabled;
+	uniform bool normal_tex_enabled;
+	uniform bool bump_tex_enabled;
+
+	uniform bool emission_tex_enabled;
+	uniform bool cube_map_reflection_enabled;
+} material_uni;
+ */
+
 
 void tDefaultMaterial::UpdateUniformBuffer(void)
 {
 	float *data = (float *)uniform_buffer->GetData();
 
-	memcpy(data, diffuse.color.v, 3 * sizeof(float));
-	data[3] = specular.exponent;
+	memcpy(data, base_color.v, 3 * sizeof(float));
+	data[3] = metallic;
 
 	data += 4;
-	memcpy(data, specular.color.v, 3 * sizeof(float));
-	data[3] = bump.depth;
-
-	data += 4;
-	memcpy(data, self_illum.color.v, 3 * sizeof(float));
-	*((int *)(data+3)) = tex[DIFFUSE] != 0 ? 1 : 0;
+	memcpy(data, emission.v, 3 * sizeof(float));
+	data[3] = roughness;
 
 	data += 4;
 	memcpy(data, cube_map_reflection.color.v, 3 * sizeof(float));
-	*((int *)(data+3)) = tex[SPECULAR] != 0 ? 1 : 0;
+	data[3] = bump_depth;
 
 	data += 4;
-	*((int *)(data+0)) = tex[NORMAL] != 0 ? 1 : 0;
-	*((int *)(data+1)) = tex[BUMP] != 0 ? 1 : 0;
-	*((int *)(data+2)) = tex[SELF_ILLUMINATION] != 0 ? 1 : 0;
-	*((int *)(data+3)) = cube_map_reflection.enabled != 0 ? 1 : 0;
+	*((int *)(data+0)) = tex[BASE_COLOR] != 0 ? 1 : 0;
+	*((int *)(data+1)) = tex[METALLIC_ROUGHNESS] != 0 ? 1 : 0;
+	*((int *)(data+2)) = tex[NORMAL] != 0 ? 1 : 0;
+	*((int *)(data+3)) = tex[BUMP] != 0 ? 1 : 0;
 
 	data += 4;
-	*(data+0) = roughness;
+	*((int *)(data+0)) = tex[EMISSION] != 0 ? 1 : 0;
+	*((int *)(data+1)) = cube_map_reflection.enabled != 0 ? 1 : 0;
 
 	uniform_buffer->UploadData();
 }
@@ -185,16 +176,16 @@ void tDefaultMaterial::UpdateUniformBuffer(void)
 
 bool tDefaultMaterial::InitGeometryPass(tRenderer *renderer)
 {
-	if(renderer->GetShadowPass() && !shadow.cast)
+	if(renderer->GetShadowPass() && !shadow_cast)
 		return false;
 
 	uniform_buffer->Bind(tShader::material_binding_point);
 
-	if(tex[DIFFUSE])
-		renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
+	if(tex[BASE_COLOR])
+		renderer->GetCurrentFaceShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);
 
-	if(tex[SPECULAR])
-		renderer->GetCurrentFaceShader()->SetSpecularTexture(tex[SPECULAR]);
+	if(tex[METALLIC_ROUGHNESS])
+		renderer->GetCurrentFaceShader()->SetMetallicRoughnessTexture(tex[METALLIC_ROUGHNESS]);
 
 	if(tex[NORMAL])
 		renderer->GetCurrentFaceShader()->SetNormalTexture(tex[NORMAL]);
@@ -202,8 +193,8 @@ bool tDefaultMaterial::InitGeometryPass(tRenderer *renderer)
 	if(tex[BUMP])
 		renderer->GetCurrentFaceShader()->SetBumpTexture(tex[BUMP]);
 
-	if(tex[SELF_ILLUMINATION])
-		renderer->GetCurrentFaceShader()->SetSelfIlluminationTexture(tex[SELF_ILLUMINATION]);
+	if(tex[EMISSION])
+		renderer->GetCurrentFaceShader()->SetEmissionTexture(tex[EMISSION]);
 
 	return true;
 }

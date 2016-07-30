@@ -79,7 +79,7 @@ void main(void)
 	}
 	
 	vec3 self_illumination = texture(self_illumination_tex_uni, uv_coord_var).rgb;
-	//color += self_illumination;
+	color += self_illumination;
 	
 	
 	// point lighting

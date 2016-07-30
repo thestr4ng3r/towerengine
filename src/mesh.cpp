@@ -832,7 +832,7 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 	bool cube_map_reflection_enabled = false;
 	tVector cube_map_reflection_color = Vec(0.0, 0.0, 0.0);
 
-	tVector self_illum_color = Vec(0.0, 0.0, 0.0);
+	tVector emission_color = Vec(0.0, 0.0, 0.0);
 	string self_illum_file;
 
 	bool shadow_cast = true;
@@ -970,11 +970,11 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 				self_illum_mode = TEXTURE_DATA;
 			}
 			if((attr = child->first_attribute("r")))
-				self_illum_color.r = (float)atof(attr->value());
+				emission_color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				self_illum_color.g = (float)atof(attr->value());
+				emission_color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				self_illum_color.b = (float)atof(attr->value());
+				emission_color.b = (float)atof(attr->value());
 		}
 		else if(strcmp(name_temp, "bump") == 0)
 		{
@@ -1021,23 +1021,24 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 
 	r = new tDefaultMaterial();
 
-	r->SetDiffuse(diffuse_color);
-	r->SetSpecular(specular_color, exponent);
+	r->SetBaseColor(diffuse_color);
+	//r->SetSpecular(specular_color, exponent);
+	// r->SetMetallic
 	r->SetRoughness(roughness);
-	r->SetBump(bump_depth);
+	r->SetBumpDepth(bump_depth);
 	r->SetCubeMapReflection(cube_map_reflection_enabled, cube_map_reflection_color);
-	r->SetSelfIlluminationColor(self_illum_color);
+	r->SetEmission(emission_color);
 	r->SetShadowCast(shadow_cast);
 
 	if(diffuse_mode == TEXTURE_FILE)
-		r->LoadTexture(tDefaultMaterial::DIFFUSE, path + diffuse_file);
+		r->LoadTexture(tDefaultMaterial::BASE_COLOR, path + diffuse_file);
 	else if(diffuse_mode == TEXTURE_DATA)
-		r->LoadTexture(tDefaultMaterial::DIFFUSE, diffuse_ext, diffuse_data, diffuse_size);
+		r->LoadTexture(tDefaultMaterial::BASE_COLOR, diffuse_ext, diffuse_data, diffuse_size);
 
 	if(specular_mode == TEXTURE_FILE)
-		r->LoadTexture(tDefaultMaterial::SPECULAR, path + specular_file);
+		r->LoadTexture(tDefaultMaterial::METALLIC_ROUGHNESS, path + specular_file);
 	else if(specular_mode == TEXTURE_DATA)
-		r->LoadTexture(tDefaultMaterial::SPECULAR, specular_ext, specular_data, specular_size);
+		r->LoadTexture(tDefaultMaterial::METALLIC_ROUGHNESS, specular_ext, specular_data, specular_size);
 
 	if(normal_mode == TEXTURE_FILE)
 		r->LoadTexture(tDefaultMaterial::NORMAL, path + normal_file);
@@ -1050,9 +1051,9 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 		r->LoadTexture(tDefaultMaterial::BUMP, bump_ext, bump_data, bump_size);
 
 	if(self_illum_mode == TEXTURE_FILE)
-		r->LoadTexture(tDefaultMaterial::SELF_ILLUMINATION, path + self_illum_file);
+		r->LoadTexture(tDefaultMaterial::EMISSION, path + self_illum_file);
 	else if(self_illum_mode == TEXTURE_DATA)
-		r->LoadTexture(tDefaultMaterial::SELF_ILLUMINATION, self_illum_ext, self_illum_data, self_illum_size);
+		r->LoadTexture(tDefaultMaterial::EMISSION, self_illum_ext, self_illum_data, self_illum_size);
 
 	r->UpdateUniformBuffer();
 

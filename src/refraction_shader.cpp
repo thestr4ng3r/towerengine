@@ -33,7 +33,7 @@ void tRefractionShader::Init(void)
 
 
 	Bind();
-	glUniform1i(color_tex_uniform, diffuse_tex_unit);
+	glUniform1i(color_tex_uniform, base_color_tex_unit);
 	glUniform1i(screen_tex_uniform, screen_tex_unit);
 	glUniform1i(normal_tex_uniform, normal_tex_unit);
 }
@@ -62,7 +62,7 @@ void tRefractionShader::SetColorTexture(bool enabled, GLuint tex)
 
 	if(enabled)
 	{
-		glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
+		glActiveTexture(GL_TEXTURE0 + base_color_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
 }

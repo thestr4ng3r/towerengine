@@ -17,7 +17,7 @@ public:
 	void Init(void);
 
 	//void SetClip(tVector c, float d);
-	void SetDiffuseTexture(bool enabled, GLuint tex = 0);
+	void SetBaseColorTexture(bool enabled, GLuint tex = 0);
 	void SetTransformation(const float m[16]);
 };
 

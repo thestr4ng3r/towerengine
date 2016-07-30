@@ -10,11 +10,11 @@ class tGeometryPassShader : public tFaceShader
 
 		GLint transformation_uniform;
 
-		GLint diffuse_tex_uniform;
+		GLint base_color_tex_uniform;
+		GLint metallic_roughness_tex_uniform;
 		GLint normal_tex_uniform;
-		GLint specular_tex_uniform;
 		GLint bump_tex_uniform;
-		GLint self_illumination_tex_uniform;
+		GLint emission_tex_uniform;
 
 		GLint cube_map_reflection_tex_uniform;
 
@@ -22,12 +22,14 @@ class tGeometryPassShader : public tFaceShader
 		void Init(void);
 
 		void SetCameraPosition(tVector pos);
-		void SetDiffuseTexture(bool enabled, GLuint tex);
-		void SetSpecularTexture(GLuint tex);
+		void SetTransformation(const float m[16]);
+
+		void SetBaseColorTexture(bool enabled, GLuint tex);
+		void SetMetallicRoughnessTexture(GLuint tex);
 		void SetNormalTexture(GLuint tex);
 		void SetBumpTexture(GLuint tex);
-		void SetTransformation(const float m[16]);
-		void SetSelfIlluminationTexture(GLuint tex);
+		void SetEmissionTexture(GLuint tex);
+
 		void SetCubeMapReflectionTexture(GLuint tex);
 };
 

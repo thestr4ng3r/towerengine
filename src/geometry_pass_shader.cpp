@@ -16,11 +16,11 @@ void tGeometryPassShader::Init(void)
 
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
-	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
+	base_color_tex_uniform = GetUniformLocation("base_color_tex_uni");
+	metallic_roughness_tex_uniform = GetUniformLocation("metallic_roughness_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
-	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
 	bump_tex_uniform = GetUniformLocation("bump_tex_uni");
-	self_illumination_tex_uniform = GetUniformLocation("self_illumination_tex_uni");
+	emission_tex_uniform = GetUniformLocation("emission_tex_uni");
 
 	cube_map_reflection_tex_uniform = GetUniformLocation("cube_map_reflection_tex_uni");
 
@@ -33,11 +33,12 @@ void tGeometryPassShader::Init(void)
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MaterialBlock"), material_binding_point);
 
 	Bind();
-	glUniform1i(diffuse_tex_uniform, diffuse_tex_unit);
-	glUniform1i(specular_tex_uniform, specular_tex_unit);
+	glUniform1i(base_color_tex_uniform, base_color_tex_unit);
+	glUniform1i(metallic_roughness_tex_uniform, metallic_roughness_tex_unit);
 	glUniform1i(normal_tex_uniform, normal_tex_unit);
 	glUniform1i(bump_tex_uniform, bump_tex_unit);
-	glUniform1i(self_illumination_tex_uniform, self_illumination_tex_unit);
+	glUniform1i(emission_tex_uniform, emission_tex_unit);
+
 	glUniform1i(cube_map_reflection_tex_uniform, cube_map_reflection_tex_unit);
 }
 
@@ -52,15 +53,15 @@ void tGeometryPassShader::SetTransformation(const float m[16])
 	glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void tGeometryPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
+void tGeometryPassShader::SetBaseColorTexture(bool enabled, GLuint tex)
 {
-	glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
+	glActiveTexture(GL_TEXTURE0 + base_color_tex_unit);
 	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
-void tGeometryPassShader::SetSpecularTexture(GLuint tex)
+void tGeometryPassShader::SetMetallicRoughnessTexture(GLuint tex)
 {
-	glActiveTexture(GL_TEXTURE0 + specular_tex_unit);
+	glActiveTexture(GL_TEXTURE0 + metallic_roughness_tex_unit);
 	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
@@ -77,6 +78,12 @@ void tGeometryPassShader::SetBumpTexture(GLuint tex)
 	glBindTexture(GL_TEXTURE_2D, tex);
 }
 
+void tGeometryPassShader::SetEmissionTexture(GLuint tex)
+{
+	glActiveTexture(GL_TEXTURE0 + emission_tex_unit);
+	glBindTexture(GL_TEXTURE_2D, tex);
+}
+
 
 
 void tGeometryPassShader::SetCubeMapReflectionTexture(GLuint tex)
@@ -87,8 +94,3 @@ void tGeometryPassShader::SetCubeMapReflectionTexture(GLuint tex)
 
 
 
-void tGeometryPassShader::SetSelfIlluminationTexture(GLuint tex)
-{
-	glActiveTexture(GL_TEXTURE0 + self_illumination_tex_unit);
-	glBindTexture(GL_TEXTURE_2D, tex);
-}

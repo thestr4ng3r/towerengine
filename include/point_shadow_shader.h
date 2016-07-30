@@ -22,7 +22,7 @@ class tPointShadowShader : public tFaceShader
 		void SetLightPos(tVector v);
 		void SetLightDist(float d);
 		void SetTransformation(const float m[16]);
-		void SetDiffuseTexture(bool enabled, GLuint tex = 0);
+		void SetBaseColorTexture(bool enabled, GLuint tex = 0);
 };
 
 class tPointShadowBlurShader : public tShader

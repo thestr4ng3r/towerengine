@@ -22,7 +22,7 @@ void tDepthPassShader::Init(void)
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
 
 	//Bind();
-	glUniform1i(diffuse_tex_uniform, diffuse_tex_unit);
+	glUniform1i(diffuse_tex_uniform, base_color_tex_unit);
 }
 
 
@@ -31,13 +31,13 @@ void tDepthPassShader::SetTransformation(const float m[16])
 	glUniformMatrix4fv(transformation_uniform, 1, GL_FALSE, m);
 }
 
-void tDepthPassShader::SetDiffuseTexture(bool enabled, GLuint tex)
+void tDepthPassShader::SetBaseColorTexture(bool enabled, GLuint tex)
 {
 	glUniform1i(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
 
 	if(enabled)
 	{
-		glActiveTexture(GL_TEXTURE0 + diffuse_tex_unit);
+		glActiveTexture(GL_TEXTURE0 + base_color_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);
 	}
 }

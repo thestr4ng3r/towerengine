@@ -51,7 +51,7 @@ void tDirectionalShadowShader::SetCamPos(tVector v)
 
 
 
-void tDirectionalShadowShader::SetDiffuseTexture(bool enabled, GLuint tex)
+void tDirectionalShadowShader::SetBaseColorTexture(bool enabled, GLuint tex)
 {
 	glUniform1i(diffuse_tex_enabled_uniform, enabled ? 1 : 0);
 

@@ -4,7 +4,7 @@
 #extension GL_ARB_texture_query_levels : enable
 
 
-layout(std140) uniform MaterialBlock
+/*layout(std140) uniform MaterialBlock
 {
 	uniform vec3 diffuse_color;
 	uniform float specular_size;
@@ -24,14 +24,36 @@ layout(std140) uniform MaterialBlock
 	uniform bool cube_map_reflection_enabled;
 
 	uniform float roughness;
+} material_uni;*/
+
+
+layout(std140) uniform MaterialBlock
+{
+	uniform vec3 base_color;
+	uniform float metallic;
+
+	uniform vec3 emission;
+	uniform float roughness;
+
+	uniform vec3 cube_map_reflection_color;
+	uniform float bump_depth;
+
+	uniform bool base_color_tex_enabled;
+	uniform bool metallic_roughness_tex_enabled;
+	uniform bool normal_tex_enabled;
+	uniform bool bump_tex_enabled;
+
+	uniform bool emission_tex_enabled;
+	uniform bool cube_map_reflection_enabled;
 } material_uni;
 
 
-uniform sampler2D diffuse_tex_uni;
+
+uniform sampler2D base_color_tex_uni;
+uniform sampler2D metallic_roughness_tex_uni;
 uniform sampler2D normal_tex_uni;
-uniform sampler2D specular_tex_uni;
 uniform sampler2D bump_tex_uni;
-uniform sampler2D self_illumination_tex_uni;
+uniform sampler2D emission_tex_uni;
 
 uniform samplerCube cube_map_reflection_tex_uni;
 
@@ -74,17 +96,35 @@ void main(void)
 		uv = uv_var;
 				
 	
-	// diffuse
+	// base_color
 	
-	vec4 diffuse_color = vec4(1.0, 1.0, 1.0, 1.0);
-	
-	if(material_uni.diffuse_tex_enabled)
-		diffuse_color = texture(diffuse_tex_uni, uv).rgba;
+	vec4 base_color;
+	if(material_uni.base_color_tex_enabled)
+	{
+		base_color = texture(base_color_tex_uni, uv).rgba;
+		if(base_color.a < 0.5)
+			discard;
+	}
+	else
+		base_color = vec4(material_uni.base_color.rgb, 1.0);
 
-	if(diffuse_color.a < 0.5)
-		discard;
-		
-	diffuse_color *= vec4(material_uni.diffuse_color.rgb, 1.0);
+
+	// metallic, roughness
+
+	float metallic;
+	float roughness;
+
+	if(material_uni.metallic_roughness_tex_enabled)
+	{
+		vec2 metallic_roughness = texture(metallic_roughness_tex_uni, uv).rg;
+		metallic = metallic_roughness.r;
+		roughness = metallic_roughness.g;
+	}
+	else
+	{
+		metallic = material_uni.metallic;
+		roughness = material_uni.roughness;
+	}
 	
 	
 	//normal
@@ -102,20 +142,18 @@ void main(void)
 	
 	face_normal_out = vec4(normal_var * 0.5 + vec3(0.5, 0.5, 0.5), 1.0);
 	
-	
-	// specular
-			
-	vec3 specular_color = material_uni.specular_color;
-	if(material_uni.specular_tex_enabled)
-		specular_color *= texture(specular_tex_uni, uv).rgb;
+
 	
 		
-	// self illumination
+	// emission
 	
-	vec3 self_illumination = material_uni.self_illumination_color;
+	vec3 emission;
 	
-	if(material_uni.self_illumination_tex_enabled)
-		self_illumination *= texture(self_illumination_tex_uni, uv).rgb;
+	if(material_uni.emission_tex_enabled)
+		emission = texture(emission_tex_uni, uv).rgb;
+	else
+		emission = material_uni.emission;
+
 		
 	
 	// cube map reflection
@@ -141,15 +179,17 @@ void main(void)
 		mipmap_level = max(mipmap_level, blur_mipmap_level);
 
 		vec3 cube_map_color = textureLod(cube_map_reflection_tex_uni, cam_reflected, mipmap_level).rgb;
-		self_illumination += cube_map_color * material_uni.cube_map_reflection_color;
+		emission += cube_map_color * material_uni.cube_map_reflection_color;
 	}
 		
 	
 	// out
 
-	diffuse_out = diffuse_color;
-	specular_out = vec4(specular_color, material_uni.specular_size);
-	self_illumination_out = vec4(self_illumination, 1.0);
+	// TODO: correct output
+
+	diffuse_out = base_color;
+	specular_out = vec4(0.0);
+	self_illumination_out = vec4(emission, 1.0);
 }
 
 
