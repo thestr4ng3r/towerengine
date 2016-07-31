@@ -88,7 +88,8 @@ void main(void)
 	{
 		color += PointLightLighting(position.xyz,
 									diffuse.rgb,
-									specular.rgba,
+									0.2, // TODO: actual values
+									0.6,
 									cam_dir,
 									normal,
 									point_light_uni.light[i].pos,

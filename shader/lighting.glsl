@@ -58,14 +58,11 @@ vec3 CalculateLighting(vec3 base_color, float roughness, float F0,
 	return color;
 }
 
-vec3 PointLightLighting(vec3 position, vec3 material_diffuse, vec4 material_specular, vec3 cam_dir, vec3 normal,
-						vec3 light_pos, float point_light_dist, vec3 light_color, // TODO: better name for point_light_dist
+vec3 PointLightLighting(vec3 position, vec3 base_color, float metallic, float roughness,
+						vec3 cam_dir, vec3 normal, vec3 light_pos,
+						float point_light_dist, vec3 light_color, // TODO: better name for point_light_dist
 						bool shadow_enabled, samplerCube shadow_map)
 {
-	float roughness = 0.5;
-	float F0 = 0.3;
-
-
 	vec3 point_to_light = light_pos - position;
 	float light_dist2 = dot(point_to_light, point_to_light);
 
@@ -112,5 +109,7 @@ vec3 PointLightLighting(vec3 position, vec3 material_diffuse, vec4 material_spec
 
     vec3 radiance = light_intensity * shadow * light_color;
 
-	return radiance * CalculateLighting(material_diffuse, roughness, F0, n, v, l, h);
+	float F0 = metallic;
+
+	return radiance * CalculateLighting(base_color, roughness, F0, n, v, l, h);
 }

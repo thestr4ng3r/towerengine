@@ -70,13 +70,13 @@ class tMatrixBuffer : public tUniformBuffer
 
 
 GLuint LoadGLTexture(const char *filename, int channels = 4, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
-GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int channels = 4, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
+GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int channels = 4, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
 
 GLuint LoadGLTextureArray(const char **filenames, const int count, int *w = 0, int *h = 0);
 
 inline GLuint LoadGLTexture(const char *filename, int channels, bool *transparent, int alpha_channel = 3)
 		{ return LoadGLTexture(filename, channels, 0, 0, transparent, alpha_channel); }
-inline GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int channels, bool *transparent, int alpha_channel = 3)
+inline GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int channels, bool *transparent, int alpha_channel = 3)
 		{ return LoadGLTextureBinary(ext, data, size, channels, 0, 0, transparent, alpha_channel); }
 
 

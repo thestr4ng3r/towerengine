@@ -68,7 +68,7 @@ class tDefaultMaterial : public tMaterial
 		void SetCubeMapReflection(bool enabled, tVector color);
 
 		void LoadTexture(TextureType type, std::string file);
-		void LoadTexture(TextureType type, const char *extension, const void *data, unsigned int size);
+		void LoadTexture(TextureType type, const char *extension, const void *data, size_t size);
 
 		void UpdateUniformBuffer(void);
 

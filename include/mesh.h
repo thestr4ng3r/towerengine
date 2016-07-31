@@ -89,6 +89,8 @@ class tMesh
 		tKeyFrame *ParseKeyFrameNode(rapidxml::xml_node<char> *cur, tAnimation *anim);
 		tEntity *ParseEntityNode(rapidxml::xml_node<char> *cur);
 
+
+		static void LoadTextureFromXMLNodeData(rapidxml::xml_node<char> *node, tDefaultMaterial *material, tDefaultMaterial::TextureType texture_type);
 		static tDefaultMaterial *ParseXMLDefaultMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 		static tSimpleForwardMaterial *ParseXMLSimpleForwardMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 		static tRefractionMaterial *ParseXMLRefractionMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);

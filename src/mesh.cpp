@@ -798,9 +798,6 @@ tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 }
 
 
-#define TEXTURE_DISABLED 0
-#define TEXTURE_FILE 1
-#define TEXTURE_DATA 2
 
 tMaterial *tMesh::ParseXMLMaterialNode(xml_node<> *cur, string &name, string path)
 {
@@ -820,246 +817,135 @@ tMaterial *tMesh::ParseXMLMaterialNode(xml_node<> *cur, string &name, string pat
 
 }
 
+
+
+void tMesh::LoadTextureFromXMLNodeData(xml_node<> *node, tDefaultMaterial *material, tDefaultMaterial::TextureType texture_type)
+{
+	unsigned char *data;
+	size_t size;
+
+	Base64Decode(node->value(), &data, &size);
+
+	xml_attribute<> *attr = node->first_attribute("image-extension");
+	char *extension;
+	if(attr)
+		extension = attr->value();
+	else
+		extension = 0;
+
+	material->LoadTexture(tDefaultMaterial::BASE_COLOR, extension, data, size);
+	delete [] data;
+}
+
 tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &name, string path)
 {
 	xml_node<> *child;
-	int diffuse_mode, specular_mode, normal_mode, bump_mode, self_illum_mode;
-	string diffuse_file; tVector diffuse_color;
-	string specular_file; float exponent; tVector specular_color;
-	string normal_file;
-	string bump_file; float bump_depth;
-
-	bool cube_map_reflection_enabled = false;
-	tVector cube_map_reflection_color = Vec(0.0, 0.0, 0.0);
-
-	tVector emission_color = Vec(0.0, 0.0, 0.0);
-	string self_illum_file;
-
-	bool shadow_cast = true;
-
-	unsigned char *diffuse_data, *specular_data, *normal_data, *bump_data, *self_illum_data;
-	size_t diffuse_size, specular_size, normal_size, bump_size, self_illum_size;
-	char *diffuse_ext, *specular_ext, *normal_ext, *bump_ext, *self_illum_ext;
-	char *base64_temp;
-
 	xml_attribute<> *attr;
-	tDefaultMaterial *r;
-
-	diffuse_mode = specular_mode = normal_mode = bump_mode = self_illum_mode = TEXTURE_DISABLED;
-	diffuse_ext = specular_ext = normal_ext = bump_ext = self_illum_ext = 0;
-	diffuse_size = specular_size = normal_size = bump_size = self_illum_size = 0;
-	diffuse_data = specular_data = normal_data = bump_data = self_illum_data = 0;
-	diffuse_color = Vec(1.0, 1.0, 1.0);
-	specular_color = Vec(0.0, 0.0, 0.0);
-	exponent = 8.0;
-	bump_depth = 0.0;
-
-	float roughness = 0.0;
 
 	if(!(attr = cur->first_attribute("name")))
 		return 0;
 
 	name = string(attr->value());
 
-	//printf("Material with path \"%s\"\n", path);
+	tDefaultMaterial *mat = new tDefaultMaterial();
+
+
 
 	child = cur->first_node();
 	while(child)
 	{
 		char *name_temp = child->name();
 
-		if(strcmp(name_temp, "diffuse") == 0)
+		if(strcmp(name_temp, "base_color") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-			{
-				diffuse_file = string(attr->value());
-				diffuse_mode = TEXTURE_FILE;
-			}
+				mat->LoadTexture(tDefaultMaterial::BASE_COLOR, path + string(attr->value()));
 			else if(child->value_size() > 0)
-			{
-				base64_temp = child->value();
+				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::BASE_COLOR);
 
-				Base64Decode(base64_temp, &diffuse_data, &diffuse_size);
-
-				attr = child->first_attribute("image-extension");
-				if(attr)
-					diffuse_ext = attr->value();
-				else
-					diffuse_ext = 0;
-				diffuse_mode = TEXTURE_DATA;
-			}
-
+			tVector color = Vec(0.0, 0.0, 0.0);
 			if((attr = child->first_attribute("r")))
-				diffuse_color.r = (float)atof(attr->value());
+				color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				diffuse_color.g = (float)atof(attr->value());
+				color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				diffuse_color.b = (float)atof(attr->value());
+				color.b = (float)atof(attr->value());
+			mat->SetBaseColor(color);
 		}
-		else if(strcmp(name_temp, "specular") == 0)
+		else if(strcmp(name_temp, "metallic_roughness") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-			{
-				specular_file = string(attr->value());
-				specular_mode = TEXTURE_FILE;
-			}
+				mat->LoadTexture(tDefaultMaterial::METALLIC_ROUGHNESS, path + string(attr->value()));
 			else if(child->value_size() > 0)
-			{
-				base64_temp = child->value();
+				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::METALLIC_ROUGHNESS);
 
-				Base64Decode(base64_temp, &specular_data, &specular_size);
-
-				attr = child->first_attribute("image-extension");
-				if(attr)
-					specular_ext = attr->value();
-				else
-					specular_ext = 0;
-				specular_mode = TEXTURE_DATA;
-			}
-			if((attr = child->first_attribute("exponent")))
-				exponent = (float)atof(attr->value());
-			if((attr = child->first_attribute("r")))
-				specular_color.r = (float)atof(attr->value());
-			if((attr = child->first_attribute("g")))
-				specular_color.g = (float)atof(attr->value());
-			if((attr = child->first_attribute("b")))
-				specular_color.b = (float)atof(attr->value());
-
+			if((attr = child->first_attribute("metallic")))
+				mat->SetMetallic((float)atof(attr->value()));
 			if((attr = child->first_attribute("roughness")))
-				roughness = (float)atof(attr->value());
+				mat->SetRoughness((float)atof(attr->value()));
 		}
 		else if(strcmp(name_temp, "normal") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-			{
-				normal_file = string(attr->value());
-				normal_mode = TEXTURE_FILE;
-			}
+				mat->LoadTexture(tDefaultMaterial::NORMAL, path + string(attr->value()));
 			else if(child->value_size() > 0)
-			{
-				base64_temp = child->value();
-
-				Base64Decode(base64_temp, &normal_data, &normal_size);
-
-				attr = child->first_attribute("image-extension");
-				if(attr)
-					normal_ext = attr->value();
-				else
-					normal_ext = 0;
-				normal_mode = TEXTURE_DATA;
-			}
+				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::NORMAL);
 		}
-		else if(strcmp(name_temp, "self_illumination") == 0)
+		else if(strcmp(name_temp, "emission") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-			{
-				self_illum_file = string(attr->value());
-				self_illum_mode = TEXTURE_FILE;
-			}
+				mat->LoadTexture(tDefaultMaterial::EMISSION, path + string(attr->value()));
 			else if(child->value_size() > 0)
-			{
-				base64_temp = child->value();
+				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::EMISSION);
 
-				Base64Decode(base64_temp, &self_illum_data, &self_illum_size);
-
-				attr = child->first_attribute("image-extension");
-				if(attr)
-					self_illum_ext = attr->value();
-				else
-					self_illum_ext = 0;
-				self_illum_mode = TEXTURE_DATA;
-			}
+			tVector color = Vec(0.0, 0.0, 0.0);
 			if((attr = child->first_attribute("r")))
-				emission_color.r = (float)atof(attr->value());
+				color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				emission_color.g = (float)atof(attr->value());
+				color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				emission_color.b = (float)atof(attr->value());
+				color.b = (float)atof(attr->value());
+			mat->SetEmission(color);
 		}
 		else if(strcmp(name_temp, "bump") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-			{
-				bump_file = string(attr->value());
-				bump_mode = TEXTURE_FILE;
-			}
+				mat->LoadTexture(tDefaultMaterial::BUMP, path + string(attr->value()));
 			else if(child->value_size() > 0)
-			{
-				base64_temp = child->value();
+				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::BUMP);
 
-				Base64Decode(base64_temp, &bump_data, &bump_size);
-
-				attr = child->first_attribute("image-extension");
-				if(attr)
-					bump_ext = attr->value();
-				else
-					bump_ext = 0;
-				bump_mode = TEXTURE_DATA;
-			}
 			if((attr = child->first_attribute("depth")))
-				bump_depth = (float)atof(attr->value());
+				mat->SetBumpDepth((float)atof(attr->value()));
 		}
 		else if(strcmp(name_temp, "cube_map_reflection") == 0)
 		{
-			cube_map_reflection_enabled = true;
-
+			tVector color = Vec(0.0, 0.0, 0.0);
 			if((attr = child->first_attribute("r")))
-				cube_map_reflection_color.r = (float)atof(attr->value());
+				color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
-				cube_map_reflection_color.g = (float)atof(attr->value());
+				color.g = (float)atof(attr->value());
 			if((attr = child->first_attribute("b")))
-				cube_map_reflection_color.b = (float)atof(attr->value());
+				color.b = (float)atof(attr->value());
+			mat->SetCubeMapReflection(true, color);
 		}
 		else if(strcmp(name_temp, "shadow") == 0)
 		{
 			if((attr = child->first_attribute("cast")))
-				shadow_cast = atoi(attr->value()) != 0;
+				mat->SetShadowCast(atoi(attr->value()) != 0);
 		}
 
 		child = child->next_sibling();
 	}
 
-	r = new tDefaultMaterial();
+	mat->UpdateUniformBuffer();
 
-	r->SetBaseColor(diffuse_color);
-	//r->SetSpecular(specular_color, exponent);
-	// r->SetMetallic
-	r->SetRoughness(roughness);
-	r->SetBumpDepth(bump_depth);
-	r->SetCubeMapReflection(cube_map_reflection_enabled, cube_map_reflection_color);
-	r->SetEmission(emission_color);
-	r->SetShadowCast(shadow_cast);
-
-	if(diffuse_mode == TEXTURE_FILE)
-		r->LoadTexture(tDefaultMaterial::BASE_COLOR, path + diffuse_file);
-	else if(diffuse_mode == TEXTURE_DATA)
-		r->LoadTexture(tDefaultMaterial::BASE_COLOR, diffuse_ext, diffuse_data, diffuse_size);
-
-	if(specular_mode == TEXTURE_FILE)
-		r->LoadTexture(tDefaultMaterial::METALLIC_ROUGHNESS, path + specular_file);
-	else if(specular_mode == TEXTURE_DATA)
-		r->LoadTexture(tDefaultMaterial::METALLIC_ROUGHNESS, specular_ext, specular_data, specular_size);
-
-	if(normal_mode == TEXTURE_FILE)
-		r->LoadTexture(tDefaultMaterial::NORMAL, path + normal_file);
-	else if(normal_mode == TEXTURE_DATA)
-		r->LoadTexture(tDefaultMaterial::NORMAL, normal_ext, normal_data, normal_size);
-
-	if(bump_mode == TEXTURE_FILE)
-		r->LoadTexture(tDefaultMaterial::BUMP, path + bump_file);
-	else if(bump_mode == TEXTURE_DATA)
-		r->LoadTexture(tDefaultMaterial::BUMP, bump_ext, bump_data, bump_size);
-
-	if(self_illum_mode == TEXTURE_FILE)
-		r->LoadTexture(tDefaultMaterial::EMISSION, path + self_illum_file);
-	else if(self_illum_mode == TEXTURE_DATA)
-		r->LoadTexture(tDefaultMaterial::EMISSION, self_illum_ext, self_illum_data, self_illum_size);
-
-	r->UpdateUniformBuffer();
-
-	return r;
+	return mat;
 }
 
+
+#define TEXTURE_DISABLED 0
+#define TEXTURE_FILE 1
+#define TEXTURE_DATA 2
 
 tSimpleForwardMaterial *tMesh::ParseXMLSimpleForwardMaterialNode(xml_node<> *cur, string &name, string path)
 {

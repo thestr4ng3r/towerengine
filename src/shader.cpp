@@ -229,7 +229,7 @@ GLuint LoadGLTexture(const char *filename, int channels, int *w, int *h, bool *t
 	return r_tex;
 }
 
-GLuint LoadGLTextureBinary(const char *ext, const void *data, unsigned int size, int channels, int *w, int *h, bool *transparent, int alpha_channel)
+GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int channels, int *w, int *h, bool *transparent, int alpha_channel)
 {
 	ILuint imageID;
 	ILboolean success;

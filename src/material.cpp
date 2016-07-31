@@ -71,7 +71,7 @@ void tDefaultMaterial::LoadTexture(TextureType type, string file)
 	tex[type] = LoadGLTexture(file.c_str(), channels, transparent);
 }
 
-void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, const void *data, unsigned int size)
+void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, const void *data, size_t size)
 {
 	if(tex[type] != 0)
 	{

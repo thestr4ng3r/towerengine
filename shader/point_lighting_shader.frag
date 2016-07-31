@@ -51,7 +51,8 @@ void main(void)
 	#pragma for(i from 0 ex param lights_count)
 		color += PointLightLighting(position.xyz,
 									diffuse.rgb,
-									specular.rgba,
+									0.2, // TODO: actual values
+									0.6,
 									cam_dir,
 									normal,
 									point_light_pos_uni[i],
