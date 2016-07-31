@@ -4,9 +4,9 @@ import bpy
 import shutil
 import base64
 from xml.dom.minidom import Document
-from .Material import ExportMaterial
+from . import export_material
 
-class ExportMesh():
+class ExportMesh:
 	def __init__(self):
 		self.meshes = dict()
 		self.materials = dict()
@@ -56,7 +56,7 @@ class ExportMesh():
 			if exclude_materials is not None:
 				if material.name in exclude_materials:
 					continue
-			node = ExportMaterial.create_node(doc, material, path, os.path.basename(filepath) + "_tex", pack_textures)
+			node = export_material.create_node(doc, material, path, os.path.basename(filepath) + "_tex", pack_textures)
 			root.appendChild(node)
 
 		for mesh in self.meshes.values():

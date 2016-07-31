@@ -2,7 +2,7 @@
 import bpy
 from bpy.props import BoolProperty
 from bpy_extras.io_utils import ExportHelper
-from .Mesh import ExportMesh
+from .export_mesh import ExportMesh
 
 
 class TowerEngineMeshExporter(bpy.types.Operator, ExportHelper):

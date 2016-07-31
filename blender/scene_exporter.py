@@ -6,9 +6,9 @@ import bpy.path
 from bpy.props import BoolProperty
 from bpy_extras.io_utils import ExportHelper
 from xml.dom.minidom import Document
-from .Mesh import ExportMesh
+from .export_mesh import ExportMesh
 from mathutils import Vector
-from .Material import ExportMaterial
+from . import export_material
 
 from . import utils
 
@@ -129,7 +129,7 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 		
 		if self.include_mat_prop:
 			for material_name in self.materials.keys():
-				material_node = ExportMaterial.create_node(self.xml_doc, self.materials[material_name], self.directory, os.path.join(self.assets_subdir, "materials"), self.pack_tex_prop)
+				material_node = export_material.create_node(self.xml_doc, self.materials[material_name], self.directory, os.path.join(self.assets_subdir, "materials"), self.pack_tex_prop)
 				assets_node.appendChild(material_node)
 		
 		for mesh_name in self.meshes.keys():
