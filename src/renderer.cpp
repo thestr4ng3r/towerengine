@@ -484,7 +484,7 @@ void tRenderer::GeometryPass(void)
 	}
 
 	float clear_color[] = {0.0, 0.0, 0.0, 0.0};
-	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::DIFFUSE_TEX), clear_color);
+	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::BASE_COLOR_TEX), clear_color);
 
 
 	glDisable(GL_BLEND);

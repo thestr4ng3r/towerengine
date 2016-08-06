@@ -17,9 +17,9 @@ uniform samplerCube point_light_shadow_map_uni[LIGHTS_COUNT];
 
 
 uniform sampler2D depth_tex_uni;
-uniform sampler2D diffuse_tex_uni;
+uniform sampler2D base_color_tex_uni;
 uniform sampler2D normal_tex_uni;
-uniform sampler2D specular_tex_uni;
+uniform sampler2D metallic_roughness_tex_uni;
 
 
 in vec2 uv_coord_var;
@@ -34,12 +34,14 @@ void main(void)
 	if(depth == 1.0)
 		discard;
 	
-	ivec2 texel_uv = ivec2(uv_coord_var * textureSize(diffuse_tex_uni, 0).xy);	
+	ivec2 texel_uv = ivec2(uv_coord_var * textureSize(base_color_tex_uni, 0).xy);
 	
-	vec3 diffuse = texelFetch(diffuse_tex_uni, texel_uv, 0).rgb;
+	vec3 base_color = texelFetch(base_color_tex_uni, texel_uv, 0).rgb;
 	vec3 position = CalculateWorldPosition(depth, uv_coord_var);
 	vec3 normal = normalize(texelFetch(normal_tex_uni, texel_uv, 0).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
-	vec4 specular = texelFetch(specular_tex_uni, texel_uv, 0).rgba;
+	vec2 metallic_roughness = texelFetch(metallic_roughness_tex_uni, texel_uv, 0).rg;
+	float metallic = metallic_roughness.r;
+	float roughness = metallic_roughness.g;
 	
 	vec3 cam_dir = normalize(cam_pos_uni - position.xyz);
 
@@ -50,9 +52,9 @@ void main(void)
 	int i;
 	#pragma for(i from 0 ex param lights_count)
 		color += PointLightLighting(position.xyz,
-									diffuse.rgb,
-									0.2, // TODO: actual values
-									0.6,
+									base_color.rgb,
+									metallic,
+									roughness,
 									cam_dir,
 									normal,
 									point_light_pos_uni[i],

@@ -15,8 +15,8 @@ void tSSAOAmbientLightingShader::Init(tGBuffer *gbuffer)
 
 	Bind();
 	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
-	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
-	glUniform1i(self_illumination_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SELF_ILLUMINATION_TEX));
+	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::BASE_COLOR_TEX));
+	glUniform1i(self_illumination_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::EMISSION_TEX));
 
 	ssao_tex_unit = gbuffer->GetLastTextureUnit() + 1;
 	glUniform1i(ssao_tex_uniform, ssao_tex_unit);

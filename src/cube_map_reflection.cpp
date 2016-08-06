@@ -137,7 +137,7 @@ void tCubeMapReflection::GeometryPass(tRenderer *renderer, int side, tWorld *wor
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	float clear_color[] = {0.0, 0.0, 0.0, 0.0};
-	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::DIFFUSE_TEX), clear_color);
+	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::BASE_COLOR_TEX), clear_color);
 
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);

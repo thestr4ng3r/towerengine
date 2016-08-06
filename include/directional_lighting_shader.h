@@ -18,9 +18,9 @@ class tDirectionalLightingShader : public tScreenShader
 		GLint directional_light_shadow_map_uniform;
 
 		GLint depth_tex_uniform;
-		GLint diffuse_tex_uniform;
+		GLint base_color_tex_uniform;
 		GLint normal_tex_uniform;
-		GLint specular_tex_uniform;
+		GLint metallic_roughness_tex_uniform;
 
 		int directional_light_shadow_tex_unit;
 

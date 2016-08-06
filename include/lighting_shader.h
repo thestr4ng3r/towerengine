@@ -14,10 +14,10 @@ class tLightingShader : public tScreenShader
 {
 	private:
 		GLint depth_tex_uniform;
-		GLint diffuse_tex_uniform;
+		GLint base_color_tex_uniform;
 		GLint normal_tex_uniform;
-		GLint specular_tex_uniform;
-		GLint self_illumination_tex_uniform;
+		GLint metallic_roughness_tex_uniform;
+		GLint emission_tex_uniform;
 
 		GLint ssao_enabled_uniform;
 		GLint ssao_tex_uniform;

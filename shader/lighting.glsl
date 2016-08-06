@@ -113,3 +113,79 @@ vec3 PointLightLighting(vec3 position, vec3 base_color, float metallic, float ro
 
 	return radiance * CalculateLighting(base_color, roughness, F0, n, v, l, h);
 }
+
+
+
+#define MAX_DIRECTIONAL_SHADOW_SPLITS 8
+#define DIRECTIONAL_LIGHT_SHADOW_LAYER_BLEND_DIST 0.5
+
+vec3 DirectionalLightLighting(	vec3 position, vec3 base_color, float metallic, float roughness,
+								vec3 cam_pos, vec3 normal,
+								vec3 light_dir, vec3 light_color,
+                                bool shadow_enabled,
+                                int shadow_splits_count,
+                                vec2 shadow_clip,
+                                mat4 shadow_tex_matrix[MAX_DIRECTIONAL_SHADOW_SPLITS],
+                                float shadow_splits_z[MAX_DIRECTIONAL_SHADOW_SPLITS+1],
+                                sampler2DArray shadow_map)
+{
+
+	vec3 cam_dir = normalize(cam_pos - position.xyz);
+
+	vec3 l = light_dir;
+	vec3 v = cam_dir;
+	vec3 n = normal;
+	vec3 h = normalize(v + l);
+
+
+	float shadow = 1.0;
+
+	if(shadow_enabled)
+	{
+		vec2 coord = vec2(0.0, 0.0);
+		int layer = -1;
+
+		for(int s=0; s<shadow_splits_count; s++)
+		{
+			vec4 coord2 = shadow_tex_matrix[s] * vec4(position.xyz, 1.0);
+			coord2 /= coord2.w;
+			coord = coord2.xy * 0.5 + vec2(0.5, 0.5);
+
+			if(!(coord.x < 0.0 || coord.x > 1.0 || coord.y < 0.0 || coord.y > 1.0))
+			{
+				layer = s;
+				break;
+			}
+		}
+
+		if(layer != -1)
+		{
+			vec2 moments = texture(shadow_map, vec3(coord, float(layer))).rg;
+
+			float light_dot = dot(position.xyz - cam_pos, -light_dir);
+
+			if(light_dot <= moments.x)
+				shadow = 1.0;
+			else
+			{
+				float p = smoothstep(light_dot-0.00005, light_dot, moments.x);
+			    float variance = max(moments.y - moments.x*moments.x, -0.001);
+			    float d = light_dot - moments.x;
+			    float p_max = linstep(0.8, 1.0, variance / (variance + d*d));
+
+			   	shadow = p_max;
+			}
+		}
+		else
+			shadow = 1.0;
+	}
+	else
+		shadow = 1.0;
+
+
+	float light_intensity = max(dot(n, l), 0.0);
+    vec3 radiance = light_intensity * shadow * light_color;
+	float F0 = metallic;
+
+	return radiance * CalculateLighting(base_color, roughness, F0, n, v, l, h);
+}

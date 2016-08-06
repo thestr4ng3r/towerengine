@@ -7,8 +7,8 @@ class tAmbientLightingShader : public tScreenShader
 {
 	private:
 		GLint depth_tex_uniform;
-		GLint diffuse_tex_uniform;
-		GLint self_illumination_tex_uniform;
+		GLint base_color_tex_uniform;
+		GLint emission_tex_uniform;
 
 		GLint light_ambient_color_uniform;
 

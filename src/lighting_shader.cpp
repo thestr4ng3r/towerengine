@@ -18,10 +18,10 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 	delete src;
 
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
-	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
+	base_color_tex_uniform = GetUniformLocation("base_color_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
-	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
-	self_illumination_tex_uniform = GetUniformLocation("self_illumination_tex_uni");
+	metallic_roughness_tex_uniform = GetUniformLocation("metallic_roughness_tex_uni");
+	emission_tex_uniform = GetUniformLocation("emission_tex_uni");
 
 	ssao_enabled_uniform = GetUniformLocation("ssao_enabled_uni");
 	ssao_tex_uniform = GetUniformLocation("ssao_tex_uni");
@@ -30,7 +30,6 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
-	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
 
 
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "PointLightBlock"), point_light_binding_point);
@@ -39,10 +38,10 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 
 	Bind();
 	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
-	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
+	glUniform1i(base_color_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::BASE_COLOR_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
-	glUniform1i(specular_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_TEX));
-	glUniform1i(self_illumination_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SELF_ILLUMINATION_TEX));
+	glUniform1i(metallic_roughness_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::METALLIC_ROUGHNESS_TEX));
+	glUniform1i(emission_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::EMISSION_TEX));
 }
 
 void tLightingShader::SetAmbientLight(tVector color)

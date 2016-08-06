@@ -8,15 +8,15 @@ void tAmbientLightingShader::Init(tGBuffer *gbuffer)
 	InitScreenShader(resources_get("ambient_lighting_shader.frag"), "Ambient Lighting Shader");
 
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
-	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
-	self_illumination_tex_uniform = GetUniformLocation("self_illumination_tex_uni");
+	base_color_tex_uniform = GetUniformLocation("base_color_tex_uni");
+	emission_tex_uniform = GetUniformLocation("emission_tex_uni");
 
 	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
 
 	Bind();
 	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
-	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
-	glUniform1i(self_illumination_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SELF_ILLUMINATION_TEX));
+	glUniform1i(base_color_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::BASE_COLOR_TEX));
+	glUniform1i(emission_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::EMISSION_TEX));
 }
 
 void tAmbientLightingShader::SetAmbientLight(tVector color)

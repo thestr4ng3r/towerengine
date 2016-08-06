@@ -9,11 +9,11 @@ class tGBuffer
 		enum BufferType
 		{
 			DEPTH_TEX,
-			DIFFUSE_TEX,
+			BASE_COLOR_TEX,
 			NORMAL_TEX,
 			FACE_NORMAL_TEX,
-			SPECULAR_TEX,
-			SELF_ILLUMINATION_TEX
+			METALLIC_ROUGHNESS_TEX,
+			EMISSION_TEX
 		};
 
 		static const int tex_count = 6;

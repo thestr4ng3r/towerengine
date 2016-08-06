@@ -9,9 +9,9 @@ void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 	InitScreenShader(resources_get("directional_lighting_shader.frag"), "Directional Lighting Shader");
 
 	depth_tex_uniform = GetUniformLocation("position_tex_uni");
-	diffuse_tex_uniform = GetUniformLocation("diffuse_tex_uni");
+	base_color_tex_uniform = GetUniformLocation("base_color_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
-	specular_tex_uniform = GetUniformLocation("specular_tex_uni");
+	metallic_roughness_tex_uniform = GetUniformLocation("metallic_roughness_tex_uni");
 
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
@@ -30,9 +30,9 @@ void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 
 	Bind();
 	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
-	glUniform1i(diffuse_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DIFFUSE_TEX));
+	glUniform1i(base_color_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::BASE_COLOR_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
-	glUniform1i(specular_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::SPECULAR_TEX));
+	glUniform1i(metallic_roughness_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::METALLIC_ROUGHNESS_TEX));
 
 	directional_light_shadow_tex_unit = gbuffer->GetLastTextureUnit() + 1;
 	glUniform1i(directional_light_shadow_map_uniform, directional_light_shadow_tex_unit);

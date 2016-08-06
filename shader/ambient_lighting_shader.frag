@@ -3,8 +3,8 @@
 uniform vec3 light_ambient_color_uni;
 
 uniform sampler2D depth_tex_uni;
-uniform sampler2D diffuse_tex_uni;
-uniform sampler2D self_illumination_tex_uni;
+uniform sampler2D base_color_tex_uni;
+uniform sampler2D emission_tex_uni;
 
 in vec2 uv_coord_var;
 
@@ -17,12 +17,12 @@ void main(void)
 	if(depth == 1.0)
 		discard;
 		
-	ivec2 texel_uv = ivec2(uv_coord_var * textureSize(diffuse_tex_uni, 0).xy);
+	ivec2 texel_uv = ivec2(uv_coord_var * textureSize(base_color_tex_uni, 0).xy);
 
-	vec3 diffuse = texelFetch(diffuse_tex_uni, texel_uv, 0).rgb;		
-	vec3 self_illumination = texelFetch(self_illumination_tex_uni, texel_uv, 0).rgb;
+	vec3 diffuse = texelFetch(base_color_tex_uni, texel_uv, 0).rgb;
+	vec3 emission = texelFetch(emission_tex_uni, texel_uv, 0).rgb;
 		
-	vec3 color = light_ambient_color_uni * diffuse.rgb + self_illumination;
+	vec3 color = light_ambient_color_uni * diffuse.rgb + emission;
 	
 	color_out = vec4(color, 1.0);
 }

@@ -6,13 +6,14 @@
 #include "position_restore.glsl"
 #include "lighting.glsl"
 
+
 uniform vec3 cam_pos_uni;
 
 uniform sampler2D depth_tex_uni;
-uniform sampler2D diffuse_tex_uni;
+uniform sampler2D base_color_tex_uni;
 uniform sampler2D normal_tex_uni;
-uniform sampler2D specular_tex_uni;
-uniform sampler2D self_illumination_tex_uni;
+uniform sampler2D metallic_roughness_tex_uni;
+uniform sampler2D emission_tex_uni;
 
 uniform bool ssao_enabled_uni;
 uniform sampler2D ssao_tex_uni;
@@ -57,20 +58,23 @@ void main(void)
 	if(depth == 1.0)
 		discard;
 
-	vec3 diffuse = texture(diffuse_tex_uni, uv_coord_var).rgb;
+	vec3 base_color = texture(base_color_tex_uni, uv_coord_var).rgb;
 	vec3 position = CalculateWorldPosition(depth, uv_coord_var);
 	vec3 normal = normalize(texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
-	vec4 specular = texture(specular_tex_uni, uv_coord_var).rgba;
+
+	vec2 metallic_roughness = texture(metallic_roughness_tex_uni, uv_coord_var).rg;
+	float metallic = metallic_roughness.r;
+	float roughness = metallic_roughness.g;
 		
 	vec3 cam_dir = normalize(cam_pos_uni - position.xyz);
 	
 	
 	
-	// ambient lighting, ssao and self illumination
+	// ambient lighting, ssao and emission
 	
 	vec3 color = vec3(0.0);
 
-	color += diffuse.rgb * light_ambient_color_uni;
+	color += base_color.rgb * light_ambient_color_uni;
 	
 	if(ssao_enabled_uni)
 	{
@@ -78,8 +82,8 @@ void main(void)
 		color *= occlusion;
 	}
 	
-	vec3 self_illumination = texture(self_illumination_tex_uni, uv_coord_var).rgb;
-	color += self_illumination;
+	vec3 emission = texture(emission_tex_uni, uv_coord_var).rgb;
+	color += emission;
 	
 	
 	// point lighting
@@ -87,9 +91,9 @@ void main(void)
 	for(int i=0; i<point_light_uni.count; i++)
 	{
 		color += PointLightLighting(position.xyz,
-									diffuse.rgb,
-									0.2, // TODO: actual values
-									0.6,
+									base_color.rgb,
+									metallic,
+									roughness,
 									cam_dir,
 									normal,
 									point_light_uni.light[i].pos,
