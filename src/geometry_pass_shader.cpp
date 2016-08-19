@@ -22,7 +22,7 @@ void tGeometryPassShader::Init(void)
 	bump_tex_uniform = GetUniformLocation("bump_tex_uni");
 	emission_tex_uniform = GetUniformLocation("emission_tex_uni");
 
-	cube_map_reflection_tex_uniform = GetUniformLocation("cube_map_reflection_tex_uni");
+	//cube_map_reflection_tex_uniform = GetUniformLocation("cube_map_reflection_tex_uni");
 
 	transformation_uniform = GetUniformLocation("transformation_uni");
 
@@ -39,7 +39,7 @@ void tGeometryPassShader::Init(void)
 	glUniform1i(bump_tex_uniform, bump_tex_unit);
 	glUniform1i(emission_tex_uniform, emission_tex_unit);
 
-	glUniform1i(cube_map_reflection_tex_uniform, cube_map_reflection_tex_unit);
+	//glUniform1i(cube_map_reflection_tex_uniform, cube_map_reflection_tex_unit);
 }
 
 
@@ -86,11 +86,11 @@ void tGeometryPassShader::SetEmissionTexture(GLuint tex)
 
 
 
-void tGeometryPassShader::SetCubeMapReflectionTexture(GLuint tex)
+/*void tGeometryPassShader::SetCubeMapReflectionTexture(GLuint tex)
 {
 	glActiveTexture(GL_TEXTURE0 + cube_map_reflection_tex_unit);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
-}
+}*/
 
 
 

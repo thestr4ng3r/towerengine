@@ -99,8 +99,8 @@ void tGBuffer::CreateTexImage(BufferType type, int width, int height)
 		case FACE_NORMAL_TEX:
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 			break;
-		case METALLIC_ROUGHNESS_TEX:
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, width, height, 0, GL_RG, GL_UNSIGNED_BYTE, 0);
+		case METAL_ROUGH_REFLECT_TEX:
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 			break;
 		case EMISSION_TEX:
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, 0);

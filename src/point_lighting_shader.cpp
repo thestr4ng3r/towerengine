@@ -43,7 +43,7 @@ void tPointLightingShader::Init(tGBuffer *gbuffer)
 	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
 	glUniform1i(base_color_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::BASE_COLOR_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
-	glUniform1i(metallic_roughness_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::METALLIC_ROUGHNESS_TEX));
+	glUniform1i(metallic_roughness_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::METAL_ROUGH_REFLECT_TEX));
 
 	point_light_shadow_tex_unit = new int[lights_count];
 	for(int i=0; i<lights_count; i++)

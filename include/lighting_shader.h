@@ -24,9 +24,10 @@ class tLightingShader : public tScreenShader
 
 		GLint cam_pos_uniform;
 
-		// ambient lighting
 		GLint light_ambient_color_uniform;
 
+		GLint reflection_tex_uniform;
+		int reflection_tex_unit;
 
 	public:
 
@@ -37,6 +38,8 @@ class tLightingShader : public tScreenShader
 		void SetAmbientLight(tVector color);
 		void SetCameraPosition(tVector pos);
 		void SetSSAO(bool enabled, GLuint64 tex_handle);
+
+		void SetReflectionTexture(GLuint tex);
 };
 
 class tLightingShaderPointLightsBuffer : public tUniformBuffer

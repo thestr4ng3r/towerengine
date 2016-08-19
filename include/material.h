@@ -21,7 +21,7 @@ class tDefaultMaterial : public tMaterial
 		enum TextureType
 		{
 			BASE_COLOR,
-			METALLIC_ROUGHNESS,
+			METAL_ROUGH_REFLECT,
 			NORMAL,
 			EMISSION,
 			BUMP
@@ -33,16 +33,12 @@ class tDefaultMaterial : public tMaterial
 		tVector base_color;
 		float metallic;
 		float roughness;
+		float reflectance;
 
 		tVector emission;
 
 		float bump_depth;
 
-		struct CubeMapReflection
-		{
-			bool enabled;
-			tVector color;
-		} cube_map_reflection;
 
 		bool shadow_cast;
 
@@ -61,11 +57,10 @@ class tDefaultMaterial : public tMaterial
 		void SetBaseColor(tVector color)	{ this->base_color = color; }
 		void SetMetallic(float metallic)	{ this->metallic = metallic; }
 		void SetRoughness(float roughness)	{ this->roughness = roughness; }
+		void SetReflectance(float reflect)	{ this->reflectance = reflect; }
 		void SetEmission(tVector color)		{ this->emission = color; }
 		void SetBumpDepth(float depth)		{ this->bump_depth = depth; }
 		void SetShadowCast(bool enabled)	{ this->shadow_cast = enabled; }
-
-		void SetCubeMapReflection(bool enabled, tVector color);
 
 		void LoadTexture(TextureType type, std::string file);
 		void LoadTexture(TextureType type, const char *extension, const void *data, size_t size);
@@ -74,9 +69,6 @@ class tDefaultMaterial : public tMaterial
 
 		bool InitDepthPrePass(tRenderer *renderer);
 		bool InitGeometryPass(tRenderer *renderer);
-
-		bool GetCubeMapReflectionEnabled(void)	{ return cube_map_reflection.enabled; }
-		tVector GetCubeMapReflectionColor(void)	{ return cube_map_reflection.color; }
 };
 
 #endif

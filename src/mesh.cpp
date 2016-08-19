@@ -833,7 +833,7 @@ void tMesh::LoadTextureFromXMLNodeData(xml_node<> *node, tDefaultMaterial *mater
 	else
 		extension = 0;
 
-	material->LoadTexture(tDefaultMaterial::BASE_COLOR, extension, data, size);
+	material->LoadTexture(texture_type, extension, data, size);
 	delete [] data;
 }
 
@@ -872,17 +872,19 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 				color.b = (float)atof(attr->value());
 			mat->SetBaseColor(color);
 		}
-		else if(strcmp(name_temp, "metallic_roughness") == 0)
+		else if(strcmp(name_temp, "metal_rough_reflect") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-				mat->LoadTexture(tDefaultMaterial::METALLIC_ROUGHNESS, path + string(attr->value()));
+				mat->LoadTexture(tDefaultMaterial::METAL_ROUGH_REFLECT, path + string(attr->value()));
 			else if(child->value_size() > 0)
-				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::METALLIC_ROUGHNESS);
+				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::METAL_ROUGH_REFLECT);
 
 			if((attr = child->first_attribute("metallic")))
 				mat->SetMetallic((float)atof(attr->value()));
 			if((attr = child->first_attribute("roughness")))
 				mat->SetRoughness((float)atof(attr->value()));
+			if((attr = child->first_attribute("reflectance")))
+				mat->SetReflectance((float)atof(attr->value()));
 		}
 		else if(strcmp(name_temp, "normal") == 0)
 		{
@@ -916,17 +918,6 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 
 			if((attr = child->first_attribute("depth")))
 				mat->SetBumpDepth((float)atof(attr->value()));
-		}
-		else if(strcmp(name_temp, "cube_map_reflection") == 0)
-		{
-			tVector color = Vec(0.0, 0.0, 0.0);
-			if((attr = child->first_attribute("r")))
-				color.r = (float)atof(attr->value());
-			if((attr = child->first_attribute("g")))
-				color.g = (float)atof(attr->value());
-			if((attr = child->first_attribute("b")))
-				color.b = (float)atof(attr->value());
-			mat->SetCubeMapReflection(true, color);
 		}
 		else if(strcmp(name_temp, "shadow") == 0)
 		{

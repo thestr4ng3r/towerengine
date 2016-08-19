@@ -5,6 +5,7 @@
 
 #include "position_restore.glsl"
 #include "lighting.glsl"
+#include "reflection.glsl"
 
 
 uniform vec3 cam_pos_uni;
@@ -62,9 +63,10 @@ void main(void)
 	vec3 position = CalculateWorldPosition(depth, uv_coord_var);
 	vec3 normal = normalize(texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
 
-	vec2 metallic_roughness = texture(metallic_roughness_tex_uni, uv_coord_var).rg;
-	float metallic = metallic_roughness.r;
-	float roughness = metallic_roughness.g;
+	vec3 metal_rough_reflect = texture(metallic_roughness_tex_uni, uv_coord_var).rgb;
+	float metallic = metal_rough_reflect.r;
+	float roughness = metal_rough_reflect.g;
+	float reflectance = metal_rough_reflect.b;
 		
 	vec3 cam_dir = normalize(cam_pos_uni - position.xyz);
 	
@@ -94,6 +96,7 @@ void main(void)
 									base_color.rgb,
 									metallic,
 									roughness,
+									1.0 - reflectance,
 									cam_dir,
 									normal,
 									point_light_uni.light[i].pos,
@@ -102,6 +105,8 @@ void main(void)
 									point_light_uni.light[i].shadow_enabled != 0,
 									point_light_uni.light[i].shadow_map);
 	}
+
+	color += GetReflectionColor(reflectance, roughness, normal, cam_dir) * base_color * metallic;
 	
 	color_out = vec4(color, 1.0);
 }

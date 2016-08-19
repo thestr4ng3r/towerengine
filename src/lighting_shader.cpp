@@ -30,6 +30,7 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
+	reflection_tex_uniform = GetUniformLocation("reflection_tex_uni");
 
 
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "PointLightBlock"), point_light_binding_point);
@@ -40,8 +41,12 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
 	glUniform1i(base_color_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::BASE_COLOR_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
-	glUniform1i(metallic_roughness_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::METALLIC_ROUGHNESS_TEX));
+	glUniform1i(metallic_roughness_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::METAL_ROUGH_REFLECT_TEX));
 	glUniform1i(emission_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::EMISSION_TEX));
+
+	reflection_tex_unit = gbuffer->GetLastTextureUnit() + 1;
+	glUniform1i(reflection_tex_uniform, reflection_tex_unit);
+
 }
 
 void tLightingShader::SetAmbientLight(tVector color)
@@ -61,6 +66,12 @@ void tLightingShader::SetSSAO(bool enabled, GLuint64 tex_handle)
 	glUniform1i(ssao_enabled_uniform, enabled ? 1 : 0);
 	if(enabled)
 		glUniformHandleui64ARB(ssao_tex_uniform, tex_handle);
+}
+
+void tLightingShader::SetReflectionTexture(GLuint tex)
+{
+	glActiveTexture(GL_TEXTURE0 + reflection_tex_unit);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 }
 
 

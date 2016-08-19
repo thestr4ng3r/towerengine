@@ -34,7 +34,7 @@ float BRDF_SpecularF_Schlick(float f0, float v_dot_h)
 }
 
 
-vec3 CalculateLighting(vec3 base_color, float roughness, float F0,
+vec3 CalculateLighting(vec3 base_color, float roughness, float F0, float specular_factor,
 						vec3 n, vec3 v, vec3 l, vec3 h)
 {
 
@@ -51,14 +51,14 @@ vec3 CalculateLighting(vec3 base_color, float roughness, float F0,
 	float specular = F * G * D;
 	specular /= 4.0 * n_dot_v; // * n_dot_l
 
-	vec3 color = specular * base_color; // * n_dot_l // specular
+	vec3 color = specular * base_color * specular_factor; // * n_dot_l // specular
 
 	color += (1.0 - F) * base_color * n_dot_l; // diffuse
 
 	return color;
 }
 
-vec3 PointLightLighting(vec3 position, vec3 base_color, float metallic, float roughness,
+vec3 PointLightLighting(vec3 position, vec3 base_color, float metallic, float roughness, float specular_factor,
 						vec3 cam_dir, vec3 normal, vec3 light_pos,
 						float point_light_dist, vec3 light_color, // TODO: better name for point_light_dist
 						bool shadow_enabled, samplerCube shadow_map)
@@ -111,7 +111,7 @@ vec3 PointLightLighting(vec3 position, vec3 base_color, float metallic, float ro
 
 	float F0 = metallic;
 
-	return radiance * CalculateLighting(base_color, roughness, F0, n, v, l, h);
+	return radiance * CalculateLighting(base_color, roughness, F0, specular_factor, n, v, l, h);
 }
 
 
@@ -119,7 +119,7 @@ vec3 PointLightLighting(vec3 position, vec3 base_color, float metallic, float ro
 #define MAX_DIRECTIONAL_SHADOW_SPLITS 8
 #define DIRECTIONAL_LIGHT_SHADOW_LAYER_BLEND_DIST 0.5
 
-vec3 DirectionalLightLighting(	vec3 position, vec3 base_color, float metallic, float roughness,
+vec3 DirectionalLightLighting(	vec3 position, vec3 base_color, float metallic, float roughness, float specular_factor,
 								vec3 cam_pos, vec3 normal,
 								vec3 light_dir, vec3 light_color,
                                 bool shadow_enabled,
@@ -187,5 +187,5 @@ vec3 DirectionalLightLighting(	vec3 position, vec3 base_color, float metallic, f
     vec3 radiance = light_intensity * shadow * light_color;
 	float F0 = metallic;
 
-	return radiance * CalculateLighting(base_color, roughness, F0, n, v, l, h);
+	return radiance * CalculateLighting(base_color, roughness, F0, specular_factor, n, v, l, h);
 }

@@ -1,8 +1,5 @@
 #version 330
 
-#extension GL_ARB_texture_query_lod : enable
-#extension GL_ARB_texture_query_levels : enable
-
 
 /*layout(std140) uniform MaterialBlock
 {
@@ -35,16 +32,14 @@ layout(std140) uniform MaterialBlock
 	uniform vec3 emission;
 	uniform float roughness;
 
-	uniform vec3 cube_map_reflection_color;
+	uniform float reflectance;
 	uniform float bump_depth;
-
 	uniform bool base_color_tex_enabled;
 	uniform bool metallic_roughness_tex_enabled;
+
 	uniform bool normal_tex_enabled;
 	uniform bool bump_tex_enabled;
-
 	uniform bool emission_tex_enabled;
-	uniform bool cube_map_reflection_enabled;
 } material_uni;
 
 
@@ -54,8 +49,6 @@ uniform sampler2D metallic_roughness_tex_uni;
 uniform sampler2D normal_tex_uni;
 uniform sampler2D bump_tex_uni;
 uniform sampler2D emission_tex_uni;
-
-uniform samplerCube cube_map_reflection_tex_uni;
 
 
 
@@ -74,7 +67,7 @@ in float reflection_radius_var;
 layout (location = 0) out vec4 base_color_out;
 layout (location = 1) out vec4 normal_out;
 layout (location = 2) out vec4 face_normal_out;
-layout (location = 3) out vec4 metallic_roughness_out;
+layout (location = 3) out vec4 metal_rough_reflect_out;
 layout (location = 4) out vec4 emission_out;
 
 vec2 ParallaxUV(void);
@@ -109,21 +102,24 @@ void main(void)
 		base_color = vec4(material_uni.base_color.rgb, 1.0);
 
 
-	// metallic, roughness
+	// metallic, roughness, reflectance
 
 	float metallic;
 	float roughness;
+	float reflectance;
 
 	if(material_uni.metallic_roughness_tex_enabled)
 	{
-		vec2 metallic_roughness = texture(metallic_roughness_tex_uni, uv).rg;
-		metallic = metallic_roughness.r;
-		roughness = metallic_roughness.g;
+		vec3 metal_rough_reflect = texture(metallic_roughness_tex_uni, uv).rgb;
+		metallic = metal_rough_reflect.r;
+		roughness = metal_rough_reflect.g;
+		reflectance = metal_rough_reflect.b;
 	}
 	else
 	{
 		metallic = material_uni.metallic;
 		roughness = material_uni.roughness;
+		reflectance = material_uni.reflectance;
 	}
 	
 	
@@ -158,7 +154,7 @@ void main(void)
 	
 	// cube map reflection
 	
-	if(material_uni.cube_map_reflection_enabled)
+	/*if(material_uni.cube_map_reflection_enabled)
 	{
 		vec3 cam_reflected = reflect(-cam_dir_var, normal);
 		cam_reflected += (pos_var - reflection_center_var) / reflection_radius_var;
@@ -180,13 +176,14 @@ void main(void)
 
 		vec3 cube_map_color = textureLod(cube_map_reflection_tex_uni, cam_reflected, mipmap_level).rgb;
 		emission += cube_map_color * material_uni.cube_map_reflection_color;
-	}
+	}*/
+
 		
 	
 	// out
 
 	base_color_out = base_color;
-	metallic_roughness_out = vec4(metallic, roughness, 0.0, 0.0);
+	metal_rough_reflect_out = vec4(metallic, roughness, reflectance, 0.0);
 	emission_out = vec4(emission, 1.0);
 }
 

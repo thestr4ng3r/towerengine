@@ -624,6 +624,34 @@ void tRenderer::BindlessTexturesLightPass(void)
 		lighting_shader->SetSSAO(true, ssao->GetTextureHandle());
 	else
 		lighting_shader->SetSSAO(false, 0);
+
+
+	// TODO: Blend between Reflections
+	if(world->GetCubeMapReflectionsCount() > 0)
+	{
+		tVector cam_pos = GetCurrentRenderingCamera()->GetPosition(); // TODO: For VR, a common position for both eyes has to be used
+
+		tCubeMapReflection *min_dist2_reflection = world->GetCubeMapReflection(0);
+		float min_dist2 = (min_dist2_reflection->GetPosition() - cam_pos).SquaredLen();
+
+		for(int i=1; i<world->GetCubeMapReflectionsCount(); i++)
+		{
+			tCubeMapReflection *reflection = world->GetCubeMapReflection(i);
+			float dist2 = (reflection->GetPosition() - cam_pos).SquaredLen();
+
+			if(dist2 < min_dist2)
+			{
+				min_dist2 = dist2;
+				min_dist2_reflection = reflection;
+			}
+		}
+
+		lighting_shader->SetReflectionTexture(min_dist2_reflection->GetCubeMapTexture());
+	}
+	else
+		lighting_shader->SetReflectionTexture(0);
+
+
 	//lighting_shader->SetPositionData(depth_tex);
 
 	RenderScreenQuad();

@@ -4,7 +4,6 @@ import bpy
 import shutil
 import base64
 import itertools
-#from xml.dom.minidom import Document
 
 
 def create_texture_node(pack_textures, path, tex_path, filename, texture, doc, node):
@@ -95,14 +94,19 @@ def create_default_material_node(doc, material, path, subpath, pack_textures = F
 
 
 
-	# metallic roughness
+	# metallic roughness reflectance
 
-	node2 = doc.createElement("metallic_roughness")
+	node2 = doc.createElement("metal_rough_reflect")
 	if metallic_roughness_tex is not None:
-		create_texture_node(pack_textures, path, tex_path, "metal_rough", metallic_roughness_tex, doc, node2)
+		create_texture_node(pack_textures, path, tex_path, "metal_rough_reflect", metallic_roughness_tex, doc, node2)
 	else:
 		node2.setAttribute("metallic", str(material.towerengine.metallic))
 		node2.setAttribute("roughness", str(material.towerengine.roughness))
+
+		reflectance = 0.0
+		if material.raytrace_mirror.use:
+			reflectance = material.raytrace_mirror.reflect_factor
+		node2.setAttribute("reflectance", str(reflectance))
 	node.appendChild(node2)
 
 
@@ -128,15 +132,6 @@ def create_default_material_node(doc, material, path, subpath, pack_textures = F
 		node2.setAttribute("depth", str(bump_depth))
 		node.appendChild(node2)
 
-
-	# reflection
-
-	if material.raytrace_mirror.use:
-		node2 = doc.createElement("cube_map_reflection")
-		node2.setAttribute("r", str(material.mirror_color.r * material.raytrace_mirror.reflect_factor))
-		node2.setAttribute("g", str(material.mirror_color.g * material.raytrace_mirror.reflect_factor))
-		node2.setAttribute("b", str(material.mirror_color.b * material.raytrace_mirror.reflect_factor))
-		node.appendChild(node2)
 
 
 	# shadowing

@@ -39,9 +39,10 @@ void main(void)
 	vec3 base_color = texelFetch(base_color_tex_uni, texel_uv, 0).rgb;
 	vec3 position = CalculateWorldPosition(depth, uv_coord_var);
 	vec3 normal = normalize(texelFetch(normal_tex_uni, texel_uv, 0).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
-	vec2 metallic_roughness = texelFetch(metallic_roughness_tex_uni, texel_uv, 0).rg;
-	float metallic = metallic_roughness.r;
-	float roughness = metallic_roughness.g;
+	vec3 metal_rough_reflect = texelFetch(metallic_roughness_tex_uni, texel_uv, 0).rgb;
+	float metallic = metal_rough_reflect.r;
+	float roughness = metal_rough_reflect.g;
+	float reflectance = metal_rough_reflect.b;
 	
 	vec3 cam_dir = normalize(cam_pos_uni - position.xyz);
 
@@ -55,6 +56,7 @@ void main(void)
 									base_color.rgb,
 									metallic,
 									roughness,
+									1.0 - reflectance,
 									cam_dir,
 									normal,
 									point_light_pos_uni[i],

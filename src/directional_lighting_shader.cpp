@@ -32,7 +32,7 @@ void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
 	glUniform1i(depth_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::DEPTH_TEX));
 	glUniform1i(base_color_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::BASE_COLOR_TEX));
 	glUniform1i(normal_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::NORMAL_TEX));
-	glUniform1i(metallic_roughness_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::METALLIC_ROUGHNESS_TEX));
+	glUniform1i(metallic_roughness_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::METAL_ROUGH_REFLECT_TEX));
 
 	directional_light_shadow_tex_unit = gbuffer->GetLastTextureUnit() + 1;
 	glUniform1i(directional_light_shadow_map_uniform, directional_light_shadow_tex_unit);

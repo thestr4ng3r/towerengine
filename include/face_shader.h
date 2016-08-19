@@ -16,7 +16,6 @@ class tFaceShader : public tShader
 		static const unsigned int normal_tex_unit = 2;
 		static const unsigned int bump_tex_unit = 3;
 		static const unsigned int emission_tex_unit = 4;
-		static const unsigned int cube_map_reflection_tex_unit = 5;
 
 		virtual void SetBaseColorTexture(bool enabled, GLuint tex) {}
 		virtual void SetMetallicRoughnessTexture(GLuint tex) {}

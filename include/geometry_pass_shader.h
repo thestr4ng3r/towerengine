@@ -16,7 +16,6 @@ class tGeometryPassShader : public tFaceShader
 		GLint bump_tex_uniform;
 		GLint emission_tex_uniform;
 
-		GLint cube_map_reflection_tex_uniform;
 
 	public:
 		void Init(void);
@@ -29,8 +28,6 @@ class tGeometryPassShader : public tFaceShader
 		void SetNormalTexture(GLuint tex);
 		void SetBumpTexture(GLuint tex);
 		void SetEmissionTexture(GLuint tex);
-
-		void SetCubeMapReflectionTexture(GLuint tex);
 };
 
 
