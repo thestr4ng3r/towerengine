@@ -51,9 +51,11 @@ vec3 CalculateLighting(vec3 base_color, float roughness, float F0, float specula
 	float specular = F * G * D;
 	specular /= 4.0 * n_dot_v; // * n_dot_l
 
-	vec3 color = specular * base_color * specular_factor; // * n_dot_l // specular
+	vec3 color = vec3(1.0) * max(specular, 0.0) * specular_factor; // * n_dot_l // specular
+	// * base_color
 
-	color += (1.0 - F) * base_color * n_dot_l; // diffuse
+
+	color += max(1.0 - F, 0.0) * base_color * n_dot_l; // diffuse
 
 	return color;
 }
