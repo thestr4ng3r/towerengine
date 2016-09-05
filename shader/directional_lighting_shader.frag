@@ -47,7 +47,7 @@ void main(void)
 	float reflectance = metal_rough_reflect.b;
 
 
-	vec3 color = DirectionalLightLighting(position, base_color, metallic, roughness, reflectance,
+	vec3 color = DirectionalLightLighting(position, base_color, metallic, roughness, 1.0 - reflectance,
 											cam_pos_uni, normal,
 											directional_light_dir_uni, directional_light_color_uni,
 											directional_light_shadow_enabled_uni,

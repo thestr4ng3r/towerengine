@@ -648,6 +648,8 @@ void tRenderer::BindlessTexturesLightPass(void)
 
 		lighting_shader->SetReflectionTexture(min_dist2_reflection->GetCubeMapTexture());
 	}
+	else if(world->GetSkyBox())
+		lighting_shader->SetReflectionTexture(world->GetSkyBox()->GetCubeMap());
 	else
 		lighting_shader->SetReflectionTexture(0);
 

@@ -23,7 +23,7 @@ vec3 GetReflectionColor(float reflectance, float roughness, vec3 normal, vec3 ca
 	float mipmap_level = 0.0;
 #endif
 
-	float blur_mipmap_level = float(mipmap_levels) * pow(roughness, 0.6);
+	float blur_mipmap_level = float(mipmap_levels) * pow(roughness, 0.3);
 	mipmap_level = max(mipmap_level, blur_mipmap_level);
 
 	vec3 reflection_color = textureLod(reflection_tex_uni, cam_reflected, mipmap_level).rgb;
