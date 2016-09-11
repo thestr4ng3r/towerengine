@@ -3,11 +3,13 @@
 
 using namespace std;
 
-tCubeMapReflection::tCubeMapReflection(tVector position)
+tCubeMapReflection::tCubeMapReflection(tVector position, tVector extent_a, tVector extent_b)
 {
 	this->initialized = false;
 	this->resolution = 0;
 	this->position = position;
+
+	this->extent = tBoundingBox(extent_a, extent_b);
 
 	camera = new tCamera();
 	camera->SetFOV(-1.0f, 1.0f, 1.0f, -1.0f);

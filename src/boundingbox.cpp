@@ -48,6 +48,13 @@ void tBoundingBox::GetCornerPoints(tVector *p)
 	p[7] = Vec(maxv.x, minv.y, minv.z);
 }
 
+bool tBoundingBox::ContainsPoint(tVector p)
+{
+	return p.x >= minv.x && p.x <= maxv.x
+			&& p.y >= minv.y && p.y <= maxv.y
+			&& p.z >= minv.z && p.z <= maxv.z;
+}
+
 tBoundingBox operator+(tBoundingBox a, const tVector &b)
 {
 	return tBoundingBox(a.GetMin() + b, a.GetMax() + b);

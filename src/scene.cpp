@@ -464,6 +464,9 @@ tSceneObject *tScene::ParsePointLightObjectNode(xml_node<> *cur)
 tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 {
 	tTransform transform;
+	tVector extent_a = Vec(1.0, 1.0, 1.0);
+	tVector extent_b = Vec(-1.0, -1.0, -1.0);
+	tVector delta_position = Vec(0.0, 0.0, 0.0);
 	xml_attribute<> *attr;
 
 	bool cube_map_reflection = false;
@@ -477,7 +480,24 @@ tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 	{
 		if(strcmp(child->name(), "transform") == 0)
 			transform = ParseTransformNode(child);
+		else if(strcmp(child->name(), "delta_transform") == 0)
+		{
+			tVector scale = Vec(1.0, 1.0, 1.0);
+
+			for(xml_node<> *child2=child->first_node(); child2; child2=child2->next_sibling())
+			{
+				if(strcmp(child2->name(), "position") == 0)
+					delta_position = ParseVectorNode(child2);
+				else if(strcmp(child2->name(), "scale") == 0)
+					scale = ParseVectorNode(child2);
+			}
+
+			extent_a = scale + delta_position;
+			extent_b = -scale + delta_position;
+		}
 	}
+
+	transform.SetPosition(transform.GetPosition() - delta_position);
 
 	if(!cube_map_reflection)
 	{
@@ -486,7 +506,7 @@ tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 	}
 	else
 	{
-		tCubeMapReflection *reflection = new tCubeMapReflection(transform.GetPosition());
+		tCubeMapReflection *reflection = new tCubeMapReflection(transform.GetPosition(), extent_a, extent_b);
 		tCubeMapReflectionSceneObject *scene_object = new tCubeMapReflectionSceneObject(reflection);
 		return scene_object;
 	}

@@ -19,6 +19,8 @@ class tBoundingBox
 
 		void SetBounds(tVector a, tVector b);
 		void AddPoint(tVector p);
+
+		bool ContainsPoint(tVector p);
 };
 
 tBoundingBox operator+(tBoundingBox a, const tVector &b);

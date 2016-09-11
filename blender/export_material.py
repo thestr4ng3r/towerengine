@@ -28,7 +28,7 @@ def create_texture_node(pack_textures, path, tex_path, filename, texture, doc, n
 
 
 def create_default_material_node(doc, material, path, subpath, pack_textures = False):
-	base_color_tex = metallic_roughness_tex = normal_tex = bump_tex = emission_tex = None
+	base_color_tex = metal_rough_reflect_tex = normal_tex = bump_tex = emission_tex = None
 	bump_depth = 0.0
 
 	for tex_slot, towerengine_tex_slot in itertools.zip_longest(material.texture_slots, material.towerengine_texture_slots):
@@ -49,12 +49,12 @@ def create_default_material_node(doc, material, path, subpath, pack_textures = F
 			emission_tex = texture
 
 		if towerengine_tex_slot is not None:
-			if towerengine_tex_slot.use_map_metallic_roughness:
-				metallic_roughness_tex = texture
+			if towerengine_tex_slot.use_map_metal_rough_reflect:
+				metal_rough_reflect_tex = texture
 
 
 	if pack_textures == False and (base_color_tex is not None
-									or metallic_roughness_tex is not None
+									or metal_rough_reflect_tex is not None
 									or normal_tex is not None
 									or bump_tex is not None
 									or emission_tex is not None):
@@ -97,8 +97,8 @@ def create_default_material_node(doc, material, path, subpath, pack_textures = F
 	# metallic roughness reflectance
 
 	node2 = doc.createElement("metal_rough_reflect")
-	if metallic_roughness_tex is not None:
-		create_texture_node(pack_textures, path, tex_path, "metal_rough_reflect", metallic_roughness_tex, doc, node2)
+	if metal_rough_reflect_tex is not None:
+		create_texture_node(pack_textures, path, tex_path, "metal_rough_reflect", metal_rough_reflect_tex, doc, node2)
 	else:
 		node2.setAttribute("metallic", str(material.towerengine.metallic))
 		node2.setAttribute("roughness", str(material.towerengine.roughness))

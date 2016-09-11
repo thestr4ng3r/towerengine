@@ -250,6 +250,7 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 	def __save_empty_object_xml(self, obj):
 		obj_node = self.xml_doc.createElement("empty")
 		obj_node.appendChild(self.__create_transform_node_xml(obj.matrix_world))
+		obj_node.appendChild(self.__create_delta_transform_node_xml(obj))
 		return obj_node
 	
 	
@@ -260,7 +261,13 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 		transform_node.appendChild(self.__create_vector_node_xml("basis_y", matrix[2][0], matrix[2][2], -matrix[2][1]))
 		transform_node.appendChild(self.__create_vector_node_xml("basis_z", -matrix[1][0], -matrix[1][2], matrix[1][1]))
 		return transform_node
-	
+
+	def __create_delta_transform_node_xml(self, obj):
+		node = self.xml_doc.createElement("delta_transform")
+		node.appendChild(self.__create_vector_node_xml("position", obj.delta_location.x, obj.delta_location.z, -obj.delta_location.y))
+		node.appendChild(self.__create_vector_node_xml("rotation", obj.delta_rotation_euler.x, obj.delta_rotation_euler.z, -obj.delta_rotation_euler.y))
+		node.appendChild(self.__create_vector_node_xml("scale", obj.delta_scale.x, obj.delta_scale.z, -obj.delta_scale.y))
+		return node
 	
 	def __create_vector_node_xml(self, name, x, y, z):
 		node = self.xml_doc.createElement(name)

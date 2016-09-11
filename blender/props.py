@@ -98,7 +98,7 @@ class TowerEngineDeleteAttributeOperator(bpy.types.Panel):
 # mesh texture slot
 
 class TowerEngineMaterialTextureSlotPropertyGroup(bpy.types.PropertyGroup):
-	use_map_metallic_roughness = bpy.props.BoolProperty(name="Metallic Roughness", default=False)
+	use_map_metal_rough_reflect = bpy.props.BoolProperty(name="Metallic/Roughness/Reflectance", default=False)
 
 
 class TowerEngineMaterialTextureSlotInitOperator(bpy.types.Operator):
@@ -139,7 +139,7 @@ class TowerEngineTexturePanel(bpy.types.Panel):
 		towerengine_slot = mat.towerengine_texture_slots[slot_index]
 
 		layout.label(text="Influence:")
-		layout.prop(towerengine_slot, 'use_map_metallic_roughness')
+		layout.prop(towerengine_slot, 'use_map_metal_rough_reflect')
 
 
 # material

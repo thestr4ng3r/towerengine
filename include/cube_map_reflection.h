@@ -7,6 +7,7 @@ class tCubeMapReflection
 {
 	private:
 		tVector position;
+		tBoundingBox extent;
 
 		unsigned int resolution;
 		unsigned int resolution_log;
@@ -29,7 +30,7 @@ class tCubeMapReflection
 		void BlurPass(tRenderer *renderer);
 
 	public:
-		tCubeMapReflection(tVector position);
+		tCubeMapReflection(tVector position, tVector extent_a, tVector extend_b);
 		~tCubeMapReflection(void);
 
 		void Init(unsigned int resolution_log);
@@ -39,6 +40,8 @@ class tCubeMapReflection
 		void Invalidate(void)			{ invalid = true; }
 
 		tVector GetPosition(void)		{ return position; }
+		tBoundingBox GetExtent(void)	{ return extent; }
+
 		GLuint GetCubeMapTexture(void)	{ return color_tex; }
 
 		bool GetInvalid(void)			{ return invalid; }
