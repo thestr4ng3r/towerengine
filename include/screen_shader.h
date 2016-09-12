@@ -10,6 +10,11 @@ class tScreenShader : public tShader
 
 };
 
+class tReflectingShader
+{
+	public:
+		virtual void SetReflectionTextures(GLuint tex1, GLuint tex2, float blend) =0;
+};
 
 
 class tPositionRestoreDataBuffer : public tUniformBuffer

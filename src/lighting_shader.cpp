@@ -30,7 +30,9 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 
 	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
 
-	reflection_tex_uniform = GetUniformLocation("reflection_tex_uni");
+	reflection_tex1_uniform = GetUniformLocation("reflection_tex1_uni");
+	reflection_tex2_uniform = GetUniformLocation("reflection_tex2_uni");
+	reflection_tex_blend_uniform = GetUniformLocation("reflection_tex_blend_uni");
 
 
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "PointLightBlock"), point_light_binding_point);
@@ -44,8 +46,11 @@ void tLightingShader::Init(tGBuffer *gbuffer)
 	glUniform1i(metallic_roughness_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::METAL_ROUGH_REFLECT_TEX));
 	glUniform1i(emission_tex_uniform, gbuffer->GetTextureUnit(tGBuffer::EMISSION_TEX));
 
-	reflection_tex_unit = gbuffer->GetLastTextureUnit() + 1;
-	glUniform1i(reflection_tex_uniform, reflection_tex_unit);
+	reflection_tex1_unit = gbuffer->GetLastTextureUnit() + 1;
+	glUniform1i(reflection_tex1_uniform, reflection_tex1_unit);
+
+	reflection_tex2_unit = gbuffer->GetLastTextureUnit() + 2;
+	glUniform1i(reflection_tex2_uniform, reflection_tex2_unit);
 
 }
 
@@ -68,10 +73,15 @@ void tLightingShader::SetSSAO(bool enabled, GLuint64 tex_handle)
 		glUniformHandleui64ARB(ssao_tex_uniform, tex_handle);
 }
 
-void tLightingShader::SetReflectionTexture(GLuint tex)
+void tLightingShader::SetReflectionTextures(GLuint tex1, GLuint tex2, float blend)
 {
-	glActiveTexture(GL_TEXTURE0 + reflection_tex_unit);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+	glActiveTexture(GL_TEXTURE0 + reflection_tex1_unit);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex1);
+
+	glActiveTexture(GL_TEXTURE0 + reflection_tex2_unit);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex2);
+
+	glUniform1f(reflection_tex_blend_uniform, blend);
 }
 
 

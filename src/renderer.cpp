@@ -199,6 +199,7 @@ tRenderer::~tRenderer(void)
 	delete directional_lighting_shader;
 	delete depth_pass_shader;
 	delete lighting_shader;
+	delete cube_map_blur_shader;
 
 	for(vector<tPointLightingShader *>::iterator psi=point_lighting_shaders.begin(); psi!=point_lighting_shaders.end(); psi++)
 		delete *psi;
@@ -626,42 +627,7 @@ void tRenderer::BindlessTexturesLightPass(void)
 		lighting_shader->SetSSAO(false, 0);
 
 
-
-	tCubeMapReflection *use_reflection = 0;
-
-	// TODO: Blend between Reflections
-	if(world->GetCubeMapReflectionsCount() > 0)
-	{
-		tVector cam_pos = GetCurrentRenderingCamera()->GetPosition(); // TODO: For VR, a common position for both eyes has to be used
-
-		//tCubeMapReflection *min_dist2_reflection = 0; //world->GetCubeMapReflection(0);
-		//float min_dist2 = (min_dist2_reflection->GetPosition() - cam_pos).SquaredLen();
-
-		for(int i=0; i<world->GetCubeMapReflectionsCount(); i++)
-		{
-			tCubeMapReflection *reflection = world->GetCubeMapReflection(i);
-			tVector dir = cam_pos - reflection->GetPosition();
-
-			if(reflection->GetExtent().ContainsPoint(dir))
-				use_reflection = reflection;
-
-			/*float dist2 = (reflection->GetPosition() - cam_pos).SquaredLen();
-
-			if(dist2 < min_dist2)
-			{
-				min_dist2 = dist2;
-				min_dist2_reflection = reflection;
-			}*/
-		}
-
-	}
-
-	if(use_reflection)
-		lighting_shader->SetReflectionTexture(use_reflection->GetCubeMapTexture());
-	else if(world->GetSkyBox())
-		lighting_shader->SetReflectionTexture(world->GetSkyBox()->GetCubeMap());
-	else
-		lighting_shader->SetReflectionTexture(0);
+	SetReflections(lighting_shader, GetCurrentRenderingCamera()->GetPosition()); // TODO: For VR, a common position for both eyes has to be used
 
 
 	//lighting_shader->SetPositionData(depth_tex);
@@ -672,6 +638,57 @@ void tRenderer::BindlessTexturesLightPass(void)
 	glBlendFunc(GL_ONE, GL_ONE);
 }
 #endif
+
+
+void tRenderer::SetReflections(tReflectingShader *shader, tVector pos)
+{
+	vector<tCubeMapReflection *> reflections;
+
+	// TODO: Blend between Reflections
+	if(world->GetCubeMapReflectionsCount() > 0)
+	{
+		for(int i=0; i<world->GetCubeMapReflectionsCount(); i++)
+		{
+			tCubeMapReflection *reflection = world->GetCubeMapReflection(i);
+			tVector dir = pos - reflection->GetPosition();
+
+			if(reflection->GetExtent().ContainsPoint(dir))
+				reflections.push_back(reflection);
+		}
+	}
+
+	if(reflections.size() >= 2)
+	{
+		// see https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
+
+		tCubeMapReflection *reflection1 = reflections[0];
+		tCubeMapReflection *reflection2 = reflections[1];
+
+		float influence1 = reflection1->GetExtent().GetNormalizedBoxDistanceToCenter(pos - reflection1->GetPosition());
+		float influence2 = reflection2->GetExtent().GetNormalizedBoxDistanceToCenter(pos - reflection2->GetPosition());
+
+		float sum = influence1 + influence2;
+		float inv_sum = (1.0f - influence1) + (1.0f - influence2);
+
+		float blend1 = 1.0f - (influence1 / sum);
+		blend1 *= (1.0f - influence1) / inv_sum;
+
+		float blend2 = 1.0f - (influence2 / sum);
+		blend2 *= (1.0f - influence2) / inv_sum;
+
+		float blend = blend1 / (blend1 + blend2);
+
+		shader->SetReflectionTextures(reflections[0]->GetCubeMapTexture(), reflections[1]->GetCubeMapTexture(), blend);
+	}
+	else if(reflections.size() == 1)
+		shader->SetReflectionTextures(reflections[0]->GetCubeMapTexture(), 0, 0.0);
+	else if(world->GetSkyBox())
+		shader->SetReflectionTextures(world->GetSkyBox()->GetCubeMap(), 0, 0.0);
+	else
+		shader->SetReflectionTextures(0, 0, 0.0);
+}
+
+
 
 
 void tRenderer::LegacyLightPass(void)

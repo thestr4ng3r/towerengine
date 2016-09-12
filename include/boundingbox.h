@@ -21,6 +21,8 @@ class tBoundingBox
 		void AddPoint(tVector p);
 
 		bool ContainsPoint(tVector p);
+		tVector GetNormalizedDistanceToCenter(tVector pos);
+		float GetNormalizedBoxDistanceToCenter(tVector pos);
 };
 
 tBoundingBox operator+(tBoundingBox a, const tVector &b);

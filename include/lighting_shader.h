@@ -10,7 +10,7 @@
 /**
  * Lighting Shader used if ARB_bindless_texture is supported
  */
-class tLightingShader : public tScreenShader
+class tLightingShader : public tScreenShader, public tReflectingShader
 {
 	private:
 		GLint depth_tex_uniform;
@@ -26,8 +26,12 @@ class tLightingShader : public tScreenShader
 
 		GLint light_ambient_color_uniform;
 
-		GLint reflection_tex_uniform;
-		int reflection_tex_unit;
+		GLint reflection_tex1_uniform;
+		GLint reflection_tex2_uniform;
+		GLint reflection_tex_blend_uniform;
+
+		int reflection_tex1_unit;
+		int reflection_tex2_unit;
 
 	public:
 
@@ -39,7 +43,7 @@ class tLightingShader : public tScreenShader
 		void SetCameraPosition(tVector pos);
 		void SetSSAO(bool enabled, GLuint64 tex_handle);
 
-		void SetReflectionTexture(GLuint tex);
+		void SetReflectionTextures(GLuint tex1, GLuint tex2, float blend);
 };
 
 class tLightingShaderPointLightsBuffer : public tUniformBuffer

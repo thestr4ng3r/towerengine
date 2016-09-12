@@ -55,6 +55,22 @@ bool tBoundingBox::ContainsPoint(tVector p)
 			&& p.z >= minv.z && p.z <= maxv.z;
 }
 
+tVector tBoundingBox::GetNormalizedDistanceToCenter(tVector pos)
+{
+	tVector center = (maxv + minv) * 0.5;
+	tVector dist = pos - center;
+	dist.x /= maxv.x - center.x;
+	dist.y /= maxv.y - center.y;
+	dist.z /= maxv.z - center.z;
+	return dist;
+}
+
+float tBoundingBox::GetNormalizedBoxDistanceToCenter(tVector pos)
+{
+	tVector dist = GetNormalizedDistanceToCenter(pos);
+	return max(max(abs(dist.x), abs(dist.y)), abs(dist.z));
+}
+
 tBoundingBox operator+(tBoundingBox a, const tVector &b)
 {
 	return tBoundingBox(a.GetMin() + b, a.GetMax() + b);

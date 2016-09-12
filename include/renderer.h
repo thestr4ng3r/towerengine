@@ -89,6 +89,8 @@ class tRenderer
 		void ForwardPass(void);
 		void RefractionPass(void);
 
+		void SetReflections(tReflectingShader *shader, tVector pos);
+
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 		void BindlessTexturesLightPass(void);
 #endif
