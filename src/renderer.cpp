@@ -72,7 +72,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	///if(!bindless_textures_enabled)
 	//{
 		ambient_lighting_shader = new tAmbientLightingShader();
-		ambient_lighting_shader->Init(gbuffer);
+		ambient_lighting_shader->Init(gbuffer, false);
 	//}
 
 	skybox_shader = new tSkyBoxShader();
@@ -233,8 +233,8 @@ void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int n
 	{
 		if(!ssao_ambient_lighting_shader && !bindless_textures_enabled)
 		{
-			ssao_ambient_lighting_shader = new tSSAOAmbientLightingShader();
-			ssao_ambient_lighting_shader->Init(gbuffer);
+			ssao_ambient_lighting_shader = new tAmbientLightingShader();
+			ssao_ambient_lighting_shader->Init(gbuffer, true);
 		}
 	}
 	else
@@ -693,18 +693,24 @@ void tRenderer::SetReflections(tReflectingShader *shader, tVector pos)
 
 void tRenderer::LegacyLightPass(void)
 {
-	// ambient
+	tAmbientLightingShader *ambient_shader;
+
 	if(ssao && ssao_ambient_only)
 	{
-		ssao_ambient_lighting_shader->Bind();
-		ssao_ambient_lighting_shader->SetSSAOTexture(ssao->GetSSAOTexture());
-		ssao_ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
+		ambient_shader = ssao_ambient_lighting_shader;
+		ambient_shader->Bind();
+		ambient_shader->SetSSAOTexture(ssao->GetSSAOTexture());
 	}
 	else
 	{
-		ambient_lighting_shader->Bind();
-		ambient_lighting_shader->SetAmbientLight(world->GetAmbientColor());
+		ambient_shader = ambient_lighting_shader;
+		ambient_shader->Bind();
 	}
+
+	ambient_shader->SetAmbientLight(world->GetAmbientColor());
+	ambient_shader->SetCameraPosition(current_rendering_camera->GetPosition());
+
+	SetReflections(ambient_shader, current_rendering_camera->GetPosition()); // TODO: For VR, a common position for both eyes has to be used
 
 	RenderScreenQuad();
 

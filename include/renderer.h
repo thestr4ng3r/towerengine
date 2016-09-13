@@ -14,7 +14,7 @@ class tRenderer
 		tLightingShader *lighting_shader;
 #endif
 		tAmbientLightingShader *ambient_lighting_shader;
-		tSSAOAmbientLightingShader *ssao_ambient_lighting_shader;
+		tAmbientLightingShader *ssao_ambient_lighting_shader;
 		tDirectionalLightingShader *directional_lighting_shader;
 		std::vector<tPointLightingShader *> point_lighting_shaders;
 		tSSAOLightingShader *ssao_lighting_shader;

@@ -61,7 +61,7 @@ void main(void)
 
 	vec3 base_color = texture(base_color_tex_uni, uv_coord_var).rgb;
 	vec3 position = CalculateWorldPosition(depth, uv_coord_var);
-	vec3 normal = normalize(texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0, 1.0, 1.0));
+	vec3 normal = normalize(texture(normal_tex_uni, uv_coord_var).rgb * 2.0 - vec3(1.0));
 
 	vec3 metal_rough_reflect = texture(metallic_roughness_tex_uni, uv_coord_var).rgb;
 	float metallic = metal_rough_reflect.r;
@@ -86,6 +86,11 @@ void main(void)
 	
 	vec3 emission = texture(emission_tex_uni, uv_coord_var).rgb;
 	color += emission;
+
+
+	// reflection
+
+	color += GetReflectionColor(reflectance, roughness, normal, cam_dir) * metallic;
 	
 	
 	// point lighting
@@ -106,7 +111,6 @@ void main(void)
 									point_light_uni.light[i].shadow_map);
 	}
 
-	color += GetReflectionColor(reflectance, roughness, normal, cam_dir) * base_color * metallic;
 	
 	color_out = vec4(color, 1.0);
 }

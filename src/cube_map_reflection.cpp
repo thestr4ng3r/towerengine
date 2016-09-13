@@ -180,6 +180,12 @@ void tCubeMapReflection::LightPass(tRenderer *renderer, int side, tWorld *world)
 
 	renderer->GetAmbientLightingShader()->Bind();
 	renderer->GetAmbientLightingShader()->SetAmbientLight(world->GetAmbientColor());
+	renderer->GetAmbientLightingShader()->SetCameraPosition(position);
+
+	if(sky_box)
+		renderer->GetAmbientLightingShader()->SetReflectionTextures(sky_box->GetCubeMap(), 0, 0.0);
+	else
+		renderer->GetAmbientLightingShader()->SetReflectionTextures(0, 0, 0.0);
 
 	renderer->RenderScreenQuad();
 

@@ -35,8 +35,8 @@ bool tEngine::Init(std::string *error)
 	int ext_count;
 	glGetIntegerv(GL_NUM_EXTENSIONS, &ext_count);
 
-	if(GLEW_ARB_bindless_texture)
-		arb_bindless_texture_supported = true;
+	//if(GLEW_ARB_bindless_texture)
+	//	arb_bindless_texture_supported = true;
 
 	if(GLEW_ARB_shading_language_include)
 		arb_shading_language_include_supported = true;
