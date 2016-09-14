@@ -13,7 +13,7 @@ uniform sampler2D normal_tex_uni;
 uniform sampler2D metal_rough_reflect_tex_uni;
 uniform sampler2D emission_tex_uni;
 
-#if AMBIENT_SSAO
+#ifdef AMBIENT_SSAO
 uniform sampler2D ssao_tex_uni;
 #endif
 
@@ -54,7 +54,7 @@ void main(void)
 
 	//ssao
 
-#if AMBIENT_SSAO
+#ifdef AMBIENT_SSAO
 	float occlusion = texture(ssao_tex_uni, uv_coord_var).r;
 	color *= occlusion;
 #endif
