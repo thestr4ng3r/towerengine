@@ -66,8 +66,13 @@ void tCubeMapReflection::Init(unsigned int resolution_log)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	for(int i=0; i<6; i++)
-		glTexImage2D(CubeTex(i), 0, GL_RGBA, resolution, resolution, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	int res = 1;
+	for(int level=resolution_log; level>=0; level--)
+	{
+		for(int i = 0; i < 6; i++)
+			glTexImage2D(CubeTex(i), level, GL_RGBA, res, res, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		res *= 2;
+	}
 
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
