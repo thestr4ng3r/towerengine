@@ -10,18 +10,18 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 
 	this->bindless_textures_enabled = tEngine::GetARBBindlessTextureSupported() && bindless_textures;
 
+
+	glGenFramebuffers(1, &fbo);
+	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 2);
+	
+	shadow_pass = false;
+
 	depth_pass_shader = new tDepthPassShader();
 	depth_pass_shader->Init();
 
 	geometry_pass_shader = new tGeometryPassShader();
 	geometry_pass_shader->Init();
-	//SetCurrentFaceShader(geometry_pass_shader);
 
-	shadow_pass = false;
-
-	glGenFramebuffers(1, &fbo);
-
-	gbuffer = new tGBuffer(screen_width, screen_height, fbo, 2);
 
 	directional_lighting_shader = new tDirectionalLightingShader();
 	directional_lighting_shader->Init(gbuffer);

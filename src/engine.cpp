@@ -8,6 +8,8 @@
 bool tEngine::arb_bindless_texture_supported = false;
 bool tEngine::arb_shading_language_include_supported = false;
 
+tNoOpShader *tEngine::no_op_shader = 0;
+
 
 const char *glew_init_error_msg = "Failed to initialize GLEW.";
 const char *arb_bindless_texture_error_msg = "ARB_bindless_texture is not supported by the graphics card or driver. This might have a negative impact on performance.";
@@ -35,8 +37,8 @@ bool tEngine::Init(std::string *error)
 	int ext_count;
 	glGetIntegerv(GL_NUM_EXTENSIONS, &ext_count);
 
-	//if(GLEW_ARB_bindless_texture)
-	//	arb_bindless_texture_supported = true;
+	if(GLEW_ARB_bindless_texture)
+		arb_bindless_texture_supported = true;
 
 	if(GLEW_ARB_shading_language_include)
 		arb_shading_language_include_supported = true;
@@ -69,5 +71,14 @@ bool tEngine::Init(std::string *error)
 	iluInit();
 
 
+	no_op_shader = new tNoOpShader();
+	no_op_shader->Init();
+
 	return true;
+}
+
+
+void tEngine::Shutdown(void)
+{
+	delete no_op_shader;
 }

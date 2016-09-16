@@ -37,6 +37,7 @@ class t2DRenderer;
 #include "gbuffer.h"
 #include "comparable.h"
 
+#include "no_op_shader.h"
 #include "screen_shader.h"
 #include "lighting_shader.h"
 #include "ambient_lighting_shader.h"

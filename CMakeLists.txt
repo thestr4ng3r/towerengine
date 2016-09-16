@@ -137,7 +137,9 @@ set(TOWERENGINE_SRC
 	src/refraction_shader.cpp
 	src/refraction_material.cpp
 	src/lighting_shader.cpp
-	src/depth_pass_shader.cpp src/cube_map_blur_shader.cpp)
+	src/depth_pass_shader.cpp
+	src/cube_map_blur_shader.cpp
+	src/no_op_shader.cpp)
 
 
 set(RESOURCES_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")

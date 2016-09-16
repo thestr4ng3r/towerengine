@@ -44,11 +44,11 @@ void tVRRenderer::PrepareRender(void)
 	tRenderer::PrepareRender(camera[0], camera_render_space); // TODO: use something instead of left camera
 }
 
-void tVRRenderer::Render(int eye, GLuint dst_fbo, bool single_texture)
+void tVRRenderer::Render(int eye, GLuint dst_fbo)
 {
 	int viewport_x = 0;
 
-	if(single_texture && eye == 1)
+	if(eye == 1)
 		viewport_x = width[0];
 	
 	tRenderer::Render(camera[eye], camera_render_space, dst_fbo, viewport_x, 0, width[eye], height[eye]);
