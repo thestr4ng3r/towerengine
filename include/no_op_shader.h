@@ -5,7 +5,7 @@
 class tNoOpShader : public tShader
 {
 	public:
-		void Init(void);
+		tNoOpShader(void);
 };
 
 #endif

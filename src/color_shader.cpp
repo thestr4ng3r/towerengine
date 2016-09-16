@@ -3,7 +3,7 @@
 #include "resources.h"
 
 
-void tColorShader::Init(void)
+tColorShader::tColorShader(void)
 {
 	InitShader(resources_get("color_shader.vert"), resources_get("color_shader.frag"));
 

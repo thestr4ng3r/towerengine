@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "resources.h"
 
-void tDepthPassShader::Init(void)
+tDepthPassShader::tDepthPassShader(void)
 {
 	InitShader(resources_get("depth_pass_shader.vert"), resources_get("depth_pass_shader.frag"), "Depth Pass Shader");
 

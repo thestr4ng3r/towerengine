@@ -18,7 +18,7 @@ class tGeometryPassShader : public tFaceShader
 
 
 	public:
-		void Init(void);
+		tGeometryPassShader(void);
 
 		void SetCameraPosition(tVector pos);
 		void SetTransformation(const float m[16]);

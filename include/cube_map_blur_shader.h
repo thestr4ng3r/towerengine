@@ -12,7 +12,8 @@ class tCubeMapBlurShader : public tShader
 	public:
 		static const GLint vertex_attribute = 0;
 
-		void Init(void);
+		tCubeMapBlurShader(void);
+
 		void SetTexture(GLuint tex);
 		void SetBlurDir(tVector v);
 		void SetMipmapLevel(int level);

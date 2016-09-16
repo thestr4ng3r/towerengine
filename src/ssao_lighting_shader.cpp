@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "resources.h"
 
-void tSSAOLightingShader::Init(tGBuffer *gbuffer)
+tSSAOLightingShader::tSSAOLightingShader(tGBuffer *gbuffer)
 {
 	InitScreenShader(resources_get("ssao_lighting_shader.frag"), "SSAO Lighting Shader");
 

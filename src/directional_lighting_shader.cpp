@@ -4,7 +4,7 @@
 #include "shader_source.h"
 
 
-void tDirectionalLightingShader::Init(tGBuffer *gbuffer)
+tDirectionalLightingShader::tDirectionalLightingShader(tGBuffer *gbuffer)
 {
 	InitScreenShader(resources_get("directional_lighting_shader.frag"), "Directional Lighting Shader");
 

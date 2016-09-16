@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "resources.h"
 
-void tPostProcessShader::Init(void)
+tPostProcessShader::tPostProcessShader(void)
 {
 	InitScreenShader(resources_get("post_process_shader.frag"), "Post Process Shader");
 

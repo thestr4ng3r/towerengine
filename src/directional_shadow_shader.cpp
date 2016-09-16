@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "resources.h"
 
-void tDirectionalShadowShader::Init(void)
+tDirectionalShadowShader::tDirectionalShadowShader(void)
 {
 	InitShader(resources_get("directional_shadow_shader.vert"), resources_get("directional_shadow_shader.frag"), "Directional Shadow Shader");
 	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
@@ -65,7 +65,7 @@ void tDirectionalShadowShader::SetBaseColorTexture(bool enabled, GLuint tex)
 
 
 
-void tDirectionalShadowBlurShader::Init(void)
+tDirectionalShadowBlurShader::tDirectionalShadowBlurShader(void)
 {
 	InitShader(resources_get("directional_shadow_blur_shader.vert"), resources_get("directional_shadow_blur_shader.frag"), "Directional Shadow Blur Shader");
 

@@ -72,7 +72,6 @@ bool tEngine::Init(std::string *error)
 
 
 	no_op_shader = new tNoOpShader();
-	no_op_shader->Init();
 
 	return true;
 }

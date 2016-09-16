@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "resources.h"
 
-void tPointShadowShader::Init(void)
+tPointShadowShader::tPointShadowShader(void)
 {
 	InitShader(resources_get("point_shadow_shader.vert"), resources_get("point_shadow_shader.frag"), "Point Shadow Shader");
 	glBindAttribLocation(program, tFaceShader::vertex_attribute, "vertex_attr");
@@ -58,7 +58,7 @@ void tPointShadowShader::SetBaseColorTexture(bool enabled, GLuint tex)
 
 
 
-void tPointShadowBlurShader::Init(void)
+tPointShadowBlurShader::tPointShadowBlurShader(void)
 {
 	InitShader(resources_get("point_shadow_blur_shader.vert"), resources_get("point_shadow_blur_shader.frag"), "Point Shadow Blur Shader");
 

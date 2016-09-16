@@ -3,7 +3,7 @@
 #include "resources.h"
 
 
-void tSSAOBlurShader::Init(void)
+tSSAOBlurShader::tSSAOBlurShader(void)
 {
 	InitScreenShader(resources_get("ssao_blur_shader.frag"), "SSAO Blur Shader");
 

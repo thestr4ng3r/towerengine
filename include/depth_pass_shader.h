@@ -14,7 +14,7 @@ private:
 	//GLint clip_dist_uniform;
 
 public:
-	void Init(void);
+	tDepthPassShader(void);
 
 	//void SetClip(tVector c, float d);
 	void SetBaseColorTexture(bool enabled, GLuint tex = 0);

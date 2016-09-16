@@ -12,7 +12,7 @@ class tSSAOLightingShader : public tScreenShader
 		int ssao_tex_unit;
 
 	public:
-		void Init(tGBuffer *gbuffer);
+		tSSAOLightingShader(tGBuffer *gbuffer);
 
 		void SetSSAOTexture(GLuint tex);
 };

@@ -11,7 +11,7 @@ class tSkyBoxShader : public tShader
 	public:
 		static const int vertex_attribute = 0;
 
-		void Init(void);
+		tSkyBoxShader(void);
 		void SetCubeMap(GLuint tex);
 		void SetCameraPosition(tVector pos);
 };

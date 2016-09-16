@@ -16,7 +16,7 @@ class tPointShadowShader : public tFaceShader
 		GLint diffuse_tex_uniform;
 
 	public:
-		void Init(void);
+		tPointShadowShader(void);
 
 		void SetModelViewProjectionMatrix(float m[16]);
 		void SetLightPos(tVector v);
@@ -34,7 +34,7 @@ class tPointShadowBlurShader : public tShader
 	public:
 		static const GLint vertex_attribute = 0;
 
-		void Init(void);
+		tPointShadowBlurShader(void);
 		void SetTexture(GLuint tex);
 		void SetBlurDir(tVector v);
 };

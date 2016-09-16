@@ -23,7 +23,7 @@ class tRefractionShader : public tFaceShader
 	public:
 		static const int screen_tex_unit = 1;
 
-		void Init(void);
+		tRefractionShader(void);
 
 		void SetColor(tVector color, tVector edge, float edge_alpha);
 		void SetColorTexture(bool enabled, GLuint tex = 0);

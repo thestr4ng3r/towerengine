@@ -5,18 +5,11 @@
 
 using namespace std;
 
-tPointLightingShader::tPointLightingShader(int lights_count)
+
+tPointLightingShader::tPointLightingShader(int lights_count, tGBuffer *gbuffer)
 {
 	this->lights_count = lights_count;
-}
 
-tPointLightingShader::~tPointLightingShader(void)
-{
-	delete [] point_light_shadow_tex_unit;
-}
-
-void tPointLightingShader::Init(tGBuffer *gbuffer)
-{
 	tShaderSource *src = new tShaderSource(string(resources_get("point_lighting_shader.frag")));
 	src->SetParameter("lights_count", new tShaderSourceVariable(lights_count));
 	InitScreenShader(src->BuildSource().c_str(), "Point Lighting Shader");
@@ -49,6 +42,11 @@ void tPointLightingShader::Init(tGBuffer *gbuffer)
 	for(int i=0; i<lights_count; i++)
 		point_light_shadow_tex_unit[i] = gbuffer->GetLastTextureUnit() + 1 + i;
 	glUniform1iv(point_light_shadow_map_uniform, lights_count, point_light_shadow_tex_unit);
+}
+
+tPointLightingShader::~tPointLightingShader(void)
+{
+	delete[] point_light_shadow_tex_unit;
 }
 
 void tPointLightingShader::SetCameraPosition(tVector pos)

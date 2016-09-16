@@ -6,7 +6,6 @@ tSSAO::tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_s
 	this->renderer = renderer;
 
 	blur_shader = new tSSAOBlurShader();
-	blur_shader->Init();
 
 	render_width = renderer->GetScreenWidth() / 2;
 	render_height = renderer->GetScreenHeight() / 2;

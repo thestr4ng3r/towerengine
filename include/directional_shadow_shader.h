@@ -17,7 +17,7 @@ class tDirectionalShadowShader : public tFaceShader
 		GLint diffuse_tex_uniform;
 
 	public:
-		void Init(void);
+		tDirectionalShadowShader(void);
 
 		void SetModelViewProjectionMatrix(float m[16]);
 		void SetLightDir(tVector v);
@@ -39,7 +39,8 @@ class tDirectionalShadowBlurShader : public tShader
 		static const GLint vertex_attribute = 0;
 		static const GLint uv_coord_attribute = 1;
 
-		void Init(void);
+		tDirectionalShadowBlurShader(void);
+
 		void SetTexture(GLuint tex);
 		void SetTextureLayers(int layers, float *blur_factors);
 		void SetBlurDir(tVector2 v);

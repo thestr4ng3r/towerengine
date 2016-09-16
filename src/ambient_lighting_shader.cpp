@@ -3,7 +3,7 @@
 #include "resources.h"
 
 
-void tAmbientLightingShader::Init(tGBuffer *gbuffer, bool ambient_ssao)
+tAmbientLightingShader::tAmbientLightingShader(tGBuffer *gbuffer, bool ambient_ssao)
 {
 	const char *src;
 	if(ambient_ssao)

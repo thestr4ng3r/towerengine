@@ -5,7 +5,6 @@
 t2DRenderer::t2DRenderer(void)
 {
 	sprite_shader = new t2DSpriteShader();
-	sprite_shader->Init();
 
 
 	vao = new tVAO();

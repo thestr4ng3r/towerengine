@@ -13,7 +13,7 @@ class t2DSpriteShader : public tShader
 		GLint tex_uniform;
 
 	public:
-		void Init(void);
+		t2DSpriteShader(void);
 
 		void SetScreenSize(int width, int height);
 		void SetSprite(int x, int y, int width, int height, GLuint tex);

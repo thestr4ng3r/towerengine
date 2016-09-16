@@ -24,7 +24,7 @@ class tSSAOShader : public tScreenShader
 		GLint cam_dir_uniform;
 
 	public:
-		void Init(void);
+		tSSAOShader(void);
 
 		void SetKernel(int kernel_size, float *kernel);
 		void SetNoiseTex(GLuint tex, tVector2 tex_scale);

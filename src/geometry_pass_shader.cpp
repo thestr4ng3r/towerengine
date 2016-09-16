@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "resources.h"
 
-void tGeometryPassShader::Init(void)
+tGeometryPassShader::tGeometryPassShader(void)
 {
 	InitShader(resources_get("geometry_pass_shader.vert"), resources_get("geometry_pass_shader.frag"), "Geometry Pass Shader");
 

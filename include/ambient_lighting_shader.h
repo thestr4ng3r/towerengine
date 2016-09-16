@@ -26,8 +26,9 @@ class tAmbientLightingShader : public tScreenShader, public tReflectingShader
 
 		int reflection_tex1_unit;
 		int reflection_tex2_unit;
+
 	public:
-		void Init(tGBuffer *gbuffer, bool ambient_ssao);
+		tAmbientLightingShader(tGBuffer *gbuffer, bool ambient_ssao);
 
 		void SetAmbientLight(tVector color);
 		void SetSSAOTexture(GLuint tex);

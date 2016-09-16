@@ -6,7 +6,7 @@ using namespace std;
 #include <IL/il.h>
 #include <IL/ilu.h>
 
-void tSkyBoxShader::Init(void)
+tSkyBoxShader::tSkyBoxShader(void)
 {
 	InitShader(resources_get("skybox_shader.vert"), resources_get("skybox_shader.frag"), "SkyBox Shader");
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");

@@ -11,7 +11,7 @@ class tSSAOBlurShader : public tScreenShader
 		GLint blur_vertical_uniform;
 
 	public:
-		void Init(void);
+		tSSAOBlurShader(void);
 
 		void SetTexture(GLuint tex);
 		void SetBlurDirection(bool vertical);

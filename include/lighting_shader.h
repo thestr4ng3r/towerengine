@@ -37,7 +37,7 @@ class tLightingShader : public tScreenShader, public tReflectingShader
 
 		static const int max_point_lights_count = 32;
 
-		void Init(tGBuffer *gbuffer);
+		tLightingShader(tGBuffer *gbuffer);
 
 		void SetAmbientLight(tVector color);
 		void SetCameraPosition(tVector pos);

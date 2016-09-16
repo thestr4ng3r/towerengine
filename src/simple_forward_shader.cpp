@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "resources.h"
 
-void tSimpleForwardShader::Init(void)
+tSimpleForwardShader::tSimpleForwardShader(void)
 {
 	InitShader(resources_get("simple_forward_shader.vert"), resources_get("simple_forward_shader.frag"), "Simple Forward Shader");
 

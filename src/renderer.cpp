@@ -17,43 +17,30 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	shadow_pass = false;
 
 	depth_pass_shader = new tDepthPassShader();
-	depth_pass_shader->Init();
-
 	geometry_pass_shader = new tGeometryPassShader();
-	geometry_pass_shader->Init();
-
-
-	directional_lighting_shader = new tDirectionalLightingShader();
-	directional_lighting_shader->Init(gbuffer);
+	directional_lighting_shader = new tDirectionalLightingShader(gbuffer);
 
 	//if(!bindless_textures_enabled)
 	//{
 		// VERY IMPORTANT:	these shaders must be ordered descending by lights_count.
 		//					also, there has to be one shader with a lights_count of 1
-		point_lighting_shaders.push_back(new tPointLightingShader(8));
-		point_lighting_shaders.push_back(new tPointLightingShader(7));
-		point_lighting_shaders.push_back(new tPointLightingShader(6));
-		point_lighting_shaders.push_back(new tPointLightingShader(5));
-		point_lighting_shaders.push_back(new tPointLightingShader(4));
-		point_lighting_shaders.push_back(new tPointLightingShader(3));
-		point_lighting_shaders.push_back(new tPointLightingShader(2));
-		point_lighting_shaders.push_back(new tPointLightingShader(1));
-
-		for(vector<tPointLightingShader *>::iterator psi=point_lighting_shaders.begin(); psi!=point_lighting_shaders.end(); psi++)
-			(*psi)->Init(gbuffer);
+		point_lighting_shaders.push_back(new tPointLightingShader(8, gbuffer));
+		point_lighting_shaders.push_back(new tPointLightingShader(7, gbuffer));
+		point_lighting_shaders.push_back(new tPointLightingShader(6, gbuffer));
+		point_lighting_shaders.push_back(new tPointLightingShader(5, gbuffer));
+		point_lighting_shaders.push_back(new tPointLightingShader(4, gbuffer));
+		point_lighting_shaders.push_back(new tPointLightingShader(3, gbuffer));
+		point_lighting_shaders.push_back(new tPointLightingShader(2, gbuffer));
+		point_lighting_shaders.push_back(new tPointLightingShader(1, gbuffer));
 	//}
 
 	simple_forward_shader = new tSimpleForwardShader();
-	simple_forward_shader->Init();
-
 	refraction_shader = new tRefractionShader();
-	refraction_shader->Init();
 
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 	if(bindless_textures_enabled)
 	{
-		lighting_shader = new tLightingShader();
-		lighting_shader->Init(gbuffer);
+		lighting_shader = new tLightingShader(gbuffer);
 
 		if(!lighting_shader->GetStatus())
 		{
@@ -71,39 +58,19 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 
 	///if(!bindless_textures_enabled)
 	//{
-		ambient_lighting_shader = new tAmbientLightingShader();
-		ambient_lighting_shader->Init(gbuffer, false);
+		ambient_lighting_shader = new tAmbientLightingShader(gbuffer, false);
 	//}
 
 	skybox_shader = new tSkyBoxShader();
-	skybox_shader->Init();
-
 	point_shadow_shader = new tPointShadowShader();
-	point_shadow_shader->Init();
-
 	point_shadow_blur_shader = new tPointShadowBlurShader();
-	point_shadow_blur_shader->Init();
-
 	directional_shadow_shader = new tDirectionalShadowShader();
-	directional_shadow_shader->Init();
-
 	directional_shadow_blur_shader = new tDirectionalShadowBlurShader();
-	directional_shadow_blur_shader->Init();
-
 	color_shader = new tColorShader();
-	color_shader->Init();
-
 	post_process_shader = new tPostProcessShader();
-	post_process_shader->Init();
-
-	particle_forward_shader = new tParticleForwardShader();
-	particle_forward_shader->Init(gbuffer);
-
-	particle_deferred_shader = new tParticleDeferredShader();
-	particle_deferred_shader->Init(gbuffer);
-
+	particle_forward_shader = new tParticleForwardShader(gbuffer);
+	particle_deferred_shader = new tParticleDeferredShader(gbuffer);
 	cube_map_blur_shader = new tCubeMapBlurShader();
-	cube_map_blur_shader->Init();
 
 	this->world = world;
 
@@ -233,23 +200,20 @@ void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int n
 	{
 		if(!ssao_ambient_lighting_shader && !bindless_textures_enabled)
 		{
-			ssao_ambient_lighting_shader = new tAmbientLightingShader();
-			ssao_ambient_lighting_shader->Init(gbuffer, true);
+			ssao_ambient_lighting_shader = new tAmbientLightingShader(gbuffer, true);
 		}
 	}
 	else
 	{
 		if(!ssao_lighting_shader)
 		{
-			ssao_lighting_shader = new tSSAOLightingShader();
-			ssao_lighting_shader->Init(gbuffer);
+			ssao_lighting_shader = new tSSAOLightingShader(gbuffer);
 		}
 	}
 
 	if(!ssao_shader)
 	{
 		ssao_shader = new tSSAOShader();
-		ssao_shader->Init();
 	}
 
 	delete ssao;

@@ -12,7 +12,7 @@ class tColorShader : public tShader
 	public:
 		static const GLint color_attribute = 1;
 
-		void Init(void);
+		tColorShader(void);
 
 		void SetModelViewProjectionmatrix(const float m[16]);
 		void SetTransformation(const float m[16]);

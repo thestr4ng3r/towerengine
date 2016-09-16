@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "resources.h"
 
-void tRefractionShader::Init(void)
+tRefractionShader::tRefractionShader(void)
 {
 	InitShader(resources_get("refraction_shader.vert"), resources_get("refraction_shader.frag"), "Refraction Shader");
 

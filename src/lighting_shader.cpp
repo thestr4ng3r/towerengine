@@ -10,7 +10,7 @@
 using namespace std;
 
 
-void tLightingShader::Init(tGBuffer *gbuffer)
+tLightingShader::tLightingShader(tGBuffer *gbuffer)
 {
 	tShaderSource *src = new tShaderSource(resources_get("lighting_shader.frag"));
 	src->SetParameter("max_point_lights_count", new tShaderSourceVariable(max_point_lights_count));

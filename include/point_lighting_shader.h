@@ -24,10 +24,8 @@ class tPointLightingShader : public tScreenShader
 		int *point_light_shadow_tex_unit;
 
 	public:
-		tPointLightingShader(int lights_count);
+		tPointLightingShader(int lights_count, tGBuffer *gbuffer);
 		~tPointLightingShader(void);
-
-		void Init(tGBuffer *gbuffer);
 
 		/**
 		 * set all point light uniforms

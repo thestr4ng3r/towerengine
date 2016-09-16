@@ -2,7 +2,7 @@
 #include "towerengine.h"
 #include "resources.h"
 
-void t2DSpriteShader::Init(void)
+t2DSpriteShader::t2DSpriteShader(void)
 {
 	InitShader(resources_get("2d_sprite_shader.vert"), resources_get("2d_sprite_shader.frag"), "2D Sprite Shader");
 	glBindAttribLocation(program, 0, "vertex_attr");

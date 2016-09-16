@@ -13,7 +13,7 @@ class tPostProcessShader : public tScreenShader
 
 
 	public:
-		void Init(void);
+		tPostProcessShader(void);
 
 		void SetTextures(GLuint color, int width, int height);
 		void SetFXAA(bool enabled);

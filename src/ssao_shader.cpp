@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void tSSAOShader::Init(void)
+tSSAOShader::tSSAOShader(void)
 {
 	InitScreenShader(resources_get("ssao_shader.frag"), "SSAO Shader");
 

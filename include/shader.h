@@ -8,6 +8,8 @@ class tShader
 		bool status;
 
 	protected:
+		tShader(void) {}
+
 		GLuint program;
 
 		static GLuint CreateShaderFromSource(GLenum type, const char *src);

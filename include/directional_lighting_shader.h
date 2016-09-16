@@ -27,8 +27,7 @@ class tDirectionalLightingShader : public tScreenShader
 	public:
 		static const GLint max_directional_light_splits = 8;
 
-
-		void Init(tGBuffer *gbuffer);
+		tDirectionalLightingShader(tGBuffer *gbuffer);
 
 		void SetDirectionalLight(tVector dir, tVector color, int shadow_enabled, GLuint shadow_map, tVector2 shadow_clip, float *shadow_tex_matrix, int shadow_splits_count, float *shadow_splits_z);
 		void SetCameraPosition(tVector pos);

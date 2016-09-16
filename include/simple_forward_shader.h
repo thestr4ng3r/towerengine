@@ -13,7 +13,7 @@ class tSimpleForwardShader : public tFaceShader
 		GLint tex_uniform;
 
 	public:
-		void Init(void);
+		tSimpleForwardShader(void);
 
 		void SetColor(tVector color, float alpha);
 		void SetTexture(bool enabled, GLuint tex = 0);
