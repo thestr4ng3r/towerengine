@@ -53,7 +53,7 @@ void main(void)
 		vec4 offset = vec4(s, 1.0) * transpose_modelview;
 		offset = projection_matrix_uni * offset;
 		offset.xy /= offset.w;
-		offset.xy = offset.xy * 0.5 + 0.5;
+		offset.xy = offset.xy * vec2(1.0 / position_restore_data_uni.uv_factor_x, 0.5) + vec2(-position_restore_data_uni.uv_offset_x, 0.5);
 		
 		if(offset.x > 1.0 || offset.y > 1.0 || offset.x < 0.0 || offset.y < 0.0)
 			continue;

@@ -51,6 +51,7 @@ class tRenderer
 		GLuint *color_tex;
 
 		tVBO<float> *screen_quad_vbo;
+		tVBO<float> *screen_quad_uv_vbo;
 		tVAO *screen_quad_vao;
 
 		bool fxaa_enabled;
@@ -79,10 +80,14 @@ class tRenderer
 		tRenderSpace *current_rendering_render_space;
 
 		void InitRenderer(int width, int height, tWorld *world, bool bindless_textures);
+		void InitShaders(void);
+
 		void PrepareRender(tCamera *camera, tRenderSpace *render_space);
 		void Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height);
 
 		void RenderShadowMaps(void);
+		void RenderCubeMapReflections(void);
+
 		void DepthPrePass(void);
 		void GeometryPass(void);
 		void LightPass(void);

@@ -38,7 +38,7 @@ class tSSAO
 
 		void ChangeScreenSize(int screen_width, int screen_height);
 
-		void Render(void);
+		void Render(float viewport_scale_x = 1.0f, float viewport_offset_x = 0.0f);
 
 		int GetWidth(void)		{ return render_width; }
 		int GetHeight(void)		{ return render_height; }

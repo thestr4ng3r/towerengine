@@ -8,6 +8,8 @@ class tScreenShader : public tShader
 	protected:
 		void InitScreenShader(const char *frag_src, const char *shader_name);
 
+	public:
+		static const int uv_coord_attribute = 1;
 };
 
 class tReflectingShader
@@ -23,7 +25,7 @@ class tPositionRestoreDataBuffer : public tUniformBuffer
 		tPositionRestoreDataBuffer(void);
 		~tPositionRestoreDataBuffer(void);
 
-		void UpdateBuffer(tCamera *camera);
+		void UpdateBuffer(tCamera *camera, float uv_factor_x = 2.0f, float uv_offset_x = -0.5f);
 
 		void Bind(void);
 };

@@ -1,9 +1,14 @@
 #version 330
 
+#extension GL_ARB_shading_language_include : require
+
+#include "position_restore.glsl"
+
 layout(std140) uniform MatrixBlock
 {
 	mat4 modelview_projection_matrix;
 } matrix_uni;
+
 
 uniform vec3 color_uni;
 uniform vec4 edge_color_uni;
@@ -48,9 +53,9 @@ void main(void)
 	vec3 ref = refract(normalize(cam_dir_var), normal, 0.2);
 	
 	vec4 screen_pos = matrix_uni.modelview_projection_matrix * vec4(pos_var + ref * 0.02, 1.0);
-	vec2 screen_uv = (screen_pos.xy / screen_pos.w) * 0.5 + vec2(0.5);
-	color.rgb *= texture(screen_tex_uni, screen_uv).rgb;
-	
+	vec2 screen_uv = (screen_pos.xy / screen_pos.w) * vec2(1.0 / position_restore_data_uni.uv_factor_x, 0.5) + vec2(-position_restore_data_uni.uv_offset_x, 0.5);
+	color.rgb *= texture(screen_tex_uni, screen_uv).rgb;	
+
 	if(edge_color_uni.a > 0.0)
 	{
 		float edge_blend = clamp(dot(normalize(-cam_dir_var), normal), 0.0, 1.0);

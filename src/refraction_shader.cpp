@@ -30,6 +30,7 @@ tRefractionShader::tRefractionShader(void)
 
 
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
+	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "PositionRestoreDataBlock"), position_restore_data_binding_point);
 
 
 	Bind();

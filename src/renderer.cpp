@@ -3,6 +3,15 @@
 
 using namespace std;
 
+
+bool CompareFloatComparable(tComparable<float> *a, tComparable<float> *b)
+{
+	return a->GetCompareValue() < b->GetCompareValue();
+}
+
+
+
+
 void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless_textures)
 {
 	this->screen_width = width;
@@ -16,61 +25,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	
 	shadow_pass = false;
 
-	depth_pass_shader = new tDepthPassShader();
-	geometry_pass_shader = new tGeometryPassShader();
-	directional_lighting_shader = new tDirectionalLightingShader(gbuffer);
-
-	//if(!bindless_textures_enabled)
-	//{
-		// VERY IMPORTANT:	these shaders must be ordered descending by lights_count.
-		//					also, there has to be one shader with a lights_count of 1
-		point_lighting_shaders.push_back(new tPointLightingShader(8, gbuffer));
-		point_lighting_shaders.push_back(new tPointLightingShader(7, gbuffer));
-		point_lighting_shaders.push_back(new tPointLightingShader(6, gbuffer));
-		point_lighting_shaders.push_back(new tPointLightingShader(5, gbuffer));
-		point_lighting_shaders.push_back(new tPointLightingShader(4, gbuffer));
-		point_lighting_shaders.push_back(new tPointLightingShader(3, gbuffer));
-		point_lighting_shaders.push_back(new tPointLightingShader(2, gbuffer));
-		point_lighting_shaders.push_back(new tPointLightingShader(1, gbuffer));
-	//}
-
-	simple_forward_shader = new tSimpleForwardShader();
-	refraction_shader = new tRefractionShader();
-
-#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
-	if(bindless_textures_enabled)
-	{
-		lighting_shader = new tLightingShader(gbuffer);
-
-		if(!lighting_shader->GetStatus())
-		{
-			delete lighting_shader;
-			lighting_shader = 0;
-			bindless_textures_enabled = false;
-			printf("failed to compile lighting shader. using fallback lighting.\n");
-		}
-	}
-	else
-		lighting_shader = 0;
-#else
-	lighting_shader = 0;
-#endif
-
-	///if(!bindless_textures_enabled)
-	//{
-		ambient_lighting_shader = new tAmbientLightingShader(gbuffer, false);
-	//}
-
-	skybox_shader = new tSkyBoxShader();
-	point_shadow_shader = new tPointShadowShader();
-	point_shadow_blur_shader = new tPointShadowBlurShader();
-	directional_shadow_shader = new tDirectionalShadowShader();
-	directional_shadow_blur_shader = new tDirectionalShadowBlurShader();
-	color_shader = new tColorShader();
-	post_process_shader = new tPostProcessShader();
-	particle_forward_shader = new tParticleForwardShader(gbuffer);
-	particle_deferred_shader = new tParticleDeferredShader(gbuffer);
-	cube_map_blur_shader = new tCubeMapBlurShader();
+	InitShaders();
 
 	this->world = world;
 
@@ -86,8 +41,6 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	fxaa_enabled = false;
 
 	depth_prepass_enabled = true;
-
-	//cube_map_reflection = 0;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -132,19 +85,85 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	screen_quad_vao->Bind();
 
 	screen_quad_vbo = new tVBO<float>(2, 4);
-
 	float *screen_quad_data = screen_quad_vbo->GetData();
 	screen_quad_data[0] = -1.0f; screen_quad_data[1] = 1.0f;
 	screen_quad_data[2] = -1.0f; screen_quad_data[3] = -1.0f;
 	screen_quad_data[4] = 1.0f; screen_quad_data[5] = 1.0f;
 	screen_quad_data[6] = 1.0f; screen_quad_data[7] = -1.0f;
-
 	screen_quad_vbo->AssignData();
 	screen_quad_vbo->SetAttribute(tShader::vertex_attribute, GL_FLOAT);
+
+	screen_quad_uv_vbo = new tVBO<float>(2, 4);
+	screen_quad_data = screen_quad_uv_vbo->GetData();
+	screen_quad_data[0] = 0.0f; screen_quad_data[1] = 1.0f;
+	screen_quad_data[2] = 0.0f; screen_quad_data[3] = 0.0f;
+	screen_quad_data[4] = 1.0f; screen_quad_data[5] = 1.0f;
+	screen_quad_data[6] = 1.0f; screen_quad_data[7] = 0.0f;
+	screen_quad_uv_vbo->AssignData();
+	screen_quad_uv_vbo->SetAttribute(tScreenShader::uv_coord_attribute, GL_FLOAT);
 
 	point_light_shadow_limit = -1;
 
 	current_read_color_tex = 0;
+}
+
+void tRenderer::InitShaders(void)
+{
+	depth_pass_shader = new tDepthPassShader();
+	geometry_pass_shader = new tGeometryPassShader();
+	directional_lighting_shader = new tDirectionalLightingShader(gbuffer);
+
+	//if(!bindless_textures_enabled)
+	//{
+	// VERY IMPORTANT:	these shaders must be ordered descending by lights_count.
+	//					also, there has to be one shader with a lights_count of 1
+	point_lighting_shaders.push_back(new tPointLightingShader(8, gbuffer));
+	point_lighting_shaders.push_back(new tPointLightingShader(7, gbuffer));
+	point_lighting_shaders.push_back(new tPointLightingShader(6, gbuffer));
+	point_lighting_shaders.push_back(new tPointLightingShader(5, gbuffer));
+	point_lighting_shaders.push_back(new tPointLightingShader(4, gbuffer));
+	point_lighting_shaders.push_back(new tPointLightingShader(3, gbuffer));
+	point_lighting_shaders.push_back(new tPointLightingShader(2, gbuffer));
+	point_lighting_shaders.push_back(new tPointLightingShader(1, gbuffer));
+	//}
+
+	simple_forward_shader = new tSimpleForwardShader();
+	refraction_shader = new tRefractionShader();
+
+#ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
+	if(bindless_textures_enabled)
+	{
+		lighting_shader = new tLightingShader(gbuffer);
+
+		if(!lighting_shader->GetStatus())
+		{
+			delete lighting_shader;
+			lighting_shader = 0;
+			bindless_textures_enabled = false;
+			printf("failed to compile lighting shader. using fallback lighting.\n");
+		}
+	}
+	else
+		lighting_shader = 0;
+#else
+	lighting_shader = 0;
+#endif
+
+	///if(!bindless_textures_enabled)
+	//{
+	ambient_lighting_shader = new tAmbientLightingShader(gbuffer, false);
+	//}
+
+	skybox_shader = new tSkyBoxShader();
+	point_shadow_shader = new tPointShadowShader();
+	point_shadow_blur_shader = new tPointShadowBlurShader();
+	directional_shadow_shader = new tDirectionalShadowShader();
+	directional_shadow_blur_shader = new tDirectionalShadowBlurShader();
+	color_shader = new tColorShader();
+	post_process_shader = new tPostProcessShader();
+	particle_forward_shader = new tParticleForwardShader(gbuffer);
+	particle_deferred_shader = new tParticleDeferredShader(gbuffer);
+	cube_map_blur_shader = new tCubeMapBlurShader();
 }
 
 tRenderer::~tRenderer(void)
@@ -241,115 +260,16 @@ void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp
 }
 
 
-/*void tRenderer::InitCubeMapReflection(int resolution, tVector position)
-{
-	delete cube_map_reflection;
-	cube_map_reflection = new tCubeMapReflection(this, resolution, position);
-}*/
-
-
 void tRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
 {
 	current_rendering_camera = camera;
 	current_rendering_render_space = render_space;
 
-
 	RenderShadowMaps();
-
-
-	shadow_pass = false;
-	for(int i=0; i<world->GetCubeMapReflectionsCount(); i++)
-	{
-		tCubeMapReflection *reflection = world->GetCubeMapReflection(i);
-		if(reflection->GetInvalid())
-			reflection->Render(this);
-	}
+	RenderCubeMapReflections();
 }
 
 
-void tRenderer::Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
-{
-	current_rendering_camera = camera;
-	current_rendering_render_space = render_space;
-
-	matrix_buffer->Bind();
-	position_restore_data_buffer->Bind();
-
-
-	
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	gbuffer->BindDrawBuffers();
-	glViewport(0, 0, screen_width, screen_height);
-
-	matrix_buffer->UpdateBuffer(current_rendering_camera->GetModelViewProjectionMatrix());
-
-	if(depth_prepass_enabled)
-		DepthPrePass();
-	GeometryPass();
-
-
-	position_restore_data_buffer->UpdateBuffer(current_rendering_camera);
-
-	if(ssao)
-	{
-		ssao->Render(); // binds its own fbo
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo); // rebind fbo
-	}
-
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-	LightPass();
-
-	ForwardPass();
-
-	current_read_color_tex = 0;
-
-	glReadBuffer(GL_COLOR_ATTACHMENT0 + current_read_color_tex);
-	glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
-	glBlitFramebuffer(0, 0, screen_width, screen_height, 0, 0, screen_width, screen_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	RefractionPass();
-	current_read_color_tex = 1-current_read_color_tex;
-
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-
-	if(fog_enabled)
-	{
-		glDrawBuffer(GL_COLOR_ATTACHMENT0 + (1-current_read_color_tex));
-
-		fog_shader->Bind();
-		fog_shader->SetTextures(gbuffer->GetTexture(tGBuffer::DEPTH_TEX), color_tex[current_read_color_tex]);
-		fog_shader->SetCameraPosition(camera->GetPosition());
-
-		RenderScreenQuad();
-
-		current_read_color_tex = 1 - current_read_color_tex;
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, dst_fbo);
-
-
-	if(viewport_width > 0 && viewport_height > 0)
-		glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
-
-	post_process_shader->Bind();
-	post_process_shader->SetFXAA(fxaa_enabled);
-	post_process_shader->SetTextures(color_tex[current_read_color_tex], screen_width, screen_height);
-
-	RenderScreenQuad();
-
-	tShader::Unbind();
-
-	if(dst_fbo != 0)
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-
-
-
-bool CompareFloatComparable(tComparable<float> *a, tComparable<float> *b)
-{
-	return a->GetCompareValue() < b->GetCompareValue();
-}
 
 void tRenderer::RenderShadowMaps(void)
 {
@@ -411,13 +331,24 @@ void tRenderer::RenderShadowMaps(void)
 		(*di)->RenderShadow(current_rendering_camera, this);
 }
 
+void tRenderer::RenderCubeMapReflections(void)
+{
+	shadow_pass = false;
+	for(int i = 0; i<world->GetCubeMapReflectionsCount(); i++)
+	{
+		tCubeMapReflection *reflection = world->GetCubeMapReflection(i);
+		if(reflection->GetInvalid())
+			reflection->Render(this);
+	}
+}
+
+
 
 
 void tRenderer::DepthPrePass(void)
 {
 	shadow_pass = false;
 
-	glClear(GL_DEPTH_BUFFER_BIT);
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
@@ -442,15 +373,10 @@ void tRenderer::GeometryPass(void)
 	}
 	else
 	{
-		glClear(GL_DEPTH_BUFFER_BIT);
 		glDepthMask(GL_TRUE);
 		glDepthFunc(GL_LESS);
 		glEnable(GL_DEPTH_TEST);
 	}
-
-	float clear_color[] = {0.0, 0.0, 0.0, 0.0};
-	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::BASE_COLOR_TEX), clear_color);
-
 
 	glDisable(GL_BLEND);
 
@@ -502,10 +428,6 @@ void tRenderer::LightPass(void)
 
 	tSkyBox *sky_box = world->GetSkyBox();
 
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glViewport(0, 0, screen_width, screen_height);
-
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 
@@ -529,7 +451,7 @@ void tRenderer::LightPass(void)
 
 
 	// directional lights
-	directional_lighting_shader->Bind();
+	directional_lighting_shader->Bind(); // TODO: only bind if there are any directional lights
 	directional_lighting_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 
 	set<tDirectionalLight *>::iterator dir_light_it;

@@ -125,7 +125,7 @@ void tSSAO::ChangeScreenSize(int screen_width, int screen_height)
 }
 
 
-void tSSAO::Render(void)
+void tSSAO::Render(float viewport_scale_x, float viewport_offset_x)
 {
 	tSSAOShader *ssao_shader = renderer->GetSSAOShader();
 	tVector2 noise_tex_scale;
@@ -149,7 +149,7 @@ void tSSAO::Render(void)
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, render_width, render_height);
+	glViewport((int)((float)render_width * viewport_offset_x), 0, (int)((float)render_width * viewport_scale_x), render_height);
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
