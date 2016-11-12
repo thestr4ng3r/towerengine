@@ -97,6 +97,10 @@ void tMeshObject::SetPose(string pose)
 tBoundingBox tMeshObject::GetBoundingBox(void)
 {
 	tBoundingBox b;
+
+	if(!mesh)
+		return b;
+
 	tVector p[8];
 	mesh->GetBoundingBox().GetCornerPoints(p);
 

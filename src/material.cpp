@@ -82,6 +82,17 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 	tex[type] = LoadGLTextureBinary(extension, data, size, channels, transparent);
 }
 
+void tDefaultMaterial::SetTexture(TextureType type, GLuint gl_tex)
+{
+	if(tex[type] != 0)
+	{
+		glDeleteTextures(1, &tex[type]);
+	}
+
+	tex[type] = gl_tex;
+}
+
+
 
 bool tDefaultMaterial::InitDepthPrePass(tRenderer *renderer)
 {
