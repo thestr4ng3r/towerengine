@@ -11,7 +11,10 @@ set(LIB_INSTALL_DIR lib)
 
 set(CMAKE_BUILD_TYPE Release)
 
-option(BUILD_STATIC_LIB "Build static instead of shared" OFF)
+option(TOWERENGINE_STATIC_LIB "Build static instead of shared" OFF)
+
+option(TOWERENGINE_BUILD_OPENVR OFF)
+option(TOWERENGINE_BUILD_OCULUS OFF)
 
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
@@ -139,7 +142,21 @@ set(TOWERENGINE_SRC
 	src/lighting_shader.cpp
 	src/depth_pass_shader.cpp
 	src/cube_map_blur_shader.cpp
-	src/no_op_shader.cpp)
+	src/no_op_shader.cpp
+	include/vr_context.h
+	src/vr_context.cpp
+	include/vr_context_openvr.h
+	include/vr_context_oculus.h)
+
+if(TOWERENGINE_BUILD_OPENVR)
+	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)
+endif()
+
+if(TOWERENGINE_BUILD_OCULUS)
+	list(APPEND TOWERENGINE_SRC src/vr_context_oculus.cpp)
+endif()
+
+
 
 
 set(RESOURCES_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
