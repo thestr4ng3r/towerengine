@@ -24,5 +24,6 @@ GLuint LoadGLCubeMapBinary(const char *ext, const void *data, unsigned int size)
 
 GLuint CreateCubeTexture(GLenum type, int width, int height);
 GLuint GLTextureFromColor(const tVector &color);
+void GetSubImage(GLubyte *dst, GLubyte *src, int src_width, int src_height, int components, int offset_x, int offset_y, int dst_width, int dst_height);
 
 #endif

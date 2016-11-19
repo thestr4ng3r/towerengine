@@ -13,7 +13,8 @@ set(CMAKE_BUILD_TYPE Release)
 
 option(TOWERENGINE_STATIC_LIB "Build static instead of shared" OFF)
 
-option(TOWERENGINE_BUILD_DEVIL ON)
+option(TOWERENGINE_BUILD_DEVIL OFF)
+option(TOWERENGINE_BUILD_LIBPNG ON)
 option(TOWERENGINE_BUILD_OPENVR OFF)
 option(TOWERENGINE_BUILD_OCULUS OFF)
 
@@ -149,7 +150,9 @@ set(TOWERENGINE_SRC
 	include/vr_context_openvr.h
 	include/vr_context_oculus.h
 	include/texture.h
-	src/texture.cpp)
+	src/texture.cpp
+	src/texture_devil.cpp
+	src/texture_png.cpp)
 
 if(TOWERENGINE_BUILD_OPENVR)
 	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)
@@ -248,6 +251,12 @@ if(TOWERENGINE_BUILD_DEVIL)
 	add_definitions(-DBUILD_DEVIL)
 endif(TOWERENGINE_BUILD_DEVIL)
 
+if(TOWERENGINE_BUILD_LIBPNG)
+	find_package(PNG REQUIRED)
+	include_directories(${PNG_INCLUDE_DIRS})
+	target_link_libraries(towerengine ${PNG_LIBRARIES})
+	add_definitions(-DBUILD_LIBPNG)
+endif(TOWERENGINE_BUILD_LIBPNG)
 
 
 
