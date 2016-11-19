@@ -28,6 +28,7 @@ class t2DRenderer;
 #include "utils.h"
 #include "buffers.h"
 #include "shader.h"
+#include "texture.h"
 #include "face_shader.h"
 #include "geometry_pass_shader.h"
 #include "depth_pass_shader.h"

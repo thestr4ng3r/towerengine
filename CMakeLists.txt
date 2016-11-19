@@ -13,6 +13,7 @@ set(CMAKE_BUILD_TYPE Release)
 
 option(TOWERENGINE_STATIC_LIB "Build static instead of shared" OFF)
 
+option(TOWERENGINE_BUILD_DEVIL ON)
 option(TOWERENGINE_BUILD_OPENVR OFF)
 option(TOWERENGINE_BUILD_OCULUS OFF)
 
@@ -146,14 +147,18 @@ set(TOWERENGINE_SRC
 	include/vr_context.h
 	src/vr_context.cpp
 	include/vr_context_openvr.h
-	include/vr_context_oculus.h)
+	include/vr_context_oculus.h
+	include/texture.h
+	src/texture.cpp)
 
 if(TOWERENGINE_BUILD_OPENVR)
 	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)
+	add_definitions(-DBUILD_OPENVR)
 endif()
 
 if(TOWERENGINE_BUILD_OCULUS)
 	list(APPEND TOWERENGINE_SRC src/vr_context_oculus.cpp)
+	add_definitions(-DBUILD_OCULUS)
 endif()
 
 
@@ -173,7 +178,7 @@ file(GLOB RESOURCES_SHADER_FILES
 
 #add_definitions(-g -Wall)
 
-if(BUILD_STATIC_LIB)
+if(TOWERENGINE_STATIC_LIB)
 	add_library(towerengine STATIC ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 else()
 	add_library(towerengine SHARED ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
@@ -231,16 +236,17 @@ find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIR})
 target_link_libraries(towerengine ${GLEW_LIBRARY})
 
-find_package(DevIL REQUIRED)
-include_directories(${IL_INCLUDE_DIR})
-target_link_libraries(towerengine ${IL_LIBRARIES})
-target_link_libraries(towerengine ${ILU_LIBRARIES})
-
 find_package(Bullet REQUIRED)
 include_directories(${BULLET_INCLUDE_DIRS})
 target_link_libraries(towerengine ${BULLET_LIBRARIES})
 
-
+if(TOWERENGINE_BUILD_DEVIL)
+	find_package(DevIL REQUIRED)
+	include_directories(${IL_INCLUDE_DIR})
+	target_link_libraries(towerengine ${IL_LIBRARIES})
+	target_link_libraries(towerengine ${ILU_LIBRARIES})
+	add_definitions(-DBUILD_DEVIL)
+endif(TOWERENGINE_BUILD_DEVIL)
 
 
 

@@ -1,7 +1,9 @@
 #include "towerengine.h"
 
+#ifdef TOWERENGINE_BUILD_DEVIL
 #include <IL/il.h>
 #include <IL/ilu.h>
+#endif
 
 tHeightMap::tHeightMap(int size)
 {
@@ -12,6 +14,7 @@ tHeightMap::tHeightMap(int size)
 
 bool tHeightMap::Load(const char *file)
 {
+#ifdef TOWERENGINE_BUILD_DEVIL
 	ILuint image;
 	ILenum error;
 	ILubyte *image_data;
@@ -69,4 +72,7 @@ bool tHeightMap::Load(const char *file)
 	ilDeleteImages(1, &image);
 
 	return true;
+#else
+	return false;
+#endif
 }

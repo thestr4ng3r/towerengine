@@ -20,12 +20,5 @@ GLenum CubeTex(int side);
 int CubeSide(GLenum tex);
 tVector CubeVecS(int side);
 
-//GLuint LoadGLTexture(const char *filename, GLenum type = GL_TEXTURE_2D);
-GLuint LoadGLCubeMap(const char *filename[6]);
-GLuint LoadGLCubeMap(const char *filename);
-GLuint LoadGLCubeMapBinary(const char *ext, const void *data, unsigned int size);
-
-GLuint CreateCubeTexture(GLenum type, int width, int height);
-GLuint GLTextureFromColor(const tVector &color);
 
 #endif
