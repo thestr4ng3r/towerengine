@@ -2,19 +2,19 @@
 #ifndef _TEXTURE_H
 #define _TEXTURE_H
 
-GLuint LoadGLTexture(const char *filename, int channels = 4, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
-GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int channels = 4, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
+GLuint LoadGLTexture(const char *filename, int channels = 4, int *w = 0, int *h = 0, bool *transparent = 0);
+GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int channels = 4, int *w = 0, int *h = 0, bool *transparent = 0);
 
 GLuint LoadGLTextureArray(const char **filenames, const int count, int *w = 0, int *h = 0);
 
-inline GLuint LoadGLTexture(const char *filename, int channels, bool *transparent, int alpha_channel = 3)
+inline GLuint LoadGLTexture(const char *filename, int channels, bool *transparent)
 {
-	return LoadGLTexture(filename, channels, 0, 0, transparent, alpha_channel);
+	return LoadGLTexture(filename, channels, 0, 0, transparent);
 }
 
-inline GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int channels, bool *transparent, int alpha_channel = 3)
+inline GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int channels, bool *transparent)
 {
-	return LoadGLTextureBinary(ext, data, size, channels, 0, 0, transparent, alpha_channel);
+	return LoadGLTextureBinary(ext, data, size, channels, 0, 0, transparent);
 }
 
 

@@ -2,18 +2,17 @@
 #include "towerengine.h"
 
 
+#if !defined(BUILD_DEVIL) && !defined(BUILD_LIBPNG)
+#pragma message("Warning: Building TowerEngine without any image loading library!")
+#endif
+
 
 #ifdef BUILD_DEVIL
 
-#include <IL/il.h>
-#include <IL/ilu.h>
-
-GLuint LoadGLTexture_IL_Image(ILuint image, int channels, int *w = 0, int *h = 0, bool *transparent = 0, int alpha_channel = 3);
-GLuint LoadGLTextureBinary_IL(const char *ext, const void *data, size_t size, int channels, int *w, int *h, bool *transparent, int alpha_channel);
-GLuint LoadGLTexture_IL(const char *filename, int channels, int *w, int *h, bool *transparent, int alpha_channel);
+GLuint LoadGLTextureBinary_IL(const char *ext, const void *data, size_t size, int channels, int *w, int *h, bool *transparent);
+GLuint LoadGLTexture_IL(const char *filename, int channels, int *w, int *h, bool *transparent);
 GLuint LoadGLTextureArray_IL(const char **filenames, const int count, int *w, int *h);
 
-GLuint LoadGLCubeMap_IL_Image(ILuint image);
 GLuint LoadGLCubeMap_IL(const char *filename[6]);
 GLuint LoadGLCubeMap_IL(const char *filename);
 GLuint LoadGLCubeMapBinary_IL(const char *ext, const void *data, unsigned int size);
@@ -23,28 +22,32 @@ GLuint LoadGLCubeMapBinary_IL(const char *ext, const void *data, unsigned int si
 
 #ifdef BUILD_LIBPNG
 
-GLuint LoadGLTexture_PNG(const char *filename, int channels, int *w, int *h, bool *transparent, int alpha_channel);
+GLuint LoadGLTexture_PNG(const char *filename, int channels, int *w, int *h, bool *transparent);
+GLuint LoadGLTextureArray_PNG(const char **filenames, const int count, int *w, int *h);
+
+GLuint LoadGLCubeMap_PNG(const char *filename[6]);
+GLuint LoadGLCubeMap_PNG(const char *filename);
 
 #endif
 
 
 
 
-GLuint LoadGLTexture(const char *filename, int channels, int *w, int *h, bool *transparent, int alpha_channel)
+GLuint LoadGLTexture(const char *filename, int channels, int *w, int *h, bool *transparent)
 {
 #ifdef BUILD_DEVIL
-	return LoadGLTexture_IL(filename, channels, w, h, transparent, alpha_channel);
+	return LoadGLTexture_IL(filename, channels, w, h, transparent);
 #elif BUILD_LIBPNG
-	return LoadGLTexture_PNG(filename, channels, w, h, transparent, alpha_channel);
+	return LoadGLTexture_PNG(filename, channels, w, h, transparent);
 #else
 	return 0;
 #endif
 }
 
-GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int channels, int *w, int *h, bool *transparent, int alpha_channel)
+GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int channels, int *w, int *h, bool *transparent)
 {
 #ifdef BUILD_DEVIL
-	return LoadGLTextureBinary_IL(ext, data, size, channels, w, h, transparent, alpha_channel);
+	return LoadGLTextureBinary_IL(ext, data, size, channels, w, h, transparent);
 #else
 	return 0;
 #endif
@@ -53,7 +56,9 @@ GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int c
 GLuint LoadGLTextureArray(const char **filenames, const int count, int *w, int *h)
 {
 #ifdef BUILD_DEVIL
-	return LoadGLTextureArray_IL(filename, channels, w, h, transparent, alpha_channel);
+	return LoadGLTextureArray_IL(filename, channels, w, h, transparent);
+#elif BUILD_LIBPNG
+	return LoadGLTextureArray_PNG(filenames, count, w, h);
 #else
 	return 0;
 #endif
@@ -66,6 +71,8 @@ GLuint LoadGLCubeMap(const char *filename[6])
 {
 #ifdef BUILD_DEVIL
 	return LoadGLCubeMap_IL(filename);
+#elif BUILD_LIBPNG
+	return LoadGLCubeMap_PNG(filename);
 #else
 	return 0;
 #endif
@@ -75,6 +82,8 @@ GLuint LoadGLCubeMap(const char *filename)
 {
 #ifdef BUILD_DEVIL
 	return LoadGLCubeMap_IL(filename);
+#elif BUILD_LIBPNG
+	return LoadGLCubeMap_PNG(filename);
 #else
 	return 0;
 #endif

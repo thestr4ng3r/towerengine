@@ -6,7 +6,7 @@
 #include <IL/il.h>
 #include <IL/ilu.h>
 
-GLuint LoadGLTexture_IL(const char *filename, int channels, int *w, int *h, bool *transparent, int alpha_channel)
+GLuint LoadGLTexture_IL(const char *filename, int channels, int *w, int *h, bool *transparent)
 {
 	ILuint imageID;
 	ILboolean success;
@@ -24,14 +24,14 @@ GLuint LoadGLTexture_IL(const char *filename, int channels, int *w, int *h, bool
 		return 0;
 	}
 
-	r_tex = LoadGLTexture_IL_Image(imageID, channels, w, h, transparent, alpha_channel);
+	r_tex = LoadGLTexture_IL_Image(imageID, channels, w, h, transparent);
 
 	ilDeleteImages(1, &imageID);
 
 	return r_tex;
 }
 
-GLuint LoadGLTexture_IL_Binary(const char *ext, const void *data, size_t size, int channels, int *w, int *h, bool *transparent, int alpha_channel)
+GLuint LoadGLTexture_IL_Binary(const char *ext, const void *data, size_t size, int channels, int *w, int *h, bool *transparent)
 {
 	ILuint imageID;
 	ILboolean success;
@@ -57,14 +57,14 @@ GLuint LoadGLTexture_IL_Binary(const char *ext, const void *data, size_t size, i
 		return 0;
 	}
 
-	r_tex = LoadGLTexture_IL_Image(imageID, channels, w, h, transparent, alpha_channel);
+	r_tex = LoadGLTexture_IL_Image(imageID, channels, w, h, transparent);
 
 	ilDeleteImages(1, &imageID);
 
 	return r_tex;
 }
 
-GLuint LoadGLTexture_IL_Image(ILuint imageID, int channels, int *w, int *h, bool *transparent, int alpha_channel)
+GLuint LoadGLTexture_IL_Image(ILuint imageID, int channels, int *w, int *h, bool *transparent)
 {
 	GLuint gl_tex;
 	ILboolean success;
@@ -130,7 +130,7 @@ GLuint LoadGLTexture_IL_Image(ILuint imageID, int channels, int *w, int *h, bool
 		*transparent = false;
 		for(i=0; i<width*height; i++)
 		{
-			if(data[i*4 + alpha_channel] < 128)
+			if(data[i*4 + 3] < 128)
 			{
 				*transparent = true;
 				break;
