@@ -11,14 +11,14 @@ def create_texture_node(pack_textures, path, tex_path, filename, texture, doc, n
 	if not pack_textures:
 		tex_file = os.path.join(tex_path, filename + "." + file_extension)
 		try:
-			shutil.copy(bpy.path.abspath(texture.image.filepath), tex_file)
+			shutil.copy(texture.image.filepath_from_user(), tex_file)
 		except OSError as e:
 			print(str(e))
 		except IOError as e:
 			print(str(e))
 		node.setAttribute("file", os.path.relpath(tex_file, path))
 	else:
-		with open(bpy.path.abspath(texture.image.filepath), "rb") as image_file:
+		with open(texture.image.filepath_from_user(), "rb") as image_file:
 			image_data = image_file.read()
 			image_base64 = base64.b64encode(image_data)
 			image_text = doc.createTextNode(image_base64.decode("utf-8"))
