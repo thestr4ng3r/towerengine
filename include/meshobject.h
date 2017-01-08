@@ -43,6 +43,8 @@ class tMeshObject : public tTransformObject
 		tMeshObject(tMesh *mesh);
 		~tMeshObject(void);
 
+		void SetMesh(tMesh *mesh)						{ this->mesh = mesh; }
+
 		void SetAnimation(const char *animation);
 		void Play(float time);
 		bool GetAnimationFinished(void);

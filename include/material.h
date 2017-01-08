@@ -64,6 +64,7 @@ class tDefaultMaterial : public tMaterial
 
 		void LoadTexture(TextureType type, std::string file);
 		void LoadTexture(TextureType type, const char *extension, const void *data, size_t size);
+		void SetTexture(TextureType type, GLuint gl_tex);
 
 		void UpdateUniformBuffer(void);
 
