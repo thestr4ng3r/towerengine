@@ -94,5 +94,6 @@ class t2DRenderer;
 #include "default_renderer.h"
 #include "vr_renderer.h"
 #include "2d_renderer.h"
+#include "timgui.h"
 
 #endif

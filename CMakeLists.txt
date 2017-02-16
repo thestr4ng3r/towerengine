@@ -11,58 +11,8 @@ set(LIB_INSTALL_DIR lib)
 
 set(CMAKE_BUILD_TYPE Release)
 
-option(BUILD_STATIC_LIB "Build static instead of shared" OFF)
-
-
-# the following if-clause was copied from BulletPhysics' CMakeLists.txt
-IF(MSVC)
-	IF (NOT USE_MSVC_INCREMENTAL_LINKING)
-		#MESSAGE("MSVC_INCREMENTAL_DEFAULT"+${MSVC_INCREMENTAL_DEFAULT})
-		SET( MSVC_INCREMENTAL_YES_FLAG "/INCREMENTAL:NO")
-
-		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags ${CMAKE_EXE_LINKER_FLAGS_DEBUG})
-		SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO ${replacementFlags}" )
-		MESSAGE("CMAKE_EXE_LINKER_FLAGS_DEBUG=${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
-
-		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags2 ${CMAKE_EXE_LINKER_FLAGS})
-
-		SET(CMAKE_EXE_LINKER_FLAGS ${replacementFlag2})
-		STRING(REPLACE "INCREMENTAL:YES" "" replacementFlags3 "${CMAKE_EXTRA_LINK_FLAGS}")
-
-		SET(CMAKE_EXTRA_LINK_FLAGS ${replacementFlag3})
-
-
-		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags3 "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}")
-		SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO ${replacementFlags3})
-		SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "/INCREMENTAL:NO ${replacementFlags3}" )
-
-	ENDIF (NOT USE_MSVC_INCREMENTAL_LINKING)
-
-	IF (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
-		#We statically link to reduce dependancies
-		FOREACH(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO )
-			IF(${flag_var} MATCHES "/MD")
-				STRING(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-			ENDIF(${flag_var} MATCHES "/MD")
-			IF(${flag_var} MATCHES "/MDd")
-				STRING(REGEX REPLACE "/MDd" "/MTd" ${flag_var} "${${flag_var}}")
-			ENDIF(${flag_var} MATCHES "/MDd")
-		ENDFOREACH(flag_var)
-	ENDIF (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
-
-	IF (CMAKE_CL_64)
-		ADD_DEFINITIONS(-D_WIN64)
-	ELSE()
-		OPTION(USE_MSVC_SSE "Use MSVC /arch:sse option"	ON)
-		IF (USE_MSVC_SSE)
-			ADD_DEFINITIONS(/arch:SSE)
-		ENDIF()
-	ENDIF()
-	OPTION(USE_MSVC_FAST_FLOATINGPOINT "Use MSVC /fp:fast option"	ON)
-	IF (USE_MSVC_FAST_FLOATINGPOINT)
-		ADD_DEFINITIONS(/fp:fast)
-	ENDIF()
-ENDIF(MSVC)
+option(TOWERENGINE_BUILD_STATIC "Build static instead of shared" OFF)
+option(TOWERENGINE_ENABLE_IMGUI "Build with ImGUI support" OFF)
 
 
 set (TOWERENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -139,7 +89,8 @@ set(TOWERENGINE_SRC
 	src/lighting_shader.cpp
 	src/depth_pass_shader.cpp
 	src/cube_map_blur_shader.cpp
-	src/no_op_shader.cpp)
+	src/no_op_shader.cpp
+	src/timgui.cpp)
 
 
 set(RESOURCES_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
@@ -154,9 +105,25 @@ file(GLOB RESOURCES_SHADER_FILES
 
 
 
-#add_definitions(-g -Wall)
 
-if(BUILD_STATIC_LIB)
+
+if(TOWERENGINE_ENABLE_IMGUI)
+	set(IMGUI_DIR "" CACHE PATH "Root directory of ImGui source.")
+
+	if(NOT IMGUI_DIR)
+		message(FATAL_ERROR "IMGUI_DIR is not set. Set it to the root directory of the ImGui source or disable TOWERENGINE_ENABLE_IMGUI.")
+	endif()
+
+	include_directories("${IMGUI_DIR}")
+	list(APPEND TOWERENGINE_SRC
+			"${IMGUI_DIR}/imgui.cpp"
+			"${IMGUI_DIR}/imgui_draw.cpp")
+
+	add_definitions(-DTOWERENGINE_ENABLE_IMGUI)
+endif()
+
+
+if(TOWERENGINE_BUILD_STATIC)
 	add_library(towerengine STATIC ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 else()
 	add_library(towerengine SHARED ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
@@ -235,6 +202,10 @@ install(TARGETS towerengine
 
 install(FILES ${TOWERENGINE_INCLUDES} DESTINATION ${INCLUDE_INSTALL_DIR})
 
+if(TOWERENGINE_ENABLE_IMGUI)
+	install(FILES "${IMGUI_DIR}/imgui.h" "${IMGUI_DIR}/imgui.h"
+			DESTINATION ${INCLUDE_INSTALL_DIR})
+endif()
 
 
 
