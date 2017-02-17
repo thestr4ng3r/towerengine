@@ -120,9 +120,6 @@ namespace tImGui
 		io.DisplayFramebufferScale = ImVec2(width_scale, height_scale);
 		io.DeltaTime = delta_time;
 
-		// TODO: mouse
-		io.MousePos = ImVec2(-1, -1);
-
 		ImGui::NewFrame();
 	}
 
