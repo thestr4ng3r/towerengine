@@ -17,6 +17,7 @@ import bpy.types
 from .mesh_exporter import TowerEngineMeshExporter
 from .scene_exporter import TowerEngineSceneExporter
 from .props import *
+from .renderer import TowerEngineRenderEngine
 
 def menu_func(self, context):
 	self.layout.operator(TowerEngineMeshExporter.bl_idname, text="TowerEngine Mesh (.tem)")
@@ -35,6 +36,10 @@ def register():
 	bpy.types.Material.towerengine_texture_slots = bpy.props.CollectionProperty(type=TowerEngineMaterialTextureSlotPropertyGroup)
 	bpy.types.Mesh.towerengine = bpy.props.PointerProperty(type=TowerEngineMeshPropertyGroup)
 
+	from bl_ui import (properties_render, properties_material)
+	properties_render.RENDER_PT_render.COMPAT_ENGINES.add(TowerEngineRenderEngine.bl_idname)
+	properties_material.MATERIAL_PT_preview.COMPAT_ENGINES.add(TowerEngineRenderEngine.bl_idname)
+
 
 def unregister():	
 	bpy.utils.unregister_module(__name__)
@@ -42,4 +47,3 @@ def unregister():
 	
 if __name__ == "__main__":
 	register()
-	
