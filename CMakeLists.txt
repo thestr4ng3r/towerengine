@@ -14,6 +14,62 @@ set(CMAKE_BUILD_TYPE Release)
 option(TOWERENGINE_BUILD_STATIC "Build static instead of shared" OFF)
 option(TOWERENGINE_ENABLE_IMGUI "Build with ImGUI support" OFF)
 
+option(TOWERENGINE_BUILD_DEVIL OFF)
+option(TOWERENGINE_BUILD_LIBPNG ON)
+option(TOWERENGINE_BUILD_OPENVR OFF)
+option(TOWERENGINE_BUILD_OCULUS OFF)
+
+
+# the following if-clause was copied from BulletPhysics' CMakeLists.txt
+IF(MSVC)
+	IF (NOT USE_MSVC_INCREMENTAL_LINKING)
+		#MESSAGE("MSVC_INCREMENTAL_DEFAULT"+${MSVC_INCREMENTAL_DEFAULT})
+		SET( MSVC_INCREMENTAL_YES_FLAG "/INCREMENTAL:NO")
+
+		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags ${CMAKE_EXE_LINKER_FLAGS_DEBUG})
+		SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO ${replacementFlags}" )
+		MESSAGE("CMAKE_EXE_LINKER_FLAGS_DEBUG=${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+
+		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags2 ${CMAKE_EXE_LINKER_FLAGS})
+
+		SET(CMAKE_EXE_LINKER_FLAGS ${replacementFlag2})
+		STRING(REPLACE "INCREMENTAL:YES" "" replacementFlags3 "${CMAKE_EXTRA_LINK_FLAGS}")
+
+		SET(CMAKE_EXTRA_LINK_FLAGS ${replacementFlag3})
+
+
+		STRING(REPLACE "INCREMENTAL:YES" "INCREMENTAL:NO" replacementFlags3 "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}")
+		SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO ${replacementFlags3})
+		SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "/INCREMENTAL:NO ${replacementFlags3}" )
+
+	ENDIF (NOT USE_MSVC_INCREMENTAL_LINKING)
+
+	IF (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
+		#We statically link to reduce dependancies
+		FOREACH(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO )
+			IF(${flag_var} MATCHES "/MD")
+				STRING(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+			ENDIF(${flag_var} MATCHES "/MD")
+			IF(${flag_var} MATCHES "/MDd")
+				STRING(REGEX REPLACE "/MDd" "/MTd" ${flag_var} "${${flag_var}}")
+			ENDIF(${flag_var} MATCHES "/MDd")
+		ENDFOREACH(flag_var)
+	ENDIF (NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
+
+	IF (CMAKE_CL_64)
+		ADD_DEFINITIONS(-D_WIN64)
+	ELSE()
+		OPTION(USE_MSVC_SSE "Use MSVC /arch:sse option"	ON)
+		IF (USE_MSVC_SSE)
+			ADD_DEFINITIONS(/arch:SSE)
+		ENDIF()
+	ENDIF()
+	OPTION(USE_MSVC_FAST_FLOATINGPOINT "Use MSVC /fp:fast option"	ON)
+	IF (USE_MSVC_FAST_FLOATINGPOINT)
+		ADD_DEFINITIONS(/fp:fast)
+	ENDIF()
+ENDIF(MSVC)
+
 
 set (TOWERENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -90,7 +146,27 @@ set(TOWERENGINE_SRC
 	src/depth_pass_shader.cpp
 	src/cube_map_blur_shader.cpp
 	src/no_op_shader.cpp
-	src/timgui.cpp)
+	src/timgui.cpp
+	include/vr_context.h
+	src/vr_context.cpp
+	include/vr_context_openvr.h
+	include/vr_context_oculus.h
+	include/texture.h
+	src/texture.cpp
+	src/texture_devil.cpp
+	src/texture_png.cpp)
+
+if(TOWERENGINE_BUILD_OPENVR)
+	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)
+	add_definitions(-DBUILD_OPENVR)
+endif()
+
+if(TOWERENGINE_BUILD_OCULUS)
+	list(APPEND TOWERENGINE_SRC src/vr_context_oculus.cpp)
+	add_definitions(-DBUILD_OCULUS)
+endif()
+
+
 
 
 set(RESOURCES_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
@@ -181,17 +257,24 @@ find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIR})
 target_link_libraries(towerengine ${GLEW_LIBRARY})
 
-find_package(DevIL REQUIRED)
-include_directories(${IL_INCLUDE_DIR})
-target_link_libraries(towerengine ${IL_LIBRARIES})
-target_link_libraries(towerengine ${ILU_LIBRARIES})
-
 find_package(Bullet REQUIRED)
 include_directories(${BULLET_INCLUDE_DIRS})
 target_link_libraries(towerengine ${BULLET_LIBRARIES})
 
+if(TOWERENGINE_BUILD_DEVIL)
+	find_package(DevIL REQUIRED)
+	include_directories(${IL_INCLUDE_DIR})
+	target_link_libraries(towerengine ${IL_LIBRARIES})
+	target_link_libraries(towerengine ${ILU_LIBRARIES})
+	add_definitions(-DBUILD_DEVIL)
+endif(TOWERENGINE_BUILD_DEVIL)
 
-
+if(TOWERENGINE_BUILD_LIBPNG)
+	find_package(PNG REQUIRED)
+	include_directories(${PNG_INCLUDE_DIRS})
+	target_link_libraries(towerengine ${PNG_LIBRARIES})
+	add_definitions(-DBUILD_LIBPNG)
+endif(TOWERENGINE_BUILD_LIBPNG)
 
 
 

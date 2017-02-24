@@ -100,14 +100,14 @@ vector<string> ParseSourceCommand(const string &source, size_t pos, size_t &end)
     return r;
 }
 
-vector<string> ParseParameterList(const string &source, unsigned long pos, unsigned long *end_pos)
+vector<string> ParseParameterList(const string &source, string::size_type pos, string::size_type *end_pos)
 {
 	vector<string> r;
 
 	if(source.at(pos) != '(')
 		return r;
 
-	unsigned long length = source.length();
+	string::size_type length = source.length();
 	*end_pos = pos;
 
 	string param = "";
@@ -212,9 +212,9 @@ string tShaderSource::BuildSource(void)
 	string final = source;
 
 	vector<string> cmd_params;
-	unsigned long cmd_end;
+	string::size_type cmd_end;
 
-	unsigned long vi = 0;
+	string::size_type vi = 0;
 	while((vi = final.find("#pragma define_param(", vi)) != string::npos)
 	{
 		cmd_params = ParseParameterList(final, vi+20, &cmd_end);

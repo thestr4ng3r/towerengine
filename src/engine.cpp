@@ -1,8 +1,11 @@
 
 #include "towerengine.h"
 
+
+#ifdef TOWERENGINE_BUILD_DEVIL
 #include <IL/il.h>
 #include <IL/ilu.h>
+#endif
 
 
 bool tEngine::arb_bindless_texture_supported = false;
@@ -67,9 +70,10 @@ bool tEngine::Init(std::string *error)
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+#ifdef TOWERENGINE_BUILD_DEVIL
 	ilInit();
 	iluInit();
-
+#endif
 
 	no_op_shader = new tNoOpShader();
 
