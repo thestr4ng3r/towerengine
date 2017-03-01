@@ -3,7 +3,7 @@ import bgl
 
 class TowerEngineRenderEngine(bpy.types.RenderEngine):
 	bl_idname = "towerengine_renderer"
-	bl_label = "Tower Engine Renderer"
+	bl_label = "TowerEngine"
 	bl_use_preview = True
 	bl_use_texture_preview = True
 
@@ -21,3 +21,10 @@ def draw(self, context):
 	print("DRAW")
 	bgl.glClearColor(0.0, 1.0, 0.0, 1.0)
 	bgl.glClear(bgl.GL_COLOR_BUFFER_BIT)
+
+
+def register():
+	bpy.utils.register_class(TowerEngineRenderEngine)
+
+def unregister():
+	bpy.utils.register_class(TowerEngineRenderEngine)

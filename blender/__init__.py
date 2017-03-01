@@ -10,40 +10,27 @@ bl_info = {
 	"category":		"Import-Export"
 }
 
+__all__ = ["mesh_exporter", "scene_exporter", "ui", "props", "renderer"]
 
-import bpy
-import bpy.utils
-import bpy.types
-from .mesh_exporter import TowerEngineMeshExporter
-from .scene_exporter import TowerEngineSceneExporter
-from .props import *
-from .renderer import TowerEngineRenderEngine
-
-def menu_func(self, context):
-	self.layout.operator(TowerEngineMeshExporter.bl_idname, text="TowerEngine Mesh (.tem)")
-	self.layout.operator(TowerEngineSceneExporter.bl_idname, text="TowerEngine Scene (.tes)")
-	
-	
-	
-	
+from . import mesh_exporter
+from . import scene_exporter
+from . import ui
+from . import props
+from . import renderer
 
 def register():
-	bpy.utils.register_module(__name__)
-	bpy.types.INFO_MT_file_export.append(menu_func)
-	
-	bpy.types.Object.towerengine = bpy.props.PointerProperty(type=TowerEngineObjectPropertyGroup)
-	bpy.types.Material.towerengine = bpy.props.PointerProperty(type=TowerEngineMaterialPropertyGroup)
-	bpy.types.Material.towerengine_texture_slots = bpy.props.CollectionProperty(type=TowerEngineMaterialTextureSlotPropertyGroup)
-	bpy.types.Mesh.towerengine = bpy.props.PointerProperty(type=TowerEngineMeshPropertyGroup)
+	props.register()
+	ui.register()
+	mesh_exporter.register()
+	scene_exporter.register()
+	renderer.register()
 
-	from bl_ui import (properties_render, properties_material)
-	properties_render.RENDER_PT_render.COMPAT_ENGINES.add(TowerEngineRenderEngine.bl_idname)
-	properties_material.MATERIAL_PT_preview.COMPAT_ENGINES.add(TowerEngineRenderEngine.bl_idname)
-
-
-def unregister():	
-	bpy.utils.unregister_module(__name__)
-	bpy.types.INFO_MT_file_export.remove(menu_func)
+def unregister():
+	props.unregister()
+	ui.unregister()
+	mesh_exporter.unregister()
+	scene_exporter.unregister()
+	renderer.unregister()
 	
 if __name__ == "__main__":
 	register()
