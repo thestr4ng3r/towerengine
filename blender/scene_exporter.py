@@ -328,20 +328,15 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 			except IOError as e:
 				print(str(e))
 			self.saved_cubemap_files[cubemap_name] = os.path.relpath(tex_file, self.directory)
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+def menu_func(self, context):
+	self.layout.operator(TowerEngineSceneExporter.bl_idname, text="TowerEngine Scene (.tes)")
+
+def register():
+	bpy.utils.register_class(TowerEngineSceneExporter)
+	bpy.types.INFO_MT_file_export.append(menu_func)
+
+def unregister():
+	bpy.types.INFO_MT_file_export.remove(menu_func)
+	bpy.utils.unregister_class(TowerEngineSceneExporter)
