@@ -1,5 +1,6 @@
 import bpy
-import bgl
+
+from . import viewport_render
 
 class TowerEngineRenderEngine(bpy.types.RenderEngine):
 	bl_idname = "towerengine_renderer"
@@ -12,15 +13,11 @@ class TowerEngineRenderEngine(bpy.types.RenderEngine):
 		return
 
 	def view_update(self, context):
-		draw(self, context)
+		viewport_render.render(self, context)
 
 	def view_draw(self, context):
-		draw(self, context)
+		viewport_render.render(self, context)
 
-def draw(self, context):
-	print("DRAW")
-	bgl.glClearColor(0.0, 1.0, 0.0, 1.0)
-	bgl.glClear(bgl.GL_COLOR_BUFFER_BIT)
 
 
 def register():
