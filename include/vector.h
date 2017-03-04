@@ -1,7 +1,6 @@
 #ifndef _VECTOR_H
 #define _VECTOR_H
 
-
 struct tMatrix3;
 class tTransform;
 

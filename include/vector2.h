@@ -1,5 +1,5 @@
-#ifndef _CVECTOR2_H
-#define _CVECTOR2_H
+#ifndef _VECTOR2_H
+#define _VECTOR2_H
 
 struct tVector;
 

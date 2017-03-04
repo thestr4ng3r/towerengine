@@ -44,7 +44,7 @@ void tMatrix3::Scale(tVector scale)
 	z *= scale.z;
 }
 
-tVector tMatrix3::ApplyToVector(tVector v)
+tVector tMatrix3::ApplyToVector(tVector v) const
 {
 	return v.x * Vec(x.x, y.x, z.x) + v.y * Vec(x.y, y.y, z.y) + v.z * Vec(x.z, y.z, z.z);
 	//return x * v.x + y * v.y + z * v.z;
@@ -70,7 +70,7 @@ tMatrix3 tMatrix3::FromBtMatrix(const btMatrix3x3 &matrix)
 	return tMatrix3(Vec(matrix.getRow(0)), Vec(matrix.getRow(1)), Vec(matrix.getRow(2)));
 }
 
-tMatrix3 operator*(tMatrix3 a, tMatrix3 b)
+tMatrix3 operator*(const tMatrix3 a, const tMatrix3 b)
 {
 	tMatrix3 r;
 

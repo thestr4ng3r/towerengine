@@ -13,7 +13,7 @@ class TowerEngineRenderEngine(bpy.types.RenderEngine):
 		return
 
 	def view_update(self, context):
-		viewport_render.render(self, context)
+		viewport_render.update(self, context)
 
 	def view_draw(self, context):
 		viewport_render.render(self, context)
