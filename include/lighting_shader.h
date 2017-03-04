@@ -4,7 +4,6 @@
 
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 
-#include <vector>
 #include "material.h"
 
 /**

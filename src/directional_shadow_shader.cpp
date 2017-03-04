@@ -64,6 +64,8 @@ void tDirectionalShadowShader::SetBaseColorTexture(bool enabled, GLuint tex)
 
 
 
+const GLint tDirectionalShadowBlurShader::vertex_attribute;
+const GLint tDirectionalShadowBlurShader::uv_coord_attribute;
 
 tDirectionalShadowBlurShader::tDirectionalShadowBlurShader(void)
 {

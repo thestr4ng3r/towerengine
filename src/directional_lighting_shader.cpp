@@ -4,6 +4,8 @@
 #include "shader_source.h"
 
 
+const GLint tDirectionalLightingShader::max_directional_light_splits;
+
 tDirectionalLightingShader::tDirectionalLightingShader(tGBuffer *gbuffer)
 {
 	InitScreenShader(resources_get("directional_lighting_shader.frag"), "Directional Lighting Shader");

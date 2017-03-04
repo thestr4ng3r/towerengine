@@ -5,7 +5,7 @@
 
 struct tParticle
 {
-	struct vertex_data
+	struct
 	{
 		tVector position;
 		float size;

@@ -3,6 +3,8 @@
 #include "resources.h"
 
 
+const GLint tColorShader::color_attribute;
+
 tColorShader::tColorShader(void)
 {
 	InitShader(resources_get("color_shader.vert"), resources_get("color_shader.frag"));

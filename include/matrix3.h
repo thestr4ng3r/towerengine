@@ -2,6 +2,7 @@
 #ifndef _MATRIX3_H
 #define _MATRIX3_H
 
+class btMatrix3x3;
 
 struct tMatrix3
 {

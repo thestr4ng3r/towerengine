@@ -9,15 +9,18 @@ set(LIB_INSTALL_DIR lib)
 
 
 
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 option(TOWERENGINE_BUILD_STATIC "Build static instead of shared" OFF)
 option(TOWERENGINE_ENABLE_IMGUI "Build with ImGUI support" OFF)
 
-option(TOWERENGINE_BUILD_DEVIL OFF)
-option(TOWERENGINE_BUILD_LIBPNG ON)
-option(TOWERENGINE_BUILD_OPENVR OFF)
-option(TOWERENGINE_BUILD_OCULUS OFF)
+option(TOWERENGINE_BUILD_DEVIL "Use DevIL for texture loading." OFF)
+option(TOWERENGINE_BUILD_LIBPNG "Use LibPNG for texture loading." ON)
+option(TOWERENGINE_BUILD_OPENVR "Build with OpenVR support." OFF)
+option(TOWERENGINE_BUILD_OCULUS "Build with Oculus support." OFF)
+
+option(TOWERENGINE_SWIG_PYTHON "Generate Python Bindings using SWIG." OFF)
 
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
@@ -154,7 +157,7 @@ set(TOWERENGINE_SRC
 	include/texture.h
 	src/texture.cpp
 	src/texture_devil.cpp
-	src/texture_png.cpp)
+	src/texture_png.cpp src/face_shader.cpp)
 
 if(TOWERENGINE_BUILD_OPENVR)
 	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)
@@ -290,6 +293,11 @@ if(TOWERENGINE_ENABLE_IMGUI)
 			DESTINATION ${INCLUDE_INSTALL_DIR})
 endif()
 
+
+
+if(TOWERENGINE_SWIG_PYTHON)
+	add_subdirectory(swig)
+endif()
 
 
 # Config

@@ -2,6 +2,9 @@
 #include "towerengine.h"
 #include "resources.h"
 
+
+const GLint tCubeMapBlurShader::vertex_attribute;
+
 tCubeMapBlurShader::tCubeMapBlurShader(void)
 {
 	InitShader(resources_get("cube_map_blur_shader.vert"), resources_get("cube_map_blur_shader.frag"), "Cube Map Blur Shader");
