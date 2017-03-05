@@ -2,7 +2,7 @@
 import bpy
 from bgl import *
 from mathutils import *
-from _towerengine_python import *
+from ._towerengine_python import *
 #import OpenGL.GL
 
 
@@ -24,7 +24,15 @@ class TowerEngineContext:
 		self.coordinate_system_object = new_tCoordinateSystemObject()
 		tWorld_AddObject(self.world, self.coordinate_system_object)
 
+		self.skybox = new_tSkyBox()
+		tWorld_SetSkyBox(self.world, self.skybox)
 
+		self.objects = {}
+		self.meshes = {}
+
+
+	def convert_mesh(self, mesh):
+		return None
 
 
 te_context = None
@@ -38,9 +46,48 @@ def update(render_engine, context):
 	if not te_context:
 		te_context = TowerEngineContext(region.width, region.height)
 
+	#tWorld_ClearObjects(te_context.world)
+
+	#for o in context.scene.objects:
+	#	if o.type == "MESH":
+	#		mesh = o.mesh
+
+
+
+
+
+
+	# cubemap_tex = None
+	# for texture_slot in context.scene.world.texture_slots.values():
+	# 	if texture_slot is None:
+	# 		continue
+	#
+	# 	tex = texture_slot.texture
+	#
+	# 	if tex.type != "ENVIRONMENT_MAP":
+	# 		continue
+	#
+	# 	if tex.image is None:
+	# 		continue
+	#
+	# 	if texture_slot.use_map_horizon:
+	# 		cubemap_tex = tex
+	#
+	# if cubemap_tex is not None:
+	# 	cubemap_tex.image.gl_load()
+	# 	cubemap_gl = LoadGLCubeMap(cubemap_tex.image.filepath_from_user())
+	# 	tSkyBox_SetCubeMap(te_context.skybox, cubemap_gl)
+	# else:
+	# 	tSkyBox_SetCubeMap(te_context.skybox, 0)
+
 
 
 def vec_te(blender_vec):
+	#v = new_tVector()
+	#tVector_x_set(v, blender_vec.x)
+	#tVector_y_set(v, blender_vec.z)
+	#tVector_z_set(v, -blender_vec.y)
+	#return v
 	return Vec(blender_vec.x, blender_vec.z, -blender_vec.y)
 
 def vec_bl(te_vec):
