@@ -1,0 +1,40 @@
+dist: trusty
+sudo: required
+
+language: cpp
+
+compiler:
+  - gcc
+
+before_install:
+  - sudo add-apt-repository -y ppa:george-edison55/cmake-3.x
+  - sudo apt-get update -qq
+  - sudo apt-get install -y cmake libgl1-mesa-dev
+
+install:
+  - mkdir external
+  - cd external
+  - wget https://github.com/nigels-com/glew/archive/glew-2.0.0.tar.gz -O /tmp/glew-2.0.0.tar.gz
+  - tar -xvf /tmp/glew-2.0.0.tar.gz
+  - cd glew-glew-2.0.0/auto
+  - make
+  - cd ..
+  - make
+  - sudo make install
+  - cd ..
+  - wget https://github.com/bulletphysics/bullet3/archive/2.86.1.tar.gz -O /tmp/bullet-2.86.1.tar.gz
+  - tar -xvf /tmp/bullet-2.86.1.tar.gz
+  - cd bullet3-2.86.1
+  - mkdir build
+  - cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_CPU_DEMOS=OFF -DBUILD_BULLET3=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF
+  - make -j4
+  - sudo make install
+  - cd ../..
+  - cd ..
+
+script:
+  - mkdir build
+  - cd build
+  - cmake .. -DTOWERENGINE_BUILD_STATIC=ON -DTOWERENGINE_BUILD_OPENVR=OFF -DTOWERENGINE_BUILD_OCULUS=OFF  -DTOWERENGINE_ENABLE_IMGUI=OFF -DTOWERENGINE_BUILD_DEVIL=OFF -DTOWERENGINE_BUILD_LIBPNG=OFF -DTOWERENGINE_SWIG_PYTHON=OFF
+  - make -j4

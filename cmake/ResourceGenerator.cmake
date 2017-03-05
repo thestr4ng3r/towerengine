@@ -1,4 +1,6 @@
+cmake_minimum_required(VERSION 3.2)
 
+include(CMakeParseArguments)
 
 set(RESOURCE_GENERATOR_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 
