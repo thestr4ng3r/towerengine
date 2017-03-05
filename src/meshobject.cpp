@@ -10,14 +10,9 @@ tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 	this->mesh = mesh;
 	rigid_body = 0;
 	motion_state = 0;
-	animation = 0;
-	pose = "Idle";
-	animation_mode = 0;
-	loop = false;
 	color = Vec(1.0, 1.0, 1.0);
 	alpha = 1.0;
 	visible = true;
-	time = 0.0;
 	motion_state = new tMeshObjectMotionState(this);
 
 	rigid_body = 0;
@@ -61,38 +56,6 @@ void tMeshObject::RemovedFromWorld(tWorld *world)
 		world->GetDynamicsWorld()->removeRigidBody(rigid_body);
 }
 
-
-void tMeshObject::SetAnimation(const char *animation)
-{
-	tAnimation *a = mesh->GetAnimationByName(animation);
-	if(a != this->animation)
-		time = 0.0;
-	this->animation = a;
-}
-
-void tMeshObject::Play(float time)
-{
-	if(!animation_mode || !animation)
-		return;
-
-	if(!loop)
-		this->time = min(animation->GetLength(), this->time + time);
-	else
-		this->time = fmod(this->time + time, animation->GetLength());
-}
-
-bool tMeshObject::GetAnimationFinished(void)
-{
-	if(!animation_mode || !animation)
-		return true;
-
-	return !loop && this->time >= animation->GetLength();
-}
-
-void tMeshObject::SetPose(string pose)
-{
-	this->pose = pose;
-}
 
 tBoundingBox tMeshObject::GetBoundingBox(void)
 {
@@ -148,16 +111,6 @@ void tMeshObject::DepthPrePass(tRenderer *renderer)
 
 	renderer->GetCurrentFaceShader()->SetTransformation(temp);
 
-	if(animation_mode && animation)
-	{
-		mesh->ChangeAnimation(animation);
-		mesh->SetAnimationLoop(0);
-		animation->SetTime(time);
-	}
-	else
-	{
-		mesh->ChangePose(pose);
-	}
 	mesh->DepthPrePass(renderer, replace_materials);
 }
 
@@ -172,16 +125,6 @@ void tMeshObject::GeometryPass(tRenderer *renderer, bool cube_map_reflection_ena
 	if(cube_map_reflection_enabled && cube_map_reflection)
 		renderer->GetCurrentFaceShader()->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());
 
-	if(animation_mode && animation)
-	{
-		mesh->ChangeAnimation(animation);
-		mesh->SetAnimationLoop(0);
-		animation->SetTime(time);
-	}
-	else
-	{
-		mesh->ChangePose(pose);
-	}
 	mesh->GeometryPass(renderer, replace_materials);
 }
 
@@ -189,17 +132,6 @@ void tMeshObject::ForwardPass(tRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
-
-	if(animation_mode && animation)
-	{
-		mesh->ChangeAnimation(animation);
-		mesh->SetAnimationLoop(0);
-		animation->SetTime(time);
-	}
-	else
-	{
-		mesh->ChangePose(pose);
-	}
 
 	float *temp = transform.GetMatrix(transform_matrix);
 	mesh->ForwardPass(renderer, temp, replace_materials);
@@ -210,17 +142,6 @@ void tMeshObject::RefractionPass(tRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
-
-	if(animation_mode && animation)
-	{
-		mesh->ChangeAnimation(animation);
-		mesh->SetAnimationLoop(0);
-		animation->SetTime(time);
-	}
-	else
-	{
-		mesh->ChangePose(pose);
-	}
 
 	float *temp = transform.GetMatrix(transform_matrix);
 	mesh->RefractionPass(renderer, temp, replace_materials);

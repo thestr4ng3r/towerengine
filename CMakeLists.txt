@@ -79,8 +79,7 @@ set (TOWERENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 file(GLOB TOWERENGINE_INCLUDES "${TOWERENGINE_INCLUDE_DIR}/*.h")
 
-set(TOWERENGINE_SRC 
-	src/animation.cpp 
+set(TOWERENGINE_SRC
 	src/buffers.cpp 
 	src/camera.cpp 
 	src/engine.cpp 
@@ -101,7 +100,6 @@ set(TOWERENGINE_SRC
 	src/mesh.cpp 
 	src/meshobject.cpp 
 	src/object.cpp
-	src/pose.cpp
 	src/shader.cpp
 	src/utils.cpp 
 	src/vector2.cpp 

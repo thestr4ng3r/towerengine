@@ -1,9 +1,6 @@
 #ifndef __TOWERENGINE_H
 #define __TOWERENGINE_H
 
-struct tMeshPose;
-class tAnimation;
-struct tKeyFrame;
 class tMesh;
 struct tTriangle;
 class tMaterial;
@@ -64,8 +61,6 @@ class t2DRenderer;
 #include "material_ibo.h"
 #include "material_manager.h"
 #include "mesh.h"
-#include "pose.h"
-#include "animation.h"
 #include "entity.h"
 #include "asset.h"
 #include "engine.h"

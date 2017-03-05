@@ -13,11 +13,6 @@ class tMeshObject : public tTransformObject
 
 		bool visible;
 
-		bool animation_mode;
-		bool loop;
-		tAnimation *animation;
-		float time;
-
 		std::string pose;
 
 		tVector color;
@@ -45,13 +40,6 @@ class tMeshObject : public tTransformObject
 
 		void SetMesh(tMesh *mesh)						{ this->mesh = mesh; }
 
-		void SetAnimation(const char *animation);
-		void Play(float time);
-		bool GetAnimationFinished(void);
-		void SetAnimationLoop(bool l)					{ loop = l; }
-		void SetAnimationMode(bool a)					{ animation_mode = a; }
-		void SetAnimationTime(float t)					{ time = t; }
-		void SetPose(std::string pose);
 		void SetColor(tVector c)						{ color = c; }
 		void SetAlpha(float a)							{ alpha = a; }
 		void SetColor(tVector c, float a)				{ SetColor(c); SetAlpha(a); }

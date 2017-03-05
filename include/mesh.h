@@ -44,10 +44,6 @@ struct tTriangle
 class tMesh
 {
 	private:
-		bool loop_anim;
-		bool anim_finished;
-		bool animation_mode;
-
 		bool refresh_vbos;
 		bool refresh_ibos;
 
@@ -65,18 +61,11 @@ class tMesh
 
 		std::set<tVertex *> outdated_vertices;
 
-		tMeshPose *current_pose;
-		tAnimation *current_animation;
-
-		tMeshPose *idle_pose;
-
 		tMaterial *idle_material;
 
 		std::vector<tVertex> vertices;
 		std::vector<tTriangle> triangles;
 		std::map<std::string, tMaterial *> materials;
-		std::map<std::string, tMeshPose *> custom_pose;
-		std::vector<tAnimation *> animations;
 		std::vector<tEntity *> entities;
 
 		std::set<tMaterial *> own_materials;
@@ -94,9 +83,6 @@ class tMesh
 		tMaterial *ParseMaterialNode(rapidxml::xml_node<char> *cur, std::string path);
 		void ParseTriangleNode(rapidxml::xml_node<char> *cur, tMaterialManager *material_manager);
 		void ParseMeshDataNode(rapidxml::xml_node<char> *cur, tMaterialManager *material_manager, int &current_vertex_id);
-		tMeshPose *ParsePoseNode(rapidxml::xml_node<char> *cur);
-		tAnimation *ParseAnimationNode(rapidxml::xml_node<char> *cur);
-		tKeyFrame *ParseKeyFrameNode(rapidxml::xml_node<char> *cur, tAnimation *anim);
 		tEntity *ParseEntityNode(rapidxml::xml_node<char> *cur);
 
 
@@ -125,14 +111,10 @@ class tMesh
 		int GetVertexCount(void)					{ return vertices.size(); }
 		int GetTriangleCount(void)					{ return triangles.size(); }
 		int GetMaterialCount(void)					{ return materials.size(); }
-		int GetCustomPosesCount(void)				{ return custom_pose.size(); }
-		int GetAnimationCount(void)					{ return animations.size(); }
 		int GetEntityCount(void)					{ return entities.size(); }
 
 		tVertex &GetVertex(tVertexIndex i)			{ return vertices[i]; }
 		tTriangle &GetTriangle(int i)				{ return triangles[i]; }
-		tMeshPose *GetCustomPose(std::string s) 			{ return custom_pose.at(s); }
-		tAnimation *GetAnimation(int i)				{ return animations.at(i); }
 		tEntity *GetEntity(int i)					{ return entities.at(i); }
 
 		tMaterial *GetIdleMaterial(void)			{ return idle_material; }
@@ -144,44 +126,18 @@ class tMesh
 		tVertexIndex AddVertex(tVertex v);
 		void AddTriangle(tTriangle t);
 		void AddMaterial(std::string name, tMaterial *m);
-		void AddCustomPose(std::string name, tMeshPose *p);
-		void AddAnimation(tAnimation *a);
 
 		/*void RemoveVertex(tVertex *v);
 		void RemoveTriangle(tTriangle *t);
 		void RemoveMaterial(std::string name);
-		void RemoveCustomPose(std::string name);
-		void RemoveAnimation(tAnimation *a);
 		void RemoveEntity(tEntity *e);*/
-
-		tMeshPose *GetIdlePose(void)		{ return idle_pose; }
-		tMeshPose *GetCustomPoseByName(std::string name);
-		tMeshPose *GetCurrentPose(void);
-		std::string GetCurrentPoseName(std::string idle = std::string("Idle"));
-
-		tAnimation *CreateAnimation(const char *name, float len = 1.0);
-		void ChangeAnimation(tAnimation *a);
-		void ChangeAnimation(const char *name);
-		tAnimation *GetAnimationByName(const char *name);
-		tAnimation *GetCurrentAnimation(void);
-		char *GetCurrentAnimationName(void);
-		void PlayAnimation(float t);
-		void ApplyAnimation(void);
-		void ResetAnimationFinished(void) { anim_finished = 0; };
-		void SetAnimationLoop(int l) { loop_anim = l ? 1 : 0; anim_finished = 0; };
-		int GetAnimationFinished(void) { return anim_finished; };
 
 		void GenerateBoundingBox(void);
 
 		btTriangleMesh *GeneratePhysicsMesh(void);
 		btTriangleMesh *GetPhysicsMesh(void)		{ return physics_triangle_mesh; }
 
-		tMeshPose *CreateCustomPose(std::string name);
 		tEntity *CreateEntity(std::string name, std::string group = std::string());
-
-		void ChangePose(std::string name, std::string idle = "Idle");
-		void ChangePose(tMeshPose *pos);
-		void CopyPoseFromVertices(void);
 
 		tMaterial *GetMaterialByName(std::string name);
 

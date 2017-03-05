@@ -9,7 +9,6 @@ using namespace rapidxml;
 
 tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 {
-	idle_pose = 0;
 	vao = 0;
 	physics_triangle_mesh = 0;
 	bounding_box = tBoundingBox();
@@ -18,7 +17,6 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 	refresh_ibos = true;
 
 	vao = new tVAO();
-	current_pose = idle_pose = new tMeshPose(this);
 	vertex_vbo = new tVBO<float>(3);
 	normal_vbo = new tVBO<float>(3);
 	tang_vbo = new tVBO<float>(3);
@@ -39,45 +37,22 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 	idle_material = new tDefaultMaterial();
 	material_ibos[idle_material] = new tMaterialIBO(this);
 
-	SetAnimationLoop(1);
-	ResetAnimationFinished();
-
 	if(file)
 		LoadFromFile(file, material_manager);
 }
 
 tMesh::~tMesh(void)
 {
-	//printf("  delete mesh\n");
-	delete idle_pose;
-	for(map<string, tMeshPose *>::iterator i=custom_pose.begin(); i!=custom_pose.end(); i++)
-		delete i->second;
-
-	//printf("  deleted poses\n");
-
-	for(vector<tAnimation *>::iterator i=animations.begin(); i!=animations.end(); i++)
-		delete *i;
-
-	//printf("  deleted triangles\n");
-	
 	for(set<tMaterial *>::iterator mi=own_materials.begin(); mi!=own_materials.end(); mi++)
 		delete *mi;
-
-	//printf("  deleted own materials\n");
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 		delete i->second;
 
-	//printf("  deleted material_ibos\n");
-
 	for(vector<tEntity *>::iterator i=entities.begin(); i!=entities.end(); i++)
 		delete *i;
 
-	//printf("  deleted stuff\n");
-
 	DeleteVBOData();
-
-	//printf("  deleted vbo data\n");
 
 	delete physics_triangle_mesh;
 	delete idle_material;
@@ -142,25 +117,6 @@ void tMesh::AddMaterial(string name, tMaterial *m)
 		material_ibos[m] = new tMaterialIBO(this);
 }
 
-void tMesh::AddCustomPose(string name, tMeshPose *p)
-{
-	if(custom_pose.find(name) != custom_pose.end())
-		return;
-
-	custom_pose.insert(pair<string, tMeshPose *>(name, p));
-	//refresh_vbo = true;
-}
-
-void tMesh::AddAnimation(tAnimation *a)
-{
-	vector<tAnimation *>::iterator i;
-
-	for(i=animations.begin(); i!=animations.end(); i++)
-		if(*i == a)
-			return;
-	animations.push_back(a);
-	//refresh_vbo = true;
-}
 
 /*void tMesh::RemoveVertex(tVertex *v)
 {
@@ -207,29 +163,6 @@ void tMesh::RemoveMaterial(string name)
 	}
 }
 
-void tMesh::RemoveCustomPose(string name)
-{
-	map<string, tMeshPose *>::iterator i;
-
-	i = custom_pose.find(name);
-
-	if(i != custom_pose.end())
-		custom_pose.erase(i);
-}
-
-void tMesh::RemoveAnimation(tAnimation *a)
-{
-	vector<tAnimation *>::iterator i;
-
-	for(i=animations.begin(); i!=animations.end(); i++)
-		if(*i == a)
-		{
-			animations.erase(i);
-			break;
-		}
-	//refresh_vbo = true;
-}
-
 void tMesh::RemoveEntity(tEntity *e)
 {
 	vector<tEntity *>::iterator i;
@@ -242,26 +175,6 @@ void tMesh::RemoveEntity(tEntity *e)
 		}
 }*/
 
-/*void tMesh::SetIDs(void)
-{
-	int i;
-	vector<tVertex *>::iterator v;
-	vector<tAnimation *>::iterator a;
-	tKeyFrame *f;
-	map<string, tMeshPose *>::iterator p;
-
-	i = 0;
-
-	//for(v=vertices.begin(), i=0; v!=vertices.end(); v++, i++)
-	//	SetVertexId((*v), i);
-
-	for(a=animations.begin(); a!=animations.end(); a++)
-		for(f=(*a)->key_first; f; f=f->chain_next, i++)
-			f->id = i;
-
-	for(p=custom_pose.begin(), i=0; p!=custom_pose.end(); p++)
-		p->second->id = i;
-}*/
 
 void tMesh::CalculateAllTangents()
 {
@@ -647,10 +560,6 @@ bool tMesh::LoadFromXML(xml_document<> *doc, string path, tMaterialManager *mate
 			ParseTriangleNode(cur, material_manager);
 		else if(strcmp(name, "mesh_data") == 0)
 			ParseMeshDataNode(cur, material_manager, current_vertex_id);
-		else if(strcmp(name, "pose") == 0 || strcmp(name, "position") == 0)
-			ParsePoseNode(cur);
-		else if(strcmp(name, "animation") == 0)
-			ParseAnimationNode(cur);
 		else if(strcmp(name, "entity") == 0)
 			ParseEntityNode(cur);
 
@@ -658,8 +567,6 @@ bool tMesh::LoadFromXML(xml_document<> *doc, string path, tMaterialManager *mate
 	}
 
 	CalculateAllTangents();
-
-	idle_pose->CopyFromVertices();
 
 	GenerateBoundingBox();
 	GeneratePhysicsMesh();
@@ -1259,112 +1166,6 @@ void tMesh::ParseTriangleNode(xml_node<> *cur, tMaterialManager *material_manage
 	//return t;
 }
 
-tMeshPose *tMesh::ParsePoseNode(xml_node<> *cur)
-{
-	char *name;
-	xml_node<> *child;
-	int count;
-	int i;
-	tMeshPose *r;
-
-	name = cur->first_attribute("name")->value();
-
-	child = cur->first_node("vertex");
-	count = 0;
-	while(child)
-	{
-		count++;
-		child = child->next_sibling("vertex");
-	}
-
-	tVertexIndex *vert = new tVertexIndex[count];
-	tVector *vec = new tVector[count];
-
-	for(child = cur->first_node("vertex"), i=0; child && i<count; child = child->next_sibling("vertex"))
-	{
-		vert[i] = atoi(child->first_attribute("id")->value());
-		vec[i].x = (float)atof(child->first_attribute("x")->value());
-		vec[i].y = (float)atof(child->first_attribute("y")->value());
-		vec[i].z = (float)atof(child->first_attribute("z")->value());
-
-		i++;
-	}
-
-	r = new tMeshPose(this);
-	r->CopyFromData(count, vert, vec);
-	delete [] vert;
-	delete [] vec;
-	AddCustomPose(name, r);
-	return r;
-}
-
-tAnimation *tMesh::ParseAnimationNode(xml_node<> *cur)
-{
-	char *name;
-	float len;
-	xml_node<> *child;
-	xml_attribute<> *attr;
-	tAnimation *r;
-
-	if(!(attr = cur->first_attribute("name")))
-		return 0;
-
-	name = attr->value();
-
-	if(!(attr = cur->first_attribute("len")))
-		return 0;
-	len = (float)atof(attr->value());
-
-	r = new tAnimation(this, name, len, 0);
-
-	for(child = cur->first_node("frame"); child; child = child->next_sibling("frame"))
-	{
-		ParseKeyFrameNode(child, r);
-	}
-
-	return r;
-}
-
-tKeyFrame *tMesh::ParseKeyFrameNode(xml_node<> *cur, tAnimation *anim)
-{
-	float time;
-	xml_node<> *child;
-	int count;
-	int i;
-	tKeyFrame *r;
-	xml_attribute<> *attr;
-
-	if(!(attr = cur->first_attribute("time")))
-		return 0;
-	time = (float)atof(attr->value());
-
-	child = cur->first_node("vertex");
-	count = 0;
-	while(child)
-	{
-		count++;
-		child = child->next_sibling("vertex");
-	}
-
-	tVertexIndex *vert = new tVertexIndex[count];
-	tVector *vec = new tVector[count];
-
-	for(child = cur->first_node("vertex"), i=0; child && i<count; child = child->first_node("vertex"))
-	{
-		vert[i] = atoi(child->first_attribute("id")->value());
-		vec[i].x = (float)atof(child->first_attribute("x")->value());
-		vec[i].y = (float)atof(child->first_attribute("y")->value());
-		vec[i].z = (float)atof(child->first_attribute("z")->value());
-
-		i++;
-	}
-
-	r = anim->NewKeyFrameFromData(time, count, vert, vec);
-	delete [] vert;
-	delete [] vec;
-	return r;
-}
-
 
 tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 {
@@ -1489,170 +1290,6 @@ map<string, tEntity *> tMesh::GetEntitiesInGroup(const char *group)
 }
 
 
-tMeshPose *tMesh::GetCustomPoseByName(string name)
-{
-	try
-	{
-		return custom_pose.at(name);
-	}
-	catch(...) {}
-
-	return 0;
-}
-
-tMeshPose *tMesh::CreateCustomPose(string name)
-{
-	if(GetCustomPoseByName(name))
-		return 0;
-
-	tMeshPose *p = new tMeshPose(this);
-	p->CopyFromVertices();
-	custom_pose.insert(pair<string, tMeshPose *>(name, p));
-
-	return p;
-}
-
-void tMesh::ChangePose(string name, string idle)
-{
-	tMeshPose *p;
-
-	if(name == idle)
-		current_pose = idle_pose;
-	else if((p = GetCustomPoseByName(name)) != 0)
-		current_pose = p;
-	else
-		return;
-
-	animation_mode = false;
-
-	//current_pose->ApplyPose();
-}
-
-void tMesh::ChangePose(tMeshPose *pos)
-{
-	if(pos == current_pose)
-		return;
-
-	current_pose = pos;
-
-	animation_mode = false;
-
-	//if(current_pose)
-	//	current_pose->ApplyPose();
-}
-
-tMeshPose *tMesh::GetCurrentPose(void)
-{
-	return current_pose;
-}
-
-void tMesh::CopyPoseFromVertices(void)
-{
-	if(current_pose)
-		current_pose->CopyFromVertices();
-}
-
-
-string tMesh::GetCurrentPoseName(string idle) // deprecated
-{
-	string r;
-
-	if(!current_pose)
-		return 0;
-
-	if(current_pose == idle_pose)
-		return idle;
-	else
-	{
-		map<string, tMeshPose *>::iterator i;
-		for(i=custom_pose.begin(); i!=custom_pose.end(); i++)
-		{
-			if(i->second == current_pose)
-				return i->first;
-		}
-	}
-
-	return string();
-}
-
-
-
-tAnimation *tMesh::CreateAnimation(const char *name, float len)
-{
-	if(GetAnimationByName(name))
-		return 0;
-
-	return new tAnimation(this, name, len);
-}
-
-void tMesh::ChangeAnimation(tAnimation *a)
-{
-	if(a->mesh != this)
-		return;
-
-	ResetAnimationFinished();
-	current_animation = a;
-	current_animation->SetTime(0.0);
-	animation_mode = true;
-	//RefreshAllVBOs();
-}
-
-void tMesh::ChangeAnimation(const char *name)
-{
-	tAnimation *a;
-
-	a = GetAnimationByName(name);
-
-	if(!a)
-		return;
-
-	ChangeAnimation(a);
-}
-
-tAnimation *tMesh::GetAnimationByName(const char *name)
-{
-	vector<tAnimation *>::iterator a;
-
-	for(a=animations.begin(); a!=animations.end(); a++)
-		if(strcmp(name, (*a)->GetName()) == 0)
-			return *a;
-	return 0;
-
-}
-
-tAnimation *tMesh::GetCurrentAnimation(void)
-{
-	return current_animation;
-}
-
-char *tMesh::GetCurrentAnimationName(void)
-{
-	char *r;
-	char *n;
-
-	if(!current_animation)
-		return 0;
-
-	n = current_animation->GetName();
-
-	r = new char[strlen(n) + 1];
-	strcpy(r, n);
-	return r;
-}
-
-void tMesh::PlayAnimation(float t)
-{
-	if(!current_animation)
-		return;
-	anim_finished = current_animation->Play(t, loop_anim);
-	current_animation->ApplyCurrentFrame();
-}
-
-void tMesh::ApplyAnimation(void)
-{
-	if(current_animation)
-		current_animation->ApplyCurrentFrame();
-}
 
 /*bool CompareTriangleDist(tTriangle *a, tTriangle *b)
 {
