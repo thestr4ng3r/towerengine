@@ -10,7 +10,7 @@ struct tMeshPose
 	tMesh *mesh;
 
 	//tVBO<float> *vbo;
-	std::map<tVertex *, tVector> vertices;
+	std::map<tVertexIndex, tVector> vertices;
 
 	int id; // TODO: ID (nur zum saven) wo anders speichern (am besten in maps)
 	
@@ -19,7 +19,7 @@ struct tMeshPose
 
 	void CopyFromVertices(void);
 	void Clear(void);
-	void CopyFromData(int c, int *vert, tVector *vec);
+	void CopyFromData(int c, tVertexIndex *vert, tVector *vec);
 	int Count(void);
 	void ApplyPoseToVertices(void);
 	void ApplyMixedPoseToVertices(tMeshPose *o, float mix);

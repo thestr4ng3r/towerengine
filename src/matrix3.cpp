@@ -70,7 +70,7 @@ tMatrix3 tMatrix3::FromBtMatrix(const btMatrix3x3 &matrix)
 	return tMatrix3(Vec(matrix.getRow(0)), Vec(matrix.getRow(1)), Vec(matrix.getRow(2)));
 }
 
-tMatrix3 operator*(const tMatrix3 a, const tMatrix3 b)
+tMatrix3 operator*(const tMatrix3 &a, const tMatrix3 &b)
 {
 	tMatrix3 r;
 

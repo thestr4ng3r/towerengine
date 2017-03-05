@@ -13,13 +13,9 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 	vao = 0;
 	physics_triangle_mesh = 0;
 	bounding_box = tBoundingBox();
-	//mat_indices = 0;
-	refresh_func = 0;
+
 	refresh_vbos = true;
 	refresh_ibos = true;
-	outdated_vertices.clear();
-	vertex_indices.clear();
-	entities.clear();
 
 	vao = new tVAO();
 	current_pose = idle_pose = new tMeshPose(this);
@@ -38,20 +34,16 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 	uvcoord_vbo->SetAttribute(tFaceShader::uvcoord_attribute, GL_FLOAT);
 	tVAO::UnBind();
 
-	outdated_vertices.clear();
-	data_count = 0;
-	refresh_func = 0;
 	refresh_vbos = true;
 	refresh_ibos = true;
 	idle_material = new tDefaultMaterial();
 	material_ibos[idle_material] = new tMaterialIBO(this);
-	//VAO::UnBind();
 
 	SetAnimationLoop(1);
 	ResetAnimationFinished();
 
 	if(file)
-		LoadFromFile(file);
+		LoadFromFile(file, material_manager);
 }
 
 tMesh::~tMesh(void)
@@ -66,11 +58,6 @@ tMesh::~tMesh(void)
 	for(vector<tAnimation *>::iterator i=animations.begin(); i!=animations.end(); i++)
 		delete *i;
 
-	//printf("  deleted animations\n");
-
-	for(vector<tTriangle *>::iterator i=triangles.begin(); i!=triangles.end(); i++)
-		delete *i;
-
 	//printf("  deleted triangles\n");
 	
 	for(set<tMaterial *>::iterator mi=own_materials.begin(); mi!=own_materials.end(); mi++)
@@ -82,11 +69,6 @@ tMesh::~tMesh(void)
 		delete i->second;
 
 	//printf("  deleted material_ibos\n");
-
-	for(vector<tVertex *>::iterator i=vertices.begin(); i!=vertices.end(); i++)
-		delete *i;
-
-	//printf("  deleted vertices\n");
 
 	for(vector<tEntity *>::iterator i=entities.begin(); i!=entities.end(); i++)
 		delete *i;
@@ -117,59 +99,6 @@ void tMesh::DeleteVBOData(void)
 	}
 }
 
-tVBO<float> *tMesh::CreateFloatVBO(int components)
-{
-	return new tVBO<float>(components);
-}
-
-
-tVertex *tMesh::CreateVertex(tVector v)
-{
-	tVertex *o;
-	o = new tVertex(v);
-	AddVertex(o);
-	refresh_vbos = false;
-	return o;
-}
-
-tTriangle *tMesh::CreateTriangle(tVertex *v1, tVertex *v2, tVertex *v3, tVector color, tMaterial *material)
-{
-	refresh_ibos = true;
-
-    tTriangle *t = tTriangle::CreateTriangle(v1, v2, v3, color, material);
-    AddTriangle(t);
-    return t;
-}
-
-/*tTriangle *tMesh::CreateTriangleAuto(tVector v1, tVector v2, tVector v3, tVector color, string material, tVector t1, tVector t2, tVector t3)
-{
-	tVertex *vert[3];
-	vector<tVertex *>::iterator verti;
-	int i;
-	float v[9] = {v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z};
-
-	vert[0] = vert[1] = vert[2] = 0;
-	for(i=0; i<3; i++)
-	{
-		for(verti=vertices.begin(); verti!=vertices.end(); verti++)
-			if((*verti)->pos.x == v[i*3+0] && (*verti)->pos.y == v[i*3+1] && (*verti)->pos.z == v[i*3+2])
-			{
-				vert[i] = *verti;
-				break;
-			}
-		if(!vert[i])
-			vert[i] = CreateVertex(Vec(v[i*3+0], v[i*3+1], v[i*3+2]));
-	}
-
-	refresh_ibos = true;
-
-	return CreateTriangle(vert[0], vert[1], vert[2],
-               color,			     // color
-               material,                    // material
-               t1,			    // t1
-               t2,			    // t2
-               t3);			    // t3
-}*/
 
 tEntity *tMesh::CreateEntity(string name, string group)
 {
@@ -190,54 +119,16 @@ tMaterial *tMesh::GetMaterialByName(string name)
 		return i->second;
 }
 
-tVertex *tMesh::GetVertexByID(int id)
+
+tVertexIndex tMesh::AddVertex(tVertex v)
 {
-	map<int, tVertex *>::iterator i = vertex_indices.find(id);
-	if(i != vertex_indices.end())
-		return i->second;
-
-	return 0;
-
-	/*
-	vector<CVertex *>::iterator v;
-	int i = 0;
-
-	for(v=vertices.begin(); v!=vertices.end(); v++)
-		if((*v)->id == id)
-		{
-			if(i>=w)
-				return *v;
-			else i++;
-		}
-
-	return 0;*/
-}
-
-void tMesh::SetVertexId(tVertex *v, int id)
-{
-	v->id = id;
-	vertex_indices[id] = v;
-}
-
-void tMesh::AddVertex(tVertex *v)
-{
-	vector<tVertex *>::iterator i;
-
-	for(i=vertices.begin(); i!=vertices.end(); i++)
-		if(*i == v)
-			return;
 	vertices.push_back(v);
-
 	refresh_vbos = true;
+	return (tVertexIndex)(vertices.size() - 1);
 }
 
-void tMesh::AddTriangle(tTriangle *t)
+void tMesh::AddTriangle(tTriangle t)
 {
-	vector<tTriangle *>::iterator i;
-
-	for(i=triangles.begin(); i!=triangles.end(); i++)
-		if(*i == t)
-			return;
 	triangles.push_back(t);
 	refresh_vbos = true;
 	refresh_ibos = true;
@@ -271,7 +162,7 @@ void tMesh::AddAnimation(tAnimation *a)
 	//refresh_vbo = true;
 }
 
-void tMesh::RemoveVertex(tVertex *v)
+/*void tMesh::RemoveVertex(tVertex *v)
 {
 	vector<tVertex *>::iterator i;
 
@@ -349,9 +240,9 @@ void tMesh::RemoveEntity(tEntity *e)
 			entities.erase(i);
 			break;
 		}
-}
+}*/
 
-void tMesh::SetIDs(void)
+/*void tMesh::SetIDs(void)
 {
 	int i;
 	vector<tVertex *>::iterator v;
@@ -359,8 +250,10 @@ void tMesh::SetIDs(void)
 	tKeyFrame *f;
 	map<string, tMeshPose *>::iterator p;
 
-	for(v=vertices.begin(), i=0; v!=vertices.end(); v++, i++)
-		SetVertexId((*v), i);
+	i = 0;
+
+	//for(v=vertices.begin(), i=0; v!=vertices.end(); v++, i++)
+	//	SetVertexId((*v), i);
 
 	for(a=animations.begin(); a!=animations.end(); a++)
 		for(f=(*a)->key_first; f; f=f->chain_next, i++)
@@ -368,41 +261,64 @@ void tMesh::SetIDs(void)
 
 	for(p=custom_pose.begin(), i=0; p!=custom_pose.end(); p++)
 		p->second->id = i;
-}
-
-/*void tMesh::SetTriangleMaterials(void)
-{
-    vector<tTriangle *>::iterator t;
-
-    for(t=triangles.begin(); t!=triangles.end(); t++)
-        (*t)->mat = GetMaterialByName((*t)->m_name);
-
-	//refresh_vbo = true;
 }*/
 
-void tMesh::AssignVertexArrayPositions(void)
+void tMesh::CalculateAllTangents()
 {
-	vector<tVertex *>::iterator i;
-	int c;
+	for(vector<tTriangle>::iterator i=triangles.begin(); i!=triangles.end(); i++)
+		CalculateTangents(*i);
+}
 
-	for(c=0, i=vertices.begin(); i!=vertices.end(); c++, i++)
-		(*i)->index = c;
+void tMesh::CalculateTangents(const tTriangle &t)
+{
+	tVertex &vert0 = vertices[t.v[0]];
+	tVertex &vert1 = vertices[t.v[1]];
+	tVertex &vert2 = vertices[t.v[2]];
 
-	refresh_vbos = true;
+	tVector edge1 = vert1.pos - vert0.pos;
+	tVector edge2 = vert2.pos - vert0.pos;
+	tVector2 uv_edge1 = vert1.uv - vert0.uv;
+	tVector2 uv_edge2 = vert2.uv - vert0.uv;
+
+	float r = uv_edge1.x * uv_edge2.y - uv_edge2.x * uv_edge1.y;
+
+	tVector tang, bitang;
+	if(r != 0.0)
+	{
+		r = 1.0f / r;
+
+		tang = Vec(	uv_edge2.y * edge1.x - uv_edge1.y * edge2.x,
+					   uv_edge2.y * edge1.y - uv_edge1.y * edge2.y,
+					   uv_edge2.y * edge1.z - uv_edge1.y * edge2.z) * r;
+		bitang = Vec(	uv_edge1.x * edge2.x - uv_edge2.x * edge1.x,
+						 uv_edge1.x * edge2.y - uv_edge2.x * edge1.y,
+						 uv_edge1.x * edge2.z - uv_edge2.x * edge1.z) * r;
+	}
+	else
+	{
+		tang = edge1;
+		bitang = edge2;
+	}
+
+	tang.Normalize();
+	bitang.Normalize();
+
+	vert0.tang = vert1.tang = vert2.tang = tang;
+	vert0.bitang = vert1.bitang = vert2.bitang = bitang;
 }
 
 void tMesh::GenerateBoundingBox(void)
 {
-	vector<tVertex *>::iterator i;
+	vector<tVertex>::iterator i;
 	bounding_box = tBoundingBox();
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
-		bounding_box.AddPoint((*i)->pos);
+		bounding_box.AddPoint((*i).pos);
 }
 
 btTriangleMesh *tMesh::GeneratePhysicsMesh(void)
 {
-	vector<tTriangle *>::iterator i;
+	vector<tTriangle>::iterator i;
 
 	//if(physics_triangle_mesh)
 	delete physics_triangle_mesh;
@@ -414,7 +330,9 @@ btTriangleMesh *tMesh::GeneratePhysicsMesh(void)
 		physics_triangle_mesh = new btTriangleMesh();
 
 		for(i=triangles.begin(); i!=triangles.end(); i++)
-			physics_triangle_mesh->addTriangle(BtVec((*i)->v[0]->pos), BtVec((*i)->v[1]->pos), BtVec((*i)->v[2]->pos));
+			physics_triangle_mesh->addTriangle(BtVec(vertices[(*i).v[0]].pos),
+											   BtVec(vertices[(*i).v[1]].pos),
+											   BtVec(vertices[(*i).v[2]].pos));
 	}
 
 	return physics_triangle_mesh;
@@ -423,15 +341,7 @@ btTriangleMesh *tMesh::GeneratePhysicsMesh(void)
 
 void tMesh::RefreshAllVBOs(void)
 {
-	vector<tTriangle *>::iterator i;
-	//vector<tMaterial *>::iterator m;
-	vector<tVertex *>::iterator v;
-	tVertex *vt;
-	int d;
-
-	AssignVertexArrayPositions();
-
-	data_count = GetVertexCount();
+	int data_count = GetVertexCount();
 	vertex_vbo->SetSize(data_count);
 	normal_vbo->SetSize(data_count);
 	tang_vbo->SetSize(data_count);
@@ -446,17 +356,17 @@ void tMesh::RefreshAllVBOs(void)
 	float *face_normal_data = face_normal_vbo->GetData();
 	float *uvcoord_data = uvcoord_vbo->GetData();
 
-	for(v=vertices.begin(); v!=vertices.end(); v++)
+	for(int i=0; i<vertices.size(); i++)
 	{
-		vt = *v;
-		d = vt->index * 3;
-		memcpy(vertex_data + d, vt->pos.v, 3 * sizeof(float));
-		memcpy(normal_data + d, vt->normal.v, 3 * sizeof(float));
-		memcpy(tang_data + d, vt->tang.v, 3 * sizeof(float));
-		memcpy(bitang_data + d, vt->bitang.v, 3 * sizeof(float));
-		memcpy(face_normal_data + d, vt->normal.v, 3 * sizeof(float));
-		memcpy(uvcoord_data + vt->index*2, vt->uv.v, 2 * sizeof(float));
-
+		tVertex &v = vertices[i];
+		int d = i*3;
+		//d = vt.index * 3;
+		memcpy(vertex_data + d, v.pos.v, 3 * sizeof(float));
+		memcpy(normal_data + d, v.normal.v, 3 * sizeof(float));
+		memcpy(tang_data + d, v.tang.v, 3 * sizeof(float));
+		memcpy(bitang_data + d, v.bitang.v, 3 * sizeof(float));
+		memcpy(face_normal_data + d, v.normal.v, 3 * sizeof(float));
+		memcpy(uvcoord_data + i*2, v.uv.v, 2 * sizeof(float));
 	}
 
 	vertex_vbo->AssignData();
@@ -471,9 +381,7 @@ void tMesh::RefreshAllVBOs(void)
 
 void tMesh::RefreshIBOs(void)
 {
-	vector<tTriangle *>::iterator i;
-	map<tMaterial *, tMaterialIBO *>::iterator m;
-	tTriangle *t;
+	vector<tTriangle>::iterator i;
 	tMaterial *mt;
 	tMaterialIBO *mibo;
 	int c;
@@ -481,18 +389,18 @@ void tMesh::RefreshIBOs(void)
 
 	SortMaterials();
 
-	for(m=material_ibos.begin(); m!=material_ibos.end(); m++)
+	for(map<tMaterial *, tMaterialIBO *>::iterator m=material_ibos.begin(); m!=material_ibos.end(); m++)
 		m->second->triangle_count = m->second->triangle_i = 0;
 
 	for(i=triangles.begin(); i!=triangles.end(); i++)
 	{
-		mt = (*i)->mat;
+		mt = (*i).mat;
 		if(!mt)
 			mt = GetIdleMaterial();
 		material_ibos[mt]->triangle_count++;
 	}
 
-	for(m=material_ibos.begin(); m!=material_ibos.end(); m++)
+	for(map<tMaterial *, tMaterialIBO *>::iterator m=material_ibos.begin(); m!=material_ibos.end(); m++)
 	{
 		mibo = m->second;
 		mibo->ibo->SetSize(mibo->triangle_count * 3);
@@ -501,18 +409,20 @@ void tMesh::RefreshIBOs(void)
 
 	for(i=triangles.begin(), c=0; i!=triangles.end(); i++, c++)
 	{
-		t = *i;
-		mt = (*i)->mat;
+		tTriangle &t = *i;
+		mt = t.mat;
 		if(!mt)
 			mt = GetIdleMaterial();
 		mibo = material_ibos[mt];
 
 		for(j=0; j<3; j++)
-			mibo->ibo_data[mibo->triangle_i*3 + j] = t->v[j]->index;
+		{
+			mibo->ibo_data[mibo->triangle_i * 3 + j] = t.v[j];
+		}
 		mibo->triangle_i++;
 	}
 
-	for(m=material_ibos.begin(); m!=material_ibos.end(); m++)
+	for(map<tMaterial *, tMaterialIBO *>::iterator m=material_ibos.begin(); m!=material_ibos.end(); m++)
 		m->second->ibo->AssignData();
 
 	refresh_ibos = false;
@@ -641,10 +551,6 @@ bool tMesh::LoadFromFile(const char *file, tMaterialManager *material_manager)
 {
 	bool r;
 	string path;
-	//struct stat s;
-	
-	//if(stat(file, &s) != 0 && errno == ENOENT)
-	//    return 0;
 	
 	path = PathOfFile(string(file));
 
@@ -709,27 +615,23 @@ bool tMesh::LoadFromXML(xml_document<> *doc, string path, tMaterialManager *mate
 	attr = cur->first_attribute("version");
 	if(!attr)
 	{
-		printf("WARNING: File does not contain version info. Assuming it is %s.\n", TEM_CURRENT_VERSION_STRING);
-		file_version = TEM_CURRENT_VERSION;
+		printf("WARNING: File does not contain version info.\n");
 	}
 	else
 	{
-		file_version = TEMVersionFromString(attr->value());
+		int file_version = TEMVersionFromString(attr->value());
 		if(file_version == -1)
 		{
-			printf("WARNING: Version of mesh file could not be recognized. Assuming it is %s.\n", TEM_CURRENT_VERSION_STRING);
-			file_version = TEM_CURRENT_VERSION;
+			printf("WARNING: Version of mesh file could not be recognized.\n");
 		}
 		else if(file_version != TEM_CURRENT_VERSION)
 		{
 			printf("WARNING: Version of mesh file of is outdated. Only %s is supported\n", TEM_CURRENT_VERSION_STRING);
-			return false;
 		}
 	}
 
 	cur = cur->first_node();
 
-	//printf("Path xml \"%s\"\n", path);
 
 	int current_vertex_id = 0;
 
@@ -755,6 +657,7 @@ bool tMesh::LoadFromXML(xml_document<> *doc, string path, tMaterialManager *mate
 		cur = cur->next_sibling();
 	}
 
+	CalculateAllTangents();
 
 	idle_pose->CopyFromVertices();
 
@@ -767,7 +670,7 @@ bool tMesh::LoadFromXML(xml_document<> *doc, string path, tMaterialManager *mate
 	return 1;
 }
 
-tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
+tVertexIndex tMesh::ParseVertexNode(xml_node<> *cur)
 {
 	int id;
 	tVector p;
@@ -777,7 +680,6 @@ tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 
 	// TODO: check if attributes really are found
 
-	id = atoi(cur->first_attribute("id")->value());
 	p.x = (float)atof(cur->first_attribute("x")->value());
 	p.y = (float)atof(cur->first_attribute("y")->value());
 	p.z = (float)atof(cur->first_attribute("z")->value());
@@ -788,13 +690,12 @@ tVertex *tMesh::ParseVertexNode(xml_node<> *cur)
 	normal.y = (float)atof(cur->first_attribute("ny")->value());
 	normal.z = (float)atof(cur->first_attribute("nz")->value());
 
-	r = new tVertex(p);
-	AddVertex(r);
-	SetVertexId(r, id);
-	//r->uv_set = file_version >= TEM_VERSION_0_2;
-	r->uv = uv;
-	r->normal = normal;
-	return r;
+
+	tVertex v;
+	v.pos = p;
+	v.uv = uv;
+	v.normal = normal;
+	return AddVertex(v);
 }
 
 
@@ -1228,9 +1129,7 @@ void tMesh::ParseMeshDataNode(xml_node<> *cur, tMaterialManager *material_manage
 						tVector p;
 						tVector normal;
 						tVector2 uv;
-						tVertex *r;
 
-						int id = current_vertex_id;
 						current_vertex_id++;
 						p.x = (float)atof(values[1]);
 						p.y = (float)atof(values[2]);
@@ -1242,12 +1141,11 @@ void tMesh::ParseMeshDataNode(xml_node<> *cur, tMaterialManager *material_manage
 						normal.y = (float)atof(values[7]);
 						normal.z = (float)atof(values[8]);
 
-						r = new tVertex(p);
-						AddVertex(r);
-						SetVertexId(r, id);
-						//r->uv_set = file_version >= TEM_VERSION_0_2;
-						r->uv = uv;
-						r->normal = normal;
+						tVertex v;
+						v.pos = p;
+						v.uv = uv;
+						v.normal = normal;
+						AddVertex(v);
 					}
 				}
 				else if(strcmp(values[0], "t") == 0)
@@ -1274,7 +1172,13 @@ void tMesh::ParseMeshDataNode(xml_node<> *cur, tMaterialManager *material_manage
 						if(!mat)
 							mat = GetIdleMaterial();
 
-						CreateTriangle(GetVertexByID(atoi(values[1])), GetVertexByID(atoi(values[2])), GetVertexByID(atoi(values[3])), Vec(1.0, 1.0, 1.0), mat);
+						//CreateTriangle(GetVertexByID(atoi(values[1])), GetVertexByID(atoi(values[2])), GetVertexByID(atoi(values[3])), Vec(1.0, 1.0, 1.0), mat);
+						tTriangle t;
+						t.v[0] = (tVertexIndex)atoi(values[1]);
+						t.v[1] = (tVertexIndex)atoi(values[2]);
+						t.v[2] = (tVertexIndex)atoi(values[3]);
+						t.mat = mat;
+						AddTriangle(t);
 					}
 				}
 			}
@@ -1298,13 +1202,13 @@ void tMesh::ParseMeshDataNode(xml_node<> *cur, tMaterialManager *material_manage
 }
 
 
-tTriangle *tMesh::ParseTriangleNode(xml_node<> *cur, tMaterialManager *material_manager)
+void tMesh::ParseTriangleNode(xml_node<> *cur, tMaterialManager *material_manager)
 {
 	string mat_name;
-	int v[3];
+	tVertexIndex v[3];
 	int i;
-	tVertex *vt[3];
-	tTriangle *r;
+	//tVertex *vt[3];
+	//tTriangle *r;
 	xml_node<> *child;
 	xml_attribute<> *attr;
 
@@ -1319,14 +1223,13 @@ tTriangle *tMesh::ParseTriangleNode(xml_node<> *cur, tMaterialManager *material_
 		if(!attr)
 			continue;
 
-		v[i] = atoi(attr->value());
-		vt[i] = GetVertexByID(v[i]);
+		v[i] = (tVertexIndex)atoi(attr->value());
 
 		i++;
 	}
 
 	if(i<2) // less than 3 vertices
-		return 0;
+		return; // 0;
 
 	tMaterial *mat = 0;
 	map<string, tMaterial *>::iterator mi = materials.find(mat_name);
@@ -1347,8 +1250,13 @@ tTriangle *tMesh::ParseTriangleNode(xml_node<> *cur, tMaterialManager *material_
 	if(!mat)
 		mat = GetIdleMaterial();
 
-	r = CreateTriangle(vt[0], vt[1], vt[2], Vec(1.0, 1.0, 1.0), mat);
-	return r;
+	tTriangle t;
+	t.v[0] = v[0];
+	t.v[1] = v[1];
+	t.v[2] = v[2];
+	t.mat = mat;
+	AddTriangle(t);
+	//return t;
 }
 
 tMeshPose *tMesh::ParsePoseNode(xml_node<> *cur)
@@ -1357,8 +1265,6 @@ tMeshPose *tMesh::ParsePoseNode(xml_node<> *cur)
 	xml_node<> *child;
 	int count;
 	int i;
-	int *vert;
-	tVector *vec;
 	tMeshPose *r;
 
 	name = cur->first_attribute("name")->value();
@@ -1371,8 +1277,8 @@ tMeshPose *tMesh::ParsePoseNode(xml_node<> *cur)
 		child = child->next_sibling("vertex");
 	}
 
-	vert = new int[count];
-	vec = new tVector[count];
+	tVertexIndex *vert = new tVertexIndex[count];
+	tVector *vec = new tVector[count];
 
 	for(child = cur->first_node("vertex"), i=0; child && i<count; child = child->next_sibling("vertex"))
 	{
@@ -1386,6 +1292,8 @@ tMeshPose *tMesh::ParsePoseNode(xml_node<> *cur)
 
 	r = new tMeshPose(this);
 	r->CopyFromData(count, vert, vec);
+	delete [] vert;
+	delete [] vec;
 	AddCustomPose(name, r);
 	return r;
 }
@@ -1423,8 +1331,6 @@ tKeyFrame *tMesh::ParseKeyFrameNode(xml_node<> *cur, tAnimation *anim)
 	xml_node<> *child;
 	int count;
 	int i;
-	int *vert;
-	tVector *vec;
 	tKeyFrame *r;
 	xml_attribute<> *attr;
 
@@ -1440,8 +1346,8 @@ tKeyFrame *tMesh::ParseKeyFrameNode(xml_node<> *cur, tAnimation *anim)
 		child = child->next_sibling("vertex");
 	}
 
-	vert = new int[count];
-	vec = new tVector[count];
+	tVertexIndex *vert = new tVertexIndex[count];
+	tVector *vec = new tVector[count];
 
 	for(child = cur->first_node("vertex"), i=0; child && i<count; child = child->first_node("vertex"))
 	{
@@ -1454,6 +1360,8 @@ tKeyFrame *tMesh::ParseKeyFrameNode(xml_node<> *cur, tAnimation *anim)
 	}
 
 	r = anim->NewKeyFrameFromData(time, count, vert, vec);
+	delete [] vert;
+	delete [] vec;
 	return r;
 }
 
@@ -1746,10 +1654,10 @@ void tMesh::ApplyAnimation(void)
 		current_animation->ApplyCurrentFrame();
 }
 
-bool CompareTriangleDist(tTriangle *a, tTriangle *b)
+/*bool CompareTriangleDist(tTriangle *a, tTriangle *b)
 {
 	return a->cam_dist > b->cam_dist;
-}
+}*/
 
 /*bool CompareTriangleMaterial(tTriangle *a, tTriangle *b)
 {

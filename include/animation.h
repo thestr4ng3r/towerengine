@@ -25,7 +25,7 @@ class tAnimation
 		void SetName(const char *name);
 
 		tKeyFrame *NewKeyFrame(float time);
-		tKeyFrame *NewKeyFrameFromData(float time, int c, int *vert, tVector *vec);
+		tKeyFrame *NewKeyFrameFromData(float time, int c, tVertexIndex *vert, tVector *vec);
 
 		void GetKeyframePair(tKeyFrame **a, tKeyFrame **b, float *mix);
 

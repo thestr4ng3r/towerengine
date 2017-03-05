@@ -97,7 +97,7 @@ tKeyFrame *tAnimation::NewKeyFrame(float time)
 	return new tKeyFrame(this, time);
 }
 
-tKeyFrame *tAnimation::NewKeyFrameFromData(float time, int c, int *vert, tVector *vec)
+tKeyFrame *tAnimation::NewKeyFrameFromData(float time, int c, tVertexIndex *vert, tVector *vec)
 {
 	tKeyFrame *f;
 
@@ -224,12 +224,12 @@ tKeyFrame::~tKeyFrame(void)
 tKeyFrame *tKeyFrame::Copy(tAnimation *a)
 {
 	tKeyFrame *r;
-	map<tVertex *, tVector>::iterator i;
+	map<tVertexIndex, tVector>::iterator i;
 
 	r = new tKeyFrame(a, time);
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
-		r->vertices.insert(pair<tVertex *, tVector>(i->first, i->second));
+		r->vertices.insert(pair<tVertexIndex, tVector>(i->first, i->second));
 
 	return r;
 

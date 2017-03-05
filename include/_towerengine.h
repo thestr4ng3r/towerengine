@@ -58,8 +58,6 @@ class t2DRenderer;
 #include "particle_shader.h"
 
 #include "skybox.h"
-#include "vertex.h"
-#include "triangle.h"
 #include "material.h"
 #include "simple_forward_material.h"
 #include "refraction_material.h"

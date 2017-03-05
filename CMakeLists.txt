@@ -102,12 +102,10 @@ set(TOWERENGINE_SRC
 	src/meshobject.cpp 
 	src/object.cpp
 	src/pose.cpp
-	src/shader.cpp 
-	src/triangle.cpp 
+	src/shader.cpp
 	src/utils.cpp 
 	src/vector2.cpp 
-	src/vector.cpp 
-	src/vertex.cpp 
+	src/vector.cpp
 	src/renderspace.cpp
 	src/gbuffer.cpp
 	src/world.cpp
