@@ -1,37 +1,14 @@
-%module towerengine_python
+%module towerengine
 %{
+#define SWIG_FILE_WITH_INIT
+#include "includes.h"
 #include "towerengine.h"
 %}
 
 typedef unsigned int GLuint;
 
-struct tVector
-{
-	float x;
-	float y;
-	float z;
-};
-
-inline tVector Vec(float x, float y, float z)
-{
-	tVector v;
-
-	v.x = x;
-	v.y = y;
-	v.z = z;
-
-	return v;
-}
-
-
-struct tVector2
-{
-	float x;
-	float y;
-};
-
-
-#define _VECTOR_H
-#define _VECTOR2_H
+#include "vector2_swig.h"
+#include "vector_swig.h"
+#include "matrix3_swig.h"
 
 #include "_towerengine.h"

@@ -39,6 +39,8 @@ struct tTriangle
 {
 	tVertexIndex v[3];
 	tMaterial *mat;
+
+	void SetVertices(tVertexIndex a, tVertexIndex b, tVertexIndex c) { v[0] = a; v[1] = b; v[2] = c; }
 };
 
 class tMesh
@@ -91,7 +93,6 @@ class tMesh
 		static tSimpleForwardMaterial *ParseXMLSimpleForwardMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 		static tRefractionMaterial *ParseXMLRefractionMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 
-		void CalculateAllTangents();
 		void CalculateTangents(const tTriangle &t);
 
 	public:
@@ -126,6 +127,8 @@ class tMesh
 		tVertexIndex AddVertex(tVertex v);
 		void AddTriangle(tTriangle t);
 		void AddMaterial(std::string name, tMaterial *m);
+
+		void CalculateAllTangents();
 
 		/*void RemoveVertex(tVertex *v);
 		void RemoveTriangle(tTriangle *t);

@@ -2,8 +2,25 @@
 import bpy
 from bgl import *
 from mathutils import *
-from ._towerengine_python import *
-#import OpenGL.GL
+from .towerengine import *
+from .mesh_converter import MeshConverter
+
+
+
+def vec_te(blender_vec):
+	return Vec(blender_vec.x, blender_vec.z, -blender_vec.y)
+
+def vec2_te(blender_vec2):
+	return Vec(blender_vec2.x, blender_vec2.y)
+
+def vec_bl(te_vec):
+	return Vector((te_vec.x, -te_vec.z, te_vec.y))
+
+def te_vec2(x, y):
+	v = tVector2()
+	v.x = x
+	v.y = y
+	return v
 
 
 class TowerEngineContext:
@@ -14,25 +31,58 @@ class TowerEngineContext:
 			print("Failed to initialize Tower Engine.")
 			return
 
-		self.world = new_tWorld()
-		self.renderer = new_tDefaultRenderer(width, height, self.world)
-		self.camera = tDefaultRenderer_GetCamera(self.renderer)
+		self.world = tWorld()
+		self.renderer = tDefaultRenderer(width, height, self.world)
+		self.camera = self.renderer.GetCamera()
 
-		tCamera_SetPosition(self.camera, Vec(3.0, 3.0, 3.0))
-		tCamera_SetDirection(self.camera, Vec(-1.0, -1.0, -1.0))
+		#tWorld_SetAmbientColor(self.world, Vec(1.0, 1.0, 1.0))
 
-		self.coordinate_system_object = new_tCoordinateSystemObject()
-		tWorld_AddObject(self.world, self.coordinate_system_object)
+		self.camera.SetPosition(Vec(3.0, 3.0, 3.0))
+		self.camera.SetDirection(Vec(-1.0, -1.0, -1.0))
 
-		self.skybox = new_tSkyBox()
-		tWorld_SetSkyBox(self.world, self.skybox)
+		self.coordinate_system_object = tCoordinateSystemObject()
+		self.world.AddObject(self.coordinate_system_object)
+
+		self.skybox = tSkyBox()
+		self.world.SetSkyBox(self.skybox)
 
 		self.objects = {}
 		self.meshes = {}
 
 
 	def convert_mesh(self, mesh):
-		return None
+		converter = TowerEngineMeshConverter()
+		converter.add_mesh(mesh)
+		converter.execute()
+		tmesh = converter.tmesh
+		tmesh.CalculateAllTangents()
+		tmesh.GenerateBoundingBox()
+		return tmesh
+
+
+class TowerEngineMeshConverter(MeshConverter):
+	def __init__(self):
+		super().__init__()
+
+		self.tmesh = tMesh()
+		self.tmesh.thisown = 0
+
+	def _add_material(self, material):
+		return
+
+	def _add_vertex(self, vertex, uv, normal):
+		tvertex = tVertex()
+		tvertex.pos = vec_te(vertex.co)
+		tvertex.normal = vec_te(vertex.co)
+		tvertex.uv = te_vec2(0.0, 0.0)#vec2_te(v.uv))
+		self.tmesh.AddVertex(tvertex)
+
+	def _add_triangle(self, vertices, material):
+		ttriangle = tTriangle()
+		# TODO: get material
+		ttriangle.mat = self.tmesh.GetIdleMaterial()
+		ttriangle.SetVertices(vertices[0], vertices[1], vertices[2])
+		self.tmesh.AddTriangle(ttriangle)
 
 
 te_context = None
@@ -46,52 +96,52 @@ def update(render_engine, context):
 	if not te_context:
 		te_context = TowerEngineContext(region.width, region.height)
 
-	#tWorld_ClearObjects(te_context.world)
+	te_context.world.ClearObjects()
+	te_context.world.ClearPointLights()
 
-	#for o in context.scene.objects:
-	#	if o.type == "MESH":
-	#		mesh = o.mesh
+	te_context.world.AddObject(te_context.coordinate_system_object)
 
-
-
-
-
-
-	# cubemap_tex = None
-	# for texture_slot in context.scene.world.texture_slots.values():
-	# 	if texture_slot is None:
-	# 		continue
-	#
-	# 	tex = texture_slot.texture
-	#
-	# 	if tex.type != "ENVIRONMENT_MAP":
-	# 		continue
-	#
-	# 	if tex.image is None:
-	# 		continue
-	#
-	# 	if texture_slot.use_map_horizon:
-	# 		cubemap_tex = tex
-	#
-	# if cubemap_tex is not None:
-	# 	cubemap_tex.image.gl_load()
-	# 	cubemap_gl = LoadGLCubeMap(cubemap_tex.image.filepath_from_user())
-	# 	tSkyBox_SetCubeMap(te_context.skybox, cubemap_gl)
-	# else:
-	# 	tSkyBox_SetCubeMap(te_context.skybox, 0)
+	for o in context.scene.objects:
+		if o.type == "MESH":
+			tmesh = te_context.convert_mesh(o.to_mesh(context.scene, True, "PREVIEW"))
+			tmeshobject = tMeshObject(tmesh)
+			tmeshobject.thisown = 0
+			te_context.world.AddObject(tmeshobject)
+		elif o.type == "LAMP":
+			tlight = tPointLight(vec_te(o.location), Vec(1.0, 1.0, 1.0), 100.0)
+			tlight.thisown = 0
+			te_context.world.AddPointLight(tlight)
 
 
 
-def vec_te(blender_vec):
-	#v = new_tVector()
-	#tVector_x_set(v, blender_vec.x)
-	#tVector_y_set(v, blender_vec.z)
-	#tVector_z_set(v, -blender_vec.y)
-	#return v
-	return Vec(blender_vec.x, blender_vec.z, -blender_vec.y)
 
-def vec_bl(te_vec):
-	return Vector((te_vec.x, -te_vec.z, te_vec.y))
+
+
+
+	cubemap_tex = None
+	for texture_slot in context.scene.world.texture_slots.values():
+		if texture_slot is None:
+			continue
+
+		tex = texture_slot.texture
+
+		if tex.type != "ENVIRONMENT_MAP":
+			continue
+
+		if tex.image is None:
+			continue
+
+		if texture_slot.use_map_horizon:
+			cubemap_tex = tex
+
+	if cubemap_tex is not None and te_context.skybox.GetCubeMap() == 0:
+		cubemap_tex.image.gl_load()
+		cubemap_gl = LoadGLCubeMap(cubemap_tex.image.filepath_from_user())
+		te_context.skybox.SetCubeMap(cubemap_gl)
+	#else:
+	#	te_context.skybox.SetCubeMap(0)
+
+
 
 
 def render(render_engine, context):
@@ -104,13 +154,14 @@ def render(render_engine, context):
 	width = region.width
 	height = region.height
 
-	print("width: " + str(width) + ", height: " + str(height))
+	#print("width: " + str(width) + ", height: " + str(height))
 
-	tDefaultRenderer_ChangeSize(te_context.renderer, width, height)
+	te_context.renderer.ChangeSize(width, height)
 
 	angle = space.lens
 	aspect = float(width) / float(height)
-	tCamera_SetFOVVerticalAngle(te_context.camera, angle, aspect)
+	angle = 49.5
+	te_context.camera.SetFOVVerticalAngle(angle, aspect)
 
 	view_matrix = region3d.view_matrix
 	view_matrix_inv = view_matrix.inverted()
@@ -119,10 +170,10 @@ def render(render_engine, context):
 	cam_dir = region3d.view_location - cam_pos
 
 	cam_pos_te = vec_te(cam_pos)
-	tCamera_SetPosition(te_context.camera, cam_pos_te)
+	te_context.camera.SetPosition(cam_pos_te)
 
 	cam_dir_te = vec_te(cam_dir)
-	tCamera_SetDirection(te_context.camera, cam_dir_te)
+	te_context.camera.SetDirection(cam_dir_te)
 
 
 
@@ -141,7 +192,7 @@ def render(render_engine, context):
 	#glLoadIdentity()
 
 
-	tDefaultRenderer_Render(te_context.renderer, 0, int(region.x), int(region.y), int(width), int(height))
+	te_context.renderer.Render(0, int(region.x), int(region.y), int(width), int(height))
 
 
 	#OpenGL.GL.glBindFramebuffer(OpenGL.GL.GL_FRAMEBUFFER, 0)

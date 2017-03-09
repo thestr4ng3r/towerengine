@@ -8,7 +8,7 @@ set(INCLUDE_INSTALL_DIR include/towerengine)
 set(LIB_INSTALL_DIR lib)
 
 
-
+set(CMAKE_CXX_STANDARD 11)
 #set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -102,7 +102,7 @@ set(TOWERENGINE_SRC
 	src/object.cpp
 	src/shader.cpp
 	src/utils.cpp 
-	src/vector2.cpp 
+	src/vector2.cpp
 	src/vector.cpp
 	src/renderspace.cpp
 	src/gbuffer.cpp

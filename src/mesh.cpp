@@ -35,6 +35,7 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 	refresh_vbos = true;
 	refresh_ibos = true;
 	idle_material = new tDefaultMaterial();
+	((tDefaultMaterial *)idle_material)->UpdateUniformBuffer();
 	material_ibos[idle_material] = new tMaterialIBO(this);
 
 	if(file)
@@ -77,9 +78,7 @@ void tMesh::DeleteVBOData(void)
 
 tEntity *tMesh::CreateEntity(string name, string group)
 {
-	tEntity *e = new tEntity();
-	e->name = name;
-	e->group = group;
+	tEntity *e = new tEntity(name, group);
 	entities.push_back(e);
 	return e;
 }
@@ -273,6 +272,7 @@ void tMesh::RefreshAllVBOs(void)
 	{
 		tVertex &v = vertices[i];
 		int d = i*3;
+
 		//d = vt.index * 3;
 		memcpy(vertex_data + d, v.pos.v, 3 * sizeof(float));
 		memcpy(normal_data + d, v.normal.v, 3 * sizeof(float));
@@ -373,6 +373,7 @@ void tMesh::GeometryPass(tRenderer *renderer, map<tMaterial *, tMaterial *> *rep
 {
 	if(refresh_vbos)
 		RefreshAllVBOs();
+
 
 	vao->Bind();
 
@@ -1169,7 +1170,6 @@ void tMesh::ParseTriangleNode(xml_node<> *cur, tMaterialManager *material_manage
 
 tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 {
-	tEntity *e = new tEntity();
 	tEntityAttribute *a;
 	xml_node<> *cur;
 	xml_attribute<> *attr;
@@ -1179,25 +1179,26 @@ tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 	if(!(attr = root->first_attribute("name")))
 		return 0;
 
-	e->name = string(attr->value());
-	if(e->name.length() == 0)
-	{
-		delete e;
+	string name = string(attr->value());
+	if(name.length() == 0)
 		return 0;
-	}
 
+	string group;
 	if((attr = root->first_attribute("group")))
-		e->group = string(attr->value());
+		group = string(attr->value());
+
+	tEntity *e = new tEntity(name, group);
 
 	for(cur=root->first_node(); cur; cur=cur->next_sibling())
 	{
 		a_type = string(cur->name());
 
-		a = new tEntityAttribute();
+		tEntityAttribute a;
+		memset(&a, 0, sizeof(a));
 
 		if(a_type.compare("vec3") == 0)
 		{
-			a->type = tEntityAttribute::VECTOR;
+			a.type = tEntityAttribute::VECTOR;
 
 			tVector v;
 
@@ -1208,11 +1209,11 @@ tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 			if((attr = cur->first_attribute("z")))
 				v.z = (float)atof(attr->value());
 
-			a->vec_v = v;
+			a.vec_v = v;
 		}
 		else if(a_type.compare("vec2") == 0)
 		{
-			a->type = tEntityAttribute::VECTOR2;
+			a.type = tEntityAttribute::VECTOR2;
 
 			tVector2 v;
 
@@ -1221,44 +1222,43 @@ tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 			if((attr = cur->first_attribute("y")))
 				v.y = (float)atof(attr->value());
 
-			a->vec2_v = v;
+			a.vec2_v = v;
 		}
 		else if(a_type.compare("float") == 0)
 		{
-			a->type = tEntityAttribute::FLOAT;
+			a.type = tEntityAttribute::FLOAT;
 
 			float v = 0.0;
 
 			if((attr = cur->first_attribute("v")))
 				v = (float)atof(attr->value());
 
-			a->float_v = v;
+			a.float_v = v;
 		}
 		else if(a_type.compare("int") == 0)
 		{
-			a->type = tEntityAttribute::INT;
+			a.type = tEntityAttribute::INT;
 
 			int v = 0;
 
 			if((attr = cur->first_attribute("v")))
 				v = atoi(attr->value());
 
-			a->int_v = v;
+			a.int_v = v;
 		}
 		else if(a_type.compare("string") == 0)
 		{
-			a->type = tEntityAttribute::STRING;
+			a.type = tEntityAttribute::STRING;
 
 			string v;
 
 			if((attr = cur->first_attribute("v")))
 				v = string(attr->value());
 
-			a->string_v = v;
+			a.string_v = v;
 		}
 		else
 		{
-			delete a;
 			continue;
 		}
 
@@ -1266,8 +1266,7 @@ tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 			continue;
 
 		a_name = string(attr->value());
-
-		e->attributes.insert(pair<string, tEntityAttribute *>(a_name, a));
+		e->SetAttribute(a_name, a);
 	}
 
 	entities.push_back(e);
@@ -1283,8 +1282,8 @@ map<string, tEntity *> tMesh::GetEntitiesInGroup(const char *group)
 	vector<tEntity *>::iterator i;
 
 	for(i=entities.begin(); i!=entities.end(); i++)
-		if((*i)->group.compare(group) == 0)
-			r.insert(pair<string, tEntity *>((*i)->name, *i));
+		if((*i)->GetGroup().compare(group) == 0)
+			r.insert(pair<string, tEntity *>((*i)->GetName(), *i));
 
 	return r;
 }
