@@ -72,8 +72,8 @@ void main(void)
 	if(fxaa_enabled_uni)
 		color = FXAA(src_color.rgb);
 	else
-		color = src_color.rgb;	
-		
+		color = src_color.rgb;
+
 	
 	color_out = vec4(color, src_color.a);
 }

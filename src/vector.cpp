@@ -1,16 +1,6 @@
 #include "towerengine.h"
 
 
-/* gegeben ist eine Ebene durch den Normalvektor n und den Abstand zum Ursprung d
-   SetFromPlane setzt meine Koordinaten von dem zweidimensionalen Punkt p (von oben gesehen), der auf der Ebene liegt
-   und erg�nzt die y-Koordinate, sodass der Ergebnispunkt auf der Ebene liegt */
-void tVector::SetFromPlane(const tVector2 &p, const tVector &n, float d)
-{
-	x = p.x;
-	y = (d - p.x * n.x - p.y * n.z) / n.y;
-	z = p.y;
-}
-
 tVector &tVector::operator*=(tMatrix3 m)
 {
 	return *this = m.ApplyToVector(*this);

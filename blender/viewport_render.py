@@ -4,6 +4,7 @@ from bgl import *
 from mathutils import *
 from .towerengine import *
 from .mesh_converter import MeshConverter
+from math import atan, degrees
 
 
 
@@ -151,16 +152,15 @@ def render(render_engine, context):
 	region3d = context.region_data
 	space = context.space_data
 
-	width = region.width
-	height = region.height
+	viewport = [region.x, region.y, region.width, region.height]
 
-	#print("width: " + str(width) + ", height: " + str(height))
+	te_context.renderer.ChangeSize(viewport[2], viewport[3])
 
-	te_context.renderer.ChangeSize(width, height)
+	sensor_width = 32
+	lens = space.lens
+	angle = degrees(2 * atan(sensor_width / (2 * lens)))
 
-	angle = space.lens
-	aspect = float(width) / float(height)
-	angle = 49.5
+	aspect = float(viewport[2]) / float(viewport[3])
 	te_context.camera.SetFOVVerticalAngle(angle, aspect)
 
 	view_matrix = region3d.view_matrix
@@ -173,46 +173,12 @@ def render(render_engine, context):
 	te_context.camera.SetPosition(cam_pos_te)
 
 	cam_dir_te = vec_te(cam_dir)
+	cam_dir_te.Normalize()
 	te_context.camera.SetDirection(cam_dir_te)
 
-
-
-
-	glClearColor(0.0, 0.0, 0.0, 1.0)
+	glClearColor(0.0, 1.0, 0.0, 1.0)
 	glClear(GL_COLOR_BUFFER_BIT)
 
-	mat = region3d.perspective_matrix
-
-	glLineWidth(2)
-
-	#glMatrixMode(GL_PROJECTION)
-	#glLoadIdentity()
-
-	#glMatrixMode(GL_MODELVIEW)
-	#glLoadIdentity()
-
-
-	te_context.renderer.Render(0, int(region.x), int(region.y), int(width), int(height))
-
-
-	#OpenGL.GL.glBindFramebuffer(OpenGL.GL.GL_FRAMEBUFFER, 0)
-
-
-	# for obj in context.scene.objects:
-	# 	if obj.type != "MESH":
-	# 		continue
-	#
-	# 	mesh = obj.to_mesh(context.scene, True, "PREVIEW")
-	#
-	# 	if obj in context.selected_objects:
-	# 		glColor4f(0.0, 1.0, 0.0, 1.0)
-	# 	else:
-	# 		glColor4f(0.0, 0.0, 1.0, 1.0)
-	#
-	# 	glBegin(GL_LINES)
-	# 	for edge in mesh.edges:
-	# 		for i in [0, 1]:
-	# 			vert = mesh.vertices[edge.vertices[i]]
-	# 			v = mat * obj.matrix_world * Vector((vert.co.x, vert.co.y, vert.co.z, 1.0))
-	# 			glVertex4f(*v)
-	# 	glEnd()
+	glDisable(GL_SCISSOR_TEST)
+	te_context.renderer.Render(0, viewport[0], viewport[1], viewport[2], viewport[3])
+	glEnable(GL_SCISSOR_TEST)
