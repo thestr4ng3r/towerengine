@@ -35,5 +35,6 @@ add_custom_target(blender-addon
 			tar -cf "${CMAKE_CURRENT_BINARY_DIR}/towerengine-blender.zip" --format=zip
 			${BLENDER_ADDON_SOURCE_ABS_BINARY} ${BINDINGS_FILES_ABS_BINARY}
 		DEPENDS ${TOWERENGINE_SWIG_TARGET}
+		COMMENT "Packaging Blender Addon"
 		SOURCES ${BLENDER_ADDON_SOURCE})
 
