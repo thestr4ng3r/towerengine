@@ -21,6 +21,7 @@ option(TOWERENGINE_BUILD_OPENVR "Build with OpenVR support." OFF)
 option(TOWERENGINE_BUILD_OCULUS "Build with Oculus support." OFF)
 
 option(TOWERENGINE_SWIG_PYTHON "Generate Python Bindings using SWIG." OFF)
+option(TOWERENGINE_BLENDER_ADDON "Package Blender Addon." OFF)
 
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
@@ -293,6 +294,10 @@ endif()
 
 if(TOWERENGINE_SWIG_PYTHON)
 	add_subdirectory(swig)
+endif()
+
+if(TOWERENGINE_BLENDER_ADDON)
+	add_subdirectory(blender)
 endif()
 
 

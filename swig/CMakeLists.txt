@@ -17,3 +17,6 @@ swig_add_module(towerengine python ${SWIG_SOURCE})
 swig_link_libraries(towerengine towerengine)
 
 set_property(TARGET ${SWIG_MODULE_towerengine_REAL_NAME} PROPERTY CXX_STANDARD_REQUIRED 11)
+
+set(TOWERENGINE_SWIG_TARGET "${SWIG_MODULE_towerengine_REAL_NAME}" PARENT_SCOPE)
+set(TOWERENGINE_SWIG_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}" PARENT_SCOPE)

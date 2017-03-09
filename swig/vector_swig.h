@@ -20,7 +20,6 @@ struct tVector
 	void Normalize(void);
 
 	tVector operator -(void) const;
-	operator tVector2() const;
 
 	tVector &operator+=(const tVector o);
 	tVector &operator-=(const tVector o);
@@ -29,8 +28,6 @@ struct tVector
 	tVector &operator/=(float f);
 	tVector &operator*=(tMatrix3 m);
 	tVector &operator*=(tTransform t);
-
-	tVector &operator=(const btVector3 &a);
 };
 
 inline tVector Vec(float x, float y, float z)
