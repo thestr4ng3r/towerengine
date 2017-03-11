@@ -135,6 +135,9 @@ class tMesh
 		void RemoveMaterial(std::string name);
 		void RemoveEntity(tEntity *e);*/
 
+		void ClearVertices();
+		void ClearTriangles();
+
 		void GenerateBoundingBox(void);
 
 		btTriangleMesh *GeneratePhysicsMesh(void);

@@ -117,6 +117,19 @@ void tMesh::AddMaterial(string name, tMaterial *m)
 }
 
 
+void tMesh::ClearVertices()
+{
+	vertices.clear();
+	refresh_vbos = true;
+}
+
+void tMesh::ClearTriangles()
+{
+	triangles.clear();
+	refresh_ibos = true;
+}
+
+
 /*void tMesh::RemoveVertex(tVertex *v)
 {
 	vector<tVertex *>::iterator i;
