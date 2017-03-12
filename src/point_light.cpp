@@ -12,6 +12,17 @@ tPointLight::tPointLight(tVector pos, tVector color, float distance)
 	shadow_invalid = false;
 }
 
+tPointLight::tPointLight()
+{
+	this->pos = Vec(0.0, 0.0, 0.0);
+	this->color = Vec(0.0, 0.0, 0.0);
+	this->distance = 0.0;
+	shadow_enabled = false;
+	shadow = 0;
+	enabled = true;
+	shadow_invalid = false;
+}
+
 tPointLight::~tPointLight(void)
 {
 	delete shadow;

@@ -12,11 +12,14 @@ tRefractionMaterial::tRefractionMaterial(void)
 
 tRefractionMaterial::~tRefractionMaterial(void)
 {
-	if(color_tex != 0)
-		glDeleteTextures(1, &color_tex);
+	if(own_textures)
+	{
+		if(color_tex != 0)
+			glDeleteTextures(1, &color_tex);
 
-	if(normal_tex != 0)
-		glDeleteTextures(1, &normal_tex);
+		if(normal_tex != 0)
+			glDeleteTextures(1, &normal_tex);
+	}
 }
 
 
@@ -34,7 +37,7 @@ void tRefractionMaterial::SetEdgeColor(tVector edge_color, float alpha)
 
 void tRefractionMaterial::LoadColorTexture(std::string file)
 {
-	if(color_tex != 0)
+	if(color_tex != 0 && own_textures)
 		glDeleteTextures(1, &color_tex);
 
 	color_tex = LoadGLTexture(file.c_str());
@@ -42,15 +45,23 @@ void tRefractionMaterial::LoadColorTexture(std::string file)
 
 void tRefractionMaterial::LoadColorTexture(const char *extension, const void *data, unsigned int size)
 {
-	if(color_tex != 0)
+	if(color_tex != 0 && own_textures)
 		glDeleteTextures(1, &color_tex);
 
 	color_tex = LoadGLTextureBinary(extension, data, size);
 }
 
+void tRefractionMaterial::SetColorTexture(GLuint gl_tex)
+{
+	if(color_tex != 0 && own_textures)
+		glDeleteTextures(1, &color_tex);
+
+	color_tex = gl_tex;
+}
+
 void tRefractionMaterial::LoadNormalTexture(std::string file)
 {
-	if(normal_tex != 0)
+	if(normal_tex != 0 && own_textures)
 		glDeleteTextures(1, &normal_tex);
 
 	normal_tex = LoadGLTexture(file.c_str());
@@ -58,10 +69,18 @@ void tRefractionMaterial::LoadNormalTexture(std::string file)
 
 void tRefractionMaterial::LoadNormalTexture(const char *extension, const void *data, unsigned int size)
 {
-	if(normal_tex != 0)
-		glDeleteTextures(1, &color_tex);
+	if(normal_tex != 0 && own_textures)
+		glDeleteTextures(1, &normal_tex);
 
 	normal_tex = LoadGLTextureBinary(extension, data, size);
+}
+
+void tRefractionMaterial::SetNormalTexture(GLuint gl_tex)
+{
+	if(normal_tex != 0 && own_textures)
+		glDeleteTextures(1, &normal_tex);
+
+	normal_tex = gl_tex;
 }
 
 bool tRefractionMaterial::InitRefractionPass(tRenderer *renderer, float *transform)

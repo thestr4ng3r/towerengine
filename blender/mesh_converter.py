@@ -17,17 +17,21 @@ class MeshConverter(ABC):
 
 
 	@abstractmethod
-	def _add_vertex(self, vertex, uv, normal):
+	def _add_material(self, material):
 		pass
 
+	def _finish_materials(self):
+		pass
+
+	@abstractmethod
+	def _add_vertex(self, vertex, uv, normal):
+		pass
 
 	@abstractmethod
 	def _add_triangle(self, vertices, material):
 		pass
 
-
-	@abstractmethod
-	def _add_material(self, material):
+	def _finish(self):
 		pass
 
 
@@ -48,6 +52,8 @@ class MeshConverter(ABC):
 				if material.name in exclude_materials:
 					continue
 			self._add_material(material)
+
+		self._finish_materials()
 
 		for mesh in self.meshes.values():
 			if mesh.towerengine.vertices_only:
@@ -117,3 +123,5 @@ class MeshConverter(ABC):
 
 					if len(face.vertices) >= 4:
 						self._add_triangle([face_vertex_id[face][2], face_vertex_id[face][3], face_vertex_id[face][0]], material_name)
+
+		self._finish()

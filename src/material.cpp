@@ -26,14 +26,19 @@ tDefaultMaterial::tDefaultMaterial(void)
 		tex[i] = 0;
 
 	uniform_buffer = new tUniformBuffer(18 * 4);
+
+	own_textures = true;
 }
 
 tDefaultMaterial::~tDefaultMaterial(void)
 {
-	for(int i=0; i<tex_count; i++)
+	if(own_textures)
 	{
-		if(tex[i] != 0)
-			glDeleteTextures(1, &tex[i]);
+		for(int i = 0; i < tex_count; i++)
+		{
+			if(tex[i] != 0)
+				glDeleteTextures(1, &tex[i]);
+		}
 	}
 
 	delete uniform_buffer;
@@ -44,7 +49,7 @@ tDefaultMaterial::~tDefaultMaterial(void)
 
 void tDefaultMaterial::LoadTexture(TextureType type, string file)
 {
-	if(tex[type] != 0)
+	if(tex[type] != 0 && own_textures)
 	{
 		glDeleteTextures(1, &tex[type]);
 	}
@@ -64,7 +69,7 @@ void tDefaultMaterial::LoadTexture(TextureType type, string file)
 
 void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, const void *data, size_t size)
 {
-	if(tex[type] != 0)
+	if(tex[type] != 0 && own_textures)
 	{
 		glDeleteTextures(1, &tex[type]);
 	}
@@ -84,7 +89,7 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 
 void tDefaultMaterial::SetTexture(TextureType type, GLuint gl_tex)
 {
-	if(tex[type] != 0)
+	if(tex[type] != 0 && own_textures)
 	{
 		glDeleteTextures(1, &tex[type]);
 	}

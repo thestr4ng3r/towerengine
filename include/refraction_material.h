@@ -23,9 +23,11 @@ class tRefractionMaterial : public tMaterial
 
 		void LoadColorTexture(std::string file);
 		void LoadColorTexture(const char *extension, const void *data, unsigned int size);
+		void SetColorTexture(GLuint gl_tex);
 
 		void LoadNormalTexture(std::string file);
 		void LoadNormalTexture(const char *extension, const void *data, unsigned int size);
+		void SetNormalTexture(GLuint gl_tex);
 
 		bool InitRefractionPass(tRenderer *renderer, float *transform);
 };

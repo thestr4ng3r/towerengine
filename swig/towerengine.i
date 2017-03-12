@@ -5,6 +5,8 @@
 #include "towerengine.h"
 %}
 
+%include "std_string.i"
+
 typedef unsigned int GLuint;
 
 #include "vector2_swig.h"

@@ -3,6 +3,9 @@
 
 class tMaterial
 {
+	protected:
+		bool own_textures;
+
 	public:
 		virtual ~tMaterial(void) {}
 
@@ -13,6 +16,9 @@ class tMaterial
 
 		virtual bool GetCubeMapReflectionEnabled(void)	{ return false; }
 		virtual tVector GetCubeMapReflectionColor(void)	{ return Vec(0.0, 0.0, 0.0); }
+
+		void SetOwnTextures(bool own)		{ this->own_textures = own; }
+		bool GetOwnTextures()				{ return own_textures; }
 };
 
 class tDefaultMaterial : public tMaterial

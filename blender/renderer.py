@@ -9,7 +9,6 @@ class TowerEngineRenderEngine(bpy.types.RenderEngine):
 	bl_use_texture_preview = True
 
 	def render(self, scene):
-		print("RENDER")
 		return
 
 	def view_update(self, context):

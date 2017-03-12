@@ -23,6 +23,7 @@ class tSimpleForwardMaterial : public tMaterial
 
 		void LoadTexture(std::string file);
 		void LoadTexture(const char *extension, const void *data, unsigned int size);
+		void SetTexture(GLuint gl_tex);
 
 		bool InitForwardPass(tRenderer *renderer, float *transform);
 };

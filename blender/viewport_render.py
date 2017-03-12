@@ -4,6 +4,7 @@ from bgl import *
 from mathutils import *
 from .towerengine import *
 from .mesh_converter import MeshConverter
+from .material_converter import MaterialConverter
 from math import atan, degrees
 
 
@@ -36,6 +37,9 @@ class TowerEngineContext:
 		self.renderer = tDefaultRenderer(context.region.width, context.region.height, self.world)
 		self.camera = self.renderer.GetCamera()
 
+		#self.renderer.InitSSAO(False, 16, 0.2)
+		self.renderer.SetFXAAEnabled(True)
+
 		self.camera.SetPosition(Vec(3.0, 3.0, 3.0))
 		self.camera.SetDirection(Vec(-1.0, -1.0, -1.0))
 
@@ -48,26 +52,34 @@ class TowerEngineContext:
 		self.objects = {}
 		self.meshes = {}
 		self.materials = {}
+		self.point_lights = {}
 
 		self.objects_updated = {}
 		self.meshes_updated = {}
 		self.materials_updated = {}
+		self.point_lights_updated = {}
 
 
 	def update_material(self, m):
 		if m in self.materials_updated:
-			return materials_updated[m]
+			return self.materials_updated[m]
 
 		if m in self.materials:
 			tmaterial = self.materials[m]
 		else:
-			tmaterial = tDefaultMaterial()
+			tmaterial = None
+
+		converter = TowerEngineMaterialConverter(self, tmaterial)
+		converter.execute(m)
+		tmaterial = converter.tmaterial
+
+		self.materials_updated[m] = tmaterial
 
 		return tmaterial
 
 
 	def __update_mesh(self, context, o):
-		if len(o.modifiers) > 0:
+		if len(o.modifiers) > 0: # TODO: use o.is_modified()
 			mesh_id = (o.data, o)
 		else:
 			mesh_id = (o.data, None)
@@ -90,8 +102,6 @@ class TowerEngineContext:
 
 		self.meshes_updated[mesh_id] = tmesh
 
-		tmesh.CalculateAllTangents()
-		tmesh.GenerateBoundingBox()
 		return tmesh
 
 
@@ -103,7 +113,6 @@ class TowerEngineContext:
 			tobject.SetMesh(tmesh)
 		else:
 			tobject = tMeshObject(tmesh)
-			tobject.thisown = 0
 			self.world.AddObject(tobject)
 
 		ttransform = tTransform()
@@ -114,20 +123,21 @@ class TowerEngineContext:
 		self.objects_updated[o] = tobject
 
 
-	def __update_cleanup(self):
-		for o in self.objects:
-			if o not in self.objects_updated:
-				tobject = self.objects[o]
-				self.world.RemoveObject(tobject)
-				del tobject
+	def __update_point_light(self, context, o):
+		if o in self.point_lights:
+			tlight = self.point_lights[o]
+		else:
+			tlight = tPointLight()
+			tlight.InitShadow(512, True)
+			self.world.AddPointLight(tlight)
 
-		for m in self.meshes:
-			if m not in self.meshes_updated:
-				del self.meshes[m]
+		lamp = o.data
+		tlight.SetPosition(vec_te(o.location))
+		tlight.SetColor(Vec(lamp.color[0] * lamp.energy, lamp.color[1] * lamp.energy, lamp.color[2] * lamp.energy))
+		tlight.SetDistance(lamp.distance)
 
-		for m in self.materials:
-			if m not in self.materials_updated:
-				del self.materials[m]
+		self.point_lights_updated[o] = tlight
+
 
 
 	def __update_skybox_test(self, context):
@@ -155,20 +165,45 @@ class TowerEngineContext:
 		#	self.skybox.SetCubeMap(0)
 
 
-	def update(self, context):
-		self.world.ClearPointLights()
+	def __update_cleanup(self):
+		for o in self.objects:
+			if o not in self.objects_updated:
+				tobject = self.objects[o]
+				self.world.RemoveObject(tobject)
+				del tobject
 
+		for o in self.point_lights:
+			if o not in self.point_lights_updated:
+				tlight = self.point_lights[o]
+				self.world.RemovePointLight(tlight)
+				del tlight
+
+		#for m in self.materials:
+		#	if m not in self.materials_updated:
+		#		del self.materials[m]
+
+
+	def update(self, context):
 		self.objects_updated = {}
 		self.meshes_updated = {}
 		self.materials_updated = {}
+		self.point_lights_updated = {}
+
 
 		for o in context.scene.objects:
+			visible = False
+			for layer in range(len(context.scene.layers)):
+				if context.scene.layers[layer] and o.layers[layer]:
+					visible = True
+					break
+
+			if not visible:
+				continue
+
 			if o.type == "MESH":
 				self.__update_mesh_object(context, o)
 			elif o.type == "LAMP":
-				tlight = tPointLight(vec_te(o.location), Vec(1.0, 1.0, 1.0), 100.0)
-				tlight.thisown = 0
-				self.world.AddPointLight(tlight)
+				self.__update_point_light(context, o)
 
 		self.__update_skybox_test(context)
 
@@ -177,6 +212,7 @@ class TowerEngineContext:
 		self.objects = self.objects_updated
 		self.meshes = self.meshes_updated
 		self.materials = self.materials_updated
+		self.point_lights = self.point_lights_updated
 
 
 
@@ -225,26 +261,130 @@ class TowerEngineMeshConverter(MeshConverter):
 		self.te_context = te_context
 
 		self.tmesh = mesh
+		self.materials = {}
 
 		if not self.tmesh:
 			self.tmesh = tMesh()
 			self.tmesh.thisown = 0
 
 	def _add_material(self, material):
-		return
+		tmaterial = self.te_context.update_material(material)
+		self.tmesh.AddMaterial(str(material.name), tmaterial)
+		self.materials[material.name] = tmaterial
+
+	def _finish_materials(self):
+		# TODO: remove old materials
+		pass
 
 	def _add_vertex(self, vertex, uv, normal):
 		tvertex = tVertex()
 		tvertex.pos = vec_te(vertex.co)
-		tvertex.normal = vec_te(vertex.co)
-		tvertex.uv = Vec(0.0, 0.0)#vec2_te(v.uv))
+		tvertex.normal = vec_te(normal)
+		tvertex.uv = Vec(uv[0], uv[1])
 		self.tmesh.AddVertex(tvertex)
 
 	def _add_triangle(self, vertices, material):
 		ttriangle = tTriangle()
-		ttriangle.mat = self.tmesh.GetIdleMaterial() #self.te_context.update_material(material)
+		if material in self.materials:
+			tmaterial = self.materials[material]
+		else:
+			tmaterial = self.tmesh.GetIdleMaterial()
+		ttriangle.mat = tmaterial
 		ttriangle.SetVertices(vertices[0], vertices[1], vertices[2])
 		self.tmesh.AddTriangle(ttriangle)
+
+	def _finish(self):
+		self.tmesh.CalculateAllTangents()
+		self.tmesh.GenerateBoundingBox()
+
+
+class TowerEngineMaterialConverter(MaterialConverter):
+	def __init__(self, te_context, tmaterial=None):
+		super().__init__()
+
+		self.te_context = te_context
+
+		self.tmaterial = tmaterial
+
+	def __get_gl_tex(self, tex):
+		gl_tex = 0
+		if tex:
+			if tex.image:
+				try:
+					tex.image.gl_load()
+					gl_tex = tex.image.bindcode[0]
+				except RuntimeError as error:
+					print("Error loading image: {0}".format(error))
+		return gl_tex
+
+
+	def _create_default_material(self, name,
+								 base_color_tex, base_color,
+								 metal_rough_reflect_tex, metallic, roughness, reflectance,
+								 normal_tex,
+								 bump_tex, bump_depth,
+								 emission_tex, emission_color,
+								 cast_shadow):
+
+		if self.tmaterial is None or not isinstance(self.tmaterial, tDefaultMaterial):
+			self.tmaterial = tDefaultMaterial()
+
+
+		self.tmaterial.SetOwnTextures(False)
+
+		self.tmaterial.SetBaseColor(Vec(base_color.r, base_color.g, base_color.b))
+		self.tmaterial.SetTexture(tDefaultMaterial.BASE_COLOR, self.__get_gl_tex(base_color_tex))
+
+		self.tmaterial.SetMetallic(metallic)
+		self.tmaterial.SetRoughness(roughness)
+		self.tmaterial.SetReflectance(reflectance)
+		self.tmaterial.SetTexture(tDefaultMaterial.METAL_ROUGH_REFLECT, self.__get_gl_tex(metal_rough_reflect_tex))
+
+		self.tmaterial.SetTexture(tDefaultMaterial.NORMAL, self.__get_gl_tex(normal_tex))
+
+		self.tmaterial.SetBumpDepth(bump_depth)
+		self.tmaterial.SetTexture(tDefaultMaterial.BUMP, self.__get_gl_tex(bump_tex))
+
+		self.tmaterial.SetEmission(Vec(emission_color[0], emission_color[1], emission_color[2]))
+		self.tmaterial.SetTexture(tDefaultMaterial.EMISSION, self.__get_gl_tex(emission_tex))
+
+		self.tmaterial.UpdateUniformBuffer()
+
+
+	def _create_simple_forward_material(self, name,
+										color_tex, color, alpha,
+										blend_mode):
+
+		if self.tmaterial is None or not isinstance(self.tmaterial, tSimpleForwardMaterial):
+			self.tmaterial = tSimpleForwardMaterial()
+
+		self.tmaterial.SetOwnTextures(False)
+
+		blend_modes = { "ALPHA": tSimpleForwardMaterial.ALPHA,
+						"ADD": tSimpleForwardMaterial.ADD,
+						"MULTIPLY": tSimpleForwardMaterial.MULTIPLY }
+		self.tmaterial.SetBlendMode(blend_modes[blend_mode])
+
+		self.tmaterial.SetColor(Vec(color.r, color.g, color.b), alpha)
+		self.tmaterial.SetTexture(self.__get_gl_tex(color_tex))
+
+
+	def _create_refraction_material(self, name,
+									color_tex, color,
+									edge_color,
+									normal_tex):
+
+		#if self.tmaterial is None or not isinstance(self.tmaterial, tRefractionMaterial):
+		self.tmaterial = tRefractionMaterial()
+
+		self.tmaterial.SetOwnTextures(False)
+
+		self.tmaterial.SetColor(Vec(color.r, color.g, color.b))
+		self.tmaterial.SetColorTexture(self.__get_gl_tex(color_tex))
+
+		self.tmaterial.SetEdgeColor(Vec(edge_color[0], edge_color[1], edge_color[2]), edge_color[3])
+
+		self.tmaterial.SetNormalTexture(self.__get_gl_tex(normal_tex))
 
 
 

@@ -13,7 +13,7 @@ tSimpleForwardMaterial::tSimpleForwardMaterial(void)
 
 tSimpleForwardMaterial::~tSimpleForwardMaterial(void)
 {
-	if(tex != 0)
+	if(tex != 0 && own_textures)
 		glDeleteTextures(1, &tex);
 }
 
@@ -32,7 +32,7 @@ void tSimpleForwardMaterial::SetBlendMode(BlendMode blend_mode)
 
 void tSimpleForwardMaterial::LoadTexture(std::string file)
 {
-	if(tex != 0)
+	if(tex != 0 && own_textures)
 		glDeleteTextures(1, &tex);
 
 	tex = LoadGLTexture(file.c_str());
@@ -40,10 +40,18 @@ void tSimpleForwardMaterial::LoadTexture(std::string file)
 
 void tSimpleForwardMaterial::LoadTexture(const char *extension, const void *data, unsigned int size)
 {
-	if(tex != 0)
+	if(tex != 0 && own_textures)
 		glDeleteTextures(1, &tex);
 
 	tex = LoadGLTextureBinary(extension, data, size);
+}
+
+void tSimpleForwardMaterial::SetTexture(GLuint gl_tex)
+{
+	if(tex != 0 && own_textures)
+		glDeleteTextures(1, &tex);
+
+	this->tex = gl_tex;
 }
 
 bool tSimpleForwardMaterial::InitForwardPass(tRenderer *renderer, float *transform)
