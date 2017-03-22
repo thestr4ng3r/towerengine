@@ -7,12 +7,16 @@ TowerEngine is a cross platform OpenGL-based Game Engine developed by Florian MÃ
 Please note that this engine was primarily developed for my own projects rather than to be used in other games.
 It is currently used in the game "Psychosis" and major changes are made frequently.
 
+![Blender Screenshot](images/screenshot.jpg)
+
 ## Features
 
 A list of features and characteristics of the engine:
+* Uses OpenGL 3.3 Core with ARB_bindless_texture and ARB_shading_language_include extensions
 * Physically Based Rendering
 * Deferred Rendering
 * Soft shadows using Variance Shadow Mapping
+* Screen Space Ambient Occlusion
 * Bullet Physics integration
 * Custom file format for meshes (.tem) and scenes (.tes)
 * OpenVR and Oculus support
@@ -22,7 +26,9 @@ A list of features and characteristics of the engine:
 Along with the engine there is a Blender Addon that provides an easy way to create
 3D content with materials specifically for TowerEngine and export meshes and scenes.
 It is also possible to get a live preview of the scene rendered directly
-with TowerEngine in Blender's viewport.
+with TowerEngine in Blender's viewport:
+
+![Blender Screenshot](images/blender.jpg)
 
 ## Building
 
