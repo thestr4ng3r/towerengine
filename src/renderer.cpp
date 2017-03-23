@@ -41,6 +41,8 @@ void tRenderer::InitRenderer(tWorld *world)
 	screen_quad_uv_vbo->SetAttribute(tScreenShader::uv_coord_attribute, GL_FLOAT);
 
 	point_light_shadow_limit = -1;
+
+	matrix_buffer = new tMatrixBuffer();
 }
 
 void tRenderer::InitShaders()
@@ -61,6 +63,8 @@ tRenderer::~tRenderer()
 
 	delete screen_quad_vbo;
 	delete screen_quad_vao;
+
+	delete matrix_buffer;
 }
 
 

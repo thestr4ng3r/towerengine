@@ -101,8 +101,17 @@ void tStandardMaterial::SetTexture(TextureType type, GLuint gl_tex)
 
 bool tStandardMaterial::InitDepthPrePass(tRenderer *renderer)
 {
-	//renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
 	renderer->GetDepthPassShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);
+	return true;
+}
+
+bool tStandardMaterial::InitShadowPass(tRenderer *renderer)
+{
+	if(!shadow_cast)
+		return false;
+
+	renderer->GetCurrentFaceShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);
+
 	return true;
 }
 
@@ -158,6 +167,28 @@ bool tStandardMaterial::InitGeometryPass(tDeferredRenderer *renderer)
 	if(renderer->GetShadowPass() && !shadow_cast)
 		return false;
 
+	uniform_buffer->Bind(tShader::material_binding_point);
+
+	if(tex[BASE_COLOR])
+		renderer->GetCurrentFaceShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);
+
+	if(tex[METAL_ROUGH_REFLECT])
+		renderer->GetCurrentFaceShader()->SetMetallicRoughnessTexture(tex[METAL_ROUGH_REFLECT]);
+
+	if(tex[NORMAL])
+		renderer->GetCurrentFaceShader()->SetNormalTexture(tex[NORMAL]);
+
+	if(tex[BUMP])
+		renderer->GetCurrentFaceShader()->SetBumpTexture(tex[BUMP]);
+
+	if(tex[EMISSION])
+		renderer->GetCurrentFaceShader()->SetEmissionTexture(tex[EMISSION]);
+
+	return true;
+}
+
+bool tStandardMaterial::InitStandardForwardPass(tForwardRenderer *renderer)
+{
 	uniform_buffer->Bind(tShader::material_binding_point);
 
 	if(tex[BASE_COLOR])

@@ -71,7 +71,6 @@ void tDeferredRenderer::InitDeferredRenderer(int width, int height, tWorld *worl
 	}
 #endif
 
-	matrix_buffer = new tMatrixBuffer();
 	position_restore_data_buffer = new tPositionRestoreDataBuffer();
 
 
@@ -166,8 +165,7 @@ tDeferredRenderer::~tDeferredRenderer(void)
 
 	delete particle_forward_shader;
 	delete particle_deferred_shader;
-	
-	delete matrix_buffer;
+
 	delete position_restore_data_buffer;
 	delete point_lights_buffer;
 }

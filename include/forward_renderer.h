@@ -1,13 +1,17 @@
 
-#ifndef PSYCHOSIS_FORWARD_RENDERER_H
-#define PSYCHOSIS_FORWARD_RENDERER_H
+#ifndef _TOWERENGINE_FORWARD_RENDERER_H
+#define _TOWERENGINE_FORWARD_RENDERER_H
 
-class tForwardRenderer
+class tForwardRenderer: public tRenderer
 {
 	protected:
 		tStandardForwardShader *standard_shader;
 
-		void InitRenderer();
+		void InitForwardRenderer(tWorld *world);
+
+		void PrepareRender(tCamera *camera, tRenderSpace *render_space);
+
+		void StandardForwardPass();
 
 	public:
 		virtual ~tForwardRenderer();

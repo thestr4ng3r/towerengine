@@ -33,6 +33,8 @@ class tRenderer
 		tVBO<float> *screen_quad_uv_vbo;
 		tVAO *screen_quad_vao;
 
+		tMatrixBuffer *matrix_buffer;
+
 		void InitRenderer(tWorld *world);
 		virtual void PrepareRender(tCamera *camera, tRenderSpace *render_space);
 
@@ -54,6 +56,7 @@ class tRenderer
 
 		void SetPointLightShadowRenderLimit(int limit)	{ this->point_light_shadow_limit = limit; }
 
+		tMatrixBuffer *GetMatrixBuffer(void)							{ return matrix_buffer; }
 
 		void SetWorld(tWorld *world)	{ this->world = world; }
 		tWorld *GetWorld(void)		{ return world; }

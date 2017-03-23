@@ -114,6 +114,18 @@ void tMeshObject::DepthPrePass(tRenderer *renderer)
 	mesh->DepthPrePass(renderer, replace_materials);
 }
 
+
+void tMeshObject::ShadowPass(tRenderer *renderer)
+{
+	if(!visible || alpha <= 0.0 || !mesh)
+		return;
+
+	float *temp = transform.GetMatrix(transform_matrix);
+	renderer->GetCurrentFaceShader()->SetTransformation(temp);
+	mesh->ShadowPass(renderer, replace_materials);
+}
+
+
 void tMeshObject::GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
@@ -147,6 +159,17 @@ void tMeshObject::RefractionPass(tDeferredRenderer *renderer)
 	mesh->RefractionPass(renderer, temp, replace_materials);
 }
 
+void tMeshObject::StandardForwardPass(tForwardRenderer *renderer)
+{
+	if(!visible || alpha <= 0.0 || !mesh)
+		return;
+
+	float *temp = transform.GetMatrix(transform_matrix);
+
+	renderer->GetCurrentFaceShader()->SetTransformation(temp);
+
+	mesh->StandardForwardPass(renderer, replace_materials);
+}
 
 void tMeshObject::InitMeshRigidBody(float mass, bool convex, bool hull_enabled)
 {

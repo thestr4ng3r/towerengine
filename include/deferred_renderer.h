@@ -59,7 +59,6 @@ class tDeferredRenderer : public tRenderer
 		tLightingShaderPointLightsBuffer *point_lights_buffer;
 #endif
 
-		tMatrixBuffer *matrix_buffer;
 		tPositionRestoreDataBuffer *position_restore_data_buffer;
 
 		int current_read_color_tex;
@@ -118,7 +117,6 @@ class tDeferredRenderer : public tRenderer
 		void SetDepthPrePassEnabled(bool enabled)		{ this->depth_prepass_enabled = enabled; }
 		bool GetDepthPrePassEnabled(void)				{ return depth_prepass_enabled; }
 
-		tMatrixBuffer *GetMatrixBuffer(void)							{ return matrix_buffer; }
 		tPositionRestoreDataBuffer *GetPositionRestoreDataBuffer(void)	{ return position_restore_data_buffer; }
 };
 

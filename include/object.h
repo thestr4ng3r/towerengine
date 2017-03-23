@@ -20,6 +20,7 @@ class tObject
 		virtual void GeometryPass(tDeferredRenderer *, bool cube_map_reflection_enabled) {}
 		virtual void ForwardPass(tDeferredRenderer *) {}
 		virtual void RefractionPass(tDeferredRenderer *) {}
+		virtual void StandardForwardPass(tForwardRenderer *) {}
 		virtual tBoundingBox GetBoundingBox(void) = 0;
 
 		void AddedObjectToWorld(tWorld *world);

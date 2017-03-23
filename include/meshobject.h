@@ -28,6 +28,7 @@ class tMeshObject : public tTransformObject
 
 		void CreateRigidBody(btScalar &mass, btVector3 &inertia);
 
+
 	protected:
 		void TransformChanged(void);
 
@@ -54,9 +55,12 @@ class tMeshObject : public tTransformObject
 		void UpdateRigidBodyTransformation(void);
 
 		void DepthPrePass(tRenderer *renderer);
+		void ShadowPass(tRenderer *renderer);
 		void GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled);
 		void ForwardPass(tDeferredRenderer *renderer);
 		void RefractionPass(tDeferredRenderer *renderer);
+		void StandardForwardPass(tForwardRenderer *renderer);
+
 		tBoundingBox GetBoundingBox(void);
 
 		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }

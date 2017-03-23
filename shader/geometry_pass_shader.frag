@@ -1,29 +1,6 @@
 #version 330
 
 
-/*layout(std140) uniform MaterialBlock
-{
-	uniform vec3 diffuse_color;
-	uniform float specular_size;
-	
-	uniform vec3 specular_color;
-	uniform float bump_depth;
-	
-	uniform vec3 self_illumination_color;
-	uniform bool diffuse_tex_enabled;
-	
-	uniform vec3 cube_map_reflection_color;
-	uniform bool specular_tex_enabled;
-	
-	uniform bool normal_tex_enabled;
-	uniform bool bump_tex_enabled;
-	uniform bool self_illumination_tex_enabled;
-	uniform bool cube_map_reflection_enabled;
-
-	uniform float roughness;
-} material_uni;*/
-
-
 layout(std140) uniform MaterialBlock
 {
 	uniform vec3 base_color;
@@ -150,33 +127,6 @@ void main(void)
 	else
 		emission = material_uni.emission;
 
-		
-	
-	// cube map reflection
-	
-	/*if(material_uni.cube_map_reflection_enabled)
-	{
-		vec3 cam_reflected = reflect(-cam_dir_var, normal);
-		cam_reflected += (pos_var - reflection_center_var) / reflection_radius_var;
-
-#if GL_ARB_texture_query_levels
-		int mipmap_levels = textureQueryLevels(cube_map_reflection_tex_uni);
-#else
-		int mipmap_levels = log2(textureSize(cube_map_reflection_tex_uni).x);
-#endif
-
-#if GL_ARB_texture_query_lod
-		float mipmap_level = textureQueryLOD(cube_map_reflection_tex_uni, cam_reflected).x;
-#else
-		float mipmap_level = 0.0;
-#endif
-
-		float blur_mipmap_level = float(mipmap_levels) * pow(material_uni.roughness, 0.6);
-		mipmap_level = max(mipmap_level, blur_mipmap_level);
-
-		vec3 cube_map_color = textureLod(cube_map_reflection_tex_uni, cam_reflected, mipmap_level).rgb;
-		emission += cube_map_color * material_uni.cube_map_reflection_color;
-	}*/
 
 		
 	

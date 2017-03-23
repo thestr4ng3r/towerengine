@@ -15,6 +15,7 @@ class tDirectionalLight;
 class tDirectionalLightShadow;
 class tRenderer;
 class tDeferredRenderer;
+class tForwardRenderer;
 class t2DRenderer;
 
 #include "vector2.h"
@@ -90,6 +91,7 @@ class t2DRenderer;
 #include "forward_renderer.h"
 #include "deferred_renderer.h"
 #include "default_deferred_renderer.h"
+#include "default_forward_renderer.h"
 #include "vr_renderer.h"
 #include "2d_renderer.h"
 #include "timgui.h"
