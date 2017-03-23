@@ -11,6 +11,7 @@ set(LIB_INSTALL_DIR lib)
 set(CMAKE_CXX_STANDARD 11)
 #set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 option(TOWERENGINE_BUILD_STATIC "Build static instead of shared" OFF)
 option(TOWERENGINE_ENABLE_IMGUI "Build with ImGUI support" OFF)
@@ -22,6 +23,8 @@ option(TOWERENGINE_BUILD_OCULUS "Build with Oculus support." OFF)
 
 option(TOWERENGINE_SWIG_PYTHON "Generate Python Bindings using SWIG." OFF)
 option(TOWERENGINE_BLENDER_ADDON "Package Blender Addon." OFF)
+
+option(TOWERENGINE_BUILD_EXAMPLES "Build TowerEngine examples" OFF)
 
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
@@ -117,7 +120,7 @@ set(TOWERENGINE_SRC
 	src/directional_shadow_shader.cpp
 	src/post_process_shader.cpp
 	src/material_ibo.cpp
-	src/renderer.cpp
+	src/deferred_renderer.cpp
 	src/ssao_shader.cpp
 	src/utilobjects.cpp
 	src/color_shader.cpp
@@ -136,7 +139,7 @@ set(TOWERENGINE_SRC
 	src/shader_source.cpp
 	src/particle.cpp
 	src/particle_shader.cpp
-	src/default_renderer.cpp
+	src/default_deferred_renderer.cpp
 	src/vr_renderer.cpp
 	src/simple_forward_shader.cpp
 	src/simple_forward_material.cpp
@@ -154,7 +157,11 @@ set(TOWERENGINE_SRC
 	include/texture.h
 	src/texture.cpp
 	src/texture_devil.cpp
-	src/texture_png.cpp src/face_shader.cpp)
+	src/texture_png.cpp
+	src/face_shader.cpp
+	src/forward_renderer.cpp
+	include/standard_forward_shader.h
+	src/standard_forward_shader.cpp)
 
 if(TOWERENGINE_BUILD_OPENVR)
 	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)
@@ -300,6 +307,10 @@ if(TOWERENGINE_BLENDER_ADDON)
 	add_subdirectory(blender)
 endif()
 
+if(TOWERENGINE_BUILD_EXAMPLES)
+	add_subdirectory(examples)
+endif()
+
 
 # Config
 set(TOWERENGINE_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/${INCLUDE_INSTALL_DIR})
@@ -323,6 +334,7 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
 
 
 

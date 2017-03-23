@@ -16,7 +16,7 @@
 
 template <class T> class tVBO;
 
-// rapidxml forward declarations
+// rapidxml simple declarations
 namespace rapidxml
 {
     template<class Ch> class xml_node;
@@ -88,8 +88,8 @@ class tMesh
 		tEntity *ParseEntityNode(rapidxml::xml_node<char> *cur);
 
 
-		static void LoadTextureFromXMLNodeData(rapidxml::xml_node<char> *node, tDefaultMaterial *material, tDefaultMaterial::TextureType texture_type);
-		static tDefaultMaterial *ParseXMLDefaultMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
+		static void LoadTextureFromXMLNodeData(rapidxml::xml_node<char> *node, tStandardMaterial *material, tStandardMaterial::TextureType texture_type);
+		static tStandardMaterial *ParseXMLDefaultMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 		static tSimpleForwardMaterial *ParseXMLSimpleForwardMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 		static tRefractionMaterial *ParseXMLRefractionMaterialNode(rapidxml::xml_node<char> *cur, std::string &name, std::string path);
 
@@ -102,10 +102,10 @@ class tMesh
 		bool LoadFromData(char *data, std::string path = "", tMaterialManager *material_manager = 0);
 		bool LoadFromXML(rapidxml::xml_document<char> *doc, std::string path, tMaterialManager *material_manager = 0);
 
-		void DepthPrePass(tRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
-		void GeometryPass(tRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
-		void ForwardPass(tRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
-		void RefractionPass(tRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
+		void DepthPrePass(tDeferredRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
+		void GeometryPass(tDeferredRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
+		void ForwardPass(tDeferredRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
+		void RefractionPass(tDeferredRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
 
 		bool GetCubeMapReflectionEnabled(void);
 

@@ -12,7 +12,7 @@ bool CompareFloatComparable(tComparable<float> *a, tComparable<float> *b)
 
 
 
-void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless_textures)
+void tDeferredRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless_textures)
 {
 	this->screen_width = width;
 	this->screen_height = height;
@@ -107,7 +107,7 @@ void tRenderer::InitRenderer(int width, int height, tWorld *world, bool bindless
 	current_read_color_tex = 0;
 }
 
-void tRenderer::InitShaders(void)
+void tDeferredRenderer::InitShaders(void)
 {
 	depth_pass_shader = new tDepthPassShader();
 	geometry_pass_shader = new tGeometryPassShader();
@@ -166,7 +166,7 @@ void tRenderer::InitShaders(void)
 	cube_map_blur_shader = new tCubeMapBlurShader();
 }
 
-tRenderer::~tRenderer(void)
+tDeferredRenderer::~tDeferredRenderer(void)
 {
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteTextures(2, color_tex);
@@ -211,7 +211,7 @@ tRenderer::~tRenderer(void)
 	delete point_lights_buffer;
 }
 
-void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int noise_tex_size)
+void tDeferredRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int noise_tex_size)
 {
 	ssao_ambient_only = ambient_only;
 
@@ -239,7 +239,7 @@ void tRenderer::InitSSAO(bool ambient_only, int kernel_size, float radius, int n
 	ssao = new tSSAO(this, kernel_size, radius, noise_tex_size);
 }
 
-void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp, tVector color)
+void tDeferredRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp, tVector color)
 {
 	fog_enabled = enabled;
 	fog_start = start_dist;
@@ -260,7 +260,7 @@ void tRenderer::SetFog(bool enabled, float start_dist, float end_dist, float exp
 }
 
 
-void tRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
+void tDeferredRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
 {
 	current_rendering_camera = camera;
 	current_rendering_render_space = render_space;
@@ -271,7 +271,7 @@ void tRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
 
 
 
-void tRenderer::RenderShadowMaps(void)
+void tDeferredRenderer::RenderShadowMaps(void)
 {
 	shadow_pass = true;
 
@@ -331,7 +331,7 @@ void tRenderer::RenderShadowMaps(void)
 		(*di)->RenderShadow(current_rendering_camera, this);
 }
 
-void tRenderer::RenderCubeMapReflections(void)
+void tDeferredRenderer::RenderCubeMapReflections(void)
 {
 	shadow_pass = false;
 	for(int i = 0; i<world->GetCubeMapReflectionsCount(); i++)
@@ -345,7 +345,7 @@ void tRenderer::RenderCubeMapReflections(void)
 
 
 
-void tRenderer::DepthPrePass(void)
+void tDeferredRenderer::DepthPrePass(void)
 {
 	shadow_pass = false;
 
@@ -361,7 +361,7 @@ void tRenderer::DepthPrePass(void)
 }
 
 
-void tRenderer::GeometryPass(void)
+void tDeferredRenderer::GeometryPass(void)
 {
 	shadow_pass = false;
 
@@ -422,7 +422,7 @@ void tRenderer::GeometryPass(void)
 		glDepthMask(GL_TRUE);
 }
 
-void tRenderer::LightPass(void)
+void tDeferredRenderer::LightPass(void)
 {
 	shadow_pass = false;
 
@@ -483,7 +483,7 @@ void tRenderer::LightPass(void)
 
 
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
-void tRenderer::BindlessTexturesLightPass(void)
+void tDeferredRenderer::BindlessTexturesLightPass(void)
 {
 	// blending should be disabled here
 
@@ -526,7 +526,7 @@ void tRenderer::BindlessTexturesLightPass(void)
 #endif
 
 
-void tRenderer::SetReflections(tReflectingShader *shader, tVector pos)
+void tDeferredRenderer::SetReflections(tReflectingShader *shader, tVector pos)
 {
 	vector<tCubeMapReflection *> reflections;
 
@@ -577,7 +577,7 @@ void tRenderer::SetReflections(tReflectingShader *shader, tVector pos)
 
 
 
-void tRenderer::LegacyLightPass(void)
+void tDeferredRenderer::LegacyLightPass(void)
 {
 	tAmbientLightingShader *ambient_shader;
 
@@ -680,7 +680,7 @@ void tRenderer::LegacyLightPass(void)
 
 
 
-void tRenderer::ForwardPass(void)
+void tDeferredRenderer::ForwardPass(void)
 {
 	shadow_pass = false;
 
@@ -710,7 +710,7 @@ void tRenderer::ForwardPass(void)
 	glDepthMask(GL_TRUE);
 }
 
-void tRenderer::RefractionPass(void)
+void tDeferredRenderer::RefractionPass(void)
 {
 	shadow_pass = false;
 	current_rendering_render_space->RefractionPass(this);
@@ -718,7 +718,7 @@ void tRenderer::RefractionPass(void)
 
 
 
-void tRenderer::ChangeScreenSize(int width, int height)
+void tDeferredRenderer::ChangeScreenSize(int width, int height)
 {
 	if(screen_width == width && screen_height == height)
 		return;
@@ -741,7 +741,7 @@ void tRenderer::ChangeScreenSize(int width, int height)
 }
 
 
-void tRenderer::RenderScreenQuad(void)
+void tDeferredRenderer::RenderScreenQuad(void)
 {
 	screen_quad_vao->Draw(GL_TRIANGLE_STRIP, 0, 4);
 }

@@ -3,7 +3,7 @@
 #define _SCENE_H
 
 
-// rapidxml forward declarations
+// rapidxml simple declarations
 namespace rapidxml
 {
     template<class Ch> class xml_node;

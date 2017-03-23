@@ -25,9 +25,9 @@ class tCubeMapReflection
 		bool initialized;
 		bool invalid;
 
-		void GeometryPass(tRenderer *renderer, int side, tWorld *world);
-		void LightPass(tRenderer *renderer, int side, tWorld *world);
-		void BlurPass(tRenderer *renderer);
+		void GeometryPass(tDeferredRenderer *renderer, int side, tWorld *world);
+		void LightPass(tDeferredRenderer *renderer, int side, tWorld *world);
+		void BlurPass(tDeferredRenderer *renderer);
 
 	public:
 		tCubeMapReflection(tVector position, tVector extent_a, tVector extend_b);
@@ -35,7 +35,7 @@ class tCubeMapReflection
 
 		void Init(unsigned int resolution_log);
 
-		void Render(tRenderer *renderer);
+		void Render(tDeferredRenderer *renderer);
 
 		void Invalidate(void)			{ invalid = true; }
 

@@ -13,7 +13,7 @@ class tPointLight;
 class tPointLightShadow;
 class tDirectionalLight;
 class tDirectionalLightShadow;
-class tRenderer;
+class tDeferredRenderer;
 class t2DRenderer;
 
 #include "vector2.h"
@@ -30,6 +30,7 @@ class t2DRenderer;
 #include "geometry_pass_shader.h"
 #include "depth_pass_shader.h"
 #include "simple_forward_shader.h"
+#include "standard_forward_shader.h"
 #include "refraction_shader.h"
 #include "2d_sprite_shader.h"
 #include "gbuffer.h"
@@ -84,8 +85,9 @@ class t2DRenderer;
 #include "scene_object.h"
 #include "scene.h"
 #include "ssao.h"
-#include "renderer.h"
-#include "default_renderer.h"
+#include "forward_renderer.h"
+#include "deferred_renderer.h"
+#include "default_deferred_renderer.h"
 #include "vr_renderer.h"
 #include "2d_renderer.h"
 #include "timgui.h"

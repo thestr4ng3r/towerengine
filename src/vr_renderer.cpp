@@ -41,7 +41,7 @@ void tVRRenderer::PrepareRender(void)
 
 	world->FillRenderSpace(camera_render_space, (tCulling **)camera, 2);
 
-	tRenderer::PrepareRender(camera[0], camera_render_space); // TODO: use something instead of left camera
+	tDeferredRenderer::PrepareRender(camera[0], camera_render_space); // TODO: use something instead of left camera
 }
 
 void tVRRenderer::Render(GLuint dst_fbo)

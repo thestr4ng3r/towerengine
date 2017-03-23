@@ -37,7 +37,7 @@ void tPointLight::InitShadow(int size, bool blur_enabled)
 	shadow_invalid = true;
 }
 
-void tPointLight::RenderShadow(tRenderer *renderer)
+void tPointLight::RenderShadow(tDeferredRenderer *renderer)
 {
 	if(!shadow_enabled)
 		return;

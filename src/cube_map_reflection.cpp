@@ -83,7 +83,7 @@ void tCubeMapReflection::Init(unsigned int resolution_log)
 	initialized = true;
 }
 
-void tCubeMapReflection::Render(tRenderer *renderer)
+void tCubeMapReflection::Render(tDeferredRenderer *renderer)
 {
 	if(!initialized)
 		return;
@@ -119,7 +119,7 @@ void tCubeMapReflection::Render(tRenderer *renderer)
 	invalid = false;
 }
 
-void tCubeMapReflection::GeometryPass(tRenderer *renderer, int side, tWorld *world)
+void tCubeMapReflection::GeometryPass(tDeferredRenderer *renderer, int side, tWorld *world)
 {
 	camera->SetPosition(position);
 	camera->SetDirection(CubeVecS(side));
@@ -161,7 +161,7 @@ void tCubeMapReflection::GeometryPass(tRenderer *renderer, int side, tWorld *wor
 	render_space->GeometryPass(renderer, false);
 }
 
-void tCubeMapReflection::LightPass(tRenderer *renderer, int side, tWorld *world)
+void tCubeMapReflection::LightPass(tDeferredRenderer *renderer, int side, tWorld *world)
 {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+side, color_tex, 0);
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -299,7 +299,7 @@ static const GLenum blur_draw_buffers[6] = {	GL_COLOR_ATTACHMENT0,
 												GL_COLOR_ATTACHMENT5 };
 
 
-void tCubeMapReflection::BlurPass(tRenderer *renderer)
+void tCubeMapReflection::BlurPass(tDeferredRenderer *renderer)
 {
 	tCubeMapBlurShader *shader = renderer->GetCubeMapBlurShader();
 

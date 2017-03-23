@@ -15,10 +15,10 @@ class tObject
 		tObject(void);
 		virtual ~tObject(void) {}
 
-		virtual void DepthPrePass(tRenderer *) {}
-		virtual void GeometryPass(tRenderer *, bool cube_map_reflection_enabled) {}
-		virtual void ForwardPass(tRenderer *) {}
-		virtual void RefractionPass(tRenderer *) {}
+		virtual void DepthPrePass(tDeferredRenderer *) {}
+		virtual void GeometryPass(tDeferredRenderer *, bool cube_map_reflection_enabled) {}
+		virtual void ForwardPass(tDeferredRenderer *) {}
+		virtual void RefractionPass(tDeferredRenderer *) {}
 		virtual tBoundingBox GetBoundingBox(void) = 0;
 
 		void AddedObjectToWorld(tWorld *world);

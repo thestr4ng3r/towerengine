@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-tSSAO::tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_size)
+tSSAO::tSSAO(tDeferredRenderer *renderer, int kernel_size, float radius, int noise_tex_size)
 {
 	this->renderer = renderer;
 

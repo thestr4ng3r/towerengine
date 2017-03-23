@@ -7,7 +7,7 @@ void tRenderObjectSpace::Clear(void)
 	objects.clear();
 }
 
-void tRenderObjectSpace::DepthPrePass(tRenderer *renderer)
+void tRenderObjectSpace::DepthPrePass(tDeferredRenderer *renderer)
 {
 	set<tObject *>::iterator i;
 
@@ -15,7 +15,7 @@ void tRenderObjectSpace::DepthPrePass(tRenderer *renderer)
 		(*i)->DepthPrePass(renderer);
 }
 
-void tRenderObjectSpace::GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled)
+void tRenderObjectSpace::GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled)
 {
 	set<tObject *>::iterator i;
 
@@ -23,7 +23,7 @@ void tRenderObjectSpace::GeometryPass(tRenderer *renderer, bool cube_map_reflect
 		(*i)->GeometryPass(renderer, cube_map_reflection_enabled);
 }
 
-void tRenderObjectSpace::ForwardPass(tRenderer *renderer)
+void tRenderObjectSpace::ForwardPass(tDeferredRenderer *renderer)
 {
 	set<tObject *>::iterator i;
 
@@ -31,7 +31,7 @@ void tRenderObjectSpace::ForwardPass(tRenderer *renderer)
 		(*i)->ForwardPass(renderer);
 }
 
-void tRenderObjectSpace::RefractionPass(tRenderer *renderer)
+void tRenderObjectSpace::RefractionPass(tDeferredRenderer *renderer)
 {
 	set<tObject *>::iterator i;
 

@@ -11,10 +11,10 @@ struct tRenderObjectSpace
 
 	virtual void Clear(void);
 
-	void DepthPrePass(tRenderer *renderer);
-	void GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled = true);
-	void ForwardPass(tRenderer *renderer);
-	void RefractionPass(tRenderer *renderer);
+	void DepthPrePass(tDeferredRenderer *renderer);
+	void GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled = true);
+	void ForwardPass(tDeferredRenderer *renderer);
+	void RefractionPass(tDeferredRenderer *renderer);
 };
 
 struct tRenderSpace : public tRenderObjectSpace

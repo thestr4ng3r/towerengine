@@ -2,7 +2,7 @@
 #ifndef _VR_RENDERER_H
 #define _VR_RENDERER_H
 
-class tVRRenderer : public tRenderer
+class tVRRenderer : public tDeferredRenderer
 {
 	private:
 		int width[2], height[2];

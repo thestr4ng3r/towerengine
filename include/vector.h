@@ -37,6 +37,8 @@ struct tVector
 	float SquaredLen(void) const		{ return x * x + y * y + z * z; }
 	void Normalize(void)		{ float l; l = 1.0f / Len(); x *= l; y *= l; z *= l; }
 
+	tVector Normalized()		{ tVector r = *this; r.Normalize(); return r; }
+
 	tVector operator -(void) const	{tVector r; r.x = -x, r.y = -y, r.z = -z; return r; }
 	operator tVector2() const	{tVector2 r; r.x = x; r.y = z; return r; }
 

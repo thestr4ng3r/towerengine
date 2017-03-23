@@ -158,7 +158,7 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 
 }
 
-void tTerrain::Paint(tRenderer *renderer)
+void tTerrain::Paint(tDeferredRenderer *renderer)
 {
 	vao->Bind();
 

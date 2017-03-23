@@ -47,7 +47,7 @@ tSkyBox::~tSkyBox(void)
 	delete ibo;
 }
 
-void tSkyBox::Paint(tRenderer *renderer, tVector pos)
+void tSkyBox::Paint(tDeferredRenderer *renderer, tVector pos)
 {
 	renderer->GetSkyBoxShader()->SetCubeMap(cube_map);
 	vao->Bind();

@@ -34,8 +34,8 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 
 	refresh_vbos = true;
 	refresh_ibos = true;
-	idle_material = new tDefaultMaterial();
-	((tDefaultMaterial *)idle_material)->UpdateUniformBuffer();
+	idle_material = new tStandardMaterial();
+	((tStandardMaterial *)idle_material)->UpdateUniformBuffer();
 	material_ibos[idle_material] = new tMaterialIBO(this);
 
 	if(file)
@@ -355,7 +355,7 @@ void tMesh::RefreshIBOs(void)
 }
 
 
-void tMesh::DepthPrePass(tRenderer *renderer, map<tMaterial *, tMaterial *> *replace_materials)
+void tMesh::DepthPrePass(tDeferredRenderer *renderer, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	if(refresh_vbos)
 		RefreshAllVBOs();
@@ -382,7 +382,7 @@ void tMesh::DepthPrePass(tRenderer *renderer, map<tMaterial *, tMaterial *> *rep
 }
 
 
-void tMesh::GeometryPass(tRenderer *renderer, map<tMaterial *, tMaterial *> *replace_materials)
+void tMesh::GeometryPass(tDeferredRenderer *renderer, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	if(refresh_vbos)
 		RefreshAllVBOs();
@@ -408,7 +408,7 @@ void tMesh::GeometryPass(tRenderer *renderer, map<tMaterial *, tMaterial *> *rep
 	}
 }
 
-void tMesh::ForwardPass(tRenderer *renderer, float *transform, map<tMaterial *, tMaterial *> *replace_materials)
+void tMesh::ForwardPass(tDeferredRenderer *renderer, float *transform, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	bool vao_bound = false;
 
@@ -437,7 +437,7 @@ void tMesh::ForwardPass(tRenderer *renderer, float *transform, map<tMaterial *, 
 }
 
 
-void tMesh::RefractionPass(tRenderer *renderer, float *transform, map<tMaterial *, tMaterial *> *replace_materials)
+void tMesh::RefractionPass(tDeferredRenderer *renderer, float *transform, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	bool vao_bound = false;
 
@@ -641,7 +641,7 @@ tMaterial *tMesh::ParseXMLMaterialNode(xml_node<> *cur, string &name, string pat
 
 
 
-void tMesh::LoadTextureFromXMLNodeData(xml_node<> *node, tDefaultMaterial *material, tDefaultMaterial::TextureType texture_type)
+void tMesh::LoadTextureFromXMLNodeData(xml_node<> *node, tStandardMaterial *material, tStandardMaterial::TextureType texture_type)
 {
 	unsigned char *data;
 	size_t size;
@@ -659,7 +659,7 @@ void tMesh::LoadTextureFromXMLNodeData(xml_node<> *node, tDefaultMaterial *mater
 	delete [] data;
 }
 
-tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &name, string path)
+tStandardMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &name, string path)
 {
 	xml_node<> *child;
 	xml_attribute<> *attr;
@@ -669,7 +669,7 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 
 	name = string(attr->value());
 
-	tDefaultMaterial *mat = new tDefaultMaterial();
+	tStandardMaterial *mat = new tStandardMaterial();
 
 
 
@@ -681,9 +681,9 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 		if(strcmp(name_temp, "base_color") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-				mat->LoadTexture(tDefaultMaterial::BASE_COLOR, path + string(attr->value()));
+				mat->LoadTexture(tStandardMaterial::BASE_COLOR, path + string(attr->value()));
 			else if(child->value_size() > 0)
-				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::BASE_COLOR);
+				LoadTextureFromXMLNodeData(child, mat, tStandardMaterial::BASE_COLOR);
 
 			tVector color = Vec(0.0, 0.0, 0.0);
 			if((attr = child->first_attribute("r")))
@@ -697,9 +697,9 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 		else if(strcmp(name_temp, "metal_rough_reflect") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-				mat->LoadTexture(tDefaultMaterial::METAL_ROUGH_REFLECT, path + string(attr->value()));
+				mat->LoadTexture(tStandardMaterial::METAL_ROUGH_REFLECT, path + string(attr->value()));
 			else if(child->value_size() > 0)
-				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::METAL_ROUGH_REFLECT);
+				LoadTextureFromXMLNodeData(child, mat, tStandardMaterial::METAL_ROUGH_REFLECT);
 
 			if((attr = child->first_attribute("metallic")))
 				mat->SetMetallic((float)atof(attr->value()));
@@ -711,16 +711,16 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 		else if(strcmp(name_temp, "normal") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-				mat->LoadTexture(tDefaultMaterial::NORMAL, path + string(attr->value()));
+				mat->LoadTexture(tStandardMaterial::NORMAL, path + string(attr->value()));
 			else if(child->value_size() > 0)
-				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::NORMAL);
+				LoadTextureFromXMLNodeData(child, mat, tStandardMaterial::NORMAL);
 		}
 		else if(strcmp(name_temp, "emission") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-				mat->LoadTexture(tDefaultMaterial::EMISSION, path + string(attr->value()));
+				mat->LoadTexture(tStandardMaterial::EMISSION, path + string(attr->value()));
 			else if(child->value_size() > 0)
-				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::EMISSION);
+				LoadTextureFromXMLNodeData(child, mat, tStandardMaterial::EMISSION);
 
 			tVector color = Vec(0.0, 0.0, 0.0);
 			if((attr = child->first_attribute("r")))
@@ -734,9 +734,9 @@ tDefaultMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &na
 		else if(strcmp(name_temp, "bump") == 0)
 		{
 			if((attr = child->first_attribute("file")))
-				mat->LoadTexture(tDefaultMaterial::BUMP, path + string(attr->value()));
+				mat->LoadTexture(tStandardMaterial::BUMP, path + string(attr->value()));
 			else if(child->value_size() > 0)
-				LoadTextureFromXMLNodeData(child, mat, tDefaultMaterial::BUMP);
+				LoadTextureFromXMLNodeData(child, mat, tStandardMaterial::BUMP);
 
 			if((attr = child->first_attribute("depth")))
 				mat->SetBumpDepth((float)atof(attr->value()));

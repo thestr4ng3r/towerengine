@@ -2,7 +2,7 @@
 #ifndef _DEFAULT_RENDERER_H
 #define _DEFAULT_RENDERER_H
 
-class tDefaultRenderer : public tRenderer
+class tDefaultDeferredRenderer : public tDeferredRenderer
 {
 	private:
 		tCamera *camera;
@@ -10,8 +10,8 @@ class tDefaultRenderer : public tRenderer
 
 
 	public:
-		tDefaultRenderer(int width, int height, tWorld *world);
-		~tDefaultRenderer(void);
+		tDefaultDeferredRenderer(int width, int height, tWorld *world);
+		~tDefaultDeferredRenderer(void);
 		
 		void Render(GLuint dst_fbo = 0, int viewport_x = 0, int viewport_y = 0, int viewport_width = 0, int viewport_height = 0);
 

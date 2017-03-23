@@ -22,7 +22,7 @@ class tCoordinateSystemObject : public tObject
 		void SetPosition(tVector pos)	{ this->pos = pos; }
 		void SetSize(tVector size)		{ this->size = size; }
 
-		void ForwardPass(tRenderer *renderer);
+		void ForwardPass(tDeferredRenderer *renderer);
 
 		tBoundingBox GetBoundingBox(void);
 };

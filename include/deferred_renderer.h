@@ -1,9 +1,9 @@
 
-#ifndef _RENDERER_H
-#define _RENDERER_H
+#ifndef _DEFERRED_RENDERER_H
+#define _DEFERRED_RENDERER_H
 
 
-class tRenderer
+class tDeferredRenderer
 {
 	protected:
 		tGeometryPassShader *geometry_pass_shader;
@@ -83,7 +83,6 @@ class tRenderer
 		void InitShaders(void);
 
 		void PrepareRender(tCamera *camera, tRenderSpace *render_space);
-		void Render(tCamera *camera, tRenderSpace *render_space, GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height);
 
 		void RenderShadowMaps(void);
 		void RenderCubeMapReflections(void);
@@ -104,7 +103,7 @@ class tRenderer
 		void ChangeScreenSize(int width, int height);
 
 	public:
-		virtual ~tRenderer();
+		virtual ~tDeferredRenderer();
 
 
 		void SetWorld(tWorld *world)	{ this->world = world; }

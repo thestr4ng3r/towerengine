@@ -102,7 +102,7 @@ void tMeshObject::RestoreReplaceMaterial(string name)
 		replace_materials->erase(i);
 }
 
-void tMeshObject::DepthPrePass(tRenderer *renderer)
+void tMeshObject::DepthPrePass(tDeferredRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
@@ -114,7 +114,7 @@ void tMeshObject::DepthPrePass(tRenderer *renderer)
 	mesh->DepthPrePass(renderer, replace_materials);
 }
 
-void tMeshObject::GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled)
+void tMeshObject::GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
@@ -128,7 +128,7 @@ void tMeshObject::GeometryPass(tRenderer *renderer, bool cube_map_reflection_ena
 	mesh->GeometryPass(renderer, replace_materials);
 }
 
-void tMeshObject::ForwardPass(tRenderer *renderer)
+void tMeshObject::ForwardPass(tDeferredRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;
@@ -138,7 +138,7 @@ void tMeshObject::ForwardPass(tRenderer *renderer)
 }
 
 
-void tMeshObject::RefractionPass(tRenderer *renderer)
+void tMeshObject::RefractionPass(tDeferredRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;

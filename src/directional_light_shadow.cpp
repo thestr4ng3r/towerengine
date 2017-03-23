@@ -92,10 +92,10 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 	blur_uv_vbo->SetAttribute(tDirectionalShadowBlurShader::uv_coord_attribute, GL_FLOAT);
 	blur_vao->UnBind();
 
-	// TODO: Use tRenderer::RenderScreenQuad for blurring
+	// TODO: Use tDeferredRenderer::RenderScreenQuad for blurring
 }
 
-void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
+void tDirectionalLightShadow::Render(tCamera *camera, tDeferredRenderer *renderer)
 {
 	//tWorld *world = renderer->GetWorld();
 
@@ -207,7 +207,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
 
-	// TODO: use tRenderer::RenderScreenQuad
+	// TODO: use tDeferredRenderer::RenderScreenQuad
 
 	glViewport(0, 0, size, size);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);

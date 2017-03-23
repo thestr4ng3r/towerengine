@@ -83,7 +83,7 @@ void tRefractionMaterial::SetNormalTexture(GLuint gl_tex)
 	normal_tex = gl_tex;
 }
 
-bool tRefractionMaterial::InitRefractionPass(tRenderer *renderer, float *transform)
+bool tRefractionMaterial::InitRefractionPass(tDeferredRenderer *renderer, float *transform)
 {
 	tRefractionShader *shader = renderer->GetRefractionShader();
 	shader->Bind();

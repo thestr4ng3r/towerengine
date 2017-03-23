@@ -53,10 +53,10 @@ class tMeshObject : public tTransformObject
 		void InitBoxRigidBody(tVector half_extents, float mass);
 		void UpdateRigidBodyTransformation(void);
 
-		void DepthPrePass(tRenderer *renderer);
-		void GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled);
-		void ForwardPass(tRenderer *renderer);
-		void RefractionPass(tRenderer *renderer);
+		void DepthPrePass(tDeferredRenderer *renderer);
+		void GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled);
+		void ForwardPass(tDeferredRenderer *renderer);
+		void RefractionPass(tDeferredRenderer *renderer);
 		tBoundingBox GetBoundingBox(void);
 
 		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }

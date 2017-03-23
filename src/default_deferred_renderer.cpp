@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-tDefaultRenderer::tDefaultRenderer(int width, int height, tWorld *world)
+tDefaultDeferredRenderer::tDefaultDeferredRenderer(int width, int height, tWorld *world)
 {
 	InitRenderer(width, height, world, true);
 
@@ -10,18 +10,18 @@ tDefaultRenderer::tDefaultRenderer(int width, int height, tWorld *world)
 }
 
 
-tDefaultRenderer::~tDefaultRenderer(void)
+tDefaultDeferredRenderer::~tDefaultDeferredRenderer(void)
 {
 	delete camera;
 	delete camera_render_space;
 }
 
-void tDefaultRenderer::Render(GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
+void tDefaultDeferredRenderer::Render(GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
 {
 	camera->CalculateModelViewProjectionMatrix();
 	world->FillRenderSpace(camera_render_space, (tCulling **)&camera, 1);
 
-	tRenderer::PrepareRender(camera, camera_render_space);
+	tDeferredRenderer::PrepareRender(camera, camera_render_space);
 
 
 	// render...

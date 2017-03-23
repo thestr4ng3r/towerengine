@@ -29,7 +29,7 @@ class tRefractionMaterial : public tMaterial
 		void LoadNormalTexture(const char *extension, const void *data, unsigned int size);
 		void SetNormalTexture(GLuint gl_tex);
 
-		bool InitRefractionPass(tRenderer *renderer, float *transform);
+		bool InitRefractionPass(tDeferredRenderer *renderer, float *transform);
 };
 
 #endif

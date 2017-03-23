@@ -5,7 +5,7 @@ using namespace std;
 
 
 
-tDefaultMaterial::tDefaultMaterial(void)
+tStandardMaterial::tStandardMaterial(void)
 {
 	base_color = Vec(1.0, 1.0, 1.0);
 	metallic = 0.2;
@@ -30,7 +30,7 @@ tDefaultMaterial::tDefaultMaterial(void)
 	own_textures = true;
 }
 
-tDefaultMaterial::~tDefaultMaterial(void)
+tStandardMaterial::~tStandardMaterial(void)
 {
 	if(own_textures)
 	{
@@ -47,7 +47,7 @@ tDefaultMaterial::~tDefaultMaterial(void)
 
 
 
-void tDefaultMaterial::LoadTexture(TextureType type, string file)
+void tStandardMaterial::LoadTexture(TextureType type, string file)
 {
 	if(tex[type] != 0 && own_textures)
 	{
@@ -67,7 +67,7 @@ void tDefaultMaterial::LoadTexture(TextureType type, string file)
 	tex[type] = LoadGLTexture(file.c_str(), channels, transparent);
 }
 
-void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, const void *data, size_t size)
+void tStandardMaterial::LoadTexture(TextureType type, const char *extension, const void *data, size_t size)
 {
 	if(tex[type] != 0 && own_textures)
 	{
@@ -87,7 +87,7 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 	tex[type] = LoadGLTextureBinary(extension, data, size, channels, transparent);
 }
 
-void tDefaultMaterial::SetTexture(TextureType type, GLuint gl_tex)
+void tStandardMaterial::SetTexture(TextureType type, GLuint gl_tex)
 {
 	if(tex[type] != 0 && own_textures)
 	{
@@ -99,7 +99,7 @@ void tDefaultMaterial::SetTexture(TextureType type, GLuint gl_tex)
 
 
 
-bool tDefaultMaterial::InitDepthPrePass(tRenderer *renderer)
+bool tStandardMaterial::InitDepthPrePass(tDeferredRenderer *renderer)
 {
 	//renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
 	renderer->GetDepthPassShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);
@@ -127,7 +127,7 @@ layout(std140) uniform MaterialBlock
 } material_uni;
  */
 
-void tDefaultMaterial::UpdateUniformBuffer(void)
+void tStandardMaterial::UpdateUniformBuffer(void)
 {
 	float *data = (float *)uniform_buffer->GetData();
 
@@ -153,7 +153,7 @@ void tDefaultMaterial::UpdateUniformBuffer(void)
 }
 
 
-bool tDefaultMaterial::InitGeometryPass(tRenderer *renderer)
+bool tStandardMaterial::InitGeometryPass(tDeferredRenderer *renderer)
 {
 	if(renderer->GetShadowPass() && !shadow_cast)
 		return false;

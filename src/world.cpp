@@ -239,7 +239,7 @@ void tWorld::FillRenderSpace(tRenderSpace *space, tCulling **cullings, int culli
 			continue;
 
 		for(i=objects.begin(); i!=objects.end(); i++)
-			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i)); // TODO: move to tRenderer
+			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i)); // TODO: move to tDeferredRenderer
 	}
 }
 

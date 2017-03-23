@@ -58,7 +58,7 @@ struct ParticleCompare
 	}
 };
 
-void tParticleSystem::Render(tRenderer *renderer, tParticleShader *shader)
+void tParticleSystem::Render(tDeferredRenderer *renderer, tParticleShader *shader)
 {
 	unsigned int particles_count = particles.size();
 
