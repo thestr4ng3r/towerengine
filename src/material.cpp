@@ -99,7 +99,7 @@ void tStandardMaterial::SetTexture(TextureType type, GLuint gl_tex)
 
 
 
-bool tStandardMaterial::InitDepthPrePass(tDeferredRenderer *renderer)
+bool tStandardMaterial::InitDepthPrePass(tRenderer *renderer)
 {
 	//renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
 	renderer->GetDepthPassShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);

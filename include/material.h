@@ -9,7 +9,7 @@ class tMaterial
 	public:
 		virtual ~tMaterial(void) {}
 
-		virtual bool InitDepthPrePass(tDeferredRenderer *renderer)						{ return false; }
+		virtual bool InitDepthPrePass(tRenderer *renderer)								{ return false; }
 		virtual bool InitGeometryPass(tDeferredRenderer *renderer)						{ return false; }
 		virtual bool InitForwardPass(tDeferredRenderer *renderer, float *transform)		{ return false; }
 		virtual bool InitRefractionPass(tDeferredRenderer *renderer, float *transform)	{ return false; }
@@ -74,7 +74,7 @@ class tStandardMaterial : public tMaterial
 
 		void UpdateUniformBuffer(void);
 
-		bool InitDepthPrePass(tDeferredRenderer *renderer);
+		bool InitDepthPrePass(tRenderer *renderer);
 		bool InitGeometryPass(tDeferredRenderer *renderer);
 };
 

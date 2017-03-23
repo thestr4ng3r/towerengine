@@ -9,7 +9,6 @@ set(LIB_INSTALL_DIR lib)
 
 
 set(CMAKE_CXX_STANDARD 11)
-#set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
@@ -161,7 +160,7 @@ set(TOWERENGINE_SRC
 	src/face_shader.cpp
 	src/forward_renderer.cpp
 	include/standard_forward_shader.h
-	src/standard_forward_shader.cpp)
+	src/standard_forward_shader.cpp include/renderer.h src/renderer.cpp)
 
 if(TOWERENGINE_BUILD_OPENVR)
 	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)

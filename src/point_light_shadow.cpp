@@ -100,7 +100,7 @@ tPointLightShadow::~tPointLightShadow(void)
 	glDeleteTextures(1, &tex);
 }
 
-void tPointLightShadow::Render(tDeferredRenderer *renderer)
+void tPointLightShadow::Render(tRenderer *renderer)
 {
 	int s;
 	tVector pos = light->GetPosition();
@@ -129,7 +129,7 @@ void tPointLightShadow::Render(tDeferredRenderer *renderer)
 
 	projection_matrix.SetPerspective(90.0, 1.0, near_clip, far_clip);
 
-	renderer->SetCurrentFaceShader(renderer->GetPointShadowShader()); // TODO: bind once in tDeferredRenderer before rendering all pointlights
+	renderer->SetCurrentFaceShader(renderer->GetPointShadowShader()); // TODO: bind once in tRenderer before rendering all pointlights
 	renderer->BindCurrentFaceShader();
 	renderer->GetPointShadowShader()->SetLightPos(pos);
 	renderer->GetPointShadowShader()->SetLightDist(light->GetDistance());
@@ -155,7 +155,7 @@ void tPointLightShadow::Render(tDeferredRenderer *renderer)
 		modelview_projection_matrix = projection_matrix * modelview_matrix;
 		renderer->GetPointShadowShader()->SetModelViewProjectionMatrix(modelview_projection_matrix.GetData());
 
-		render_object_space->GeometryPass(renderer);
+		render_object_space->ShadowPass(renderer);
 	}
 
 

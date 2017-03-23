@@ -11,7 +11,8 @@ struct tRenderObjectSpace
 
 	virtual void Clear(void);
 
-	void DepthPrePass(tDeferredRenderer *renderer);
+	void DepthPrePass(tRenderer *renderer);
+	void ShadowPass(tRenderer *renderer);
 	void GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled = true);
 	void ForwardPass(tDeferredRenderer *renderer);
 	void RefractionPass(tDeferredRenderer *renderer);

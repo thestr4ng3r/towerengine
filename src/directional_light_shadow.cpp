@@ -95,7 +95,7 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 	// TODO: Use tDeferredRenderer::RenderScreenQuad for blurring
 }
 
-void tDirectionalLightShadow::Render(tCamera *camera, tDeferredRenderer *renderer)
+void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 {
 	//tWorld *world = renderer->GetWorld();
 
@@ -196,7 +196,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tDeferredRenderer *rendere
 		glClearColor(1.0, 1.0, 1.0, 1.0);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-		render_space->GeometryPass(renderer);
+		render_space->ShadowPass(renderer);
 	}
 
 	tShader::Unbind();

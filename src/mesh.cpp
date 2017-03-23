@@ -355,7 +355,7 @@ void tMesh::RefreshIBOs(void)
 }
 
 
-void tMesh::DepthPrePass(tDeferredRenderer *renderer, map<tMaterial *, tMaterial *> *replace_materials)
+void tMesh::DepthPrePass(tRenderer *renderer, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	if(refresh_vbos)
 		RefreshAllVBOs();

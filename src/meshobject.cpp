@@ -102,7 +102,7 @@ void tMeshObject::RestoreReplaceMaterial(string name)
 		replace_materials->erase(i);
 }
 
-void tMeshObject::DepthPrePass(tDeferredRenderer *renderer)
+void tMeshObject::DepthPrePass(tRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;

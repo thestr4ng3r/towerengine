@@ -13,6 +13,7 @@ class tPointLight;
 class tPointLightShadow;
 class tDirectionalLight;
 class tDirectionalLightShadow;
+class tRenderer;
 class tDeferredRenderer;
 class t2DRenderer;
 
@@ -85,6 +86,7 @@ class t2DRenderer;
 #include "scene_object.h"
 #include "scene.h"
 #include "ssao.h"
+#include "renderer.h"
 #include "forward_renderer.h"
 #include "deferred_renderer.h"
 #include "default_deferred_renderer.h"

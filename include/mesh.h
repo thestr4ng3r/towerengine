@@ -102,7 +102,7 @@ class tMesh
 		bool LoadFromData(char *data, std::string path = "", tMaterialManager *material_manager = 0);
 		bool LoadFromXML(rapidxml::xml_document<char> *doc, std::string path, tMaterialManager *material_manager = 0);
 
-		void DepthPrePass(tDeferredRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
+		void DepthPrePass(tRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
 		void GeometryPass(tDeferredRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
 		void ForwardPass(tDeferredRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
 		void RefractionPass(tDeferredRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);

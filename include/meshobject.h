@@ -53,7 +53,7 @@ class tMeshObject : public tTransformObject
 		void InitBoxRigidBody(tVector half_extents, float mass);
 		void UpdateRigidBodyTransformation(void);
 
-		void DepthPrePass(tDeferredRenderer *renderer);
+		void DepthPrePass(tRenderer *renderer);
 		void GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled);
 		void ForwardPass(tDeferredRenderer *renderer);
 		void RefractionPass(tDeferredRenderer *renderer);

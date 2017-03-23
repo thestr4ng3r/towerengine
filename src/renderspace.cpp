@@ -7,12 +7,21 @@ void tRenderObjectSpace::Clear(void)
 	objects.clear();
 }
 
-void tRenderObjectSpace::DepthPrePass(tDeferredRenderer *renderer)
+void tRenderObjectSpace::DepthPrePass(tRenderer *renderer)
 {
 	set<tObject *>::iterator i;
 
 	for(i=objects.begin(); i!=objects.end(); i++)
 		(*i)->DepthPrePass(renderer);
+}
+
+
+void tRenderObjectSpace::ShadowPass(tRenderer *renderer)
+{
+	set<tObject *>::iterator i;
+
+	for(i=objects.begin(); i!=objects.end(); i++)
+		(*i)->ShadowPass(renderer);
 }
 
 void tRenderObjectSpace::GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled)

@@ -35,7 +35,7 @@ class tPointLight: public tComparable<float>, public tCulling
 		bool GetEnabled(void)				{ return enabled; }
 
 		void InitShadow(int size, bool blur_enabled = false);
-		void RenderShadow(tDeferredRenderer *renderer);
+		void RenderShadow(tRenderer *renderer);
 
 		void SetSortingValue(float v)	{ sorting_value = v; }
 		float GetSortingValue(void)		{ return sorting_value; }

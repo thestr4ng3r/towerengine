@@ -44,16 +44,17 @@ By default, this will build a shared library called `libtowerengine.so`.
 
 These are some options that can be specified to CMake:
 
-| CMake Option                | Description                             |
-| --------------------------- | --------------------------------------- |
-| `TOWERENGINE_BUILD_STATIC`  | Build static library instead of shared. |
-| `TOWERENGINE_ENABLE_IMGUI`  | Build with ImGUI support.               |
-| `TOWERENGINE_BUILD_DEVIL`   | Use DevIL for texture loading.          |
-| `TOWERENGINE_BUILD_LIBPNG`  | Use LibPNG for texture loading.         |
-| `TOWERENGINE_BUILD_OPENVR`  | Build with OpenVR support.              |
-| `TOWERENGINE_BUILD_OCULUS`  | Build with Oculus support.              |
-| `TOWERENGINE_SWIG_PYTHON`   | Generate Python Bindings using SWIG.    |
-| `TOWERENGINE_BLENDER_ADDON` | Package Blender Addon.                  |
+| CMake Option                 | Description                             |
+| ---------------------------- | --------------------------------------- |
+| `TOWERENGINE_BUILD_STATIC`   | Build static library instead of shared. |
+| `TOWERENGINE_ENABLE_IMGUI`   | Build with ImGUI support.               |
+| `TOWERENGINE_BUILD_DEVIL`    | Use DevIL for texture loading.          |
+| `TOWERENGINE_BUILD_LIBPNG`   | Use LibPNG for texture loading.         |
+| `TOWERENGINE_BUILD_OPENVR`   | Build with OpenVR support.              |
+| `TOWERENGINE_BUILD_OCULUS`   | Build with Oculus support.              |
+| `TOWERENGINE_SWIG_PYTHON`    | Generate Python Bindings using SWIG.    |
+| `TOWERENGINE_BLENDER_ADDON`  | Package Blender Addon.                  |
+| `TOWERENGINE_BUILD_EXAMPLES` | Build examples in [examples](examples). |
 
 ## About
 Created by Florian Märkl: https://www.metallic.software
