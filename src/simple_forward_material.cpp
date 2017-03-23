@@ -3,7 +3,7 @@
 
 tSimpleForwardMaterial::tSimpleForwardMaterial(void)
 {
-	color = Vec(1.0, 1.0, 1.0);
+	color = tVec(1.0, 1.0, 1.0);
 	alpha = 1.0;
 
 	tex = 0;

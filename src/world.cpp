@@ -8,7 +8,7 @@ using namespace std;
 
 tWorld::tWorld(void)
 {
-	ambient_color = Vec(0.1, 0.1, 0.1);
+	ambient_color = tVec(0.1, 0.1, 0.1);
 	sky_box = 0;
 
 	physics.broadphase = new btDbvtBroadphase();

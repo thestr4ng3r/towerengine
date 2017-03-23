@@ -14,8 +14,8 @@ tPointLight::tPointLight(tVector pos, tVector color, float distance)
 
 tPointLight::tPointLight()
 {
-	this->pos = Vec(0.0, 0.0, 0.0);
-	this->color = Vec(0.0, 0.0, 0.0);
+	this->pos = tVec(0.0, 0.0, 0.0);
+	this->color = tVec(0.0, 0.0, 0.0);
 	this->distance = 0.0;
 	shadow_enabled = false;
 	shadow = 0;

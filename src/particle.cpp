@@ -10,7 +10,7 @@ tParticleSystem::tParticleSystem(tVector position, GLuint tex, int tex_count)
 	this->tex_count = tex_count;
 	this->position = position;
 
-	lighting_normal = Vec(0.0, 1.0, 0.0);
+	lighting_normal = tVec(0.0, 1.0, 0.0);
 
 	render_type = FORWARD_ALPHA;
 
@@ -130,7 +130,7 @@ void tParticleSystem::Render(tDeferredRenderer *renderer, tParticleShader *shade
 tDefaultParticleSystem::tDefaultParticleSystem(tVector position, GLuint tex, int tex_count) : tParticleSystem(position, tex, tex_count)
 {
 	spawn_area_type = ELLIPSOID;
-	spawn_size = Vec(1.0, 1.0, 1.0);
+	spawn_size = tVec(1.0, 1.0, 1.0);
 	size_min = 0.1;
 	size_max = 0.2;
 	velocity_min = 0.1;
@@ -146,9 +146,9 @@ tDefaultParticleSystem::tDefaultParticleSystem(tVector position, GLuint tex, int
 	fade_in_time = 0.0;
 	fade_out_time = 0.0;
 
-	color = Vec(1.0, 1.0, 1.0);
+	color = tVec(1.0, 1.0, 1.0);
 
-	gravity = Vec(0.0, 0.0, 0.0);
+	gravity = tVec(0.0, 0.0, 0.0);
 	gravity_enabled = false;
 
 	last_spawn_time = 0.0;
@@ -172,13 +172,13 @@ void tDefaultParticleSystem::Step(float time)
 
 		for(int i=0; i<spawn_count; i++)
 		{
-			dir = Vec(RandomFloat(-1.0, 1.0), RandomFloat(-1.0, 1.0), RandomFloat(-1.0, 1.0));
+			dir = tVec(RandomFloat(-1.0, 1.0), RandomFloat(-1.0, 1.0), RandomFloat(-1.0, 1.0));
 
 			if(spawn_area_type == ELLIPSOID)
 			{
 				while(dir.SquaredLen() > 1.0)
 				{
-					dir = Vec(RandomFloat(-1.0, 1.0), RandomFloat(-1.0, 1.0), RandomFloat(-1.0, 1.0));
+					dir = tVec(RandomFloat(-1.0, 1.0), RandomFloat(-1.0, 1.0), RandomFloat(-1.0, 1.0));
 				}
 				dir.Normalize();
 			}
@@ -263,7 +263,7 @@ void tStaticParticleSystem::AddParticle(tVector position, float size, float rota
 
 	particle.texture_index = (float)tex;
 
-	/*particle.velocity = Vec(0.0, 0.0, 0.0);
+	/*particle.velocity = tVec(0.0, 0.0, 0.0);
 	particle.rotation_velocity = 0.0;
 
 	particle.lifetime = 0.0;

@@ -121,7 +121,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tDeferredRenderer *rendere
 
 	light_dir = -light->GetDirection();
 	light_to = cam_pos + light_dir;
-	light_right = Cross(light_dir, Vec(0.0, 1.0, 0.0));
+	light_right = Cross(light_dir, tVec(0.0, 1.0, 0.0));
 	light_right.Normalize();
 	light_up = Cross(light_right, light_dir);
 	light_up.Normalize();
@@ -216,7 +216,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tDeferredRenderer *rendere
 	renderer->GetDirectionalShadowBlurShader()->Bind();
 	renderer->GetDirectionalShadowBlurShader()->SetTexture(tex);
 	renderer->GetDirectionalShadowBlurShader()->SetTextureLayers(splits, h_blur);
-	renderer->GetDirectionalShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0) * blur_size);
+	renderer->GetDirectionalShadowBlurShader()->SetBlurDir(tVec(1.0, 0.0) * blur_size);
 
 	glDrawBuffers(splits, blur_draw_buffers);
 
@@ -228,7 +228,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tDeferredRenderer *rendere
 
 	renderer->GetDirectionalShadowBlurShader()->SetTexture(blur_tex);
 	renderer->GetDirectionalShadowBlurShader()->SetTextureLayers(splits, v_blur);
-	renderer->GetDirectionalShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0) * blur_size);
+	renderer->GetDirectionalShadowBlurShader()->SetBlurDir(tVec(0.0, 1.0) * blur_size);
 
 	for(s=0; s<splits; s++)
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, blur_draw_buffers[s], tex, 0, s);

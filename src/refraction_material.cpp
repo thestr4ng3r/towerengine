@@ -3,8 +3,8 @@
 
 tRefractionMaterial::tRefractionMaterial(void)
 {
-	color = Vec(1.0, 1.0, 1.0);
-	edge_color = Vec(1.0, 1.0, 1.0);
+	color = tVec(1.0, 1.0, 1.0);
+	edge_color = tVec(1.0, 1.0, 1.0);
 	edge_alpha = 0.0;
 	color_tex = 0;
 	normal_tex = 0;

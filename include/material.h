@@ -15,7 +15,7 @@ class tMaterial
 		virtual bool InitRefractionPass(tDeferredRenderer *renderer, float *transform)	{ return false; }
 
 		virtual bool GetCubeMapReflectionEnabled(void)	{ return false; }
-		virtual tVector GetCubeMapReflectionColor(void)	{ return Vec(0.0, 0.0, 0.0); }
+		virtual tVector GetCubeMapReflectionColor(void)	{ return tVec(0.0, 0.0, 0.0); }
 
 		void SetOwnTextures(bool own)		{ this->own_textures = own; }
 		bool GetOwnTextures()				{ return own_textures; }

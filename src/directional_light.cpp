@@ -32,7 +32,7 @@ void tDirectionalLight::RenderShadow(tCamera *camera, tDeferredRenderer *rendere
 void tDirectionalLight::InitRenderLighting(tDirectionalLightingShader *shader)
 {
 	GLuint shadow_map = 0;
-	tVector2 shadow_clip = Vec(0.0, 0.0);
+	tVector2 shadow_clip = tVec(0.0, 0.0);
 	float *shadow_tex_matrix = 0;
 	int shadow_splits_count = 0;
 	float *shadow_splits_z = 0;
@@ -40,7 +40,7 @@ void tDirectionalLight::InitRenderLighting(tDirectionalLightingShader *shader)
 	if(shadow_enabled)
 	{
 		shadow_map = shadow->GetShadowMap();
-		shadow_clip = Vec(shadow->GetNearClip(), shadow->GetFarClip());
+		shadow_clip = tVec(shadow->GetNearClip(), shadow->GetFarClip());
 		shadow_splits_count = shadow->GetSplitsCount();
 		shadow_tex_matrix = new float[shadow_splits_count * 16];
 		for(int i=0; i<shadow->GetSplitsCount(); i++)

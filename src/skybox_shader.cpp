@@ -67,14 +67,14 @@ tVector CubeVecS(int side)
 {
 	switch(side)
 	{
-		case 0:	return Vec(1.0, 0.0, 0.0);
-		case 1:	return Vec(-1.0, 0.0, 0.0);
-		case 2:	return Vec(0.0, 1.0, 0.0);
-		case 3:	return Vec(0.0, -1.0, 0.0);
-		case 4:	return Vec(0.0, 0.0, 1.0);
-		case 5:	return Vec(0.0, 0.0, -1.0);
+		case 0:	return tVec(1.0, 0.0, 0.0);
+		case 1:	return tVec(-1.0, 0.0, 0.0);
+		case 2:	return tVec(0.0, 1.0, 0.0);
+		case 3:	return tVec(0.0, -1.0, 0.0);
+		case 4:	return tVec(0.0, 0.0, 1.0);
+		case 5:	return tVec(0.0, 0.0, -1.0);
 	}
 
-	return Vec(0.0, 0.0, 0.0);
+	return tVec(0.0, 0.0, 0.0);
 }
 

@@ -44,8 +44,8 @@ int main()
 
 	tCamera *camera = renderer->GetCamera();
 	camera->SetFOVVerticalAngle(60.0f, (float)screen_width / (float)screen_height);
-	camera->SetPosition(Vec(3.0, 3.0, 3.0));
-	camera->SetDirection(Vec(-1.0, -1.0, -1.0).Normalized());
+	camera->SetPosition(tVec(3.0, 3.0, 3.0));
+	camera->SetDirection(tVec(-1.0, -1.0, -1.0).Normalized());
 
 	while(!glfwWindowShouldClose(window))
 	{

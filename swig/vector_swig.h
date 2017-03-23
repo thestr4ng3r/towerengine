@@ -30,7 +30,7 @@ struct tVector
 	tVector &operator*=(tTransform t);
 };
 
-inline tVector Vec(float x, float y, float z)
+inline tVector tVec(float x, float y, float z)
 {
 	tVector v;
 
@@ -41,7 +41,7 @@ inline tVector Vec(float x, float y, float z)
 	return v;
 }
 
-inline tVector Vec(const btVector3 &v)
+inline tVector tVec(const btVector3 &v)
 {
 	return Vec(v.x(), v.y(), v.z());
 }

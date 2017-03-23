@@ -45,7 +45,7 @@ class tTransform
 		void SetFromBtTransform(const btTransform &bt_trans)
 		{
 			basis = tMatrix3::FromBtMatrix(bt_trans.getBasis());
-			position = Vec(bt_trans.getOrigin());
+			position = tVec(bt_trans.getOrigin());
 		}
 
 		static tTransform GetIdentity(void)	{ return tTransform(); }

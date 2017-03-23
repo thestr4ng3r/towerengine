@@ -212,12 +212,12 @@ void tMesh::CalculateTangents(const tTriangle &t)
 	{
 		r = 1.0f / r;
 
-		tang = Vec(	uv_edge2.y * edge1.x - uv_edge1.y * edge2.x,
-					   uv_edge2.y * edge1.y - uv_edge1.y * edge2.y,
-					   uv_edge2.y * edge1.z - uv_edge1.y * edge2.z) * r;
-		bitang = Vec(	uv_edge1.x * edge2.x - uv_edge2.x * edge1.x,
-						 uv_edge1.x * edge2.y - uv_edge2.x * edge1.y,
-						 uv_edge1.x * edge2.z - uv_edge2.x * edge1.z) * r;
+		tang = tVec(uv_edge2.y * edge1.x - uv_edge1.y * edge2.x,
+					uv_edge2.y * edge1.y - uv_edge1.y * edge2.y,
+					uv_edge2.y * edge1.z - uv_edge1.y * edge2.z) * r;
+		bitang = tVec(uv_edge1.x * edge2.x - uv_edge2.x * edge1.x,
+					  uv_edge1.x * edge2.y - uv_edge2.x * edge1.y,
+					  uv_edge1.x * edge2.z - uv_edge2.x * edge1.z) * r;
 	}
 	else
 	{
@@ -685,7 +685,7 @@ tStandardMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &n
 			else if(child->value_size() > 0)
 				LoadTextureFromXMLNodeData(child, mat, tStandardMaterial::BASE_COLOR);
 
-			tVector color = Vec(0.0, 0.0, 0.0);
+			tVector color = tVec(0.0, 0.0, 0.0);
 			if((attr = child->first_attribute("r")))
 				color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
@@ -722,7 +722,7 @@ tStandardMaterial *tMesh::ParseXMLDefaultMaterialNode(xml_node<> *cur, string &n
 			else if(child->value_size() > 0)
 				LoadTextureFromXMLNodeData(child, mat, tStandardMaterial::EMISSION);
 
-			tVector color = Vec(0.0, 0.0, 0.0);
+			tVector color = tVec(0.0, 0.0, 0.0);
 			if((attr = child->first_attribute("r")))
 				color.r = (float)atof(attr->value());
 			if((attr = child->first_attribute("g")))
@@ -766,7 +766,7 @@ tSimpleForwardMaterial *tMesh::ParseXMLSimpleForwardMaterialNode(xml_node<> *cur
 
 	int tex_mode = TEXTURE_DISABLED;
 	string tex_file;
-	tVector color = Vec(1.0, 1.0, 1.0);
+	tVector color = tVec(1.0, 1.0, 1.0);
 	float alpha = 1.0;
 
 	tSimpleForwardMaterial::BlendMode blend_mode = tSimpleForwardMaterial::ALPHA;
@@ -858,9 +858,9 @@ tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, stri
 	string color_tex_file;
 	int normal_tex_mode = TEXTURE_DISABLED;
 	string normal_tex_file;
-	tVector color = Vec(1.0, 1.0, 1.0);
+	tVector color = tVec(1.0, 1.0, 1.0);
 
-	tVector edge_color = Vec(0.0, 0.0, 0.0);
+	tVector edge_color = tVec(0.0, 0.0, 0.0);
 	float edge_alpha = 0.0;
 
 	unsigned char *color_tex_data = 0;
@@ -1093,7 +1093,7 @@ void tMesh::ParseMeshDataNode(xml_node<> *cur, tMaterialManager *material_manage
 						if(!mat)
 							mat = GetIdleMaterial();
 
-						//CreateTriangle(GetVertexByID(atoi(values[1])), GetVertexByID(atoi(values[2])), GetVertexByID(atoi(values[3])), Vec(1.0, 1.0, 1.0), mat);
+						//CreateTriangle(GetVertexByID(atoi(values[1])), GetVertexByID(atoi(values[2])), GetVertexByID(atoi(values[3])), tVec(1.0, 1.0, 1.0), mat);
 						tTriangle t;
 						t.v[0] = (tVertexIndex)atoi(values[1]);
 						t.v[1] = (tVertexIndex)atoi(values[2]);

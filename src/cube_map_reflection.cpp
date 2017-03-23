@@ -124,11 +124,11 @@ void tCubeMapReflection::GeometryPass(tDeferredRenderer *renderer, int side, tWo
 	camera->SetPosition(position);
 	camera->SetDirection(CubeVecS(side));
 
-	tVector cam_up = Vec(0.0, -1.0, 0.0);
+	tVector cam_up = tVec(0.0, -1.0, 0.0);
 	if(side == 2)
-		cam_up = Vec(0.0, 0.0, 1.0);
+		cam_up = tVec(0.0, 0.0, 1.0);
 	else if(side == 3)
-		cam_up = Vec(0.0, 0.0, -1.0);
+		cam_up = tVec(0.0, 0.0, -1.0);
 
 	camera->SetUp(cam_up);
 	camera->CalculateModelViewProjectionMatrix();
@@ -331,9 +331,9 @@ void tCubeMapReflection::BlurPass(tDeferredRenderer *renderer)
 			glViewport(0, 0, level_resolution, level_resolution);
 
 			if(direction == 0)
-				blur_dir = Vec(1.0, 0.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
+				blur_dir = tVec(1.0, 0.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
 			else // direction == 1
-				blur_dir = Vec(0.0, 1.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
+				blur_dir = tVec(0.0, 1.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
 
 			shader->SetBlurDir(blur_dir);
 			shader->SetMipmapLevel(level);

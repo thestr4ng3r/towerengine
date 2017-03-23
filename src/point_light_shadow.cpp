@@ -144,11 +144,11 @@ void tPointLightShadow::Render(tDeferredRenderer *renderer)
 		//glLoadIdentity();
 		cam_dir = CubeVecS(s);
 		cam_to = pos + cam_dir;
-		v_vec = Vec(0.0, -1.0, 0.0);
+		v_vec = tVec(0.0, -1.0, 0.0);
 		if(s == 2)
-			v_vec = Vec(0.0, 0.0, 1.0);
+			v_vec = tVec(0.0, 0.0, 1.0);
 		else if(s == 3)
-			v_vec = Vec(0.0, 0.0, -1.0);
+			v_vec = tVec(0.0, 0.0, -1.0);
 		//gluLookAt(pos.x, pos.y, pos.z, cam_to.x, cam_to.y, cam_to.z, v_vec.x, v_vec.y, v_vec.z);
 		modelview_matrix.SetLookAt(pos, cam_to, v_vec);
 
@@ -175,7 +175,7 @@ void tPointLightShadow::Render(tDeferredRenderer *renderer)
 
 	//glClear(GL_COLOR_BUFFER_BIT);
 
-	renderer->GetPointShadowBlurShader()->SetBlurDir(Vec(0.0, 1.0, 0.0) * blur_size);
+	renderer->GetPointShadowBlurShader()->SetBlurDir(tVec(0.0, 1.0, 0.0) * blur_size);
 
 	//blur_vao->Draw(GL_QUADS, 0, 4);
 	renderer->RenderScreenQuad();
@@ -188,7 +188,7 @@ void tPointLightShadow::Render(tDeferredRenderer *renderer)
 
 	//glClear(GL_COLOR_BUFFER_BIT);
 
-	renderer->GetPointShadowBlurShader()->SetBlurDir(Vec(1.0, 0.0, 0.0) * blur_size);
+	renderer->GetPointShadowBlurShader()->SetBlurDir(tVec(1.0, 0.0, 0.0) * blur_size);
 
 	//blur_vao->Draw(GL_QUADS, 0, 4);
 

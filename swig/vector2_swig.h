@@ -19,7 +19,7 @@ struct tVector2
 	tVector2 &operator *= (const tVector2 o);
 };
 
-tVector2 Vec(float x, float y);
+tVector2 tVec(float x, float y);
 tVector2 operator+(const tVector2 &a, const tVector2 &b);
 tVector2 operator-(const tVector2 &a, const tVector2 &b);
 tVector2 operator*(const tVector2 &a, float scalar);

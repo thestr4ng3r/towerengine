@@ -10,7 +10,7 @@ tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 	this->mesh = mesh;
 	rigid_body = 0;
 	motion_state = 0;
-	color = Vec(1.0, 1.0, 1.0);
+	color = tVec(1.0, 1.0, 1.0);
 	alpha = 1.0;
 	visible = true;
 	motion_state = new tMeshObjectMotionState(this);

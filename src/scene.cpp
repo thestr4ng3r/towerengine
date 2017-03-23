@@ -464,9 +464,9 @@ tSceneObject *tScene::ParsePointLightObjectNode(xml_node<> *cur)
 tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 {
 	tTransform transform;
-	tVector extent_a = Vec(1.0, 1.0, 1.0);
-	tVector extent_b = Vec(-1.0, -1.0, -1.0);
-	tVector delta_position = Vec(0.0, 0.0, 0.0);
+	tVector extent_a = tVec(1.0, 1.0, 1.0);
+	tVector extent_b = tVec(-1.0, -1.0, -1.0);
+	tVector delta_position = tVec(0.0, 0.0, 0.0);
 	xml_attribute<> *attr;
 
 	bool cube_map_reflection = false;
@@ -482,7 +482,7 @@ tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 			transform = ParseTransformNode(child);
 		else if(strcmp(child->name(), "delta_transform") == 0)
 		{
-			tVector scale = Vec(1.0, 1.0, 1.0);
+			tVector scale = tVec(1.0, 1.0, 1.0);
 
 			for(xml_node<> *child2=child->first_node(); child2; child2=child2->next_sibling())
 			{
@@ -572,7 +572,7 @@ tTransform tScene::ParseTransformNode(xml_node<> *cur)
 
 tVector tScene::ParseVectorNode(xml_node<> *cur, const char *x_p, const char *y_p, const char *z_p)
 {
-	tVector r = Vec(0.0, 0.0, 0.0);
+	tVector r = tVec(0.0, 0.0, 0.0);
 
 	xml_attribute<> *attr;
 

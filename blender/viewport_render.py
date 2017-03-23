@@ -10,15 +10,15 @@ from math import atan, degrees
 
 
 def vec_te(blender_vec):
-	return Vec(blender_vec.x, blender_vec.z, -blender_vec.y)
+	return tVec(blender_vec.x, blender_vec.z, -blender_vec.y)
 
 def vec2_te(blender_vec2):
-	return Vec(blender_vec2.x, blender_vec2.y)
+	return tVec(blender_vec2.x, blender_vec2.y)
 
 def mat3_te(blender_mat):
-	x = Vec(blender_mat[0][0], blender_mat[0][2], -blender_mat[0][1])
-	y = Vec(blender_mat[2][0], blender_mat[2][2], -blender_mat[2][1])
-	z = Vec(-blender_mat[1][0], -blender_mat[1][2], blender_mat[1][1])
+	x = tVec(blender_mat[0][0], blender_mat[0][2], -blender_mat[0][1])
+	y = tVec(blender_mat[2][0], blender_mat[2][2], -blender_mat[2][1])
+	z = tVec(-blender_mat[1][0], -blender_mat[1][2], blender_mat[1][1])
 	return tMatrix3(x, y, z)
 
 def vec_bl(te_vec):
@@ -34,14 +34,14 @@ class TowerEngineContext:
 			return
 
 		self.world = tWorld()
-		self.renderer = tDefaultRenderer(context.region.width, context.region.height, self.world)
+		self.renderer = tDefaultDeferredRenderer(context.region.width, context.region.height, self.world)
 		self.camera = self.renderer.GetCamera()
 
 		#self.renderer.InitSSAO(False, 16, 0.2)
 		self.renderer.SetFXAAEnabled(True)
 
-		self.camera.SetPosition(Vec(3.0, 3.0, 3.0))
-		self.camera.SetDirection(Vec(-1.0, -1.0, -1.0))
+		self.camera.SetPosition(tVec(3.0, 3.0, 3.0))
+		self.camera.SetDirection(tVec(-1.0, -1.0, -1.0))
 
 		self.coordinate_system_object = tCoordinateSystemObject()
 		self.world.AddObject(self.coordinate_system_object)
@@ -133,7 +133,7 @@ class TowerEngineContext:
 
 		lamp = o.data
 		tlight.SetPosition(vec_te(o.location))
-		tlight.SetColor(Vec(lamp.color[0] * lamp.energy, lamp.color[1] * lamp.energy, lamp.color[2] * lamp.energy))
+		tlight.SetColor(tVec(lamp.color[0] * lamp.energy, lamp.color[1] * lamp.energy, lamp.color[2] * lamp.energy))
 		tlight.SetDistance(lamp.distance)
 
 		self.point_lights_updated[o] = tlight
@@ -280,7 +280,7 @@ class TowerEngineMeshConverter(MeshConverter):
 		tvertex = tVertex()
 		tvertex.pos = vec_te(vertex.co)
 		tvertex.normal = vec_te(normal)
-		tvertex.uv = Vec(uv[0], uv[1])
+		tvertex.uv = tVec(uv[0], uv[1])
 		self.tmesh.AddVertex(tvertex)
 
 	def _add_triangle(self, vertices, material):
@@ -326,27 +326,27 @@ class TowerEngineMaterialConverter(MaterialConverter):
 								 emission_tex, emission_color,
 								 cast_shadow):
 
-		if self.tmaterial is None or not isinstance(self.tmaterial, tDefaultMaterial):
-			self.tmaterial = tDefaultMaterial()
+		if self.tmaterial is None or not isinstance(self.tmaterial, tStandardMaterial):
+			self.tmaterial = tStandardMaterial()
 
 
 		self.tmaterial.SetOwnTextures(False)
 
-		self.tmaterial.SetBaseColor(Vec(base_color.r, base_color.g, base_color.b))
-		self.tmaterial.SetTexture(tDefaultMaterial.BASE_COLOR, self.__get_gl_tex(base_color_tex))
+		self.tmaterial.SetBaseColor(tVec(base_color.r, base_color.g, base_color.b))
+		self.tmaterial.SetTexture(tStandardMaterial.BASE_COLOR, self.__get_gl_tex(base_color_tex))
 
 		self.tmaterial.SetMetallic(metallic)
 		self.tmaterial.SetRoughness(roughness)
 		self.tmaterial.SetReflectance(reflectance)
-		self.tmaterial.SetTexture(tDefaultMaterial.METAL_ROUGH_REFLECT, self.__get_gl_tex(metal_rough_reflect_tex))
+		self.tmaterial.SetTexture(tStandardMaterial.METAL_ROUGH_REFLECT, self.__get_gl_tex(metal_rough_reflect_tex))
 
-		self.tmaterial.SetTexture(tDefaultMaterial.NORMAL, self.__get_gl_tex(normal_tex))
+		self.tmaterial.SetTexture(tStandardMaterial.NORMAL, self.__get_gl_tex(normal_tex))
 
 		self.tmaterial.SetBumpDepth(bump_depth)
-		self.tmaterial.SetTexture(tDefaultMaterial.BUMP, self.__get_gl_tex(bump_tex))
+		self.tmaterial.SetTexture(tStandardMaterial.BUMP, self.__get_gl_tex(bump_tex))
 
-		self.tmaterial.SetEmission(Vec(emission_color[0], emission_color[1], emission_color[2]))
-		self.tmaterial.SetTexture(tDefaultMaterial.EMISSION, self.__get_gl_tex(emission_tex))
+		self.tmaterial.SetEmission(tVec(emission_color[0], emission_color[1], emission_color[2]))
+		self.tmaterial.SetTexture(tStandardMaterial.EMISSION, self.__get_gl_tex(emission_tex))
 
 		self.tmaterial.UpdateUniformBuffer()
 
@@ -365,7 +365,7 @@ class TowerEngineMaterialConverter(MaterialConverter):
 						"MULTIPLY": tSimpleForwardMaterial.MULTIPLY }
 		self.tmaterial.SetBlendMode(blend_modes[blend_mode])
 
-		self.tmaterial.SetColor(Vec(color.r, color.g, color.b), alpha)
+		self.tmaterial.SetColor(tVec(color.r, color.g, color.b), alpha)
 		self.tmaterial.SetTexture(self.__get_gl_tex(color_tex))
 
 
@@ -379,10 +379,10 @@ class TowerEngineMaterialConverter(MaterialConverter):
 
 		self.tmaterial.SetOwnTextures(False)
 
-		self.tmaterial.SetColor(Vec(color.r, color.g, color.b))
+		self.tmaterial.SetColor(tVec(color.r, color.g, color.b))
 		self.tmaterial.SetColorTexture(self.__get_gl_tex(color_tex))
 
-		self.tmaterial.SetEdgeColor(Vec(edge_color[0], edge_color[1], edge_color[2]), edge_color[3])
+		self.tmaterial.SetEdgeColor(tVec(edge_color[0], edge_color[1], edge_color[2]), edge_color[3])
 
 		self.tmaterial.SetNormalTexture(self.__get_gl_tex(normal_tex))
 

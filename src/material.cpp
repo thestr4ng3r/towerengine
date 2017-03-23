@@ -7,12 +7,12 @@ using namespace std;
 
 tStandardMaterial::tStandardMaterial(void)
 {
-	base_color = Vec(1.0, 1.0, 1.0);
+	base_color = tVec(1.0, 1.0, 1.0);
 	metallic = 0.2;
 	roughness = 0.3;
 	reflectance = 0.0;
 
-	emission = Vec(0.0, 0.0, 0.0);
+	emission = tVec(0.0, 0.0, 0.0);
 
     transparent = false;
 
