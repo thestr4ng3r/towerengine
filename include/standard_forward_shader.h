@@ -5,7 +5,6 @@
 class tStandardForwardShader : public tFaceShader
 {
 	private:
-		GLint cam_pos_uniform;
 
 		GLint transformation_uniform;
 
@@ -15,7 +14,21 @@ class tStandardForwardShader : public tFaceShader
 		GLint bump_tex_uniform;
 		GLint emission_tex_uniform;
 
+
+		GLint cam_pos_uniform;
+
+		GLint light_ambient_color_uniform;
+
+		/*GLint reflection_tex1_uniform;
+		GLint reflection_tex2_uniform;
+		GLint reflection_tex_blend_uniform;
+
+		int reflection_tex1_unit;
+		int reflection_tex2_unit;*/
+
 	public:
+		static const int max_point_lights_count = 32;
+
 		tStandardForwardShader(void);
 
 		void SetCameraPosition(tVector pos);
@@ -26,6 +39,8 @@ class tStandardForwardShader : public tFaceShader
 		void SetNormalTexture(GLuint tex);
 		void SetBumpTexture(GLuint tex);
 		void SetEmissionTexture(GLuint tex);
+
+		void SetAmbientLight(tVector color);
 };
 
 

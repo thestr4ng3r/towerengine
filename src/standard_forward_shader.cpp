@@ -1,10 +1,13 @@
 
 #include "towerengine.h"
 #include "resources.h"
+#include "shader_source.h"
 
 tStandardForwardShader::tStandardForwardShader(void)
 {
-	InitShader(resources_get("standard_forward_shader.vert"), resources_get("standard_forward_shader.frag"), "Standard Forward Shader");
+	tShaderSource src(resources_get("standard_forward_shader.frag"));
+	src.SetParameter("max_point_lights_count", new tShaderSourceVariable(max_point_lights_count));
+	InitShader(resources_get("standard_forward_shader.vert"), src.BuildSource().c_str(), "Standard Forward Shader");
 
 	glBindAttribLocation(program, vertex_attribute, "vertex_attr");
 	glBindAttribLocation(program, normal_attribute, "normal_attr");
@@ -14,8 +17,6 @@ tStandardForwardShader::tStandardForwardShader(void)
 
 	LinkProgram();
 
-	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
-
 	base_color_tex_uniform = GetUniformLocation("base_color_tex_uni");
 	metallic_roughness_tex_uniform = GetUniformLocation("metallic_roughness_tex_uni");
 	normal_tex_uniform = GetUniformLocation("normal_tex_uni");
@@ -24,8 +25,20 @@ tStandardForwardShader::tStandardForwardShader(void)
 
 	transformation_uniform = GetUniformLocation("transformation_uni");
 
+
+
+	light_ambient_color_uniform = GetUniformLocation("light_ambient_color_uni");
+
+	cam_pos_uniform = GetUniformLocation("cam_pos_uni");
+
+	/*reflection_tex1_uniform = GetUniformLocation("reflection_tex1_uni");
+	reflection_tex2_uniform = GetUniformLocation("reflection_tex2_uni");
+	reflection_tex_blend_uniform = GetUniformLocation("reflection_tex_blend_uni");*/
+
+
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MaterialBlock"), material_binding_point);
+	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "PointLightBlock"), point_light_binding_point);
 
 	Bind();
 	glUniform1i(base_color_tex_uniform, base_color_tex_unit);
@@ -35,13 +48,6 @@ tStandardForwardShader::tStandardForwardShader(void)
 	glUniform1i(emission_tex_uniform, emission_tex_unit);
 }
 
-
-
-
-void tStandardForwardShader::SetCameraPosition(tVector pos)
-{
-	glUniform3f(cam_pos_uniform, pos.x, pos.y, pos.z);
-}
 
 void tStandardForwardShader::SetTransformation(const float m[16])
 {
@@ -78,6 +84,22 @@ void tStandardForwardShader::SetEmissionTexture(GLuint tex)
 	glActiveTexture(GL_TEXTURE0 + emission_tex_unit);
 	glBindTexture(GL_TEXTURE_2D, tex);
 }
+
+
+
+
+
+void tStandardForwardShader::SetCameraPosition(tVector pos)
+{
+	glUniform3f(cam_pos_uniform, pos.x, pos.y, pos.z);
+}
+
+
+void tStandardForwardShader::SetAmbientLight(tVector color)
+{
+	glUniform3f(light_ambient_color_uniform, color.x, color.y, color.z);
+}
+
 
 
 

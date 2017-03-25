@@ -1,5 +1,13 @@
 #version 330
 
+#extension GL_ARB_bindless_texture : require
+#extension GL_ARB_shading_language_include : require
+
+#include "position_restore.glsl"
+#include "lighting.glsl"
+#include "reflection.glsl"
+
+
 layout(std140) uniform MaterialBlock
 {
 	uniform vec3 base_color;
@@ -39,14 +47,48 @@ in float reflection_radius_var;
 
 
 
+
+
+
+// ambient
+
+uniform vec3 light_ambient_color_uni;
+
+// point lights
+
+#pragma define_param(MAX_POINT_LIGHTS_COUNT max_point_lights_count)
+
+struct PointLight
+{
+	float dist;
+	int shadow_enabled;
+	vec3 pos;
+	vec3 color;
+	samplerCube shadow_map;
+};
+
+
+layout(std140) uniform PointLightBlock
+{
+	int count;
+	PointLight light[MAX_POINT_LIGHTS_COUNT];
+} point_light_uni;
+
+
+
+
+
+
 out vec4 color_out;
 
 void main(void)
 {
 	mat3 tang_mat = mat3(normalize(tang_var), normalize(bitang_var), normalize(normal_var));
 
-	vec2 uv;
+	vec3 position = pos_var;
 
+
+	vec2 uv;
 	/*if(material_uni.bump_tex_enabled)
 		uv = ParallaxOcclusionUV(tang_mat);
 	else*/
@@ -115,5 +157,41 @@ void main(void)
 		emission = material_uni.emission;
 
 
-	color_out = base_color;
+
+	// --------------------------------------------
+	// LIGHTING
+	// --------------------------------------------
+
+	// ambient lighting and emission
+
+	vec3 color = vec3(0.0);
+
+	color += base_color.rgb * light_ambient_color_uni;
+	color += emission;
+
+
+	// reflection
+
+	// color += GetReflectionColor(reflectance, roughness, normal, cam_dir) * metallic;
+
+
+	// point lighting
+
+	for(int i=0; i<point_light_uni.count; i++)
+	{
+		color += PointLightLighting(position.xyz,
+									base_color.rgb,
+									metallic,
+									roughness,
+									1.0 - reflectance,
+									cam_dir_var,
+									normal,
+									point_light_uni.light[i].pos,
+									point_light_uni.light[i].dist,
+									point_light_uni.light[i].color,
+									point_light_uni.light[i].shadow_enabled != 0,
+									point_light_uni.light[i].shadow_map);
+	}
+
+	color_out = vec4(color, 1.0);
 }

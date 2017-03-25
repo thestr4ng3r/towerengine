@@ -12,10 +12,9 @@ using namespace std;
 
 tLightingShader::tLightingShader(tGBuffer *gbuffer)
 {
-	tShaderSource *src = new tShaderSource(resources_get("lighting_shader.frag"));
-	src->SetParameter("max_point_lights_count", new tShaderSourceVariable(max_point_lights_count));
-	InitScreenShader(src->BuildSource().c_str(), "Lighting Shader");
-	delete src;
+	tShaderSource src(resources_get("lighting_shader.frag"));
+	src.SetParameter("max_point_lights_count", new tShaderSourceVariable(max_point_lights_count));
+	InitScreenShader(src.BuildSource().c_str(), "Lighting Shader");
 
 	depth_tex_uniform = GetUniformLocation("depth_tex_uni");
 	base_color_tex_uniform = GetUniformLocation("base_color_tex_uni");
