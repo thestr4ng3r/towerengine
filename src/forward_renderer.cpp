@@ -23,5 +23,7 @@ void tForwardRenderer::StandardForwardPass()
 	SetCurrentFaceShader(standard_shader);
 	BindCurrentFaceShader();
 
+	glEnable(GL_DEPTH_TEST);
+
 	current_rendering_render_space->StandardForwardPass(this);
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<tscene>
+  <assets>
+    <material name="Cube" type="default">
+      <base_color file="simple.tes_assets/materials/Cube/base_color.png"/>
+      <normal file="simple.tes_assets/materials/Cube/normal.png"/>
+      <metal_rough_reflect file="simple.tes_assets/materials/Cube/metal_rough_reflect.png"/>
+    </material>
+    <material name="Floor" type="default">
+      <base_color file="simple.tes_assets/materials/Floor/base_color.png"/>
+      <metal_rough_reflect metallic="0.0" reflectance="0.0" roughness="0.7784512042999268"/>
+    </material>
+    <mesh name="Cube">
+      <data file="simple.tes_assets/Cube.tem"/>
+    </mesh>
+    <mesh name="Plane">
+      <data file="simple.tes_assets/Plane.tem"/>
+    </mesh>
+  </assets>
+  <objects>
+    <point_light name="Lamp" tag="">
+      <position x="0.3953549861907959" y="4.566653728485107" z="3.869065284729004"/>
+      <distance v="29.999982833862305"/>
+      <color b="1.0" g="1.0" r="1.0"/>
+    </point_light>
+    <mesh name="Cube" tag="">
+      <transform>
+        <position x="0.0" y="1.0" z="-0.0"/>
+        <basis_x x="1.0" y="0.0" z="-0.0"/>
+        <basis_y x="0.0" y="1.0" z="-0.0"/>
+        <basis_z x="-0.0" y="-0.0" z="1.0"/>
+      </transform>
+      <mesh_asset asset="Cube"/>
+    </mesh>
+    <mesh name="Plane" tag="">
+      <transform>
+        <position x="0.0" y="0.0" z="-0.0"/>
+        <basis_x x="10.0" y="0.0" z="-0.0"/>
+        <basis_y x="0.0" y="10.0" z="-0.0"/>
+        <basis_z x="-0.0" y="-0.0" z="10.0"/>
+      </transform>
+      <mesh_asset asset="Plane"/>
+    </mesh>
+  </objects>
+  <scene/>
+</tscene>

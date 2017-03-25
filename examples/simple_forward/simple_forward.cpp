@@ -30,7 +30,7 @@ int main()
 
 	tWorld *world = new tWorld();
 	tScene *scene = new tScene(world);
-	if(!scene->LoadFromFile("assets/cube.tes"))
+	if(!scene->LoadFromFile("assets/simple.tes"))
 	{
 		fprintf(stderr, "Failed to load scene. Make sure to run this program in the examples/.\n");
 		delete scene;
@@ -40,12 +40,15 @@ int main()
 	}
 	scene->AddToWorld();
 
+	for(int i=0; i<world->GetPointLightsCount(); i++)
+		world->GetPointLight(i)->InitShadow(256, true);
+
 	tDefaultForwardRenderer *renderer = new tDefaultForwardRenderer(world);
 
 	tCamera *camera = renderer->GetCamera();
 	camera->SetFOVVerticalAngle(60.0f, (float)screen_width / (float)screen_height);
-	camera->SetPosition(tVec(3.0, 3.0, 3.0));
-	camera->SetDirection(tVec(-1.0, -1.0, -1.0).Normalized());
+	camera->SetPosition(tVec(4.0, 4.0, 4.0));
+	camera->SetDirection(tVec(-1.0, -0.7, -1.0).Normalized());
 
 	while(!glfwWindowShouldClose(window))
 	{
