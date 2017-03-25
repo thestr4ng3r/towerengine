@@ -3,7 +3,7 @@
 
 using namespace std;
 
-tCubeMapReflection::tCubeMapReflection(tVector position, tVector extent_a, tVector extent_b)
+tReflectionProbe::tReflectionProbe(tVector position, tVector extent_a, tVector extent_b)
 {
 	this->initialized = false;
 	this->resolution = 0;
@@ -21,7 +21,7 @@ tCubeMapReflection::tCubeMapReflection(tVector position, tVector extent_a, tVect
 	color_tex = 0;
 }
 
-tCubeMapReflection::~tCubeMapReflection(void)
+tReflectionProbe::~tReflectionProbe(void)
 {
 	delete camera;
 	delete render_space;
@@ -33,7 +33,7 @@ tCubeMapReflection::~tCubeMapReflection(void)
 	delete gbuffer;
 }
 
-void tCubeMapReflection::Init(unsigned int resolution_log)
+void tReflectionProbe::Init(unsigned int resolution_log)
 {
 	this->resolution_log = resolution_log;
 	this->resolution = (unsigned int)1 << resolution_log;
@@ -83,7 +83,7 @@ void tCubeMapReflection::Init(unsigned int resolution_log)
 	initialized = true;
 }
 
-void tCubeMapReflection::Render(tDeferredRenderer *renderer)
+void tReflectionProbe::Render(tDeferredRenderer *renderer)
 {
 	if(!initialized)
 		return;
@@ -119,7 +119,7 @@ void tCubeMapReflection::Render(tDeferredRenderer *renderer)
 	invalid = false;
 }
 
-void tCubeMapReflection::GeometryPass(tDeferredRenderer *renderer, int side, tWorld *world)
+void tReflectionProbe::GeometryPass(tDeferredRenderer *renderer, int side, tWorld *world)
 {
 	camera->SetPosition(position);
 	camera->SetDirection(CubeVecS(side));
@@ -161,7 +161,7 @@ void tCubeMapReflection::GeometryPass(tDeferredRenderer *renderer, int side, tWo
 	render_space->GeometryPass(renderer, false);
 }
 
-void tCubeMapReflection::LightPass(tDeferredRenderer *renderer, int side, tWorld *world)
+void tReflectionProbe::LightPass(tDeferredRenderer *renderer, int side, tWorld *world)
 {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+side, color_tex, 0);
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -299,7 +299,7 @@ static const GLenum blur_draw_buffers[6] = {	GL_COLOR_ATTACHMENT0,
 												GL_COLOR_ATTACHMENT5 };
 
 
-void tCubeMapReflection::BlurPass(tDeferredRenderer *renderer)
+void tReflectionProbe::BlurPass(tDeferredRenderer *renderer)
 {
 	tCubeMapBlurShader *shader = renderer->GetCubeMapBlurShader();
 

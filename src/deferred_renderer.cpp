@@ -231,9 +231,9 @@ void tDeferredRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_spac
 void tDeferredRenderer::RenderCubeMapReflections(void)
 {
 	shadow_pass = false;
-	for(int i = 0; i<world->GetCubeMapReflectionsCount(); i++)
+	for(int i = 0; i< world->GetReflectionProbesCount(); i++)
 	{
-		tCubeMapReflection *reflection = world->GetCubeMapReflection(i);
+		tReflectionProbe *reflection = world->GetReflectionProbe(i);
 		if(reflection->GetInvalid())
 			reflection->Render(this);
 	}
@@ -280,9 +280,9 @@ void tDeferredRenderer::GeometryPass(void)
 
 	geometry_pass_shader->SetCameraPosition(current_rendering_camera->GetPosition());
 
-	//tCubeMapReflection *cube_map_reflection = 0;
-	//if(world->GetCubeMapReflectionsCount() > 0)
-	//	cube_map_reflection = world->GetCubeMapReflection(0);
+	//tReflectionProbe *cube_map_reflection = 0;
+	//if(world->GetReflectionProbesCount() > 0)
+	//	cube_map_reflection = world->GetReflectionProbe(0);
 
 	//if (cube_map_reflection)
 	//	geometry_pass_shader->SetCubeMapReflectionTexture(cube_map_reflection->GetCubeMapTexture());
@@ -423,14 +423,14 @@ void tDeferredRenderer::BindlessTexturesLightPass(void)
 
 void tDeferredRenderer::SetReflections(tReflectingShader *shader, tVector pos)
 {
-	vector<tCubeMapReflection *> reflections;
+	vector<tReflectionProbe *> reflections;
 
 	// TODO: Blend between Reflections
-	if(world->GetCubeMapReflectionsCount() > 0)
+	if(world->GetReflectionProbesCount() > 0)
 	{
-		for(int i=0; i<world->GetCubeMapReflectionsCount(); i++)
+		for(int i=0; i< world->GetReflectionProbesCount(); i++)
 		{
-			tCubeMapReflection *reflection = world->GetCubeMapReflection(i);
+			tReflectionProbe *reflection = world->GetReflectionProbe(i);
 			tVector dir = pos - reflection->GetPosition();
 
 			if(reflection->GetExtent().ContainsPoint(dir))
@@ -442,8 +442,8 @@ void tDeferredRenderer::SetReflections(tReflectingShader *shader, tVector pos)
 	{
 		// see https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
 
-		tCubeMapReflection *reflection1 = reflections[0];
-		tCubeMapReflection *reflection2 = reflections[1];
+		tReflectionProbe *reflection1 = reflections[0];
+		tReflectionProbe *reflection2 = reflections[1];
 
 		float influence1 = reflection1->GetExtent().GetNormalizedBoxDistanceToCenter(pos - reflection1->GetPosition());
 		float influence2 = reflection2->GetExtent().GetNormalizedBoxDistanceToCenter(pos - reflection2->GetPosition());

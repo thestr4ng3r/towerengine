@@ -119,7 +119,7 @@ bool tScene::LoadFromFile(string file)
 	for(map<string, tSceneObject *>::iterator i=objects.begin(); i!=objects.end(); i++)
 	{
 		tSceneObject *so = i->second;
-		string reflection_name = so->GetAttribute("T_cube_map_reflection");
+		string reflection_name = so->GetAttribute("T_reflection_probe");
 
 		if(reflection_name.empty())
 			continue;
@@ -132,8 +132,8 @@ bool tScene::LoadFromFile(string file)
 		if(!mesh_object)
 			continue;
 
-		map<string, tCubeMapReflectionSceneObject *>::iterator reflection_i = cube_map_reflection_scene_objects.find(reflection_name);
-		if(reflection_i == cube_map_reflection_scene_objects.end())
+		map<string, tReflectionProbeSceneObject *>::iterator reflection_i = reflection_probe_scene_objects.find(reflection_name);
+		if(reflection_i == reflection_probe_scene_objects.end())
 			continue;
 
 		mesh_object->SetCubeMapReflection(reflection_i->second->GetReflection());
@@ -322,13 +322,13 @@ void tScene::ParseObjectsNode(xml_node<> *cur)
 
 			scene_object->SetAttribute(attr_name, attr_value);
 
-			if(scene_object->GetType() == T_SCENE_OBJECT_TYPE_CUBE_MAP_REFLECTION && attr_name == "T_cube_map_reflection_name")
+			if(scene_object->GetType() == T_SCENE_OBJECT_TYPE_REFLECTION_PROBE && attr_name == "T_cube_map_reflection_name")
 			{
-				tCubeMapReflectionSceneObject *cube_map_reflection_object = dynamic_cast<tCubeMapReflectionSceneObject *>(scene_object);
+				tReflectionProbeSceneObject *cube_map_reflection_object = dynamic_cast<tReflectionProbeSceneObject *>(scene_object);
 				if(!cube_map_reflection_object)
 					continue;
 
-				cube_map_reflection_scene_objects.insert(pair<string, tCubeMapReflectionSceneObject *>(attr_value, cube_map_reflection_object));
+				reflection_probe_scene_objects.insert(pair<string, tReflectionProbeSceneObject *>(attr_value, cube_map_reflection_object));
 			}
 		}
 
@@ -469,11 +469,11 @@ tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 	tVector delta_position = tVec(0.0, 0.0, 0.0);
 	xml_attribute<> *attr;
 
-	bool cube_map_reflection = false;
+	bool reflection_probe = false;
 
 	if((attr = cur->first_attribute("tag")))
-		if(strcmp(attr->value(), "T_cube_map_reflection") == 0)
-			cube_map_reflection = true;
+		if(strcmp(attr->value(), "T_reflection_probe") == 0)
+			reflection_probe = true;
 
 	xml_node<> *child = cur->first_node();
 	for(; child; child = child->next_sibling())
@@ -499,15 +499,15 @@ tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 
 	transform.SetPosition(transform.GetPosition() - delta_position);
 
-	if(!cube_map_reflection)
+	if(!reflection_probe)
 	{
 		tEmptySceneObject *scene_object = new tEmptySceneObject(transform);
 		return scene_object;
 	}
 	else
 	{
-		tCubeMapReflection *reflection = new tCubeMapReflection(transform.GetPosition(), extent_a, extent_b);
-		tCubeMapReflectionSceneObject *scene_object = new tCubeMapReflectionSceneObject(reflection);
+		tReflectionProbe *reflection = new tReflectionProbe(transform.GetPosition(), extent_a, extent_b);
+		tReflectionProbeSceneObject *scene_object = new tReflectionProbeSceneObject(reflection);
 		return scene_object;
 	}
 }
@@ -603,7 +603,7 @@ void tScene::AddToWorld(void)
 	for(i=objects.begin(); i!=objects.end(); i++)
 		i->second->AddToWorld(world);
 
-	world->AssignUnsetCubeMapReflections();
+	world->AssignUnsetReflectionProbes();
 }
 
 void tScene::RemoveFromWorld(void)

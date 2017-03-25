@@ -129,22 +129,22 @@ tEmptySceneObject::~tEmptySceneObject(void)
 
 // ---------------------------------------------
 
-tCubeMapReflectionSceneObject::tCubeMapReflectionSceneObject(tCubeMapReflection *reflection)
+tReflectionProbeSceneObject::tReflectionProbeSceneObject(tReflectionProbe *reflection)
 {
 	this->reflection = reflection;
 }
 
-tCubeMapReflectionSceneObject::~tCubeMapReflectionSceneObject()
+tReflectionProbeSceneObject::~tReflectionProbeSceneObject()
 {
 	delete reflection;
 }
 
-void tCubeMapReflectionSceneObject::AddToWorld(tWorld *world)
+void tReflectionProbeSceneObject::AddToWorld(tWorld *world)
 {
 	world->AddCubeMapReflection(reflection);
 }
 
-void tCubeMapReflectionSceneObject::RemoveFromWorld(tWorld *world)
+void tReflectionProbeSceneObject::RemoveFromWorld(tWorld *world)
 {
 	world->RemoveCubeMapReflection(reflection);
 }

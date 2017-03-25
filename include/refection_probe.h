@@ -1,9 +1,9 @@
 
-#ifndef _CUBE_MAP_REFLECTION_H
-#define _CUBE_MAP_REFLECTION_H
+#ifndef _TOWERENGINE_REFLECTION_PROBE_REFLECTION_H
+#define _TOWERENGINE_REFLECTION_PROBE_REFLECTION_H
 
 
-class tCubeMapReflection
+class tReflectionProbe
 {
 	private:
 		tVector position;
@@ -30,8 +30,8 @@ class tCubeMapReflection
 		void BlurPass(tDeferredRenderer *renderer);
 
 	public:
-		tCubeMapReflection(tVector position, tVector extent_a, tVector extend_b);
-		~tCubeMapReflection(void);
+		tReflectionProbe(tVector position, tVector extent_a, tVector extend_b);
+		~tReflectionProbe(void);
 
 		void Init(unsigned int resolution_log);
 

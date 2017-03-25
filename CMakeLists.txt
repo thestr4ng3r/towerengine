@@ -129,7 +129,7 @@ set(TOWERENGINE_SRC
 	src/ssao.cpp
 	src/ssao_blur_shader.cpp
 	src/fog_shader.cpp
-	src/cube_map_reflection.cpp
+		src/refection_probe.cpp
 	src/material_manager.cpp
 	src/matrix3.cpp
 	src/matrix4.cpp

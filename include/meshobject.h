@@ -2,14 +2,14 @@
 #ifndef _MESHOBJECT_H
 #define _MESHOBJECT_H
 
-class tCubeMapReflection;
+class tReflectionProbe;
 
 class tMeshObject : public tTransformObject
 {
 	private:
 		tMesh *mesh;
 
-		tCubeMapReflection *cube_map_reflection;
+		tReflectionProbe *cube_map_reflection;
 
 		bool visible;
 
@@ -45,7 +45,7 @@ class tMeshObject : public tTransformObject
 		void SetAlpha(float a)							{ alpha = a; }
 		void SetColor(tVector c, float a)				{ SetColor(c); SetAlpha(a); }
 		void SetVisible(bool visible)					{ this->visible = visible; }
-		void SetCubeMapReflection(tCubeMapReflection *reflection)	{ this->cube_map_reflection = reflection; }
+		void SetCubeMapReflection(tReflectionProbe *reflection)	{ this->cube_map_reflection = reflection; }
 
 		void ReplaceMaterial(std::string name, tMaterial *material);
 		void RestoreReplaceMaterial(std::string name);
@@ -63,7 +63,7 @@ class tMeshObject : public tTransformObject
 
 		tBoundingBox GetBoundingBox(void);
 
-		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
+		tReflectionProbe *GetCubeMapReflection(void)	{ return cube_map_reflection; }
 		bool GetCubeMapReflectionEnabled(void)			{ return mesh->GetCubeMapReflectionEnabled(); }
 
 		btRigidBody *GetRigidBody(void)		{ return rigid_body; }

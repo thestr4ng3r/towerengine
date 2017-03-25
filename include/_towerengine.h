@@ -82,7 +82,7 @@ class t2DRenderer;
 #include "renderspace.h"
 #include "point_light_shadow.h"
 #include "directional_light_shadow.h"
-#include "cube_map_reflection.h"
+#include "refection_probe.h"
 #include "world.h"
 #include "scene_object.h"
 #include "scene.h"
