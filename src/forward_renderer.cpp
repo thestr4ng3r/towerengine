@@ -23,8 +23,56 @@ void tForwardRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space
 	tRenderer::PrepareRender(camera, render_space);
 }
 
-void tForwardRenderer::StandardForwardPass()
+
+void tForwardRenderer::DepthPrePass()
 {
+	shadow_pass = false;
+
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_DEPTH_TEST);
+
+	SetCurrentFaceShader(depth_pass_shader);
+	BindCurrentFaceShader();
+
+	current_rendering_render_space->DepthPrePass(this);
+
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+}
+
+void tForwardRenderer::RenderForward()
+{
+	shadow_pass = false;
+
+
+	tSkyBox *sky_box = world->GetSkyBox();
+
+	if(sky_box)
+	{
+		glDisable(GL_BLEND);
+		glDisable(GL_DEPTH_TEST);
+		skybox_shader->Bind();
+		skybox_shader->SetCameraPosition(current_rendering_camera->GetPosition());
+		sky_box->Render(this, current_rendering_camera->GetPosition());
+	}
+
+
+	if(GetDepthPrePassEnabled())
+	{
+		DepthPrePass();
+
+		glDepthMask(GL_FALSE);
+		glDepthFunc(GL_EQUAL);
+	}
+	else
+	{
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
+	}
+	glEnable(GL_DEPTH_TEST);
+
+
 	SetCurrentFaceShader(standard_shader);
 	BindCurrentFaceShader();
 
@@ -56,7 +104,9 @@ void tForwardRenderer::StandardForwardPass()
 
 
 
-	glEnable(GL_DEPTH_TEST);
 
 	current_rendering_render_space->StandardForwardPass(this);
+
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
 }

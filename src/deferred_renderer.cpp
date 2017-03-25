@@ -34,8 +34,6 @@ void tDeferredRenderer::InitDeferredRenderer(int width, int height, tWorld *worl
 
 	fxaa_enabled = false;
 
-	depth_prepass_enabled = true;
-
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	color_tex = new GLuint[2];
@@ -124,7 +122,6 @@ void tDeferredRenderer::InitShaders(void)
 	ambient_lighting_shader = new tAmbientLightingShader(gbuffer, false);
 	//}
 
-	skybox_shader = new tSkyBoxShader();
 	color_shader = new tColorShader();
 	post_process_shader = new tPostProcessShader();
 	particle_forward_shader = new tParticleForwardShader(gbuffer);
@@ -158,7 +155,6 @@ tDeferredRenderer::~tDeferredRenderer(void)
 	delete ssao_ambient_lighting_shader;
 	delete ssao_shader;
 
-	delete skybox_shader;
 	delete color_shader;
 	delete post_process_shader;
 	delete fog_shader;
@@ -260,8 +256,11 @@ void tDeferredRenderer::GeometryPass(void)
 {
 	shadow_pass = false;
 
+	if(GetDepthPrePassEnabled())
+		DepthPrePass();
+
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	if(depth_prepass_enabled)
+	if(GetDepthPrePassEnabled())
 	{
 		glDepthMask(GL_FALSE);
 		glDepthFunc(GL_EQUAL);
@@ -291,7 +290,7 @@ void tDeferredRenderer::GeometryPass(void)
 
 	current_rendering_render_space->GeometryPass(this);
 
-	if(depth_prepass_enabled)
+	if(GetDepthPrePassEnabled())
 		glDepthFunc(GL_LESS);
 
 	bool particle_rendering_initialized = false;
@@ -313,7 +312,7 @@ void tDeferredRenderer::GeometryPass(void)
 		particle_system->Render(this, particle_deferred_shader);
 	}
 
-	if(particle_rendering_initialized || depth_prepass_enabled)
+	if(particle_rendering_initialized || GetDepthPrePassEnabled())
 		glDepthMask(GL_TRUE);
 }
 
@@ -330,7 +329,7 @@ void tDeferredRenderer::LightPass(void)
 	{
 		skybox_shader->Bind();
 		skybox_shader->SetCameraPosition(current_rendering_camera->GetPosition());
-		sky_box->Paint(this, current_rendering_camera->GetPosition());
+		sky_box->Render(this, current_rendering_camera->GetPosition());
 	}
 
 	gbuffer->BindTextures();

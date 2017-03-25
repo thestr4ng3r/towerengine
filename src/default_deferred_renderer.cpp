@@ -21,7 +21,7 @@ void tDefaultDeferredRenderer::Render(GLuint dst_fbo, int viewport_x, int viewpo
 	camera->CalculateModelViewProjectionMatrix();
 	world->FillRenderSpace(camera_render_space, (tCulling **)&camera, 1);
 
-	tDeferredRenderer::PrepareRender(camera, camera_render_space);
+	PrepareRender(camera, camera_render_space);
 
 
 	// render...
@@ -29,11 +29,8 @@ void tDefaultDeferredRenderer::Render(GLuint dst_fbo, int viewport_x, int viewpo
 	current_rendering_camera = camera;
 	current_rendering_render_space = camera_render_space;
 
-	matrix_buffer->Bind();
+
 	position_restore_data_buffer->Bind();
-
-	matrix_buffer->UpdateBuffer(current_rendering_camera->GetModelViewProjectionMatrix());
-
 
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -44,11 +41,7 @@ void tDefaultDeferredRenderer::Render(GLuint dst_fbo, int viewport_x, int viewpo
 	float clear_color[] = { 0.0, 0.0, 0.0, 0.0 };
 	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::BASE_COLOR_TEX), clear_color);
 
-	if(depth_prepass_enabled)
-		DepthPrePass();
-
 	GeometryPass();
-
 
 	position_restore_data_buffer->UpdateBuffer(current_rendering_camera);
 

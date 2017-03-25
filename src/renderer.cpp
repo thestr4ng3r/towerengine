@@ -52,6 +52,7 @@ void tRenderer::InitShaders()
 	point_shadow_blur_shader = new tPointShadowBlurShader();
 	directional_shadow_shader = new tDirectionalShadowShader();
 	directional_shadow_blur_shader = new tDirectionalShadowBlurShader();
+	skybox_shader = new tSkyBoxShader();
 }
 
 tRenderer::~tRenderer()
@@ -60,6 +61,7 @@ tRenderer::~tRenderer()
 	delete point_shadow_blur_shader;
 	delete directional_shadow_shader;
 	delete directional_shadow_blur_shader;
+	delete skybox_shader;
 
 	delete screen_quad_vbo;
 	delete screen_quad_vao;
@@ -75,6 +77,7 @@ void tRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
 
 	RenderShadowMaps();
 }
+
 
 void tRenderer::RenderShadowMaps(void)
 {
@@ -96,7 +99,6 @@ void tRenderer::RenderShadowMaps(void)
 		render_point_light_shadows.push_back(*pi);
 		(*pi)->SetCompareValue(((*pi)->GetPosition() - current_rendering_camera->GetPosition()).SquaredLen());
 	}
-
 
 	if(point_light_shadow_limit == 0)
 		render_point_light_shadows.clear();

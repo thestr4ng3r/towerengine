@@ -14,6 +14,7 @@ class tPointLightShadow;
 class tDirectionalLight;
 class tDirectionalLightShadow;
 class tRenderer;
+class tDefaultRenderer;
 class tDeferredRenderer;
 class tForwardRenderer;
 class t2DRenderer;

@@ -2,7 +2,7 @@
 #ifndef _DEFAULT_RENDERER_H
 #define _DEFAULT_RENDERER_H
 
-class tDefaultDeferredRenderer : public tDeferredRenderer
+class tDefaultDeferredRenderer : public tDeferredRenderer//, public tDefaultRenderer
 {
 	private:
 		tCamera *camera;

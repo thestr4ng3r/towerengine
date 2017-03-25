@@ -9,6 +9,10 @@ class tRenderer
 
 		void RenderShadowMaps(void);
 
+		bool depth_prepass_enabled;
+
+
+
 	protected:
 		tWorld *world;
 
@@ -16,6 +20,7 @@ class tRenderer
 		tPointShadowBlurShader *point_shadow_blur_shader;
 		tDirectionalShadowShader *directional_shadow_shader;
 		tDirectionalShadowBlurShader *directional_shadow_blur_shader;
+		tSkyBoxShader *skybox_shader;
 
 		tDepthPassShader *depth_pass_shader;
 
@@ -46,9 +51,13 @@ class tRenderer
 		tDirectionalShadowShader *GetDirectionalShadowShader(void)			{ return directional_shadow_shader; }
 		tDirectionalShadowBlurShader *GetDirectionalShadowBlurShader(void)	{ return directional_shadow_blur_shader; }
 		tDepthPassShader *GetDepthPassShader(void)							{ return depth_pass_shader; }
+		tSkyBoxShader *GetSkyBoxShader(void)								{ return skybox_shader; }
 
 		bool GetShadowPass(void)					{ return shadow_pass; }
 		tCamera *GetCurrentRenderingCamera(void)	{ return current_rendering_camera; }
+
+		void SetDepthPrePassEnabled(bool enabled)		{ this->depth_prepass_enabled = enabled; }
+		bool GetDepthPrePassEnabled(void)				{ return depth_prepass_enabled; }
 
 		tFaceShader *GetCurrentFaceShader(void)		{ return current_face_shader; }
 		void BindCurrentFaceShader(void)			{ current_face_shader->Bind(); }

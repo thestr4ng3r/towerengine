@@ -8,6 +8,8 @@ class tDeferredRenderer : public tRenderer
 	private:
 		void InitShaders(void);
 
+		void DepthPrePass(void);
+
 	protected:
 		tGeometryPassShader *geometry_pass_shader;
 		tSimpleForwardShader *simple_forward_shader;
@@ -21,7 +23,6 @@ class tDeferredRenderer : public tRenderer
 		std::vector<tPointLightingShader *> point_lighting_shaders;
 		tSSAOLightingShader *ssao_lighting_shader;
 
-		tSkyBoxShader *skybox_shader;
 		tColorShader *color_shader;
 		tPostProcessShader *post_process_shader;
 
@@ -49,7 +50,6 @@ class tDeferredRenderer : public tRenderer
 		tSSAO *ssao;
 		bool ssao_ambient_only;
 
-		bool depth_prepass_enabled;
 
 		bool bindless_textures_enabled;
 
@@ -66,7 +66,6 @@ class tDeferredRenderer : public tRenderer
 
 		void InitDeferredRenderer(int width, int height, tWorld *world, bool bindless_textures);
 
-		void DepthPrePass(void);
 		void GeometryPass(void);
 		void LightPass(void);
 		void ForwardPass(void);
@@ -101,7 +100,6 @@ class tDeferredRenderer : public tRenderer
 		tDirectionalLightingShader *GetDirectionalLightingShader(void)		{ return directional_lighting_shader; }
 		std::vector<tPointLightingShader *>::iterator GetPointLightingShadersBegin(void)	{ return point_lighting_shaders.begin(); }
 		std::vector<tPointLightingShader *>::iterator GetPointLightingShadersEnd(void)		{ return point_lighting_shaders.end(); }
-		tSkyBoxShader *GetSkyBoxShader(void)								{ return skybox_shader; }
 		tColorShader *GetColorShader(void)									{ return color_shader; }
 		tSSAOShader *GetSSAOShader(void)									{ return ssao_shader; }
 		tCubeMapBlurShader *GetCubeMapBlurShader(void)						{ return cube_map_blur_shader; }
@@ -114,8 +112,6 @@ class tDeferredRenderer : public tRenderer
 
 		GLuint GetCurrentReadColorTexture(void)			{ return color_tex[current_read_color_tex]; }
 
-		void SetDepthPrePassEnabled(bool enabled)		{ this->depth_prepass_enabled = enabled; }
-		bool GetDepthPrePassEnabled(void)				{ return depth_prepass_enabled; }
 
 		tPositionRestoreDataBuffer *GetPositionRestoreDataBuffer(void)	{ return position_restore_data_buffer; }
 };

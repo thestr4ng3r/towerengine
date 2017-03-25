@@ -1,7 +1,7 @@
 
 #include "towerengine.h"
 
-tDefaultForwardRenderer::tDefaultForwardRenderer(tWorld *world)
+tDefaultForwardRenderer::tDefaultForwardRenderer(tWorld *world) : tForwardRenderer()
 {
 	InitForwardRenderer(world);
 
@@ -33,15 +33,12 @@ void tDefaultForwardRenderer::Render(GLuint dst_fbo, int viewport_x, int viewpor
 
 
 	glBindFramebuffer(GL_FRAMEBUFFER, dst_fbo);
-
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
-
-	StandardForwardPass();
+	RenderForward();
 
 	tShader::Unbind();
 

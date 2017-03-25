@@ -178,7 +178,7 @@ void tReflectionProbe::LightPass(tDeferredRenderer *renderer, int side, tWorld *
 		tSkyBoxShader *skybox_shader = renderer->GetSkyBoxShader();
 		skybox_shader->Bind();
 		skybox_shader->SetCameraPosition(camera->GetPosition());
-		sky_box->Paint(renderer, camera->GetPosition());
+		sky_box->Render(renderer, camera->GetPosition());
 	}
 
 	gbuffer->BindTextures();

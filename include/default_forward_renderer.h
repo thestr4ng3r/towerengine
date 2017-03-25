@@ -3,7 +3,7 @@
 #define _TOWERENGINE_DEFAULT_FORWARD_RENDERER_H
 
 
-class tDefaultForwardRenderer: public tForwardRenderer
+class tDefaultForwardRenderer: public tForwardRenderer//, public tDefaultRenderer
 {
 	private:
 		tCamera *camera;

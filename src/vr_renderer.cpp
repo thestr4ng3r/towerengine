@@ -69,9 +69,6 @@ void tVRRenderer::Render(GLuint dst_fbo)
 
 		glViewport(eye == 1 ? width[0] : 0, 0, width[eye], height[eye]);
 
-		if(depth_prepass_enabled)
-			DepthPrePass();
-
 		GeometryPass();
 	}
 	

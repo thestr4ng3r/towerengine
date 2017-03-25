@@ -20,7 +20,7 @@ class tSkyBox
 		void SetCubeMap(GLuint cube_map)	{ this->cube_map = cube_map; }
 		GLuint GetCubeMap(void)				{ return cube_map; }
 
-		void Paint(tDeferredRenderer *renderer, tVector pos);
+		void Render(tRenderer *renderer, tVector pos);
 };
 
 

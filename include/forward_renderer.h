@@ -4,6 +4,9 @@
 
 class tForwardRenderer: public tRenderer
 {
+	private:
+		void DepthPrePass();
+
 	protected:
 		tStandardForwardShader *standard_shader;
 
@@ -13,7 +16,7 @@ class tForwardRenderer: public tRenderer
 
 		void PrepareRender(tCamera *camera, tRenderSpace *render_space);
 
-		void StandardForwardPass();
+		void RenderForward();
 
 	public:
 		virtual ~tForwardRenderer();
