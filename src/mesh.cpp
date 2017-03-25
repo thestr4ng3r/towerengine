@@ -368,6 +368,9 @@ void tMesh::DepthPrePass(tRenderer *renderer, map<tMaterial *, tMaterial *> *rep
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
+		if(i->second->ibo->GetSize() == 0)
+			continue;
+
 		tMaterial *mat = i->first;
 		if(replace_materials)
 		{
@@ -394,6 +397,9 @@ void tMesh::ShadowPass(tRenderer *renderer, map<tMaterial *, tMaterial *> *repla
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
+		if(i->second->ibo->GetSize() == 0)
+			continue;
+
 		tMaterial *mat = i->first;
 		if(replace_materials)
 		{
@@ -421,6 +427,9 @@ void tMesh::GeometryPass(tDeferredRenderer *renderer, map<tMaterial *, tMaterial
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
+		if(i->second->ibo->GetSize() == 0)
+			continue;
+
 		tMaterial *mat = i->first;
 		if(replace_materials)
 		{
@@ -440,6 +449,9 @@ void tMesh::ForwardPass(tDeferredRenderer *renderer, float *transform, map<tMate
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
+		if(i->second->ibo->GetSize() == 0)
+			continue;
+
 		tMaterial *mat = i->first;
 		if(replace_materials)
 		{
@@ -469,6 +481,9 @@ void tMesh::RefractionPass(tDeferredRenderer *renderer, float *transform, map<tM
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
+		if(i->second->ibo->GetSize() == 0)
+			continue;
+
 		tMaterial *mat = i->first;
 		if(replace_materials)
 		{
@@ -505,6 +520,9 @@ void tMesh::StandardForwardPass(tForwardRenderer *renderer, map<tMaterial *, tMa
 
 	for(map<tMaterial *, tMaterialIBO *>::iterator i=material_ibos.begin(); i!=material_ibos.end(); i++)
 	{
+		if(i->second->ibo->GetSize() == 0)
+			continue;
+
 		tMaterial *mat = i->first;
 		if(replace_materials)
 		{

@@ -29,6 +29,8 @@ void tDefaultDeferredRenderer::Render(GLuint dst_fbo, int viewport_x, int viewpo
 	current_rendering_camera = camera;
 	current_rendering_render_space = camera_render_space;
 
+	matrix_buffer->Bind();
+	matrix_buffer->UpdateBuffer(camera->GetModelViewProjectionMatrix());
 
 	position_restore_data_buffer->Bind();
 
