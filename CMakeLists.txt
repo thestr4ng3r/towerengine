@@ -129,7 +129,7 @@ set(TOWERENGINE_SRC
 	src/ssao.cpp
 	src/ssao_blur_shader.cpp
 	src/fog_shader.cpp
-		src/refection_probe.cpp
+	src/refection_probe.cpp
 	src/material_manager.cpp
 	src/matrix3.cpp
 	src/matrix4.cpp
@@ -160,7 +160,11 @@ set(TOWERENGINE_SRC
 	src/face_shader.cpp
 	src/forward_renderer.cpp
 	include/standard_forward_shader.h
-	src/standard_forward_shader.cpp include/renderer.h src/renderer.cpp include/default_forward_renderer.h src/default_forward_renderer.cpp include/default_renderer.h)
+	src/standard_forward_shader.cpp
+	include/renderer.h
+	src/renderer.cpp
+	include/default_forward_renderer.h
+	src/default_forward_renderer.cpp)
 
 if(TOWERENGINE_BUILD_OPENVR)
 	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)
