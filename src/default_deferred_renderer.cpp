@@ -1,27 +1,27 @@
 
 #include "towerengine.h"
 
-tDefaultRenderer::tDefaultRenderer(int width, int height, tWorld *world)
+tDefaultDeferredRenderer::tDefaultDeferredRenderer(int width, int height, tWorld *world)
 {
-	InitRenderer(width, height, world, true);
+	InitDeferredRenderer(width, height, world, true);
 
 	camera = new tCamera();
 	camera_render_space = new tRenderSpace();
 }
 
 
-tDefaultRenderer::~tDefaultRenderer(void)
+tDefaultDeferredRenderer::~tDefaultDeferredRenderer(void)
 {
 	delete camera;
 	delete camera_render_space;
 }
 
-void tDefaultRenderer::Render(GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
+void tDefaultDeferredRenderer::Render(GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
 {
 	camera->CalculateModelViewProjectionMatrix();
 	world->FillRenderSpace(camera_render_space, (tCulling **)&camera, 1);
 
-	tRenderer::PrepareRender(camera, camera_render_space);
+	PrepareRender(camera, camera_render_space);
 
 
 	// render...
@@ -30,10 +30,9 @@ void tDefaultRenderer::Render(GLuint dst_fbo, int viewport_x, int viewport_y, in
 	current_rendering_render_space = camera_render_space;
 
 	matrix_buffer->Bind();
+	matrix_buffer->UpdateBuffer(camera->GetModelViewProjectionMatrix());
+
 	position_restore_data_buffer->Bind();
-
-	matrix_buffer->UpdateBuffer(current_rendering_camera->GetModelViewProjectionMatrix());
-
 
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -44,11 +43,7 @@ void tDefaultRenderer::Render(GLuint dst_fbo, int viewport_x, int viewport_y, in
 	float clear_color[] = { 0.0, 0.0, 0.0, 0.0 };
 	glClearBufferfv(GL_COLOR, gbuffer->GetDrawBufferIndex(tGBuffer::BASE_COLOR_TEX), clear_color);
 
-	if(depth_prepass_enabled)
-		DepthPrePass();
-
 	GeometryPass();
-
 
 	position_restore_data_buffer->UpdateBuffer(current_rendering_camera);
 

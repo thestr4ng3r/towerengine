@@ -5,14 +5,14 @@ using namespace std;
 
 
 
-tDefaultMaterial::tDefaultMaterial(void)
+tStandardMaterial::tStandardMaterial(void)
 {
-	base_color = Vec(1.0, 1.0, 1.0);
+	base_color = tVec(1.0, 1.0, 1.0);
 	metallic = 0.2;
 	roughness = 0.3;
 	reflectance = 0.0;
 
-	emission = Vec(0.0, 0.0, 0.0);
+	emission = tVec(0.0, 0.0, 0.0);
 
     transparent = false;
 
@@ -26,14 +26,19 @@ tDefaultMaterial::tDefaultMaterial(void)
 		tex[i] = 0;
 
 	uniform_buffer = new tUniformBuffer(18 * 4);
+
+	own_textures = true;
 }
 
-tDefaultMaterial::~tDefaultMaterial(void)
+tStandardMaterial::~tStandardMaterial(void)
 {
-	for(int i=0; i<tex_count; i++)
+	if(own_textures)
 	{
-		if(tex[i] != 0)
-			glDeleteTextures(1, &tex[i]);
+		for(int i = 0; i < tex_count; i++)
+		{
+			if(tex[i] != 0)
+				glDeleteTextures(1, &tex[i]);
+		}
 	}
 
 	delete uniform_buffer;
@@ -42,9 +47,9 @@ tDefaultMaterial::~tDefaultMaterial(void)
 
 
 
-void tDefaultMaterial::LoadTexture(TextureType type, string file)
+void tStandardMaterial::LoadTexture(TextureType type, string file)
 {
-	if(tex[type] != 0)
+	if(tex[type] != 0 && own_textures)
 	{
 		glDeleteTextures(1, &tex[type]);
 	}
@@ -62,9 +67,9 @@ void tDefaultMaterial::LoadTexture(TextureType type, string file)
 	tex[type] = LoadGLTexture(file.c_str(), channels, transparent);
 }
 
-void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, const void *data, size_t size)
+void tStandardMaterial::LoadTexture(TextureType type, const char *extension, const void *data, size_t size)
 {
-	if(tex[type] != 0)
+	if(tex[type] != 0 && own_textures)
 	{
 		glDeleteTextures(1, &tex[type]);
 	}
@@ -82,9 +87,9 @@ void tDefaultMaterial::LoadTexture(TextureType type, const char *extension, cons
 	tex[type] = LoadGLTextureBinary(extension, data, size, channels, transparent);
 }
 
-void tDefaultMaterial::SetTexture(TextureType type, GLuint gl_tex)
+void tStandardMaterial::SetTexture(TextureType type, GLuint gl_tex)
 {
-	if(tex[type] != 0)
+	if(tex[type] != 0 && own_textures)
 	{
 		glDeleteTextures(1, &tex[type]);
 	}
@@ -94,10 +99,19 @@ void tDefaultMaterial::SetTexture(TextureType type, GLuint gl_tex)
 
 
 
-bool tDefaultMaterial::InitDepthPrePass(tRenderer *renderer)
+bool tStandardMaterial::InitDepthPrePass(tRenderer *renderer)
 {
-	//renderer->GetCurrentFaceShader()->SetDiffuseTexture(transparent && tex[DIFFUSE] != 0, tex[DIFFUSE]);
 	renderer->GetDepthPassShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);
+	return true;
+}
+
+bool tStandardMaterial::InitShadowPass(tRenderer *renderer)
+{
+	if(!shadow_cast)
+		return false;
+
+	renderer->GetCurrentFaceShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);
+
 	return true;
 }
 
@@ -122,7 +136,7 @@ layout(std140) uniform MaterialBlock
 } material_uni;
  */
 
-void tDefaultMaterial::UpdateUniformBuffer(void)
+void tStandardMaterial::UpdateUniformBuffer(void)
 {
 	float *data = (float *)uniform_buffer->GetData();
 
@@ -148,11 +162,33 @@ void tDefaultMaterial::UpdateUniformBuffer(void)
 }
 
 
-bool tDefaultMaterial::InitGeometryPass(tRenderer *renderer)
+bool tStandardMaterial::InitGeometryPass(tDeferredRenderer *renderer)
 {
 	if(renderer->GetShadowPass() && !shadow_cast)
 		return false;
 
+	uniform_buffer->Bind(tShader::material_binding_point);
+
+	if(tex[BASE_COLOR])
+		renderer->GetCurrentFaceShader()->SetBaseColorTexture(transparent && tex[BASE_COLOR] != 0, tex[BASE_COLOR]);
+
+	if(tex[METAL_ROUGH_REFLECT])
+		renderer->GetCurrentFaceShader()->SetMetallicRoughnessTexture(tex[METAL_ROUGH_REFLECT]);
+
+	if(tex[NORMAL])
+		renderer->GetCurrentFaceShader()->SetNormalTexture(tex[NORMAL]);
+
+	if(tex[BUMP])
+		renderer->GetCurrentFaceShader()->SetBumpTexture(tex[BUMP]);
+
+	if(tex[EMISSION])
+		renderer->GetCurrentFaceShader()->SetEmissionTexture(tex[EMISSION]);
+
+	return true;
+}
+
+bool tStandardMaterial::InitStandardForwardPass(tForwardRenderer *renderer)
+{
 	uniform_buffer->Bind(tShader::material_binding_point);
 
 	if(tex[BASE_COLOR])

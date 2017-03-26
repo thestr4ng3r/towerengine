@@ -20,9 +20,11 @@
 # Build
 build/
 build_msvc/
+build-win64/
 
 # PyDev
 .pydevproject
 
 # CLion
 .idea/
+cmake-build-*

@@ -50,7 +50,7 @@ class tIBO
 		tIBO(int size = 0);
 		~tIBO(void);
 
-		void SetAttribute(GLuint index, GLenum type, GLboolean normalize = GL_FALSE, GLsizei stride = 0);
+		//void SetAttribute(GLuint index, GLenum type, GLboolean normalize = GL_FALSE, GLsizei stride = 0);
 		void Bind(void)					{ glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); };
 		static void UnBind(void)		{ glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); };
 		bool SetSize(int size, bool copy = false); // returns true if size has changed and false if not

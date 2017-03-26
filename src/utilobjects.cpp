@@ -5,8 +5,8 @@
 tCoordinateSystemObject::tCoordinateSystemObject(bool depth_test) : tObject()
 {
 	this->depth_test = depth_test;
-	pos = Vec(0.0, 0.0, 0.0);
-	size = Vec(1.0, 1.0, 1.0);
+	pos = tVec(0.0, 0.0, 0.0);
+	size = tVec(1.0, 1.0, 1.0);
 
 	vao = new tVAO();
 	vao->Bind();
@@ -45,7 +45,7 @@ tCoordinateSystemObject::~tCoordinateSystemObject(void)
 	delete color_vbo;
 }
 
-void tCoordinateSystemObject::ForwardPass(tRenderer *renderer)
+void tCoordinateSystemObject::ForwardPass(tDeferredRenderer *renderer)
 {
 	if(depth_test)
 		glEnable(GL_DEPTH_TEST);

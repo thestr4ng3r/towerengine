@@ -2,7 +2,7 @@
 #ifndef _VR_RENDERER_H
 #define _VR_RENDERER_H
 
-class tVRRenderer : public tRenderer
+class tVRDeferredRenderer : public tDeferredRenderer
 {
 	private:
 		int width[2], height[2];
@@ -10,11 +10,11 @@ class tVRRenderer : public tRenderer
 		tCamera *camera[2];
 		tRenderSpace *camera_render_space;
 
-		void PrepareRender(void);
+		void PrepareVRRender(void);
 		
 	public:
-		tVRRenderer(int left_width, int left_height, int right_width, int right_height, tWorld *world);
-		~tVRRenderer(void);
+		tVRDeferredRenderer(int left_width, int left_height, int right_width, int right_height, tWorld *world);
+		~tVRDeferredRenderer(void);
 
 		void Render(GLuint dst_fbo);
 

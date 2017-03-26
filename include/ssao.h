@@ -2,12 +2,12 @@
 #ifndef _SSAO_H
 #define _SSAO_H
 
-class tRenderer;
+class tDeferredRenderer;
 
 class tSSAO
 {
 	private:
-		tRenderer *renderer;
+		tDeferredRenderer *renderer;
 
 		tSSAOBlurShader *blur_shader;
 
@@ -33,7 +33,7 @@ class tSSAO
 #endif
 
 	public:
-		tSSAO(tRenderer *renderer, int kernel_size, float radius, int noise_tex_size = 4);
+		tSSAO(tDeferredRenderer *renderer, int kernel_size, float radius, int noise_tex_size = 4);
 		~tSSAO(void);
 
 		void ChangeScreenSize(int screen_width, int screen_height);

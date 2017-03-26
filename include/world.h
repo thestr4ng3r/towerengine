@@ -9,7 +9,7 @@ class tWorld
 		std::vector<tPointLight *> point_lights;
 		std::vector<tDirectionalLight *> dir_lights;
 		std::vector<tParticleSystem *> particle_systems;
-		std::vector<tCubeMapReflection *> cube_map_reflections;
+		std::vector<tReflectionProbe *> reflection_probes;
 		tSkyBox *sky_box;
 
 		tVector ambient_color;
@@ -60,11 +60,11 @@ class tWorld
 		int GetParticleSystemsCount(void)				{ return particle_systems.size(); }
 		tParticleSystem *GetParticleSystem(int i)		{ return particle_systems.at(i); }
 
-		void AddCubeMapReflection(tCubeMapReflection *r);
-		void RemoveCubeMapReflection(tCubeMapReflection *r);
+		void AddCubeMapReflection(tReflectionProbe *r);
+		void RemoveCubeMapReflection(tReflectionProbe *r);
 
-		int GetCubeMapReflectionsCount(void)			{ return cube_map_reflections.size(); }
-		tCubeMapReflection *GetCubeMapReflection(int i)	{ return cube_map_reflections.at(i); }
+		int GetReflectionProbesCount(void)				{ return reflection_probes.size(); }
+		tReflectionProbe *GetReflectionProbe(int i)		{ return reflection_probes.at(i); }
 
 		void Step(float time, int max_sub_steps = 1, float fixed_time_step = 1.0f / 60.0f);
 
@@ -73,7 +73,7 @@ class tWorld
 
 		tSkyBox *GetSkyBox(void)						{ return sky_box; }
 
-		void AssignUnsetCubeMapReflections(void);
+		void AssignUnsetReflectionProbes(void);
 };
 
 

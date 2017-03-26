@@ -1,16 +1,6 @@
 #include "towerengine.h"
 
 
-/* gegeben ist eine Ebene durch den Normalvektor n und den Abstand zum Ursprung d
-   SetFromPlane setzt meine Koordinaten von dem zweidimensionalen Punkt p (von oben gesehen), der auf der Ebene liegt
-   und erg�nzt die y-Koordinate, sodass der Ergebnispunkt auf der Ebene liegt */
-void tVector::SetFromPlane(const tVector2 &p, const tVector &n, float d)
-{
-	x = p.x;
-	y = (d - p.x * n.x - p.y * n.z) / n.y;
-	z = p.y;
-}
-
 tVector &tVector::operator*=(tMatrix3 m)
 {
 	return *this = m.ApplyToVector(*this);
@@ -60,7 +50,7 @@ int PointInRange(tVector p, tVector s, tVector b)
 tVector PointToLine(tVector p, tVector r, tVector n)
 {
 	float l = Dot(p, n) - Dot(n, r);
-	l /= (float)Dot(n*n, Vec(1.0, 1.0, 1.0));
+	l /= (float)Dot(n*n, tVec(1.0, 1.0, 1.0));
 	tVector f = r + n*l;
 	return f-p;
 }
@@ -136,20 +126,20 @@ void DistToPlane(const tVector &a, const tVector &b, const tVector &c, const tVe
 /*#ifdef TMS_USE_LIB_3DS
 CVector Vec3ds(Lib3dsVector v)
 {
-    return Vec(v[0], v[1], v[2]);
+    return tVec(v[0], v[1], v[2]);
 }
 #endif
 
 #ifdef TMS_USE_LIB_G3D
 CVector VecG3D(G3DVector v[3])
 {
-    return Vec(v[0], v[1], v[2]);
+    return tVec(v[0], v[1], v[2]);
 }
 #endif*/
 
 tVector NullVec(void)
 {
-    return Vec(0.0, 0.0, 0.0);
+    return tVec(0.0, 0.0, 0.0);
 }
 
 tVector operator+(const tVector &a, const tVector &b)
@@ -228,7 +218,7 @@ tVector Cross(const tVector &a, const tVector &b)
 	return ret;
 }
 
-tVector Vec(const tVector2 &v, float y)
+tVector tVec(const tVector2 &v, float y)
 {
 	tVector r;
 
@@ -317,12 +307,12 @@ tVector Mix(const tVector v[], const float a[], int count, float mix)
 }
 
 
-tVector RandVec(void)
+/*tVector RandVec(void)
 {
 	tVector r;
 	tVector v;
 
-	r = Vec((float)rand(), (float)rand(), (float)rand());
+	r = tVec((float) rand(), (float) rand(), (float) rand());
 	r /= RAND_MAX;
 	r *= M_PI;
 	v.x = sin(r.y) * cos(r.z);
@@ -332,3 +322,4 @@ tVector RandVec(void)
 
 	return v;
 }
+*/

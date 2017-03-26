@@ -32,8 +32,6 @@ class tPointShadowBlurShader : public tShader
 		GLint blur_dir_uniform;
 
 	public:
-		static const GLint vertex_attribute = 0;
-
 		tPointShadowBlurShader(void);
 		void SetTexture(GLuint tex);
 		void SetBlurDir(tVector v);

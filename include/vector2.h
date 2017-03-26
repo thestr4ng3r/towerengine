@@ -1,5 +1,5 @@
-#ifndef _CVECTOR2_H
-#define _CVECTOR2_H
+#ifndef _VECTOR2_H
+#define _VECTOR2_H
 
 struct tVector;
 
@@ -26,7 +26,7 @@ struct tVector2
 	tVector2 &operator *= (const tVector2 o) { x*=o.x; y*=o.y; return *this; };
 };
 
-tVector2 Vec(float x, float y);
+tVector2 tVec(float x, float y);
 tVector2 operator+(const tVector2 &a, const tVector2 &b);
 tVector2 operator-(const tVector2 &a, const tVector2 &b);
 tVector2 operator*(const tVector2 &a, float scalar);

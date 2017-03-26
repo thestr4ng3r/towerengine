@@ -1,7 +1,6 @@
 #ifndef _VECTOR_H
 #define _VECTOR_H
 
-
 struct tMatrix3;
 class tTransform;
 
@@ -26,19 +25,20 @@ struct tVector
 
 
 
-	tVector2 xy(void) { return Vec(x, y); };
-	tVector2 xz(void) { return Vec(x, z); };
-	tVector2 yx(void) { return Vec(y, x); };
-	tVector2 yz(void) { return Vec(y, z); };
-	tVector2 zx(void) { return Vec(z, x); };
-	tVector2 zy(void) { return Vec(z, y); };
+	tVector2 xy(void) { return tVec(x, y); };
+	tVector2 xz(void) { return tVec(x, z); };
+	tVector2 yx(void) { return tVec(y, x); };
+	tVector2 yz(void) { return tVec(y, z); };
+	tVector2 zx(void) { return tVec(z, x); };
+	tVector2 zy(void) { return tVec(z, y); };
 
 	void Set(float _x, float _y, float _z) { x = _x; y = _y; z = _z; }
 	float Len(void) const		{ return sqrt(x * x + y * y + z * z); }
 	float SquaredLen(void) const		{ return x * x + y * y + z * z; }
 	void Normalize(void)		{ float l; l = 1.0f / Len(); x *= l; y *= l; z *= l; }
 
-	void SetFromPlane(const tVector2 &p, const tVector &n, float d);
+	tVector Normalized()		{ tVector r = *this; r.Normalize(); return r; }
+
 	tVector operator -(void) const	{tVector r; r.x = -x, r.y = -y, r.z = -z; return r; }
 	operator tVector2() const	{tVector2 r; r.x = x; r.y = z; return r; }
 
@@ -53,7 +53,7 @@ struct tVector
 	tVector &operator=(const btVector3 &a)	{ x = a.x(); y = a.y(); z = a.z(); return *this; }
 };
 
-inline tVector Vec(float x, float y, float z)
+inline tVector tVec(float x, float y, float z)
 {
 	tVector v;
 
@@ -64,9 +64,9 @@ inline tVector Vec(float x, float y, float z)
 	return v;
 }
 
-inline tVector Vec(const btVector3 &v)
+inline tVector tVec(const btVector3 &v)
 {
-	return Vec(v.x(), v.y(), v.z());
+	return tVec(v.x(), v.y(), v.z());
 }
 
 
@@ -82,7 +82,7 @@ int operator==(const tVector a, const tVector b);
 
 double Dot(const tVector &a, const tVector &b);
 tVector Cross(const tVector &a, const tVector &b);
-tVector Vec(const tVector2 &v, float y);
+tVector tVec(const tVector2 &v, float y);
 tVector Rotate(const tVector &vec, const tVector &axis, float angle);
 double Det(const tVector &v1, const tVector &v2, const tVector &v3);
 tVector Mix(const tVector v1, const tVector v2, float mix);
@@ -98,6 +98,6 @@ float DistToLine(tVector p, tVector r, tVector n);
 
 int PointInRange(tVector p, tVector s, tVector b);
 
-tVector RandVec(void);
+//tVector RandVec(void);
 
 #endif

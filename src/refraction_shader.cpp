@@ -68,11 +68,11 @@ void tRefractionShader::SetColorTexture(bool enabled, GLuint tex)
 	}
 }
 
-void tRefractionShader::SetNormalTexture(bool enabled, GLuint tex)
+void tRefractionShader::SetNormalTexture(GLuint tex)
 {
-	glUniform1i(normal_tex_enabled_uniform, enabled ? 1 : 0);
+	glUniform1i(normal_tex_enabled_uniform, tex ? 1 : 0);
 
-	if(enabled)
+	if(tex)
 	{
 		glActiveTexture(GL_TEXTURE0 + normal_tex_unit);
 		glBindTexture(GL_TEXTURE_2D, tex);

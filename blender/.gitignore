@@ -1,1 +1,8 @@
 __pycache__
+*.pyc
+
+test.py
+test.blend*
+
+_towerengine.so
+towerengine.py

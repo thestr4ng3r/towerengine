@@ -3,9 +3,9 @@
 
 tCamera::tCamera(void)
 {
-	pos = Vec(0.0, 0.0, 0.0);
-	dir = Vec(0.0, 0.0, -1.0);
-	up = Vec(0.0, 1.0, 0.0);
+	pos = tVec(0.0, 0.0, 0.0);
+	dir = tVec(0.0, 0.0, -1.0);
+	up = tVec(0.0, 1.0, 0.0);
 	near_clip = 0.1;
 	far_clip = 300.0;
 
@@ -48,17 +48,17 @@ tVector *tCamera::GetViewRays(void)
 {
 	tVector *c = new tVector[4];
 	
-	c[0] = Vec(fov.right,	fov.top, 1.0);
-	c[1] = Vec(fov.left,	fov.top, 1.0);
-	c[2] = Vec(fov.left,	fov.bottom, 1.0);
-	c[3] = Vec(fov.right,	fov.bottom, 1.0);
+	c[0] = tVec(fov.right, fov.top, 1.0);
+	c[1] = tVec(fov.left, fov.top, 1.0);
+	c[2] = tVec(fov.left, fov.bottom, 1.0);
+	c[3] = tVec(fov.right, fov.bottom, 1.0);
 
 	return c;
 }
 
 tVector tCamera::GetScreenRay(float x, float y)
 {
-	tVector r = Vec(x * fov.right, y * fov.bottom, 1.0); // TODO: Fix for asymmetrical FOV
+	tVector r = tVec(x * fov.right, y * fov.bottom, 1.0); // TODO: Fix for asymmetrical FOV
 	r *= far_clip;
 
 	tVector hvec = Cross(dir, up);

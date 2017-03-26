@@ -3,14 +3,14 @@
 
 using namespace std;
 
-tVRRenderer::tVRRenderer(int left_width, int left_height, int right_width, int right_height, tWorld *world)
+tVRDeferredRenderer::tVRDeferredRenderer(int left_width, int left_height, int right_width, int right_height, tWorld *world)
 {
 	width[0] = left_width;
 	height[0] = left_height;
 	width[1] = right_width;
 	height[1] = right_height;
 
-	InitRenderer(left_width + right_width, max(left_height, right_height), world, true);
+	InitDeferredRenderer(left_width + right_width, max(left_height, right_height), world, true);
 
 	for(int i=0; i<2; i++)
 	{
@@ -20,7 +20,7 @@ tVRRenderer::tVRRenderer(int left_width, int left_height, int right_width, int r
 	camera_render_space = new tRenderSpace();
 }
 
-tVRRenderer::~tVRRenderer(void)
+tVRDeferredRenderer::~tVRDeferredRenderer(void)
 {
 	for(int i=0; i<2; i++)
 	{
@@ -29,7 +29,7 @@ tVRRenderer::~tVRRenderer(void)
 }
 
 
-void tVRRenderer::PrepareRender(void)
+void tVRDeferredRenderer::PrepareVRRender(void)
 {
 	for(int eye=0; eye<2; eye++)
 	{
@@ -41,12 +41,12 @@ void tVRRenderer::PrepareRender(void)
 
 	world->FillRenderSpace(camera_render_space, (tCulling **)camera, 2);
 
-	tRenderer::PrepareRender(camera[0], camera_render_space); // TODO: use something instead of left camera
+	PrepareRender(camera[0], camera_render_space); // TODO: use something instead of left camera
 }
 
-void tVRRenderer::Render(GLuint dst_fbo)
+void tVRDeferredRenderer::Render(GLuint dst_fbo)
 {
-	PrepareRender();
+	PrepareVRRender();
 
 	// render...
 
@@ -68,9 +68,6 @@ void tVRRenderer::Render(GLuint dst_fbo)
 		matrix_buffer->UpdateBuffer(current_rendering_camera->GetModelViewProjectionMatrix());
 
 		glViewport(eye == 1 ? width[0] : 0, 0, width[eye], height[eye]);
-
-		if(depth_prepass_enabled)
-			DepthPrePass();
 
 		GeometryPass();
 	}

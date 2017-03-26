@@ -2,21 +2,16 @@
 #ifndef _MESHOBJECT_H
 #define _MESHOBJECT_H
 
-class tCubeMapReflection;
+class tReflectionProbe;
 
 class tMeshObject : public tTransformObject
 {
 	private:
 		tMesh *mesh;
 
-		tCubeMapReflection *cube_map_reflection;
+		tReflectionProbe *cube_map_reflection;
 
 		bool visible;
-
-		bool animation_mode;
-		bool loop;
-		tAnimation *animation;
-		float time;
 
 		std::string pose;
 
@@ -33,6 +28,7 @@ class tMeshObject : public tTransformObject
 
 		void CreateRigidBody(btScalar &mass, btVector3 &inertia);
 
+
 	protected:
 		void TransformChanged(void);
 
@@ -45,18 +41,11 @@ class tMeshObject : public tTransformObject
 
 		void SetMesh(tMesh *mesh)						{ this->mesh = mesh; }
 
-		void SetAnimation(const char *animation);
-		void Play(float time);
-		bool GetAnimationFinished(void);
-		void SetAnimationLoop(bool l)					{ loop = l; }
-		void SetAnimationMode(bool a)					{ animation_mode = a; }
-		void SetAnimationTime(float t)					{ time = t; }
-		void SetPose(std::string pose);
 		void SetColor(tVector c)						{ color = c; }
 		void SetAlpha(float a)							{ alpha = a; }
 		void SetColor(tVector c, float a)				{ SetColor(c); SetAlpha(a); }
 		void SetVisible(bool visible)					{ this->visible = visible; }
-		void SetCubeMapReflection(tCubeMapReflection *reflection)	{ this->cube_map_reflection = reflection; }
+		void SetCubeMapReflection(tReflectionProbe *reflection)	{ this->cube_map_reflection = reflection; }
 
 		void ReplaceMaterial(std::string name, tMaterial *material);
 		void RestoreReplaceMaterial(std::string name);
@@ -66,12 +55,15 @@ class tMeshObject : public tTransformObject
 		void UpdateRigidBodyTransformation(void);
 
 		void DepthPrePass(tRenderer *renderer);
-		void GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled);
-		void ForwardPass(tRenderer *renderer);
-		void RefractionPass(tRenderer *renderer);
+		void ShadowPass(tRenderer *renderer);
+		void GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled);
+		void ForwardPass(tDeferredRenderer *renderer);
+		void RefractionPass(tDeferredRenderer *renderer);
+		void StandardForwardPass(tForwardRenderer *renderer);
+
 		tBoundingBox GetBoundingBox(void);
 
-		tCubeMapReflection *GetCubeMapReflection(void)	{ return cube_map_reflection; }
+		tReflectionProbe *GetCubeMapReflection(void)	{ return cube_map_reflection; }
 		bool GetCubeMapReflectionEnabled(void)			{ return mesh->GetCubeMapReflectionEnabled(); }
 
 		btRigidBody *GetRigidBody(void)		{ return rigid_body; }

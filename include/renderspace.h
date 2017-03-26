@@ -1,6 +1,6 @@
 
-#ifndef _RENDERSPACE_H
-#define _RENDERSPACE_H
+#ifndef _TOWERENGINE_RENDERSPACE_H
+#define _TOWERENGINE_RENDERSPACE_H
 
 
 struct tRenderObjectSpace
@@ -12,9 +12,11 @@ struct tRenderObjectSpace
 	virtual void Clear(void);
 
 	void DepthPrePass(tRenderer *renderer);
-	void GeometryPass(tRenderer *renderer, bool cube_map_reflection_enabled = true);
-	void ForwardPass(tRenderer *renderer);
-	void RefractionPass(tRenderer *renderer);
+	void ShadowPass(tRenderer *renderer);
+	void GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled = true);
+	void ForwardPass(tDeferredRenderer *renderer);
+	void RefractionPass(tDeferredRenderer *renderer);
+	void StandardForwardPass(tForwardRenderer *renderer);
 };
 
 struct tRenderSpace : public tRenderObjectSpace

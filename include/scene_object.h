@@ -7,7 +7,7 @@
 #define T_SCENE_OBJECT_TYPE_DIRECTIONAL_LIGHT 2
 #define T_SCENE_OBJECT_TYPE_POINT_LIGHT 3
 #define T_SCENE_OBJECT_TYPE_EMPTY 4
-#define T_SCENE_OBJECT_TYPE_CUBE_MAP_REFLECTION 5
+#define T_SCENE_OBJECT_TYPE_REFLECTION_PROBE 5
 
 class tSceneObject
 {
@@ -105,21 +105,21 @@ class tEmptySceneObject : public tSceneObject
 };
 
 
-class tCubeMapReflectionSceneObject : public tSceneObject
+class tReflectionProbeSceneObject : public tSceneObject
 {
 	private:
-		tCubeMapReflection *reflection;
+		tReflectionProbe *reflection;
 
 	public:
-		tCubeMapReflectionSceneObject(tCubeMapReflection *reflection);
-		~tCubeMapReflectionSceneObject(void);
+		tReflectionProbeSceneObject(tReflectionProbe *reflection);
+		~tReflectionProbeSceneObject(void);
 
 		void AddToWorld(tWorld *world);
 		void RemoveFromWorld(tWorld *world);
 
-		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_CUBE_MAP_REFLECTION; }
+		int GetType(void)	{ return T_SCENE_OBJECT_TYPE_REFLECTION_PROBE; }
 
-		tCubeMapReflection *GetReflection(void)		{ return reflection; }
+		tReflectionProbe *GetReflection(void)		{ return reflection; }
 };
 
 

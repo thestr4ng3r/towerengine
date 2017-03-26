@@ -1,0 +1,64 @@
+dist: trusty
+sudo: required
+language: cpp
+compiler:
+- gcc
+
+addons:
+  ssh_known_hosts: ci.metallic.software
+
+before_install:
+- sudo apt-get update -qq
+- sudo apt-get install -y swig3.0
+- sudo apt-get remove -y cmake
+- wget https://cmake.org/files/v3.7/cmake-3.7.2-Linux-x86_64.tar.gz -O /tmp/cmake-3.7.2-Linux-x86_64.tar.gz
+- sudo tar -xvf /tmp/cmake-3.7.2-Linux-x86_64.tar.gz -C /tmp
+- sudo cp -RT /tmp/cmake-3.7.2-Linux-x86_64 /usr
+
+install:
+- mkdir external
+- cd external
+- wget https://github.com/nigels-com/glew/archive/glew-2.0.0.tar.gz -O /tmp/glew-2.0.0.tar.gz
+- tar -xvf /tmp/glew-2.0.0.tar.gz
+- cd glew-glew-2.0.0/auto
+- make
+- cd ..
+- make
+- sudo make install
+- cd ..
+- wget https://github.com/bulletphysics/bullet3/archive/2.86.1.tar.gz -O /tmp/bullet-2.86.1.tar.gz
+- tar -xvf /tmp/bullet-2.86.1.tar.gz
+- cd bullet3-2.86.1
+- mkdir build
+- cd build
+- cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DBUILD_CPU_DEMOS=OFF
+  -DBUILD_BULLET3=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF
+- make -j4
+- sudo make install
+- cd ../..
+- cd ..
+
+script:
+- mkdir build
+- cd build
+- cmake .. -DTOWERENGINE_BUILD_STATIC=ON -DTOWERENGINE_SWIG_PYTHON=ON -DTOWERENGINE_BLENDER_ADDON=ON
+  -DTOWERENGINE_BUILD_OPENVR=OFF -DTOWERENGINE_BUILD_OCULUS=OFF  -DTOWERENGINE_ENABLE_IMGUI=OFF
+  -DTOWERENGINE_BUILD_DEVIL=OFF -DTOWERENGINE_BUILD_LIBPNG=OFF
+- make -j4
+- make blender-addon
+
+before_deploy:
+- openssl aes-256-cbc -K $encrypted_6340509c891b_key -iv $encrypted_6340509c891b_iv
+  -in $TRAVIS_BUILD_DIR/.travis_rsa.enc -out /tmp/travis_rsa -d
+- eval "$(ssh-agent -s)"
+- chmod 600 /tmp/travis_rsa
+- ssh-add /tmp/travis_rsa
+- cd $TRAVIS_BUILD_DIR
+- export COMMIT_HASH_SHORT=`git rev-parse --short HEAD`
+
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: scp -B $TRAVIS_BUILD_DIR/build/blender/towerengine-blender.zip ci@ci.metallic.software:~/build/towerengine/towerengine-blender-${COMMIT_HASH_SHORT}-linux-amd64.zip
+  on:
+    branch: master

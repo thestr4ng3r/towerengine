@@ -8,7 +8,7 @@ using namespace std;
 
 tWorld::tWorld(void)
 {
-	ambient_color = Vec(0.1, 0.1, 0.1);
+	ambient_color = tVec(0.1, 0.1, 0.1);
 	sky_box = 0;
 
 	physics.broadphase = new btDbvtBroadphase();
@@ -44,7 +44,7 @@ tWorld::~tWorld(void)
 	for(vector<tParticleSystem *>::iterator i=particle_systems.begin(); i!=particle_systems.end(); i++)
 		delete *i;
 
-	for(vector<tCubeMapReflection *>::iterator i=cube_map_reflections.begin(); i!=cube_map_reflections.end(); i++)
+	for(vector<tReflectionProbe *>::iterator i=reflection_probes.begin(); i!=reflection_probes.end(); i++)
 		delete *i;*/
 }
 
@@ -130,21 +130,21 @@ void tWorld::RemoveParticleSystem(tParticleSystem *ps)
 }
 
 
-void tWorld::AddCubeMapReflection(tCubeMapReflection *r)
+void tWorld::AddCubeMapReflection(tReflectionProbe *r)
 {
-	for(vector<tCubeMapReflection *>::iterator i = cube_map_reflections.begin(); i != cube_map_reflections.end(); i++)
+	for(vector<tReflectionProbe *>::iterator i = reflection_probes.begin(); i != reflection_probes.end(); i++)
 		if(*i == r)
 			return;
-	cube_map_reflections.push_back(r);
+	reflection_probes.push_back(r);
 
 }
 
-void tWorld::RemoveCubeMapReflection(tCubeMapReflection *r)
+void tWorld::RemoveCubeMapReflection(tReflectionProbe *r)
 {
-	for(vector<tCubeMapReflection *>::iterator i = cube_map_reflections.begin(); i != cube_map_reflections.end(); i++)
+	for(vector<tReflectionProbe *>::iterator i = reflection_probes.begin(); i != reflection_probes.end(); i++)
 		if(*i == r)
 		{
-			cube_map_reflections.erase(i);
+			reflection_probes.erase(i);
 			return;
 		}
 }
@@ -239,12 +239,12 @@ void tWorld::FillRenderSpace(tRenderSpace *space, tCulling **cullings, int culli
 			continue;
 
 		for(i=objects.begin(); i!=objects.end(); i++)
-			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i)); // TODO: move to tRenderer
+			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i)); // TODO: move to tDeferredRenderer
 	}
 }
 
 
-void tWorld::AssignUnsetCubeMapReflections(void)
+void tWorld::AssignUnsetReflectionProbes(void)
 {
 	for(vector<tObject *>::iterator i=objects.begin(); i!=objects.end(); i++)
 	{
@@ -256,11 +256,11 @@ void tWorld::AssignUnsetCubeMapReflections(void)
 				|| !mesh_object->GetCubeMapReflectionEnabled()) // or not needed
 			continue;
 
-		tCubeMapReflection *min = 0;
+		tReflectionProbe *min = 0;
 		float min_v = FLT_MAX;
-		for(vector<tCubeMapReflection *>::iterator ri=cube_map_reflections.begin(); ri!=cube_map_reflections.end(); ri++)
+		for(vector<tReflectionProbe *>::iterator ri=reflection_probes.begin(); ri!=reflection_probes.end(); ri++)
 		{
-			tCubeMapReflection *reflection = *ri;
+			tReflectionProbe *reflection = *ri;
 			float v = (reflection->GetPosition() - mesh_object->GetTransform().GetPosition()).SquaredLen();
 			if(v < min_v)
 			{

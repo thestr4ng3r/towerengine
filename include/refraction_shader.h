@@ -27,7 +27,7 @@ class tRefractionShader : public tFaceShader
 
 		void SetColor(tVector color, tVector edge, float edge_alpha);
 		void SetColorTexture(bool enabled, GLuint tex = 0);
-		void SetNormalTexture(bool enabled, GLuint tex = 0);
+		void SetNormalTexture(GLuint tex = 0);
 		void SetScreenTexture(GLuint tex);
 		void SetTransformation(const float m[16]);
 		void SetCameraPosition(tVector pos);

@@ -3,19 +3,27 @@
 
 class tMaterial
 {
+	protected:
+		bool own_textures;
+
 	public:
 		virtual ~tMaterial(void) {}
 
-		virtual bool InitDepthPrePass(tRenderer *renderer)						{ return false; }
-		virtual bool InitGeometryPass(tRenderer *renderer)						{ return false; }
-		virtual bool InitForwardPass(tRenderer *renderer, float *transform)		{ return false; }
-		virtual bool InitRefractionPass(tRenderer *renderer, float *transform)	{ return false; }
+		virtual bool InitDepthPrePass(tRenderer *renderer)								{ return false; }
+		virtual bool InitShadowPass(tRenderer *renderer)								{ return false; }
+		virtual bool InitGeometryPass(tDeferredRenderer *renderer)						{ return false; }
+		virtual bool InitStandardForwardPass(tForwardRenderer *renderer)				{ return false; }
+		virtual bool InitForwardPass(tDeferredRenderer *renderer, float *transform)		{ return false; }
+		virtual bool InitRefractionPass(tDeferredRenderer *renderer, float *transform)	{ return false; }
 
 		virtual bool GetCubeMapReflectionEnabled(void)	{ return false; }
-		virtual tVector GetCubeMapReflectionColor(void)	{ return Vec(0.0, 0.0, 0.0); }
+		virtual tVector GetCubeMapReflectionColor(void)	{ return tVec(0.0, 0.0, 0.0); }
+
+		void SetOwnTextures(bool own)		{ this->own_textures = own; }
+		bool GetOwnTextures()				{ return own_textures; }
 };
 
-class tDefaultMaterial : public tMaterial
+class tStandardMaterial : public tMaterial
 {
 	public:
 		enum TextureType
@@ -51,8 +59,8 @@ class tDefaultMaterial : public tMaterial
 		tUniformBuffer *uniform_buffer;
 
 	public:
-		tDefaultMaterial(void);
-		~tDefaultMaterial(void);
+		tStandardMaterial(void);
+		~tStandardMaterial(void);
 
 		void SetBaseColor(tVector color)	{ this->base_color = color; }
 		void SetMetallic(float metallic)	{ this->metallic = metallic; }
@@ -69,7 +77,9 @@ class tDefaultMaterial : public tMaterial
 		void UpdateUniformBuffer(void);
 
 		bool InitDepthPrePass(tRenderer *renderer);
-		bool InitGeometryPass(tRenderer *renderer);
+		bool InitShadowPass(tRenderer *renderer);
+		bool InitGeometryPass(tDeferredRenderer *renderer);
+		bool InitStandardForwardPass(tForwardRenderer *renderer);
 };
 
 #endif

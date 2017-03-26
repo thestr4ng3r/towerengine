@@ -21,7 +21,7 @@ tDepthPassShader::tDepthPassShader(void)
 
 	glUniformBlockBinding(program, glGetUniformBlockIndex(program, "MatrixBlock"), matrix_binding_point);
 
-	//Bind();
+	Bind();
 	glUniform1i(diffuse_tex_uniform, base_color_tex_unit);
 }
 

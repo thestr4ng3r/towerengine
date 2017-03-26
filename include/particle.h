@@ -5,7 +5,7 @@
 
 struct tParticle
 {
-	struct vertex_data
+	struct
 	{
 		tVector position;
 		float size;
@@ -57,7 +57,7 @@ class tParticleSystem
 
 		virtual void Step(float time) 				{}
 
-		void Render(tRenderer *renderer, tParticleShader *shader);
+		void Render(tDeferredRenderer *renderer, tParticleShader *shader);
 
 		void SetPosition(tVector pos)				{ this->position = pos; }
 		void SetRenderType(RenderType type)			{ this->render_type = type; }

@@ -10,8 +10,8 @@ tBoundingBox::tBoundingBox(tVector a, tVector b)
 
 tBoundingBox::tBoundingBox(void)
 {
-	minv = Vec(INFINITY, INFINITY, INFINITY);
-	maxv = Vec(-INFINITY, -INFINITY, -INFINITY);
+	minv = tVec(INFINITY, INFINITY, INFINITY);
+	maxv = tVec(-INFINITY, -INFINITY, -INFINITY);
 }
 
 void tBoundingBox::SetBounds(tVector a, tVector b)
@@ -38,14 +38,14 @@ void tBoundingBox::AddPoint(tVector p)
 
 void tBoundingBox::GetCornerPoints(tVector *p)
 {
-	p[0] = Vec(minv.x, maxv.y, minv.z);
-	p[1] = Vec(minv.x, maxv.y, maxv.z);
-	p[2] = Vec(maxv.x, maxv.y, maxv.z);
-	p[3] = Vec(maxv.x, maxv.y, minv.z);
-	p[4] = Vec(minv.x, minv.y, minv.z);
-	p[5] = Vec(minv.x, minv.y, maxv.z);
-	p[6] = Vec(maxv.x, minv.y, maxv.z);
-	p[7] = Vec(maxv.x, minv.y, minv.z);
+	p[0] = tVec(minv.x, maxv.y, minv.z);
+	p[1] = tVec(minv.x, maxv.y, maxv.z);
+	p[2] = tVec(maxv.x, maxv.y, maxv.z);
+	p[3] = tVec(maxv.x, maxv.y, minv.z);
+	p[4] = tVec(minv.x, minv.y, minv.z);
+	p[5] = tVec(minv.x, minv.y, maxv.z);
+	p[6] = tVec(maxv.x, minv.y, maxv.z);
+	p[7] = tVec(maxv.x, minv.y, minv.z);
 }
 
 bool tBoundingBox::ContainsPoint(tVector p)

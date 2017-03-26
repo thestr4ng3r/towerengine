@@ -4,8 +4,16 @@
 
 #include "resources.h"
 
-
 using namespace std;
+
+
+const int tShader::vertex_attribute;
+
+const int tShader::matrix_binding_point;
+const int tShader::material_binding_point;
+const int tShader::position_restore_data_binding_point;
+const int tShader::point_light_binding_point;
+
 
 void PrintGLInfoLog(const char *log_title, GLuint handle, const char *shader_name = 0);
 

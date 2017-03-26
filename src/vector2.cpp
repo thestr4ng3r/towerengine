@@ -1,7 +1,7 @@
 #include "towerengine.h"
 
 
-tVector2 Vec(float x, float y)
+tVector2 tVec(float x, float y)
 {
 	tVector2 v;
 

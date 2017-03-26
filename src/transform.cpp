@@ -41,12 +41,12 @@ tVector tTransform::ApplyToVector(tVector v)
 void tTransform::SetIdentity(void)
 {
 	basis = tMatrix3::GetIdentity();
-	position = Vec(0.0, 0.0, 0.0);
+	position = tVec(0.0, 0.0, 0.0);
 }
 
 tTransform tTransform::FromBtTransform(const btTransform &trans)
 {
-	return tTransform(tMatrix3::FromBtMatrix(trans.getBasis()), Vec(trans.getOrigin()));
+	return tTransform(tMatrix3::FromBtMatrix(trans.getBasis()), tVec(trans.getOrigin()));
 }
 
 

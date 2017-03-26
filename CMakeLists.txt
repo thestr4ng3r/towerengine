@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.2)
 
 project(TowerEngine)
 
@@ -8,15 +8,23 @@ set(INCLUDE_INSTALL_DIR include/towerengine)
 set(LIB_INSTALL_DIR lib)
 
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-#set(CMAKE_BUILD_TYPE Release)
 
-option(TOWERENGINE_STATIC_LIB "Build static instead of shared" ON)
+option(TOWERENGINE_BUILD_STATIC "Build static instead of shared" OFF)
+option(TOWERENGINE_ENABLE_IMGUI "Build with ImGUI support" OFF)
 
-option(TOWERENGINE_BUILD_DEVIL "Texture loading support using DevIL" OFF)
-option(TOWERENGINE_BUILD_LIBPNG "Texture loading support using libpng" ON)
-option(TOWERENGINE_BUILD_OPENVR "Build with OpenVR" OFF)
-option(TOWERENGINE_BUILD_OCULUS "Build with Oculus SDK" OFF)
+option(TOWERENGINE_BUILD_DEVIL "Use DevIL for texture loading." OFF)
+option(TOWERENGINE_BUILD_LIBPNG "Use LibPNG for texture loading." ON)
+option(TOWERENGINE_BUILD_OPENVR "Build with OpenVR support." OFF)
+option(TOWERENGINE_BUILD_OCULUS "Build with Oculus support." OFF)
+
+option(TOWERENGINE_SWIG_PYTHON "Generate Python Bindings using SWIG." OFF)
+option(TOWERENGINE_BLENDER_ADDON "Package Blender Addon." OFF)
+
+option(TOWERENGINE_BUILD_EXAMPLES "Build TowerEngine examples" OFF)
 
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
@@ -75,8 +83,7 @@ set (TOWERENGINE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 file(GLOB TOWERENGINE_INCLUDES "${TOWERENGINE_INCLUDE_DIR}/*.h")
 
-set(TOWERENGINE_SRC 
-	src/animation.cpp 
+set(TOWERENGINE_SRC
 	src/buffers.cpp 
 	src/camera.cpp 
 	src/engine.cpp 
@@ -97,13 +104,10 @@ set(TOWERENGINE_SRC
 	src/mesh.cpp 
 	src/meshobject.cpp 
 	src/object.cpp
-	src/pose.cpp
-	src/shader.cpp 
-	src/triangle.cpp 
+	src/shader.cpp
 	src/utils.cpp 
-	src/vector2.cpp 
-	src/vector.cpp 
-	src/vertex.cpp 
+	src/vector2.cpp
+	src/vector.cpp
 	src/renderspace.cpp
 	src/gbuffer.cpp
 	src/world.cpp
@@ -116,7 +120,7 @@ set(TOWERENGINE_SRC
 	src/directional_shadow_shader.cpp
 	src/post_process_shader.cpp
 	src/material_ibo.cpp
-	src/renderer.cpp
+	src/deferred_renderer.cpp
 	src/ssao_shader.cpp
 	src/utilobjects.cpp
 	src/color_shader.cpp
@@ -126,7 +130,7 @@ set(TOWERENGINE_SRC
 	src/ssao.cpp
 	src/ssao_blur_shader.cpp
 	src/fog_shader.cpp
-	src/cube_map_reflection.cpp
+	src/refection_probe.cpp
 	src/material_manager.cpp
 	src/matrix3.cpp
 	src/matrix4.cpp
@@ -135,8 +139,8 @@ set(TOWERENGINE_SRC
 	src/shader_source.cpp
 	src/particle.cpp
 	src/particle_shader.cpp
-	src/default_renderer.cpp
-	src/vr_renderer.cpp
+	src/default_deferred_renderer.cpp
+		src/vr_deferred_renderer.cpp
 	src/simple_forward_shader.cpp
 	src/simple_forward_material.cpp
 	src/refraction_shader.cpp
@@ -145,6 +149,7 @@ set(TOWERENGINE_SRC
 	src/depth_pass_shader.cpp
 	src/cube_map_blur_shader.cpp
 	src/no_op_shader.cpp
+	src/timgui.cpp
 	include/vr_context.h
 	src/vr_context.cpp
 	include/vr_context_openvr.h
@@ -154,7 +159,15 @@ set(TOWERENGINE_SRC
 	include/texture.h
 	src/texture.cpp
 	src/texture_devil.cpp
-	src/texture_png.cpp)
+	src/texture_png.cpp
+	src/face_shader.cpp
+	src/forward_renderer.cpp
+	include/standard_forward_shader.h
+	src/standard_forward_shader.cpp
+	include/renderer.h
+	src/renderer.cpp
+	include/default_forward_renderer.h
+	src/default_forward_renderer.cpp include/vr_forward_renderer.h src/vr_forward_renderer.cpp)
 
 if(TOWERENGINE_BUILD_OPENVR)
 	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)
@@ -181,9 +194,25 @@ file(GLOB RESOURCES_SHADER_FILES
 
 
 
-#add_definitions(-g -Wall)
 
-if(TOWERENGINE_STATIC_LIB)
+
+if(TOWERENGINE_ENABLE_IMGUI)
+	set(IMGUI_DIR "" CACHE PATH "Root directory of ImGui source.")
+
+	if(NOT IMGUI_DIR)
+		message(FATAL_ERROR "IMGUI_DIR is not set. Set it to the root directory of the ImGui source or disable TOWERENGINE_ENABLE_IMGUI.")
+	endif()
+
+	include_directories("${IMGUI_DIR}")
+	list(APPEND TOWERENGINE_SRC
+			"${IMGUI_DIR}/imgui.cpp"
+			"${IMGUI_DIR}/imgui_draw.cpp")
+
+	add_definitions(-DTOWERENGINE_ENABLE_IMGUI)
+endif()
+
+
+if(TOWERENGINE_BUILD_STATIC)
 	add_library(towerengine STATIC ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
 else()
 	add_library(towerengine SHARED ${TOWERENGINE_SRC} ${TOWERENGINE_INCLUDES} ${RESOURCES_HEADERS} ${RESOURCES_SRC})
@@ -281,7 +310,24 @@ install(TARGETS towerengine
 
 install(FILES ${TOWERENGINE_INCLUDES} DESTINATION ${INCLUDE_INSTALL_DIR})
 
+if(TOWERENGINE_ENABLE_IMGUI)
+	install(FILES "${IMGUI_DIR}/imgui.h" "${IMGUI_DIR}/imgui.h"
+			DESTINATION ${INCLUDE_INSTALL_DIR})
+endif()
 
+
+
+if(TOWERENGINE_SWIG_PYTHON)
+	add_subdirectory(swig)
+endif()
+
+if(TOWERENGINE_BLENDER_ADDON)
+	add_subdirectory(blender)
+endif()
+
+if(TOWERENGINE_BUILD_EXAMPLES)
+	add_subdirectory(examples)
+endif()
 
 
 # Config
@@ -306,6 +352,7 @@ configure_file(
 
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
 
 
 

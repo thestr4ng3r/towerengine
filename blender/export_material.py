@@ -11,14 +11,14 @@ def create_texture_node(pack_textures, path, tex_path, filename, texture, doc, n
 	if not pack_textures:
 		tex_file = os.path.join(tex_path, filename + "." + file_extension)
 		try:
-			shutil.copy(bpy.path.abspath(texture.image.filepath), tex_file)
+			shutil.copy(texture.image.filepath_from_user(), tex_file)
 		except OSError as e:
 			print(str(e))
 		except IOError as e:
 			print(str(e))
 		node.setAttribute("file", os.path.relpath(tex_file, path))
 	else:
-		with open(bpy.path.abspath(texture.image.filepath), "rb") as image_file:
+		with open(texture.image.filepath_from_user(), "rb") as image_file:
 			image_data = image_file.read()
 			image_base64 = base64.b64encode(image_data)
 			image_text = doc.createTextNode(image_base64.decode("utf-8"))
@@ -102,11 +102,7 @@ def create_default_material_node(doc, material, path, subpath, pack_textures = F
 	else:
 		node2.setAttribute("metallic", str(material.towerengine.metallic))
 		node2.setAttribute("roughness", str(material.towerengine.roughness))
-
-		reflectance = 0.0
-		if material.raytrace_mirror.use:
-			reflectance = material.raytrace_mirror.reflect_factor
-		node2.setAttribute("reflectance", str(reflectance))
+		node2.setAttribute("reflectance", str(material.towerengine.reflectance))
 	node.appendChild(node2)
 
 
@@ -270,15 +266,15 @@ def create_refraction_material_node(doc, material, path, subpath, pack_textures 
 				node2.appendChild(image_text)
 			node2.setAttribute("image-extension", file_extension)
 
-		node.appendChild(node2);
+		node.appendChild(node2)
 
 	node.appendChild(node2);
 
 	node2 = doc.createElement("edge_color")
-	node2.setAttribute("r", str(material.specular_color.r))
-	node2.setAttribute("g", str(material.specular_color.g))
-	node2.setAttribute("b", str(material.specular_color.b))
-	node2.setAttribute("a", str(material.specular_intensity))
+	node2.setAttribute("r", str(material.towerengine.refraction_edge_color[0]))
+	node2.setAttribute("g", str(material.towerengine.refraction_edge_color[1]))
+	node2.setAttribute("b", str(material.towerengine.refraction_edge_color[2]))
+	node2.setAttribute("a", str(material.towerengine.refraction_edge_color[3]))
 	node.appendChild(node2)
 
 
@@ -303,7 +299,7 @@ def create_refraction_material_node(doc, material, path, subpath, pack_textures 
 				node2.appendChild(image_text)
 			node2.setAttribute("image-extension", file_extension)
 
-		node.appendChild(node2);
+		node.appendChild(node2)
 
 	return node
 

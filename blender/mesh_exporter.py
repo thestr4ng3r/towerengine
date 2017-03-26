@@ -36,3 +36,15 @@ class TowerEngineMeshExporter(bpy.types.Operator, ExportHelper):
 		export_mesh.save(self.filepath, self.include_tex_prop)
 		
 		return {'FINISHED'}
+
+
+def menu_func(self, context):
+	self.layout.operator(TowerEngineMeshExporter.bl_idname, text="TowerEngine Mesh (.tem)")
+
+def register():
+	bpy.utils.register_class(TowerEngineMeshExporter)
+	bpy.types.INFO_MT_file_export.append(menu_func)
+
+def unregister():
+	bpy.types.INFO_MT_file_export.remove(menu_func)
+	bpy.utils.unregister_class(TowerEngineMeshExporter)

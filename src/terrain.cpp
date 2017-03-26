@@ -77,9 +77,12 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 			ibo_data[d + 1] = ibo_data[d + 0] + map_size;
 			ibo_data[d + 2] = ibo_data[d + 0] + 1;
 
-			a = Vec(vertex_data[ibo_data[d + 0] * 3 + 0], vertex_data[ibo_data[d + 0] * 3 + 1], vertex_data[ibo_data[d + 0] * 3 + 2]);
-			b = Vec(vertex_data[ibo_data[d + 1] * 3 + 0], vertex_data[ibo_data[d + 1] * 3 + 1], vertex_data[ibo_data[d + 1] * 3 + 2]);
-			c = Vec(vertex_data[ibo_data[d + 2] * 3 + 0], vertex_data[ibo_data[d + 2] * 3 + 1], vertex_data[ibo_data[d + 2] * 3 + 2]);
+			a = tVec(vertex_data[ibo_data[d + 0] * 3 + 0], vertex_data[ibo_data[d + 0] * 3 + 1],
+					 vertex_data[ibo_data[d + 0] * 3 + 2]);
+			b = tVec(vertex_data[ibo_data[d + 1] * 3 + 0], vertex_data[ibo_data[d + 1] * 3 + 1],
+					 vertex_data[ibo_data[d + 1] * 3 + 2]);
+			c = tVec(vertex_data[ibo_data[d + 2] * 3 + 0], vertex_data[ibo_data[d + 2] * 3 + 1],
+					 vertex_data[ibo_data[d + 2] * 3 + 2]);
 
 			face_normals[x][y][0] = Cross(b-a, c-a);
 
@@ -88,9 +91,12 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 			ibo_data[d + 4] = ibo_data[d + 0] + map_size;
 			ibo_data[d + 5] = ibo_data[d + 0] + map_size + 1;
 
-			a = Vec(vertex_data[ibo_data[d + 3] * 3 + 0], vertex_data[ibo_data[d + 3] * 3 + 1], vertex_data[ibo_data[d + 3] * 3 + 2]);
-			b = Vec(vertex_data[ibo_data[d + 4] * 3 + 0], vertex_data[ibo_data[d + 4] * 3 + 1], vertex_data[ibo_data[d + 4] * 3 + 2]);
-			c = Vec(vertex_data[ibo_data[d + 5] * 3 + 0], vertex_data[ibo_data[d + 5] * 3 + 1], vertex_data[ibo_data[d + 5] * 3 + 2]);
+			a = tVec(vertex_data[ibo_data[d + 3] * 3 + 0], vertex_data[ibo_data[d + 3] * 3 + 1],
+					 vertex_data[ibo_data[d + 3] * 3 + 2]);
+			b = tVec(vertex_data[ibo_data[d + 4] * 3 + 0], vertex_data[ibo_data[d + 4] * 3 + 1],
+					 vertex_data[ibo_data[d + 4] * 3 + 2]);
+			c = tVec(vertex_data[ibo_data[d + 5] * 3 + 0], vertex_data[ibo_data[d + 5] * 3 + 1],
+					 vertex_data[ibo_data[d + 5] * 3 + 2]);
 
 			face_normals[x][y][1] = Cross(b-a, c-a);
 
@@ -158,7 +164,7 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 
 }
 
-void tTerrain::Paint(tRenderer *renderer)
+void tTerrain::Paint(tDeferredRenderer *renderer)
 {
 	vao->Bind();
 
@@ -178,10 +184,10 @@ void tTerrain::Paint(tRenderer *renderer)
 		renderer->GetCurrentFaceShader()->SetSpecularTexture(false);
 		renderer->GetCurrentFaceShader()->SetNormalTexture(false);
 		//CEngine::GetCurrentFaceShader()->SetHeightTexture(false);
-		renderer->GetCurrentFaceShader()->SetDiffuseColor(Vec(1.0, 1.0, 1.0));
-		renderer->GetCurrentFaceShader()->SetSpecularColor(Vec(0.0, 0.0, 0.0));
+		renderer->GetCurrentFaceShader()->SetDiffuseColor(tVec(1.0, 1.0, 1.0));
+		renderer->GetCurrentFaceShader()->SetSpecularColor(tVec(0.0, 0.0, 0.0));
 		renderer->GetCurrentFaceShader()->SetSpecular(0.0);
-		//CEngine::GetCurrentFaceShader()->SetHeightFactor(Vec(0.0, 0.0, 0.0));*/
+		//CEngine::GetCurrentFaceShader()->SetHeightFactor(tVec(0.0, 0.0, 0.0));*/
 	}
 
 	ibo->Draw(GL_TRIANGLES);
@@ -189,8 +195,8 @@ void tTerrain::Paint(tRenderer *renderer)
 
 tBoundingBox tTerrain::GetBoundingBox(void)
 {
-	return tBoundingBox(	Vec(-size / 2.0, height, -size / 2.0),
-							Vec(size / 2.0, 0.0, size / 2.0));
+	return tBoundingBox(tVec(-size / 2.0, height, -size / 2.0),
+							tVec(size / 2.0, 0.0, size / 2.0));
 }
 
 

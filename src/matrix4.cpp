@@ -312,9 +312,9 @@ tMatrix4 operator*(tMatrix4 &a, tMatrix4 &b)
 tVector ApplyMatrix4(float m[16], tVector v)
 {
 	tVector r;
-	r.x = Dot(Vec(m[0], m[1], m[2]), v) + m[3];
-	r.y = Dot(Vec(m[4], m[5], m[6]), v) + m[7];
-	r.z = Dot(Vec(m[8], m[9], m[10]), v) + m[11];
+	r.x = Dot(tVec(m[0], m[1], m[2]), v) + m[3];
+	r.y = Dot(tVec(m[4], m[5], m[6]), v) + m[7];
+	r.z = Dot(tVec(m[8], m[9], m[10]), v) + m[11];
 
 	return r;
 }

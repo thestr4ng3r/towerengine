@@ -1,14 +1,11 @@
 #ifndef __TOWERENGINE_H
 #define __TOWERENGINE_H
 
-struct tMeshPose;
-class tAnimation;
-struct tKeyFrame;
 class tMesh;
 struct tTriangle;
 class tMaterial;
 struct tVertex;
-struct tEntity;
+class tEntity;
 class tWorld;
 class tObject;
 class tCamera;
@@ -17,6 +14,9 @@ class tPointLightShadow;
 class tDirectionalLight;
 class tDirectionalLightShadow;
 class tRenderer;
+class tDefaultRenderer;
+class tDeferredRenderer;
+class tForwardRenderer;
 class t2DRenderer;
 
 #include "vector2.h"
@@ -33,6 +33,7 @@ class t2DRenderer;
 #include "geometry_pass_shader.h"
 #include "depth_pass_shader.h"
 #include "simple_forward_shader.h"
+#include "standard_forward_shader.h"
 #include "refraction_shader.h"
 #include "2d_sprite_shader.h"
 #include "gbuffer.h"
@@ -58,16 +59,12 @@ class t2DRenderer;
 #include "particle_shader.h"
 
 #include "skybox.h"
-#include "vertex.h"
-#include "triangle.h"
 #include "material.h"
 #include "simple_forward_material.h"
 #include "refraction_material.h"
 #include "material_ibo.h"
 #include "material_manager.h"
 #include "mesh.h"
-#include "pose.h"
-#include "animation.h"
 #include "entity.h"
 #include "asset.h"
 #include "engine.h"
@@ -86,15 +83,20 @@ class t2DRenderer;
 #include "renderspace.h"
 #include "point_light_shadow.h"
 #include "directional_light_shadow.h"
-#include "cube_map_reflection.h"
+#include "refection_probe.h"
 #include "world.h"
 #include "scene_object.h"
 #include "scene.h"
 #include "ssao.h"
 #include "renderer.h"
-#include "default_renderer.h"
-#include "vr_renderer.h"
+#include "forward_renderer.h"
+#include "deferred_renderer.h"
+#include "default_deferred_renderer.h"
+#include "default_forward_renderer.h"
+#include "vr_deferred_renderer.h"
+#include "vr_forward_renderer.h"
 #include "2d_renderer.h"
+#include "timgui.h"
 
 #include "vr_context.h"
 #include "vr_context_test.h"

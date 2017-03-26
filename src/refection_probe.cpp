@@ -3,7 +3,7 @@
 
 using namespace std;
 
-tCubeMapReflection::tCubeMapReflection(tVector position, tVector extent_a, tVector extent_b)
+tReflectionProbe::tReflectionProbe(tVector position, tVector extent_a, tVector extent_b)
 {
 	this->initialized = false;
 	this->resolution = 0;
@@ -21,7 +21,7 @@ tCubeMapReflection::tCubeMapReflection(tVector position, tVector extent_a, tVect
 	color_tex = 0;
 }
 
-tCubeMapReflection::~tCubeMapReflection(void)
+tReflectionProbe::~tReflectionProbe(void)
 {
 	delete camera;
 	delete render_space;
@@ -33,7 +33,7 @@ tCubeMapReflection::~tCubeMapReflection(void)
 	delete gbuffer;
 }
 
-void tCubeMapReflection::Init(unsigned int resolution_log)
+void tReflectionProbe::Init(unsigned int resolution_log)
 {
 	this->resolution_log = resolution_log;
 	this->resolution = (unsigned int)1 << resolution_log;
@@ -83,7 +83,7 @@ void tCubeMapReflection::Init(unsigned int resolution_log)
 	initialized = true;
 }
 
-void tCubeMapReflection::Render(tRenderer *renderer)
+void tReflectionProbe::Render(tDeferredRenderer *renderer)
 {
 	if(!initialized)
 		return;
@@ -119,16 +119,16 @@ void tCubeMapReflection::Render(tRenderer *renderer)
 	invalid = false;
 }
 
-void tCubeMapReflection::GeometryPass(tRenderer *renderer, int side, tWorld *world)
+void tReflectionProbe::GeometryPass(tDeferredRenderer *renderer, int side, tWorld *world)
 {
 	camera->SetPosition(position);
 	camera->SetDirection(CubeVecS(side));
 
-	tVector cam_up = Vec(0.0, -1.0, 0.0);
+	tVector cam_up = tVec(0.0, -1.0, 0.0);
 	if(side == 2)
-		cam_up = Vec(0.0, 0.0, 1.0);
+		cam_up = tVec(0.0, 0.0, 1.0);
 	else if(side == 3)
-		cam_up = Vec(0.0, 0.0, -1.0);
+		cam_up = tVec(0.0, 0.0, -1.0);
 
 	camera->SetUp(cam_up);
 	camera->CalculateModelViewProjectionMatrix();
@@ -161,7 +161,7 @@ void tCubeMapReflection::GeometryPass(tRenderer *renderer, int side, tWorld *wor
 	render_space->GeometryPass(renderer, false);
 }
 
-void tCubeMapReflection::LightPass(tRenderer *renderer, int side, tWorld *world)
+void tReflectionProbe::LightPass(tDeferredRenderer *renderer, int side, tWorld *world)
 {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+side, color_tex, 0);
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -178,7 +178,7 @@ void tCubeMapReflection::LightPass(tRenderer *renderer, int side, tWorld *world)
 		tSkyBoxShader *skybox_shader = renderer->GetSkyBoxShader();
 		skybox_shader->Bind();
 		skybox_shader->SetCameraPosition(camera->GetPosition());
-		sky_box->Paint(renderer, camera->GetPosition());
+		sky_box->Render(renderer, camera->GetPosition());
 	}
 
 	gbuffer->BindTextures();
@@ -299,7 +299,7 @@ static const GLenum blur_draw_buffers[6] = {	GL_COLOR_ATTACHMENT0,
 												GL_COLOR_ATTACHMENT5 };
 
 
-void tCubeMapReflection::BlurPass(tRenderer *renderer)
+void tReflectionProbe::BlurPass(tDeferredRenderer *renderer)
 {
 	tCubeMapBlurShader *shader = renderer->GetCubeMapBlurShader();
 
@@ -331,9 +331,9 @@ void tCubeMapReflection::BlurPass(tRenderer *renderer)
 			glViewport(0, 0, level_resolution, level_resolution);
 
 			if(direction == 0)
-				blur_dir = Vec(1.0, 0.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
+				blur_dir = tVec(1.0, 0.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
 			else // direction == 1
-				blur_dir = Vec(0.0, 1.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
+				blur_dir = tVec(0.0, 1.0, 0.0) * (1.0f / (float)level_resolution) * 2.0f;
 
 			shader->SetBlurDir(blur_dir);
 			shader->SetMipmapLevel(level);

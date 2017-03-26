@@ -20,9 +20,6 @@ class tPointLightShadow
 		GLuint blur_fbo;
 		static const GLenum blur_draw_buffers[6];
 
-		tVAO *blur_vao;
-		tVBO<float> *blur_vertex_vbo;
-
 		int size;
 
 		//bool culled;
