@@ -664,11 +664,9 @@ bool tMesh::LoadFromXML(xml_document<> *doc, string path, tMaterialManager *mate
 
 tVertexIndex tMesh::ParseVertexNode(xml_node<> *cur)
 {
-	int id;
 	tVector p;
 	tVector normal;
 	tVector2 uv;
-	tVertex *r;
 
 	// TODO: check if attributes really are found
 
@@ -1254,7 +1252,6 @@ void tMesh::ParseTriangleNode(xml_node<> *cur, tMaterialManager *material_manage
 
 tEntity *tMesh::ParseEntityNode(xml_node<> *root)
 {
-	tEntityAttribute *a;
 	xml_node<> *cur;
 	xml_attribute<> *attr;
 	string a_type, a_name;

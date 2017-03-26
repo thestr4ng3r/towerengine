@@ -89,7 +89,7 @@ bool tRefractionMaterial::InitRefractionPass(tDeferredRenderer *renderer, float 
 	shader->Bind();
 	shader->SetColor(color, edge_color, edge_alpha);
 	shader->SetColorTexture(color_tex != 0, color_tex);
-	shader->SetNormalTexture(normal_tex != 0, normal_tex);
+	shader->SetNormalTexture(normal_tex);
 	shader->SetTransformation(transform);
 	shader->SetCameraPosition(renderer->GetCurrentRenderingCamera()->GetPosition());
 	shader->SetScreenTexture(renderer->GetCurrentReadColorTexture());

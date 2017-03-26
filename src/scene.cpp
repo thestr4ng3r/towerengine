@@ -60,7 +60,6 @@ tScene::~tScene(void)
 
 	//printf("deleted objects\n");
 
-	int ai=0;
 	for(map<string, tAsset *>::iterator i=assets.begin(); i!=assets.end(); i++)
 	{
 		//printf("asset %d\n", ai++);

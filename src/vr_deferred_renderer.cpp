@@ -3,7 +3,7 @@
 
 using namespace std;
 
-tVRRenderer::tVRRenderer(int left_width, int left_height, int right_width, int right_height, tWorld *world)
+tVRDeferredRenderer::tVRDeferredRenderer(int left_width, int left_height, int right_width, int right_height, tWorld *world)
 {
 	width[0] = left_width;
 	height[0] = left_height;
@@ -20,7 +20,7 @@ tVRRenderer::tVRRenderer(int left_width, int left_height, int right_width, int r
 	camera_render_space = new tRenderSpace();
 }
 
-tVRRenderer::~tVRRenderer(void)
+tVRDeferredRenderer::~tVRDeferredRenderer(void)
 {
 	for(int i=0; i<2; i++)
 	{
@@ -29,7 +29,7 @@ tVRRenderer::~tVRRenderer(void)
 }
 
 
-void tVRRenderer::PrepareRender(void)
+void tVRDeferredRenderer::PrepareVRRender(void)
 {
 	for(int eye=0; eye<2; eye++)
 	{
@@ -41,12 +41,12 @@ void tVRRenderer::PrepareRender(void)
 
 	world->FillRenderSpace(camera_render_space, (tCulling **)camera, 2);
 
-	tDeferredRenderer::PrepareRender(camera[0], camera_render_space); // TODO: use something instead of left camera
+	PrepareRender(camera[0], camera_render_space); // TODO: use something instead of left camera
 }
 
-void tVRRenderer::Render(GLuint dst_fbo)
+void tVRDeferredRenderer::Render(GLuint dst_fbo)
 {
-	PrepareRender();
+	PrepareVRRender();
 
 	// render...
 

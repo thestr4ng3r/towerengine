@@ -5,7 +5,7 @@ class tMesh;
 struct tTriangle;
 class tMaterial;
 struct tVertex;
-struct tEntity;
+class tEntity;
 class tWorld;
 class tObject;
 class tCamera;
@@ -93,7 +93,8 @@ class t2DRenderer;
 #include "deferred_renderer.h"
 #include "default_deferred_renderer.h"
 #include "default_forward_renderer.h"
-#include "vr_renderer.h"
+#include "vr_deferred_renderer.h"
+#include "vr_forward_renderer.h"
 #include "2d_renderer.h"
 #include "timgui.h"
 

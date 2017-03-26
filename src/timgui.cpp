@@ -14,8 +14,6 @@ namespace tImGui
 		private:
 			GLint vertex_transform_uniform;
 
-			GLint sprite_coords_uniform;
-
 			GLint tex_uniform;
 
 		public:

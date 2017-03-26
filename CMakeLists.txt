@@ -139,7 +139,7 @@ set(TOWERENGINE_SRC
 	src/particle.cpp
 	src/particle_shader.cpp
 	src/default_deferred_renderer.cpp
-	src/vr_renderer.cpp
+		src/vr_deferred_renderer.cpp
 	src/simple_forward_shader.cpp
 	src/simple_forward_material.cpp
 	src/refraction_shader.cpp
@@ -164,7 +164,7 @@ set(TOWERENGINE_SRC
 	include/renderer.h
 	src/renderer.cpp
 	include/default_forward_renderer.h
-	src/default_forward_renderer.cpp)
+	src/default_forward_renderer.cpp include/vr_forward_renderer.h src/vr_forward_renderer.cpp)
 
 if(TOWERENGINE_BUILD_OPENVR)
 	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)
