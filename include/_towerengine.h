@@ -96,4 +96,7 @@ class t2DRenderer;
 #include "vr_renderer.h"
 #include "2d_renderer.h"
 
+#include "vr_context.h"
+#include "vr_context_test.h"
+
 #endif

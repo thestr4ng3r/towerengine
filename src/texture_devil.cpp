@@ -6,63 +6,7 @@
 #include <IL/il.h>
 #include <IL/ilu.h>
 
-GLuint LoadGLTexture_IL(const char *filename, int channels, int *w, int *h, bool *transparent)
-{
-	ILuint imageID;
-	ILboolean success;
-	ILenum error;
-	GLuint r_tex;
-
-	ilGenImages(1, &imageID);
-	ilBindImage(imageID);
-	success = ilLoadImage(filename);
-
-	if (!success)
-	{
-		error = ilGetError();
-		printf("Failed to load image \"%s\": %s\n", filename, iluErrorString(error));
-		return 0;
-	}
-
-	r_tex = LoadGLTexture_IL_Image(imageID, channels, w, h, transparent);
-
-	ilDeleteImages(1, &imageID);
-
-	return r_tex;
-}
-
-GLuint LoadGLTexture_IL_Binary(const char *ext, const void *data, size_t size, int channels, int *w, int *h, bool *transparent)
-{
-	ILuint imageID;
-	ILboolean success;
-	ILenum error;
-	GLuint r_tex;
-
-	ILenum file_type = IL_TYPE_UNKNOWN;
-
-	if(ext)
-		file_type = ilTypeFromExt((string("f.") + string(ext)).c_str());
-
-	if(file_type == IL_TYPE_UNKNOWN)
-		file_type = ilDetermineTypeL(data, size);
-
-	ilGenImages(1, &imageID);
-	ilBindImage(imageID);
-	success = ilLoadL(file_type, data, size);
-
-	if (!success)
-	{
-		error = ilGetError();
-		printf("Failed to load image: %s\n", iluErrorString(error));
-		return 0;
-	}
-
-	r_tex = LoadGLTexture_IL_Image(imageID, channels, w, h, transparent);
-
-	ilDeleteImages(1, &imageID);
-
-	return r_tex;
-}
+using namespace std;
 
 GLuint LoadGLTexture_IL_Image(ILuint imageID, int channels, int *w, int *h, bool *transparent)
 {
@@ -159,6 +103,66 @@ GLuint LoadGLTexture_IL_Image(ILuint imageID, int channels, int *w, int *h, bool
 }
 
 
+GLuint LoadGLTexture_IL(const char *filename, int channels, int *w, int *h, bool *transparent)
+{
+	ILuint imageID;
+	ILboolean success;
+	ILenum error;
+	GLuint r_tex;
+
+	ilGenImages(1, &imageID);
+	ilBindImage(imageID);
+	success = ilLoadImage(filename);
+
+	if(!success)
+	{
+		error = ilGetError();
+		printf("Failed to load image \"%s\": %s\n", filename, iluErrorString(error));
+		return 0;
+	}
+
+	r_tex = LoadGLTexture_IL_Image(imageID, channels, w, h, transparent);
+
+	ilDeleteImages(1, &imageID);
+
+	return r_tex;
+}
+
+
+GLuint LoadGLTextureBinary_IL(const char *ext, const void *data, size_t size, int channels, int *w, int *h, bool *transparent)
+{
+	ILuint imageID;
+	ILboolean success;
+	ILenum error;
+	GLuint r_tex;
+
+	ILenum file_type = IL_TYPE_UNKNOWN;
+
+	if(ext)
+		file_type = ilTypeFromExt((string("f.") + string(ext)).c_str());
+
+	if(file_type == IL_TYPE_UNKNOWN)
+		file_type = ilDetermineTypeL(data, size);
+
+	ilGenImages(1, &imageID);
+	ilBindImage(imageID);
+	success = ilLoadL(file_type, data, size);
+
+	if(!success)
+	{
+		error = ilGetError();
+		printf("Failed to load image: %s\n", iluErrorString(error));
+		return 0;
+	}
+
+	r_tex = LoadGLTexture_IL_Image(imageID, channels, w, h, transparent);
+
+	ilDeleteImages(1, &imageID);
+
+	return r_tex;
+}
+
+
 GLuint LoadGLTextureArray_IL(const char **filenames, const int count, int *w, int *h)
 {
 	if(count <= 0)
@@ -245,6 +249,84 @@ GLuint LoadGLTextureArray_IL(const char **filenames, const int count, int *w, in
 
 
 
+GLuint LoadGLCubeMap_IL_Image(ILuint image)
+{
+	ILinfo ImageInfo;
+	ILboolean success;
+	ILenum error;
+	GLuint handle;
+
+	glGenTextures(1, &handle);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
+
+	ilBindImage(image);
+
+	iluGetImageInfo(&ImageInfo);
+	if(ImageInfo.Origin != IL_ORIGIN_UPPER_LEFT)
+	{
+		iluFlipImage();
+	}
+	success = ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
+
+	if(!success)
+	{
+		error = ilGetError();
+		std::cout << "Image conversion failed - IL reports error: " << error << " - " << iluErrorString(error) << std::endl;
+		return 0;
+	}
+
+	/*
+	* ----------------
+	* | -x | -z | +x |
+	* ----------------
+	* | -y | +y | +z |
+	* ----------------
+	*/
+
+	int width = ilGetInteger(IL_IMAGE_WIDTH);
+	int height = ilGetInteger(IL_IMAGE_HEIGHT);
+	int side_width = width / 3;
+	int side_height = height / 2;
+	GLenum format = ilGetInteger(IL_IMAGE_FORMAT);
+	GLint bpp = ilGetInteger(IL_IMAGE_BPP);
+	GLubyte *data = ilGetData();
+
+	GLubyte *side_data = new GLubyte[side_width * side_height * bpp];
+
+
+	GetSubImage(side_data, data, width, height, bpp, 0, 0, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	GetSubImage(side_data, data, width, height, bpp, side_width, 0, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	GetSubImage(side_data, data, width, height, bpp, side_width * 2, 0, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+
+	GetSubImage(side_data, data, width, height, bpp, 0, side_height, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	GetSubImage(side_data, data, width, height, bpp, side_width, side_height, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	GetSubImage(side_data, data, width, height, bpp, side_width * 2, side_height, side_width, side_height);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
+
+	delete[] side_data;
+
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+
+
+	return handle;
+}
 
 
 
@@ -367,83 +449,5 @@ GLuint LoadGLCubeMapBinary_IL(const char *ext, const void *data, unsigned int si
 	return r_tex;
 }
 
-GLuint LoadGLCubeMap_IL_Image(ILuint image)
-{
-	ILinfo ImageInfo;
-	ILboolean success;
-	ILenum error;
-	GLuint handle;
-
-	glGenTextures(1, &handle);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
-
-	ilBindImage(image);
-
-	iluGetImageInfo(&ImageInfo);
-	if (ImageInfo.Origin != IL_ORIGIN_UPPER_LEFT)
-	{
-		iluFlipImage();
-	}
-	success = ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-
-	if (!success)
-	{
-		error = ilGetError();
-		std::cout << "Image conversion failed - IL reports error: " << error << " - " << iluErrorString(error) << std::endl;
-		return 0;
-	}
-
-	/*
-	 * ----------------
-	 * | -x | -z | +x |
-	 * ----------------
-	 * | -y | +y | +z |
-	 * ----------------
-	 */
-
-	int width = ilGetInteger(IL_IMAGE_WIDTH);
-	int height = ilGetInteger(IL_IMAGE_HEIGHT);
-	int side_width = width / 3;
-	int side_height = height / 2;
-	GLenum format = ilGetInteger(IL_IMAGE_FORMAT);
-	GLint bpp = ilGetInteger(IL_IMAGE_BPP);
-	GLubyte *data = ilGetData();
-
-	GLubyte *side_data = new GLubyte[side_width * side_height * bpp];
-
-
-	GetSubImage(side_data, data, width, height, bpp, 0, 0, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
-
-	GetSubImage(side_data, data, width, height, bpp, side_width, 0, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
-
-	GetSubImage(side_data, data, width, height, bpp, side_width * 2, 0, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
-
-
-	GetSubImage(side_data, data, width, height, bpp, 0, side_height, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
-
-	GetSubImage(side_data, data, width, height, bpp, side_width, side_height, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
-
-	GetSubImage(side_data, data, width, height, bpp, side_width * 2, side_height, side_width, side_height);
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, format, side_width, side_height, 0, format, GL_UNSIGNED_BYTE, side_data);
-
-	delete [] side_data;
-
-	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-
-
-	return handle;
-}
 
 #endif

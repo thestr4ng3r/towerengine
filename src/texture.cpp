@@ -56,7 +56,7 @@ GLuint LoadGLTextureBinary(const char *ext, const void *data, size_t size, int c
 GLuint LoadGLTextureArray(const char **filenames, const int count, int *w, int *h)
 {
 #ifdef BUILD_DEVIL
-	return LoadGLTextureArray_IL(filename, channels, w, h, transparent);
+	return LoadGLTextureArray_IL(filenames, count, w, h);
 #elif BUILD_LIBPNG
 	return LoadGLTextureArray_PNG(filenames, count, w, h);
 #else

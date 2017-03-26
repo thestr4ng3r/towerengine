@@ -2,7 +2,7 @@
 #include "towerengine.h"
 
 
-#ifdef TOWERENGINE_BUILD_DEVIL
+#ifdef BUILD_DEVIL
 #include <IL/il.h>
 #include <IL/ilu.h>
 #endif
@@ -70,7 +70,7 @@ bool tEngine::Init(std::string *error)
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-#ifdef TOWERENGINE_BUILD_DEVIL
+#ifdef BUILD_DEVIL
 	ilInit();
 	iluInit();
 #endif

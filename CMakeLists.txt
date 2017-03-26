@@ -9,14 +9,14 @@ set(LIB_INSTALL_DIR lib)
 
 
 
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
 
-option(TOWERENGINE_STATIC_LIB "Build static instead of shared" OFF)
+option(TOWERENGINE_STATIC_LIB "Build static instead of shared" ON)
 
-option(TOWERENGINE_BUILD_DEVIL OFF)
-option(TOWERENGINE_BUILD_LIBPNG ON)
-option(TOWERENGINE_BUILD_OPENVR OFF)
-option(TOWERENGINE_BUILD_OCULUS OFF)
+option(TOWERENGINE_BUILD_DEVIL "Texture loading support using DevIL" OFF)
+option(TOWERENGINE_BUILD_LIBPNG "Texture loading support using libpng" ON)
+option(TOWERENGINE_BUILD_OPENVR "Build with OpenVR" OFF)
+option(TOWERENGINE_BUILD_OCULUS "Build with Oculus SDK" OFF)
 
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
@@ -149,6 +149,8 @@ set(TOWERENGINE_SRC
 	src/vr_context.cpp
 	include/vr_context_openvr.h
 	include/vr_context_oculus.h
+	include/vr_context_test.h
+	src/vr_context_test.cpp
 	include/texture.h
 	src/texture.cpp
 	src/texture_devil.cpp
@@ -258,6 +260,18 @@ if(TOWERENGINE_BUILD_LIBPNG)
 	add_definitions(-DBUILD_LIBPNG)
 endif(TOWERENGINE_BUILD_LIBPNG)
 
+
+if(TOWERENGINE_BUILD_OPENVR)
+	find_package(OpenVR REQUIRED)
+	include_directories(${OPENVR_INCLUDE_DIRS})
+	target_link_libraries(towerengine ${OPENVR_LIBRARIES})
+endif(TOWERENGINE_BUILD_OPENVR)
+
+if(TOWERENGINE_BUILD_OCULUS)
+	find_package(OculusSDK REQUIRED)
+	include_directories(${OCULUS_SDK_INCLUDE_DIRS})
+	target_link_libraries(towerengine ${OCULUS_SDK_LIBRARY})
+endif(TOWERENGINE_BUILD_OCULUS)
 
 
 install(TARGETS towerengine
