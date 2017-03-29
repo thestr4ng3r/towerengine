@@ -23,7 +23,7 @@ tMesh *ConvertOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderModel
 {
 	tMesh *mesh = new tMesh();
 
-	tDefaultMaterial *material = new tDefaultMaterial();
+	tStandardMaterial *material = new tStandardMaterial();
 
 	GLuint tex;
 	glGenTextures(1, &tex);
@@ -36,7 +36,7 @@ tMesh *ConvertOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderModel
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	material->SetTexture(tDefaultMaterial::BASE_COLOR, tex);
+	material->SetTexture(tStandardMaterial::BASE_COLOR, tex);
 	material->SetMetallic(0.05);
 	material->SetRoughness(0.95);
 
@@ -46,25 +46,30 @@ tMesh *ConvertOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderModel
 
 	for(int i=0; i<render_model->unVertexCount; i++)
 	{
-		tVertex *vertex = mesh->CreateVertex(Vec(render_model->rVertexData[i].vPosition.v[0],
-												 render_model->rVertexData[i].vPosition.v[1],
-												 render_model->rVertexData[i].vPosition.v[2]));
+		tVertex v;
 
-		vertex->normal = Vec(render_model->rVertexData[i].vNormal.v[0],
-							 render_model->rVertexData[i].vNormal.v[1],
-							 render_model->rVertexData[i].vNormal.v[2]);
+		v.pos = tVec(render_model->rVertexData[i].vPosition.v[0],
+					render_model->rVertexData[i].vPosition.v[1],
+					render_model->rVertexData[i].vPosition.v[2]);
 
-		vertex->uv = Vec(render_model->rVertexData[i].rfTextureCoord[0],
-						 render_model->rVertexData[i].rfTextureCoord[1]);
+		v.normal = tVec(render_model->rVertexData[i].vNormal.v[0],
+					   render_model->rVertexData[i].vNormal.v[1],
+					   render_model->rVertexData[i].vNormal.v[2]);
+
+		v.uv = tVec(render_model->rVertexData[i].rfTextureCoord[0],
+					render_model->rVertexData[i].rfTextureCoord[1]);
+
+		mesh->AddVertex(v);
 	}
 
 	for(int i=0; i<render_model->unTriangleCount; i++)
 	{
-		mesh->CreateTriangle(mesh->GetVertex(render_model->rIndexData[i * 3 + 0]),
-							 mesh->GetVertex(render_model->rIndexData[i * 3 + 1]),
-							 mesh->GetVertex(render_model->rIndexData[i * 3 + 2]),
-							 Vec(1.0, 1.0, 1.0),
-							 material);
+		tTriangle t;
+		t.v[0] = render_model->rIndexData[i * 3 + 0];
+		t.v[1] = render_model->rIndexData[i * 3 + 1];
+		t.v[2] = render_model->rIndexData[i * 3 + 2];
+		t.mat = material;
+		mesh->AddTriangle(t);
 	}
 
 	mesh->GenerateBoundingBox();
@@ -277,8 +282,8 @@ void tVRContextOpenVR::StartFrame(tVector2 cam_rot, tVector src_pos, tVector &ce
 	}
 
 	float *data = hmd_matrix.GetData();
-	center_pos = src_pos + Vec(data[3], data[7], data[11]);
-	center_dir = -Vec(data[2], data[6], data[10]);
+	center_pos = src_pos + tVec(data[3], data[7], data[11]);
+	center_dir = -tVec(data[2], data[6], data[10]);
 
 
 	for(int i=0; i<2; i++)
@@ -286,9 +291,9 @@ void tVRContextOpenVR::StartFrame(tVector2 cam_rot, tVector src_pos, tVector &ce
 		tMatrix4 eye_hmd_matrix = hmd_matrix * eye_matrix[i];
 		data = eye_hmd_matrix.GetData();
 
-		tVector pos = src_pos + Vec(data[3], data[7], data[11]);
-		tVector dir = -Vec(data[2], data[6], data[10]);
-		tVector up = Vec(data[1], data[5], data[9]);
+		tVector pos = src_pos + tVec(data[3], data[7], data[11]);
+		tVector dir = -tVec(data[2], data[6], data[10]);
+		tVector up = tVec(data[1], data[5], data[9]);
 
 		camera[i]->SetFOV(fov[i].left, fov[i].right, fov[i].bottom, fov[i].top);
 		camera[i]->SetPosition(pos);
@@ -342,7 +347,7 @@ void tVRContextOpenVR::StartFrame(tVector2 cam_rot, tVector src_pos, tVector &ce
 void tVRContextOpenVR::FinishFrame(void)
 {
 	vr::Texture_t left_tex;
-	left_tex.eType = vr::API_OpenGL;
+	left_tex.eType = vr::TextureType_OpenGL;
 	left_tex.eColorSpace = vr::ColorSpace_Gamma;
 	left_tex.handle = (void *)render_tex;
 
@@ -354,7 +359,7 @@ void tVRContextOpenVR::FinishFrame(void)
 	vr::VRCompositor()->Submit(vr::Eye_Left, &left_tex, &left_bounds);
 
 	vr::Texture_t right_tex;
-	right_tex.eType = vr::API_OpenGL;
+	right_tex.eType = vr::TextureType_OpenGL;
 	right_tex.eColorSpace = vr::ColorSpace_Gamma;
 	right_tex.handle = (void *)render_tex;
 
