@@ -38,13 +38,13 @@ void tVRContextTest::StartFrame(tVector2 cam_rot, tVector src_pos, tVector &cent
 	//center_dir = -Vec(data[2], data[6], data[10]);
 
 	double cy = cos(cam_rot.y);
-	center_dir = Vec(cos(cam_rot.x) * cy, sin(cam_rot.y), sin(cam_rot.x) * cy);
+	center_dir = tVec(cos(cam_rot.x) * cy, sin(cam_rot.y), sin(cam_rot.x) * cy);
 
 	for(int i=0; i<2; i++)
 	{
 		tVector pos = center_pos; // + Vec(data[3], data[7], data[11]);
 		tVector dir = center_dir;
-		tVector up = Vec(0.0, 1.0, 0.0);
+		tVector up = tVec(0.0, 1.0, 0.0);
 
 		//camera[i]->SetFOV(openvr.fov[i].left, openvr.fov[i].right, openvr.fov[i].bottom, openvr.fov[i].top);
 		camera[i]->SetFOVVerticalAngle(110.0f, (float)eye_render_width / (float)eye_render_height);

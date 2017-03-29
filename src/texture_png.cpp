@@ -5,9 +5,30 @@
 
 #include <png.h>
 
+
+FILE *fp;
+
+void PNGCBAPI
+user_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+	png_size_t check;
+
+	if(png_ptr == NULL)
+		return;
+
+	/* fread() returns 0 on error, so it is OK to store this in a png_size_t
+	* instead of an int, which is what fread() actually returns.
+	*/
+	check = fread(data, 1, length, fp);
+
+	if(check != length)
+		png_error(png_ptr, "Read Error");
+}
+
+
 struct tPNGImage
 {
-	FILE *fp;
+	//FILE *fp;
 	png_structp png_ptr;
 	png_infop info_ptr;
 
@@ -102,11 +123,12 @@ struct tPNGImage
 
 
 		data = (png_bytep)png_malloc(png_ptr, row_bytes * height);
-
+		
 		rows = (png_bytepp)png_malloc(png_ptr, sizeof(png_bytep) * height);
 		for(int i=0; i<height; i++)
-			rows[i] = &data[row_bytes * (mirror_y ? (height - i - 1) : i)];
+			rows[i] = &(data[row_bytes * (mirror_y ? (height - i - 1) : i)]);
 
+		png_set_read_fn(png_ptr, fp, user_png_read_data);
 		png_read_image(png_ptr, rows);
 		png_read_end(png_ptr, info_ptr);
 
