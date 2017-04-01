@@ -6,6 +6,8 @@
 #include <png.h>
 
 
+
+#ifdef _WIN32
 FILE *fp;
 
 void PNGCBAPI
@@ -24,11 +26,14 @@ user_png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 	if(check != length)
 		png_error(png_ptr, "Read Error");
 }
+#endif
 
 
 struct tPNGImage
 {
-	//FILE *fp;
+#ifndef _WIN32
+	FILE *fp;
+#endif
 	png_structp png_ptr;
 	png_infop info_ptr;
 
@@ -128,7 +133,9 @@ struct tPNGImage
 		for(int i=0; i<height; i++)
 			rows[i] = &(data[row_bytes * (mirror_y ? (height - i - 1) : i)]);
 
+#ifdef _WIN32
 		png_set_read_fn(png_ptr, fp, user_png_read_data);
+#endif
 		png_read_image(png_ptr, rows);
 		png_read_end(png_ptr, info_ptr);
 
