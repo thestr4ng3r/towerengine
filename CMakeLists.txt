@@ -262,7 +262,7 @@ add_dependencies(towerengine resources)
 
 
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/rapidxml)
+include_directories(third_party/rapidxml)
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})

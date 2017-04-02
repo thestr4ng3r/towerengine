@@ -1,6 +1,7 @@
 # TowerEngine
 
 [![Build Status](https://travis-ci.org/thestr4ng3r/towerengine.svg?branch=master)](https://travis-ci.org/thestr4ng3r/towerengine)
+[![Build status](https://ci.appveyor.com/api/projects/status/wxmknchevbsd8we7?svg=true)](https://ci.appveyor.com/project/thestr4ng3r/towerengine)
 
 TowerEngine is a cross platform OpenGL-based Game Engine developed by Florian Märkl / Metallic Entertainment. It is available under the GPLv3 license.
 

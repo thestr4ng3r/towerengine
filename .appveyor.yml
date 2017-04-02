@@ -1,0 +1,60 @@
+version: 1.0.{build}
+install:
+  - set root_dir=%cd%
+  - C:\"Program Files (x86)"\"Microsoft Visual Studio 14.0"\VC\vcvarsall.bat amd64
+  - set PATH=%PATH%;C:\"Program Files (x86)"\7-zip
+
+
+  - REM ---------------------------------
+  - REM GLEW
+  - REM ---------------------------------
+
+  - SET glew_url="https://netcologne.dl.sourceforge.net/project/glew/glew/2.0.0/glew-2.0.0.zip"
+  - SET glew_zip="%root_dir%\third_party\glew-2.0.0.zip"
+  - SET glew_dir="%root_dir%\third_party\glew-2.0.0"
+
+  - echo "Downloading %glew_url%"
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('%glew_url%', '%glew_zip%')"
+  - echo "Extracting %glew_zip%"
+  - 7z x -o"%root_dir%/third_party" "%glew_zip%"
+
+  - SET glew_install_prefix="%root_dir%/third_party/glew-bin"
+  - cd %glew_dir%
+  - cd build
+  - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%glew_install_prefix%" ./cmake
+  - nmake
+  - cmake -P cmake_install.cmake
+
+  - cd %root_dir%
+
+
+  - REM ---------------------------------
+  - REM Bullet
+  - REM ---------------------------------
+
+  - SET bullet_url="https://github.com/bulletphysics/bullet3/archive/2.86.1.zip"
+  - SET bullet_zip="%root_dir%\third_party\bullet-2.86.1.zip"
+  - SET bullet_dir="%root_dir%\third_party\bullet3-2.86.1"
+
+  - echo "Downloading %bullet_url%"
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('%bullet_url%', '%bullet_zip%')"
+  - echo "Extracting %bullet_zip%"
+  - 7z x -o"%root_dir%/third_party" "%bullet_zip%"
+
+  - SET bullet_install_prefix="%root_dir%/third_party/bullet-bin"
+  - cd %bullet_dir%
+  - mkdir build
+  - cd build
+
+  - cmake -G "NMake Makefiles" -DBUILD_BULLET2_DEMOS=OFF -DBUILD_BULLET3=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_UNIT_TESTS=OFF -DBUILD_SHARED_LIBS=OFF -DINSTALL_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="%bullet_install_prefix%" ..
+  - nmake
+  - cmake -P cmake_install.cmake
+
+
+  - cd %root_dir%
+
+build_script:
+  - mkdir build
+  - cd build
+  - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="%glew_install_prefix%;%bullet_install_prefix%" -DTOWERENGINE_BUILD_DEVIL=OFF -DTOWERENGINE_BUILD_LIBPNG=OFF ..
+  - nmake
