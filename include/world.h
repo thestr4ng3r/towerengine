@@ -2,8 +2,6 @@
 #ifndef _WORLD_H
 #define _WORLD_H
 
-#include <unordered_set>
-
 class tWorld
 {
 	private:
@@ -47,8 +45,7 @@ class tWorld
 
 		void Step(float time, int max_sub_steps = 1, float fixed_time_step = 1.0f / 60.0f);
 
-		void FillObjectSpace(tObjectSpace *space, tCulling **cullings, int cullings_count, bool clear = true, bool init_cullings = true);
-		//void FillRenderSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool init_cullings = true);
+		void FillObjectSpace(tObjectSpace *space, tCulling *culling, bool clear = true, bool init_culling = true);
 
 		tSkyBox *GetSkyBox(void)						{ return sky_box; }
 

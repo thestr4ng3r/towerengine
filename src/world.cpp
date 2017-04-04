@@ -61,9 +61,6 @@ void tWorld::AddObject(tObject *o)
 	if(tReflectionProbe *reflection_probe = dynamic_cast<tReflectionProbe *>(o))
 		reflection_probes.insert(reflection_probe);
 
-	//if(tParticleSystem *particle_system = dynamic_cast<tParticleSystem *>(o))
-	//	particle_systems.insert(particle_system);
-
 	o->AddedObjectToWorld(this);
 }
 
@@ -81,101 +78,25 @@ void tWorld::RemoveObject(tObject *o)
 
 	if(tReflectionProbe *reflection_probe = dynamic_cast<tReflectionProbe *>(o))
 		reflection_probes.erase(reflection_probe);
-
-	//if(tParticleSystem *particle_system = dynamic_cast<tParticleSystem *>(o))
-	//	particle_systems.erase(particle_system);
 }
 
-void tWorld::FillObjectSpace(tObjectSpace *space, tCulling **cullings, int cullings_count, bool clear, bool init_cullings)
+void tWorld::FillObjectSpace(tObjectSpace *space, tCulling *culling, bool clear, bool init_culling)
 {
 	if(clear)
 		space->Clear();
 
-	if(init_cullings)
-		for(int c=0; c<cullings_count; c++)
-			cullings[c]->InitCulling();
+	if(init_culling)
+		culling->InitCulling();
 
 	for(tObject *object : objects)
 	{
-		bool cull = true;
-
 		tBoundingBox bounding_box = object->GetBoundingBox();
-		for(int c=0; c<cullings_count; c++)
-		{
-			if(!cullings[c]->TestBoundingBoxCulling(bounding_box))
-			{
-				cull = false;
-				break;
-			}
-		}
-
-		if(cull)
+		if(culling->TestBoundingBoxCulling(bounding_box))
 			continue;
 
 		space->AddObject(object);
 	}
 }
-
-
-/*void tWorld::FillRenderSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool init_cullings)
-{
-	tBoundingBox b;
-	//tVector minv, maxv;
-	tVector light_pos;
-	float light_dist;
-	vector<tObject *>::iterator i;
-
-	if(init_cullings)
-		for(int c=0; c<cullings_count; c++)
-			cullings[c]->InitCulling();
-
-	space->Clear();
-
-	FillRenderObjectSpace(space, cullings, cullings_count, false, false);
-
-	vector<tPointLight *>::iterator pi;
-
-	for(pi=point_lights.begin(); pi!=point_lights.end(); pi++)
-	{
-		if(!(*pi)->GetEnabled())
-			continue;
-
-		if(!(*pi)->GetShadowInvalid())
-		{
-			light_pos = (*pi)->GetPosition();
-			light_dist = (*pi)->GetDistance();
-
-			bool cull = true;
-
-			for(int c=0; c<cullings_count; c++)
-			{
-				if(!cullings[c]->TestSphereCulling(light_pos, light_dist))
-				{
-					cull = false;
-					break;
-				}
-			}
-
-			if(cull)
-				continue;
-		}
-
-		space->point_lights.insert(*pi);
-	}
-
-	vector<tDirectionalLight *>::iterator di;
-
-	for(di=dir_lights.begin(); di!=dir_lights.end(); di++)
-	{
-		space->dir_lights.insert(*di);
-
-		if(!(*di)->GetShadowEnabled())
-			continue;
-
-		for(i=objects.begin(); i!=objects.end(); i++)
-			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i)); // TODO: move to tDeferredRenderer
-	}
-}*/
 
 
 void tWorld::AssignUnsetReflectionProbes(void)

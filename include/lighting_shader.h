@@ -6,9 +6,9 @@
 
 #include "material.h"
 
-/**
- * Lighting Shader used if ARB_bindless_texture is supported
- */
+
+/// Lighting Shader used if ARB_bindless_texture is supported
+///
 class tLightingShader : public tScreenShader, public tReflectingShader
 {
 	private:

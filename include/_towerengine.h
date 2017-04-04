@@ -80,7 +80,7 @@ class t2DRenderer;
 #include "camera.h"
 #include "point_light.h"
 #include "directional_light.h"
-#include "renderspace.h"
+#include "object_space.h"
 #include "point_light_shadow.h"
 #include "directional_light_shadow.h"
 #include "refection_probe.h"

@@ -137,7 +137,7 @@ void tReflectionProbe::RenderGeometryPass(tDeferredRenderer *renderer, int side,
 	renderer->GetPositionRestoreDataBuffer()->Bind();
 	renderer->GetPositionRestoreDataBuffer()->UpdateBuffer(camera);
 
-	world->FillObjectSpace(render_space, (tCulling **)&camera, 1);
+	world->FillObjectSpace(render_space, camera);
 
 	gbuffer->BindDrawBuffers();
 

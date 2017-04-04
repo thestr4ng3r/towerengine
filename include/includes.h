@@ -12,6 +12,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include <unordered_set>
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>

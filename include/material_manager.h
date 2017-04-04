@@ -2,10 +2,9 @@
 #ifndef _MATERIAL_MANAGER_H
 #define _MATERIAL_MANAGER_H
 
-/**
- * class for organizing multiple materials by names.
- * All materials added are "owned" by the manager and will be deleted with the manager object.
- */
+
+/// class for organizing multiple materials by names.
+/// All materials added are "owned" by the manager and will be deleted with the manager object.
 class tMaterialManager
 {
 	private:

@@ -2,8 +2,6 @@
 #ifndef _TOWERENGINE_RENDERSPACE_H
 #define _TOWERENGINE_RENDERSPACE_H
 
-#include <unordered_set>
-
 struct tObjectSpace
 {
 	std::unordered_set<tObject *> objects;

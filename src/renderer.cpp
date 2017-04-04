@@ -126,8 +126,7 @@ void tRenderer::RenderShadowMaps(void)
 	for(pli=render_point_light_shadows.begin(); pli!=render_point_light_shadows.end(); pli++)
 	{
 		tObjectSpace *object_space = (*pli)->GetShadow()->GetRenderObjectSpace();
-		tCulling *cullings[1] = { *pli };
-		world->FillObjectSpace(object_space, cullings, 1);
+		world->FillObjectSpace(object_space, *pli);
 	}
 
 

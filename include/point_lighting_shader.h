@@ -27,14 +27,12 @@ class tPointLightingShader : public tScreenShader
 		tPointLightingShader(int lights_count, tGBuffer *gbuffer);
 		~tPointLightingShader(void);
 
-		/**
-		 * set all point light uniforms
-		 * @param pos length must be 3 * lights_count
-		 * @param color length must be 3 * lights_count
-		 * @param dist length must be lights_count
-		 * @param shadow_enabled length must be lights_count
-		 * @param shadow_map length must be lights_count
-		*/
+		/// set all point light uniforms
+		/// \param pos length must be 3 * lights_count
+		/// \param color length must be 3 * lights_count
+		/// \param dist length must be lights_count
+		/// \param shadow_enabled length must be lights_count
+		/// \param shadow_map length must be lights_count
 		void SetPointLights(float *pos, float *color, float *dist, int *shadow_enabled, GLuint *shadow_map);
 
 		void SetCameraPosition(tVector pos);

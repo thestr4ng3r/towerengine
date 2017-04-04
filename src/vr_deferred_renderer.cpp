@@ -39,7 +39,8 @@ void tVRDeferredRenderer::PrepareVRRender(void)
 		cam->CalculateModelViewProjectionMatrix();
 	}
 
-	world->FillObjectSpace(camera_render_space, (tCulling **)camera, 2);
+	tCullingCompound culling_compound(tCullingCompound::UNION, camera[0], camera[1]);
+	world->FillObjectSpace(camera_render_space, &culling_compound);
 
 	PrepareRender(camera[0], camera_render_space); // TODO: use something instead of left camera
 }
