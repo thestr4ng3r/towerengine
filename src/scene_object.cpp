@@ -86,12 +86,12 @@ tDirectionalLightSceneObject::~tDirectionalLightSceneObject(void)
 
 void tDirectionalLightSceneObject::AddToWorld(tWorld *world)
 {
-	world->AddDirectionalLight(light);
+	world->AddObject(light);
 }
 
 void tDirectionalLightSceneObject::RemoveFromWorld(tWorld *world)
 {
-	world->RemoveDirectionalLight(light);
+	world->RemoveObject(light);
 }
 
 // ---------------------------------------------
@@ -108,12 +108,12 @@ tPointLightSceneObject::~tPointLightSceneObject(void)
 
 void tPointLightSceneObject::AddToWorld(tWorld *world)
 {
-	world->AddPointLight(light);
+	world->AddObject(light);
 }
 
 void tPointLightSceneObject::RemoveFromWorld(tWorld *world)
 {
-	world->RemovePointLight(light);
+	world->RemoveObject(light);
 }
 
 // ---------------------------------------------
@@ -141,10 +141,10 @@ tReflectionProbeSceneObject::~tReflectionProbeSceneObject()
 
 void tReflectionProbeSceneObject::AddToWorld(tWorld *world)
 {
-	world->AddCubeMapReflection(reflection);
+	world->AddObject(reflection);
 }
 
 void tReflectionProbeSceneObject::RemoveFromWorld(tWorld *world)
 {
-	world->RemoveCubeMapReflection(reflection);
+	world->AddObject(reflection);
 }

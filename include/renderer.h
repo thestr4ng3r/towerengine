@@ -27,7 +27,7 @@ class tRenderer
 		bool shadow_pass;
 
 		tCamera *current_rendering_camera;
-		tRenderSpace *current_rendering_render_space;
+		tRenderObjectSpace *current_rendering_render_space;
 
 		tFaceShader *current_face_shader;
 
@@ -41,7 +41,7 @@ class tRenderer
 		tMatrixBuffer *matrix_buffer;
 
 		void InitRenderer(tWorld *world);
-		virtual void PrepareRender(tCamera *camera, tRenderSpace *render_space);
+		virtual void PrepareRender(tCamera *camera, tRenderObjectSpace *render_space);
 
 	public:
 		virtual ~tRenderer();

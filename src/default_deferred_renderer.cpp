@@ -6,7 +6,7 @@ tDefaultDeferredRenderer::tDefaultDeferredRenderer(int width, int height, tWorld
 	InitDeferredRenderer(width, height, world, true);
 
 	camera = new tCamera();
-	camera_render_space = new tRenderSpace();
+	camera_render_space = new tRenderObjectSpace();
 }
 
 
@@ -19,7 +19,8 @@ tDefaultDeferredRenderer::~tDefaultDeferredRenderer(void)
 void tDefaultDeferredRenderer::Render(GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
 {
 	camera->CalculateModelViewProjectionMatrix();
-	world->FillRenderSpace(camera_render_space, (tCulling **)&camera, 1);
+	tCulling *cullings[1] = { camera };
+	world->FillObjectSpace(camera_render_space, cullings, 1);
 
 	PrepareRender(camera, camera_render_space);
 

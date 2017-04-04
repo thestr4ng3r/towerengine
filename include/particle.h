@@ -26,7 +26,7 @@ struct tParticle
 };
 
 
-class tParticleSystem
+class tParticleSystem: public tObject
 {
 	public:
 		enum RenderType { DEFERRED_LIT, FORWARD_ADD, FORWARD_ALPHA };

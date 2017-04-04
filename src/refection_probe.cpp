@@ -15,7 +15,7 @@ tReflectionProbe::tReflectionProbe(tVector position, tVector extent_a, tVector e
 	camera->SetFOV(-1.0f, 1.0f, 1.0f, -1.0f);
 	// TODO: near/far clip other than default
 
-	render_space = new tRenderSpace();
+	render_space = new tRenderObjectSpace();
 
 	fbo = 0;
 	color_tex = 0;
@@ -102,8 +102,8 @@ void tReflectionProbe::Render(tDeferredRenderer *renderer)
 
 	for(int s=0; s<6; s++)
 	{
-		GeometryPass(renderer, s, world);
-		LightPass(renderer, s, world);
+		RenderGeometryPass(renderer, s, world);
+		RenderLightPass(renderer, s, world);
 	}
 
 	glDisable(GL_BLEND);
@@ -111,7 +111,7 @@ void tReflectionProbe::Render(tDeferredRenderer *renderer)
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, color_tex);
 	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-	BlurPass(renderer);
+	RenderBlurPass(renderer);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -119,7 +119,7 @@ void tReflectionProbe::Render(tDeferredRenderer *renderer)
 	invalid = false;
 }
 
-void tReflectionProbe::GeometryPass(tDeferredRenderer *renderer, int side, tWorld *world)
+void tReflectionProbe::RenderGeometryPass(tDeferredRenderer *renderer, int side, tWorld *world)
 {
 	camera->SetPosition(position);
 	camera->SetDirection(CubeVecS(side));
@@ -137,7 +137,7 @@ void tReflectionProbe::GeometryPass(tDeferredRenderer *renderer, int side, tWorl
 	renderer->GetPositionRestoreDataBuffer()->Bind();
 	renderer->GetPositionRestoreDataBuffer()->UpdateBuffer(camera);
 
-	world->FillRenderSpace(render_space, (tCulling **)&camera, 1);
+	world->FillObjectSpace(render_space, (tCulling **)&camera, 1);
 
 	gbuffer->BindDrawBuffers();
 
@@ -161,7 +161,7 @@ void tReflectionProbe::GeometryPass(tDeferredRenderer *renderer, int side, tWorl
 	render_space->GeometryPass(renderer, false);
 }
 
-void tReflectionProbe::LightPass(tDeferredRenderer *renderer, int side, tWorld *world)
+void tReflectionProbe::RenderLightPass(tDeferredRenderer *renderer, int side, tWorld *world)
 {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X+side, color_tex, 0);
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -299,7 +299,7 @@ static const GLenum blur_draw_buffers[6] = {	GL_COLOR_ATTACHMENT0,
 												GL_COLOR_ATTACHMENT5 };
 
 
-void tReflectionProbe::BlurPass(tDeferredRenderer *renderer)
+void tReflectionProbe::RenderBlurPass(tDeferredRenderer *renderer)
 {
 	tCubeMapBlurShader *shader = renderer->GetCubeMapBlurShader();
 

@@ -7,17 +7,23 @@ class tBoundingBox
 {
 	private:
 		tVector minv, maxv;
+		bool infinite;
 
 	public:
 		tBoundingBox(void);
-		tBoundingBox(tVector a, tVector b);
+		tBoundingBox(bool infinite);
+		tBoundingBox(tVector a, tVector b, bool infinite = false);
 
-		tVector GetMin(void)	{ return minv; }
-		tVector GetMax(void)	{ return maxv; }
+		static tBoundingBox Infinite() 			{ return tBoundingBox(true); }
+
+		const tVector &GetMin(void) const		{ return minv; }
+		const tVector &GetMax(void) const		{ return maxv; }
+		const bool &GetInfinite(void) const		{ return infinite; }
 
 		void GetCornerPoints(tVector p[8]);
 
 		void SetBounds(tVector a, tVector b);
+		void SetInfinite(bool infinite)	{ this->infinite = infinite; }
 		void AddPoint(tVector p);
 
 		bool ContainsPoint(tVector p);

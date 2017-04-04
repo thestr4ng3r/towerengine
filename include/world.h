@@ -2,17 +2,18 @@
 #ifndef _WORLD_H
 #define _WORLD_H
 
+#include <unordered_set>
+
 class tWorld
 {
 	private:
 		std::vector<tObject *> objects;
-		std::vector<tPointLight *> point_lights;
-		std::vector<tDirectionalLight *> dir_lights;
-		std::vector<tParticleSystem *> particle_systems;
-		std::vector<tReflectionProbe *> reflection_probes;
 		tSkyBox *sky_box;
 
 		tVector ambient_color;
+
+		std::unordered_set<tReflectionProbe *> reflection_probes;
+		//std::unordered_set<tParticleSystem *> particle_systems;
 
 		struct physics
 		{
@@ -30,6 +31,11 @@ class tWorld
 
 		void AddObject(tObject *o);
 		void RemoveObject(tObject *o);
+		const std::vector<tObject *> &GetObjects() const							{ return objects; }
+
+		const std::unordered_set<tReflectionProbe *> &GetReflectionProbes() const	{ return reflection_probes; }
+		//const std::unordered_set<tParticleSystem *> &GetParticleSystems() const 	{ return particle_systems; }
+
 		void SetSkyBox(tSkyBox *sky_box)				{ this->sky_box = sky_box; }
 		void ClearObjects(void)							{ objects.clear(); }
 
@@ -39,37 +45,10 @@ class tWorld
 
 		void SetAmbientColor(tVector v)					{ ambient_color = v; }
 
-		void AddPointLight(tPointLight *light);
-		void RemovePointLight(tPointLight *light);
-		void ClearPointLights(void)						{ point_lights.clear(); }
-
-		int GetPointLightsCount(void)					{ return point_lights.size(); }
-		tPointLight *GetPointLight(int i)				{ return point_lights.at(i); }
-
-		void AddDirectionalLight(tDirectionalLight *light);
-		void RemoveDirectionalLight(tDirectionalLight *light);
-		void ClearDirectionalLights(void)				{ dir_lights.clear(); }
-
-		int GetDirectionalLightsCount(void)				{ return dir_lights.size(); }
-		tDirectionalLight *GetDirectionalLight(int i)	{ return dir_lights.at(i); }
-
-		void AddParticleSystem(tParticleSystem *ps);
-		void RemoveParticleSystem(tParticleSystem *ps);
-		void ClearParticleSystems(void)					{ particle_systems.clear(); }
-
-		int GetParticleSystemsCount(void)				{ return particle_systems.size(); }
-		tParticleSystem *GetParticleSystem(int i)		{ return particle_systems.at(i); }
-
-		void AddCubeMapReflection(tReflectionProbe *r);
-		void RemoveCubeMapReflection(tReflectionProbe *r);
-
-		int GetReflectionProbesCount(void)				{ return reflection_probes.size(); }
-		tReflectionProbe *GetReflectionProbe(int i)		{ return reflection_probes.at(i); }
-
 		void Step(float time, int max_sub_steps = 1, float fixed_time_step = 1.0f / 60.0f);
 
-		void FillRenderObjectSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool clear = true, bool init_cullings = true);
-		void FillRenderSpace(tRenderSpace *space, tCulling **cullings, int cullings_count, bool init_cullings = true);
+		void FillObjectSpace(tObjectSpace *space, tCulling **cullings, int cullings_count, bool clear = true, bool init_cullings = true);
+		//void FillRenderSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool init_cullings = true);
 
 		tSkyBox *GetSkyBox(void)						{ return sky_box; }
 

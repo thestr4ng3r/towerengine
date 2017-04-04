@@ -40,8 +40,13 @@ int main()
 	}
 	scene->AddToWorld();
 
-	for(int i=0; i<world->GetPointLightsCount(); i++)
-		world->GetPointLight(i)->InitShadow(256, true);
+	for(tObject *object : world->GetObjects())
+	{
+		if(tPointLight *point_light = dynamic_cast<tPointLight *>(object))
+		{
+			point_light->InitShadow(256, true);
+		}
+	}
 
 	tDefaultForwardRenderer *renderer = new tDefaultForwardRenderer(world);
 

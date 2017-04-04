@@ -2,6 +2,7 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
+
 class tObject
 {
 	private:
@@ -21,7 +22,7 @@ class tObject
 		virtual void ForwardPass(tDeferredRenderer *) {}
 		virtual void RefractionPass(tDeferredRenderer *) {}
 		virtual void StandardForwardPass(tForwardRenderer *) {}
-		virtual tBoundingBox GetBoundingBox(void) = 0;
+		virtual tBoundingBox GetBoundingBox(void)	{ return tBoundingBox::Infinite(); };
 
 		void AddedObjectToWorld(tWorld *world);
 		void RemovedObjectFromWorld(tWorld *world);

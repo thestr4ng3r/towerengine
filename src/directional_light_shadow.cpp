@@ -22,7 +22,7 @@ tDirectionalLightShadow::tDirectionalLightShadow(tDirectionalLight *light, int s
 	}
 	splits_z[splits] = 0.0;
 
-	render_space = new tRenderSpace();
+	render_space = new tRenderObjectSpace();
 
 	glGenTextures(1, &tex);
 

@@ -71,7 +71,7 @@ class tDeferredRenderer : public tRenderer
 		void ForwardPass(void);
 		void RefractionPass(void);
 
-		void PrepareRender(tCamera *camera, tRenderSpace *render_space);
+		void PrepareRender(tCamera *camera, tRenderObjectSpace *render_space);
 		void RenderCubeMapReflections(void);
 
 		void SetReflections(tReflectingShader *shader, tVector pos);

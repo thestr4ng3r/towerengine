@@ -15,7 +15,7 @@ tVRForwardRenderer::tVRForwardRenderer(int left_width, int left_height, int righ
 	for(int i=0; i<2; i++)
 		camera[i] = new tCamera();
 
-	camera_render_space = new tRenderSpace();
+	camera_render_space = new tRenderObjectSpace();
 
 
 
@@ -82,7 +82,7 @@ void tVRForwardRenderer::PrepareVRRender(void)
 		cam->CalculateModelViewProjectionMatrix();
 	}
 
-	world->FillRenderSpace(camera_render_space, (tCulling **)camera, 2);
+	world->FillObjectSpace(camera_render_space, (tCulling **)camera, 2);
 
 	tForwardRenderer::PrepareRender(camera[0], camera_render_space); // TODO: use something instead of left camera
 }

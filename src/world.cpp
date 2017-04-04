@@ -57,6 +57,13 @@ void tWorld::AddObject(tObject *o)
 			return;
 
 	objects.push_back(o);
+
+	if(tReflectionProbe *reflection_probe = dynamic_cast<tReflectionProbe *>(o))
+		reflection_probes.insert(reflection_probe);
+
+	//if(tParticleSystem *particle_system = dynamic_cast<tParticleSystem *>(o))
+	//	particle_systems.insert(particle_system);
+
 	o->AddedObjectToWorld(this);
 }
 
@@ -71,87 +78,15 @@ void tWorld::RemoveObject(tObject *o)
 			o->RemovedObjectFromWorld(this);
 			return;
 		}
+
+	if(tReflectionProbe *reflection_probe = dynamic_cast<tReflectionProbe *>(o))
+		reflection_probes.erase(reflection_probe);
+
+	//if(tParticleSystem *particle_system = dynamic_cast<tParticleSystem *>(o))
+	//	particle_systems.erase(particle_system);
 }
 
-void tWorld::AddPointLight(tPointLight *light)
-{
-	for(vector<tPointLight *>::iterator i = point_lights.begin(); i != point_lights.end(); i++)
-		if((*i) == light)
-			return;
-	point_lights.push_back(light);
-}
-
-void tWorld::RemovePointLight(tPointLight *light)
-{
-	for(vector<tPointLight *>::iterator i = point_lights.begin(); i != point_lights.end(); i++)
-		if((*i) == light)
-		{
-			point_lights.erase(i);
-			return;
-		}
-}
-
-void tWorld::AddDirectionalLight(tDirectionalLight *light)
-{
-	for(vector<tDirectionalLight *>::iterator i = dir_lights.begin(); i != dir_lights.end(); i++)
-		if((*i) == light)
-			return;
-	dir_lights.push_back(light);
-}
-
-void tWorld::RemoveDirectionalLight(tDirectionalLight *light)
-{
-	for(vector<tDirectionalLight *>::iterator i = dir_lights.begin(); i != dir_lights.end(); i++)
-		if((*i) == light)
-		{
-			dir_lights.erase(i);
-			return;
-		}
-}
-
-
-
-void tWorld::AddParticleSystem(tParticleSystem *ps)
-{
-	for(vector<tParticleSystem *>::iterator i = particle_systems.begin(); i != particle_systems.end(); i++)
-		if(*i == ps)
-			return;
-	particle_systems.push_back(ps);
-}
-
-void tWorld::RemoveParticleSystem(tParticleSystem *ps)
-{
-	for(vector<tParticleSystem *>::iterator i = particle_systems.begin(); i != particle_systems.end(); i++)
-		if(*i == ps)
-		{
-			particle_systems.erase(i);
-			return;
-		}
-}
-
-
-void tWorld::AddCubeMapReflection(tReflectionProbe *r)
-{
-	for(vector<tReflectionProbe *>::iterator i = reflection_probes.begin(); i != reflection_probes.end(); i++)
-		if(*i == r)
-			return;
-	reflection_probes.push_back(r);
-
-}
-
-void tWorld::RemoveCubeMapReflection(tReflectionProbe *r)
-{
-	for(vector<tReflectionProbe *>::iterator i = reflection_probes.begin(); i != reflection_probes.end(); i++)
-		if(*i == r)
-		{
-			reflection_probes.erase(i);
-			return;
-		}
-}
-
-
-
-void tWorld::FillRenderObjectSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool clear, bool init_cullings)
+void tWorld::FillObjectSpace(tObjectSpace *space, tCulling **cullings, int cullings_count, bool clear, bool init_cullings)
 {
 	if(clear)
 		space->Clear();
@@ -160,15 +95,14 @@ void tWorld::FillRenderObjectSpace(tRenderObjectSpace *space, tCulling **culling
 		for(int c=0; c<cullings_count; c++)
 			cullings[c]->InitCulling();
 
-	vector<tObject *>::iterator i;
-
-	for(i=objects.begin(); i!=objects.end(); i++)
+	for(tObject *object : objects)
 	{
 		bool cull = true;
 
+		tBoundingBox bounding_box = object->GetBoundingBox();
 		for(int c=0; c<cullings_count; c++)
 		{
-			if(!cullings[c]->TestBoundingBoxCulling((*i)->GetBoundingBox()))
+			if(!cullings[c]->TestBoundingBoxCulling(bounding_box))
 			{
 				cull = false;
 				break;
@@ -178,12 +112,12 @@ void tWorld::FillRenderObjectSpace(tRenderObjectSpace *space, tCulling **culling
 		if(cull)
 			continue;
 
-		space->objects.insert((*i));
+		space->AddObject(object);
 	}
 }
 
 
-void tWorld::FillRenderSpace(tRenderSpace *space, tCulling **cullings, int cullings_count, bool init_cullings)
+/*void tWorld::FillRenderSpace(tRenderObjectSpace *space, tCulling **cullings, int cullings_count, bool init_cullings)
 {
 	tBoundingBox b;
 	//tVector minv, maxv;
@@ -241,7 +175,7 @@ void tWorld::FillRenderSpace(tRenderSpace *space, tCulling **cullings, int culli
 		for(i=objects.begin(); i!=objects.end(); i++)
 			(*di)->GetShadow()->GetRenderSpace()->objects.insert((*i)); // TODO: move to tDeferredRenderer
 	}
-}
+}*/
 
 
 void tWorld::AssignUnsetReflectionProbes(void)
@@ -258,7 +192,8 @@ void tWorld::AssignUnsetReflectionProbes(void)
 
 		tReflectionProbe *min = 0;
 		float min_v = FLT_MAX;
-		for(vector<tReflectionProbe *>::iterator ri=reflection_probes.begin(); ri!=reflection_probes.end(); ri++)
+
+		for(auto ri=reflection_probes.begin(); ri!=reflection_probes.end(); ri++)
 		{
 			tReflectionProbe *reflection = *ri;
 			float v = (reflection->GetPosition() - mesh_object->GetTransform().GetPosition()).SquaredLen();
@@ -283,8 +218,8 @@ void tWorld::Step(float time, int max_sub_steps, float fixed_time_step)
 	physics.dynamics_world->stepSimulation(time, max_sub_steps, fixed_time_step);
 	//CProfileManager::dumpAll();
 
-	for(vector<tParticleSystem *>::iterator psi = particle_systems.begin(); psi != particle_systems.end(); psi++)
-		(*psi)->Step(time);
+	//for(vector<tParticleSystem *>::iterator psi = particle_systems.begin(); psi != particle_systems.end(); psi++)
+	//	(*psi)->Step(time);
 }
 
 

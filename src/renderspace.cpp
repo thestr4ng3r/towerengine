@@ -2,63 +2,71 @@
 
 using namespace std;
 
-void tRenderObjectSpace::Clear(void)
+void tObjectSpace::AddObject(tObject *object)
+{
+	objects.insert(object);
+}
+
+void tObjectSpace::Clear(void)
 {
 	objects.clear();
 }
 
-void tRenderObjectSpace::DepthPrePass(tRenderer *renderer)
+void tObjectSpace::DepthPrePass(tRenderer *renderer)
 {
-	set<tObject *>::iterator i;
-
-	for(i=objects.begin(); i!=objects.end(); i++)
-		(*i)->DepthPrePass(renderer);
+	for(tObject *object : objects)
+		object->DepthPrePass(renderer);
 }
 
 
-void tRenderObjectSpace::ShadowPass(tRenderer *renderer)
+void tObjectSpace::ShadowPass(tRenderer *renderer)
 {
-	set<tObject *>::iterator i;
-
-	for(i=objects.begin(); i!=objects.end(); i++)
-		(*i)->ShadowPass(renderer);
+	for(tObject *object : objects)
+		object->ShadowPass(renderer);
 }
 
-void tRenderObjectSpace::GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled)
+void tObjectSpace::GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled)
 {
-	set<tObject *>::iterator i;
-
-	for(i=objects.begin(); i!=objects.end(); i++)
-		(*i)->GeometryPass(renderer, cube_map_reflection_enabled);
+	for(tObject *object : objects)
+		object->GeometryPass(renderer, cube_map_reflection_enabled);
 }
 
-void tRenderObjectSpace::ForwardPass(tDeferredRenderer *renderer)
+void tObjectSpace::ForwardPass(tDeferredRenderer *renderer)
 {
-	set<tObject *>::iterator i;
-
-	for(i=objects.begin(); i!=objects.end(); i++)
-		(*i)->ForwardPass(renderer);
+	for(tObject *object : objects)
+		object->ForwardPass(renderer);
 }
 
-void tRenderObjectSpace::RefractionPass(tDeferredRenderer *renderer)
+void tObjectSpace::RefractionPass(tDeferredRenderer *renderer)
 {
-	set<tObject *>::iterator i;
-
-	for(i=objects.begin(); i!=objects.end(); i++)
-		(*i)->RefractionPass(renderer);
+	for(tObject *object : objects)
+		object->RefractionPass(renderer);
 }
 
-void tRenderObjectSpace::StandardForwardPass(tForwardRenderer *renderer)
+void tObjectSpace::StandardForwardPass(tForwardRenderer *renderer)
 {
-	set<tObject *>::iterator i;
-
-	for(i=objects.begin(); i!=objects.end(); i++)
-		(*i)->StandardForwardPass(renderer);
+	for(tObject *object : objects)
+		object->StandardForwardPass(renderer);
 }
 
-void tRenderSpace::Clear(void)
+
+
+
+
+void tRenderObjectSpace::AddObject(tObject *object)
 {
-	tRenderObjectSpace::Clear();
+	tObjectSpace::AddObject(object);
+
+	if(tPointLight *point_light = dynamic_cast<tPointLight *>(object))
+		point_lights.insert(point_light);
+
+	if(tDirectionalLight *dir_light = dynamic_cast<tDirectionalLight *>(object))
+		dir_lights.insert(dir_light);
+}
+
+void tRenderObjectSpace::Clear(void)
+{
+	tObjectSpace::Clear();
 
 	point_lights.clear();
 	dir_lights.clear();

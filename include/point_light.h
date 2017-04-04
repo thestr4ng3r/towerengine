@@ -2,7 +2,7 @@
 #ifndef _POINT_LIGHT_H
 #define _POINT_LIGHT_H
 
-class tPointLight: public tComparable<float>, public tCulling
+class tPointLight: public tObject, public tComparable<float>, public tCulling
 {
 	private:
 		tVector pos;

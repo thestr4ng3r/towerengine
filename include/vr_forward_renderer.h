@@ -17,7 +17,7 @@ class tVRForwardRenderer: public tForwardRenderer
 		GLuint depth_tex;
 
 		tCamera *camera[2];
-		tRenderSpace *camera_render_space;
+		tRenderObjectSpace *camera_render_space;
 
 		void PrepareVRRender(void);
 

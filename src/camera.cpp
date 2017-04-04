@@ -159,6 +159,9 @@ bool tCamera::TestSphereCulling(tVector center, float radius)
 
 bool tCamera::TestBoundingBoxCulling(tBoundingBox b)
 {
+	if(b.GetInfinite())
+		return false;
+
 	tVector p, n;
 	tVector normal;
 

@@ -3,15 +3,24 @@
 
 using namespace std;
 
-tBoundingBox::tBoundingBox(tVector a, tVector b)
+tBoundingBox::tBoundingBox(tVector a, tVector b, bool infinite)
 {
 	SetBounds(a, b);
+	this->infinite = infinite;
+}
+
+tBoundingBox::tBoundingBox(bool infinite)
+{
+	minv = tVec(0.0f, 0.0f, 0.0f);
+	maxv = tVec(0.0f, 0.0f, 0.0f);
+	this->infinite = infinite;
 }
 
 tBoundingBox::tBoundingBox(void)
 {
-	minv = tVec(INFINITY, INFINITY, INFINITY);
-	maxv = tVec(-INFINITY, -INFINITY, -INFINITY);
+	minv = tVec(0.0f, 0.0f, 0.0f);
+	maxv = tVec(0.0f, 0.0f, 0.0f);
+	this->infinite = false;
 }
 
 void tBoundingBox::SetBounds(tVector a, tVector b)
@@ -50,9 +59,10 @@ void tBoundingBox::GetCornerPoints(tVector *p)
 
 bool tBoundingBox::ContainsPoint(tVector p)
 {
-	return p.x >= minv.x && p.x <= maxv.x
+	return infinite ||
+			(p.x >= minv.x && p.x <= maxv.x
 			&& p.y >= minv.y && p.y <= maxv.y
-			&& p.z >= minv.z && p.z <= maxv.z;
+			&& p.z >= minv.z && p.z <= maxv.z);
 }
 
 tVector tBoundingBox::GetNormalizedDistanceToCenter(tVector pos)

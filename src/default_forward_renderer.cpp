@@ -6,7 +6,7 @@ tDefaultForwardRenderer::tDefaultForwardRenderer(tWorld *world) : tForwardRender
 	InitForwardRenderer(world);
 
 	camera = new tCamera();
-	camera_render_space = new tRenderSpace();
+	camera_render_space = new tRenderObjectSpace();
 }
 
 
@@ -19,7 +19,7 @@ tDefaultForwardRenderer::~tDefaultForwardRenderer(void)
 void tDefaultForwardRenderer::Render(GLuint dst_fbo, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
 {
 	camera->CalculateModelViewProjectionMatrix();
-	world->FillRenderSpace(camera_render_space, (tCulling **)&camera, 1);
+	world->FillObjectSpace(camera_render_space, (tCulling **)&camera, 1);
 
 	PrepareRender(camera, camera_render_space);
 

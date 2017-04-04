@@ -18,7 +18,7 @@ tForwardRenderer::~tForwardRenderer()
 	delete point_lights_buffer;
 }
 
-void tForwardRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
+void tForwardRenderer::PrepareRender(tCamera *camera, tRenderObjectSpace *render_space)
 {
 	tRenderer::PrepareRender(camera, render_space);
 }

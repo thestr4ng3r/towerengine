@@ -8,7 +8,7 @@ class tVRDeferredRenderer : public tDeferredRenderer
 		int width[2], height[2];
 
 		tCamera *camera[2];
-		tRenderSpace *camera_render_space;
+		tRenderObjectSpace *camera_render_space;
 
 		void PrepareVRRender(void);
 		

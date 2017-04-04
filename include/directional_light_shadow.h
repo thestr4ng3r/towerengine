@@ -7,7 +7,7 @@ class tDirectionalLightShadow
 	private:
 		tDirectionalLight *light;
 
-		tRenderSpace *render_space;
+		tRenderObjectSpace *render_space;
 
 		GLuint tex;
 		GLuint fbo;
@@ -42,7 +42,7 @@ class tDirectionalLightShadow
 		float GetFarClip(void)				{ return far_clip; }
 		int GetSplitsCount(void)			{ return splits; }
 		float *GetSplitsZ(void)				{ return splits_z; }
-		tRenderSpace *GetRenderSpace(void)	{ return render_space; }
+		tRenderObjectSpace *GetRenderSpace(void)	{ return render_space; }
 
 		void SetNearClip(float v)			{ near_clip = v; }
 		void SetFarClip(float v)			{ far_clip = v; }

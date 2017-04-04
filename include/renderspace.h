@@ -2,13 +2,15 @@
 #ifndef _TOWERENGINE_RENDERSPACE_H
 #define _TOWERENGINE_RENDERSPACE_H
 
+#include <unordered_set>
 
-struct tRenderObjectSpace
+struct tObjectSpace
 {
-	std::set<tObject *> objects;
+	std::unordered_set<tObject *> objects;
 
-	virtual ~tRenderObjectSpace(void)	{}
+	virtual ~tObjectSpace(void)	{}
 
+	virtual void AddObject(tObject *object);
 	virtual void Clear(void);
 
 	void DepthPrePass(tRenderer *renderer);
@@ -19,12 +21,13 @@ struct tRenderObjectSpace
 	void StandardForwardPass(tForwardRenderer *renderer);
 };
 
-struct tRenderSpace : public tRenderObjectSpace
+struct tRenderObjectSpace : public tObjectSpace
 {
 	std::set<tPointLight *> point_lights;
 	std::set<tDirectionalLight *> dir_lights;
 
-	void Clear(void);
+	virtual void AddObject(tObject *object);
+	virtual void Clear(void);
 };
 
 

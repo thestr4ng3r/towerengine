@@ -17,6 +17,8 @@ void tRenderer::InitRenderer(tWorld *world)
 
 	shadow_pass = false;
 
+	depth_prepass_enabled = true;
+
 	InitShaders();
 
 	screen_quad_vao = new tVAO();
@@ -70,7 +72,7 @@ tRenderer::~tRenderer()
 }
 
 
-void tRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
+void tRenderer::PrepareRender(tCamera *camera, tRenderObjectSpace *render_space)
 {
 	current_rendering_camera = camera;
 	current_rendering_render_space = render_space;
@@ -123,7 +125,9 @@ void tRenderer::RenderShadowMaps(void)
 
 	for(pli=render_point_light_shadows.begin(); pli!=render_point_light_shadows.end(); pli++)
 	{
-		world->FillRenderObjectSpace((*pli)->GetShadow()->GetRenderObjectSpace(), (tCulling **)&(*pli), 1);
+		tObjectSpace *object_space = (*pli)->GetShadow()->GetRenderObjectSpace();
+		tCulling *cullings[1] = { *pli };
+		world->FillObjectSpace(object_space, cullings, 1);
 	}
 
 

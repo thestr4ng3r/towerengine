@@ -13,7 +13,7 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 	//culled = false;
 
-	render_object_space = new tRenderSpace();
+	render_object_space = new tObjectSpace();
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);

@@ -8,7 +8,7 @@ class tPointLightShadow
 	private:
 		tPointLight *light;
 
-		tRenderObjectSpace *render_object_space;
+		tObjectSpace *render_object_space;
 
 		GLuint tex;
 		GLuint fbo;
@@ -48,7 +48,7 @@ class tPointLightShadow
 
 		bool GetBlurEnabled(void)			{ return blur_enabled; }
 		float GetBlurSize(void)				{ return blur_size; }
-		tRenderObjectSpace *GetRenderObjectSpace(void)	{ return render_object_space; }
+		tObjectSpace *GetRenderObjectSpace(void)	{ return render_object_space; }
 		//bool GetCulled(void)				{ return culled; }
 };
 

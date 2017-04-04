@@ -70,9 +70,5 @@ void tCoordinateSystemObject::ForwardPass(tDeferredRenderer *renderer)
 
 tBoundingBox tCoordinateSystemObject::GetBoundingBox(void)
 {
-	tBoundingBox b;
-
-	b.SetBounds(pos, pos + size);
-
-	return b;
+	return tBoundingBox(pos, pos + size);
 }

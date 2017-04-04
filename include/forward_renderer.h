@@ -14,7 +14,7 @@ class tForwardRenderer: public tRenderer
 
 		void InitForwardRenderer(tWorld *world);
 
-		void PrepareRender(tCamera *camera, tRenderSpace *render_space);
+		void PrepareRender(tCamera *camera, tRenderObjectSpace *render_space);
 
 		void RenderForward();
 

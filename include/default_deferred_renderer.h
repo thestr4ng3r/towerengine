@@ -6,7 +6,7 @@ class tDefaultDeferredRenderer : public tDeferredRenderer//, public tDefaultRend
 {
 	private:
 		tCamera *camera;
-		tRenderSpace *camera_render_space;
+		tRenderObjectSpace *camera_render_space;
 
 
 	public:

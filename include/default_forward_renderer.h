@@ -7,7 +7,7 @@ class tDefaultForwardRenderer: public tForwardRenderer//, public tDefaultRendere
 {
 	private:
 		tCamera *camera;
-		tRenderSpace *camera_render_space;
+		tRenderObjectSpace *camera_render_space;
 
 	public:
 		tDefaultForwardRenderer(tWorld *world);

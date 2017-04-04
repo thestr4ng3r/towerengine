@@ -2,7 +2,7 @@
 #ifndef _DIRECTIONAL_LIGHT_H
 #define _DIRECTIONAL_LIGHT_H
 
-class tDirectionalLight
+class tDirectionalLight: public tObject
 {
 	private:
 		tVector dir;

@@ -3,7 +3,7 @@
 #define _TOWERENGINE_REFLECTION_PROBE_REFLECTION_H
 
 
-class tReflectionProbe
+class tReflectionProbe: public tObject
 {
 	private:
 		tVector position;
@@ -20,14 +20,14 @@ class tReflectionProbe
 		GLuint blur_tex;
 
 		tCamera *camera;
-		tRenderSpace *render_space;
+		tRenderObjectSpace *render_space;
 
 		bool initialized;
 		bool invalid;
 
-		void GeometryPass(tDeferredRenderer *renderer, int side, tWorld *world);
-		void LightPass(tDeferredRenderer *renderer, int side, tWorld *world);
-		void BlurPass(tDeferredRenderer *renderer);
+		void RenderGeometryPass(tDeferredRenderer *renderer, int side, tWorld *world);
+		void RenderLightPass(tDeferredRenderer *renderer, int side, tWorld *world);
+		void RenderBlurPass(tDeferredRenderer *renderer);
 
 	public:
 		tReflectionProbe(tVector position, tVector extent_a, tVector extend_b);

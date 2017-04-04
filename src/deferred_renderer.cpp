@@ -218,7 +218,7 @@ void tDeferredRenderer::SetFog(bool enabled, float start_dist, float end_dist, f
 
 
 
-void tDeferredRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_space)
+void tDeferredRenderer::PrepareRender(tCamera *camera, tRenderObjectSpace *render_space)
 {
 	tRenderer::PrepareRender(camera, render_space);
 	RenderCubeMapReflections();
@@ -227,11 +227,10 @@ void tDeferredRenderer::PrepareRender(tCamera *camera, tRenderSpace *render_spac
 void tDeferredRenderer::RenderCubeMapReflections(void)
 {
 	shadow_pass = false;
-	for(int i = 0; i< world->GetReflectionProbesCount(); i++)
+	for(tReflectionProbe *probe : world->GetReflectionProbes())
 	{
-		tReflectionProbe *reflection = world->GetReflectionProbe(i);
-		if(reflection->GetInvalid())
-			reflection->Render(this);
+		if(probe->GetInvalid())
+			probe->Render(this);
 	}
 }
 
@@ -293,10 +292,14 @@ void tDeferredRenderer::GeometryPass(void)
 	if(GetDepthPrePassEnabled())
 		glDepthFunc(GL_LESS);
 
+
+	// TODO: move particle rendering somewhere else
 	bool particle_rendering_initialized = false;
-	for(int i=0; i<world->GetParticleSystemsCount(); i++)
+	for(tObject *object : current_rendering_render_space->objects)
 	{
-		tParticleSystem *particle_system = world->GetParticleSystem(i);
+		tParticleSystem *particle_system = dynamic_cast<tParticleSystem *>(object);
+		if(!particle_system)
+			continue;
 
 		if(particle_system->GetRenderType() != tParticleSystem::DEFERRED_LIT)
 			continue;
@@ -425,16 +428,12 @@ void tDeferredRenderer::SetReflections(tReflectingShader *shader, tVector pos)
 	vector<tReflectionProbe *> reflections;
 
 	// TODO: Blend between Reflections
-	if(world->GetReflectionProbesCount() > 0)
+	for(tReflectionProbe *reflection_probe : world->GetReflectionProbes())
 	{
-		for(int i=0; i< world->GetReflectionProbesCount(); i++)
-		{
-			tReflectionProbe *reflection = world->GetReflectionProbe(i);
-			tVector dir = pos - reflection->GetPosition();
+		tVector dir = pos - reflection_probe->GetPosition();
 
-			if(reflection->GetExtent().ContainsPoint(dir))
-				reflections.push_back(reflection);
-		}
+		if(reflection_probe->GetExtent().ContainsPoint(dir))
+			reflections.push_back(reflection_probe);
 	}
 
 	if(reflections.size() >= 2)
@@ -580,10 +579,13 @@ void tDeferredRenderer::ForwardPass(void)
 
 	current_rendering_render_space->ForwardPass(this);
 
+	// TODO: move particle rendering somewhere else
 	bool particle_render_initialized = false;
-	for(int i=0; i<world->GetParticleSystemsCount(); i++)
+	for(tObject *object : world->GetObjects())
 	{
-		tParticleSystem *ps = world->GetParticleSystem(i);
+		tParticleSystem *ps = dynamic_cast<tParticleSystem *>(object);
+		if(!ps)
+			continue;
 
 		if(ps->GetRenderType() != tParticleSystem::FORWARD_ADD && ps->GetRenderType() != tParticleSystem::FORWARD_ALPHA)
 			continue;
