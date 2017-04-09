@@ -27,7 +27,7 @@ prefix_entries(BLENDER_ADDON_SOURCE_ABS "${CMAKE_CURRENT_SOURCE_DIR}/" "${BLENDE
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/towerengine")
 
-add_custom_target(blender-addon ALL
+add_custom_target(blender-addon
 		${CMAKE_COMMAND} -E copy ${BLENDER_ADDON_SOURCE_ABS} ${BINDINGS_FILES_ABS} "${CMAKE_CURRENT_BINARY_DIR}/towerengine"
 		COMMAND ${CMAKE_COMMAND} -E
 			tar -cf "${CMAKE_CURRENT_BINARY_DIR}/towerengine-blender.zip" --format=zip
