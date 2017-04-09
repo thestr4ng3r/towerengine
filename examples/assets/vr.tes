@@ -23,15 +23,6 @@
       <distance v="29.999982833862305"/>
       <color b="1.0" g="1.0" r="1.0"/>
     </point_light>
-    <mesh name="Cube" tag="">
-      <transform>
-        <position x="0.0" y="1.0" z="-0.0"/>
-        <basis_x x="1.0" y="0.0" z="-0.0"/>
-        <basis_y x="0.0" y="1.0" z="-0.0"/>
-        <basis_z x="-0.0" y="-0.0" z="1.0"/>
-      </transform>
-      <mesh_asset asset="Cube"/>
-    </mesh>
     <mesh name="Plane" tag="">
       <transform>
         <position x="0.0" y="0.0" z="-0.0"/>

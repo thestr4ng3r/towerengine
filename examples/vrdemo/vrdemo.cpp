@@ -5,8 +5,8 @@
 #include <GLFW/glfw3.h>
 
 
-const int screen_width = 640;
-const int screen_height = 480;
+const int screen_width = 1280;
+const int screen_height = 720;
 
 
 GLFWwindow *window = 0;
@@ -67,7 +67,7 @@ void InitScene()
 {
 	world = new tWorld();
 	scene = new tScene(world);
-	if (!scene->LoadFromFile("assets/simple.tes"))
+	if (!scene->LoadFromFile("assets/vr.tes"))
 	{
 		fprintf(stderr, "Failed to load scene. Make sure to run this program in the examples/.\n");
 		Cleanup();
@@ -97,10 +97,14 @@ void MainLoop()
 	{
 		tVector center_pos;
 		tVector center_dir;
-		vr_context->StartFrame(tVec(0.0f, 0.0f), tVec(4.0f, 0.0f, 4.0f), center_pos, center_dir, renderer->GetCameras());
+		vr_context->StartFrame(tVec(0.0f, 0.0f), tVec(0.0f, 0.0f, 0.0f), center_pos, center_dir, renderer->GetCameras());
 		renderer->Render(vr_context->GetFBO());
 		vr_context->FinishFrame();
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		vr_context->BlitMirrorFrame(0, 0, screen_width, screen_height);
 		glfwSwapBuffers(window);
+
 		glfwPollEvents();
 	}
 }
