@@ -100,7 +100,7 @@ tLightingShaderPointLightsBuffer::~tLightingShaderPointLightsBuffer(void)
 
 void tLightingShaderPointLightsBuffer::UpdateBuffer(std::vector<tPointLight *> lights)
 {
-	int lights_count = lights.size();
+	int lights_count = (int)lights.size();
 	if(lights_count > tLightingShader::max_point_lights_count)
 		lights_count = tLightingShader::max_point_lights_count;
 

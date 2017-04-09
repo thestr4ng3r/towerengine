@@ -4,6 +4,12 @@ include(${SWIG_USE_FILE})
 find_package(PythonLibs 3 REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
+# Workaround, so Python library is found
+if(MSVC)
+	get_filename_component(PYTHON_LIBRARY_DIRS ${PYTHON_LIBRARIES} DIRECTORY)
+	link_directories(${PYTHON_LIBRARY_DIRS})
+endif()
+
 set(SWIG_SOURCE towerengine.i)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 

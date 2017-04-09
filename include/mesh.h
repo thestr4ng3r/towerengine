@@ -111,10 +111,10 @@ class tMesh
 
 		bool GetCubeMapReflectionEnabled(void);
 
-		int GetVertexCount(void)					{ return vertices.size(); }
-		int GetTriangleCount(void)					{ return triangles.size(); }
-		int GetMaterialCount(void)					{ return materials.size(); }
-		int GetEntityCount(void)					{ return entities.size(); }
+		tVertexIndex GetVertexCount(void)			{ return (tVertexIndex)vertices.size(); }
+		int GetTriangleCount(void)					{ return (int)triangles.size(); }
+		int GetMaterialCount(void)					{ return (int)materials.size(); }
+		int GetEntityCount(void)					{ return (int)entities.size(); }
 
 		tVertex &GetVertex(tVertexIndex i)			{ return vertices[i]; }
 		tTriangle &GetTriangle(int i)				{ return triangles[i]; }

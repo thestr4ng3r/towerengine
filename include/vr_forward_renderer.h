@@ -27,8 +27,7 @@ class tVRForwardRenderer: public tForwardRenderer
 
 		void Render(GLuint dst_fbo);
 
-		tCamera *GetLeftCamera(void)	{ return camera[0]; }
-		tCamera *GetRightCamera(void)	{ return camera[1]; }
+		tCamera **GetCameras() const	{ return (tCamera **)camera; }
 };
 
 #endif

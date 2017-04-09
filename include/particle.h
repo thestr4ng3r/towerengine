@@ -66,7 +66,7 @@ class tParticleSystem: public tObject
 		tVector GetPosition(void)					{ return position; }
 		RenderType GetRenderType(void)				{ return render_type; }
 		int GetTexturesCount(void)					{ return tex_count; }
-		unsigned int GetParticlesCount(void)		{ return particles.size(); }
+		unsigned int GetParticlesCount(void)		{ return (unsigned int)particles.size(); }
 };
 
 
