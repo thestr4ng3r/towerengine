@@ -1,6 +1,6 @@
-#cmake_minimum_required (VERSION 3.2)
+cmake_minimum_required (VERSION 3.2)
 
-#project(TowerEngine)
+project(TowerEngine)
 
 set(TOWERENGINE_VERSION 1.0.0)
 
