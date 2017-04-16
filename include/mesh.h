@@ -106,7 +106,7 @@ class tMesh
 		void ShadowPass(tRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
 		void GeometryPass(tDeferredRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
 		void StandardForwardPass(tForwardRenderer *renderer, std::map<tMaterial *, tMaterial *> *replace_materials);
-		void ForwardPass(tDeferredRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
+		void ForwardPass(tRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
 		void RefractionPass(tDeferredRenderer *renderer, float *transform, std::map<tMaterial *, tMaterial *> *replace_materials);
 
 		bool GetCubeMapReflectionEnabled(void);

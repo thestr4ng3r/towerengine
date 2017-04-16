@@ -80,11 +80,11 @@ tVector operator*(float scalar, const tVector &a);
 tVector operator*(const tVector &a, const tVector &b);
 int operator==(const tVector a, const tVector b);
 
-double Dot(const tVector &a, const tVector &b);
+float Dot(const tVector &a, const tVector &b);
 tVector Cross(const tVector &a, const tVector &b);
 tVector tVec(const tVector2 &v, float y);
 tVector Rotate(const tVector &vec, const tVector &axis, float angle);
-double Det(const tVector &v1, const tVector &v2, const tVector &v3);
+float Det(const tVector &v1, const tVector &v2, const tVector &v3);
 tVector Mix(const tVector v1, const tVector v2, float mix);
 tVector Mix(const tVector v[], const float a[], int count, float mix);
 

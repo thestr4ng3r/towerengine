@@ -21,7 +21,8 @@ class tRenderer
 		tDirectionalShadowShader *directional_shadow_shader;
 		tDirectionalShadowBlurShader *directional_shadow_blur_shader;
 		tSkyBoxShader *skybox_shader;
-
+		tColorShader *color_shader;
+		tSimpleForwardShader *simple_forward_shader;
 		tDepthPassShader *depth_pass_shader;
 
 		bool shadow_pass;
@@ -52,6 +53,8 @@ class tRenderer
 		tDirectionalShadowBlurShader *GetDirectionalShadowBlurShader(void)	{ return directional_shadow_blur_shader; }
 		tDepthPassShader *GetDepthPassShader(void)							{ return depth_pass_shader; }
 		tSkyBoxShader *GetSkyBoxShader(void)								{ return skybox_shader; }
+		tColorShader *GetColorShader(void)									{ return color_shader; }
+		tSimpleForwardShader *GetSimpleForwardShader(void) { return simple_forward_shader; }
 
 		bool GetShadowPass(void)					{ return shadow_pass; }
 		tCamera *GetCurrentRenderingCamera(void)	{ return current_rendering_camera; }

@@ -108,7 +108,7 @@ set(TOWERENGINE_SRC
 	src/utils.cpp 
 	src/vector2.cpp
 	src/vector.cpp
-		src/object_space.cpp
+	src/object_space.cpp
 	src/gbuffer.cpp
 	src/world.cpp
 	src/heightmap.cpp
@@ -169,7 +169,10 @@ set(TOWERENGINE_SRC
 	include/default_forward_renderer.h
 	src/default_forward_renderer.cpp
 	include/vr_forward_renderer.h
-	src/vr_forward_renderer.cpp src/culling.cpp)
+	src/vr_forward_renderer.cpp
+	src/culling.cpp
+	include/bullet_debug_object.h
+	src/bullet_debug_object.cpp)
 
 if(TOWERENGINE_BUILD_OPENVR)
 	list(APPEND TOWERENGINE_SRC src/vr_context_openvr.cpp)

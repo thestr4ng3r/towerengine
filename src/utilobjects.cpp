@@ -45,7 +45,7 @@ tCoordinateSystemObject::~tCoordinateSystemObject(void)
 	delete color_vbo;
 }
 
-void tCoordinateSystemObject::ForwardPass(tDeferredRenderer *renderer)
+void tCoordinateSystemObject::ForwardPass(tRenderer *renderer)
 {
 	if(depth_test)
 		glEnable(GL_DEPTH_TEST);

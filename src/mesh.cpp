@@ -443,7 +443,7 @@ void tMesh::GeometryPass(tDeferredRenderer *renderer, map<tMaterial *, tMaterial
 	}
 }
 
-void tMesh::ForwardPass(tDeferredRenderer *renderer, float *transform, map<tMaterial *, tMaterial *> *replace_materials)
+void tMesh::ForwardPass(tRenderer *renderer, float *transform, map<tMaterial *, tMaterial *> *replace_materials)
 {
 	bool vao_bound = false;
 

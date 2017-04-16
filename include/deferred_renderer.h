@@ -12,7 +12,6 @@ class tDeferredRenderer : public tRenderer
 
 	protected:
 		tGeometryPassShader *geometry_pass_shader;
-		tSimpleForwardShader *simple_forward_shader;
 		tRefractionShader *refraction_shader;
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
 		tLightingShader *lighting_shader;
@@ -23,7 +22,6 @@ class tDeferredRenderer : public tRenderer
 		std::vector<tPointLightingShader *> point_lighting_shaders;
 		tSSAOLightingShader *ssao_lighting_shader;
 
-		tColorShader *color_shader;
 		tPostProcessShader *post_process_shader;
 
 		tParticleForwardShader *particle_forward_shader;
@@ -94,13 +92,11 @@ class tDeferredRenderer : public tRenderer
 		void SetFog(bool enabled, float start_dist = 0.0, float end_dist = 100.0, float exp = 1.0, tVector color = tVec(0.0, 0.0, 0.0));
 
 		tGeometryPassShader *GetGeometryPassShader(void)					{ return geometry_pass_shader; }
-		tSimpleForwardShader *GetSimpleForwardShader(void)					{ return simple_forward_shader; }
 		tRefractionShader *GetRefractionShader(void)						{ return refraction_shader; }
 		tAmbientLightingShader *GetAmbientLightingShader(void)				{ return ambient_lighting_shader; }
 		tDirectionalLightingShader *GetDirectionalLightingShader(void)		{ return directional_lighting_shader; }
 		std::vector<tPointLightingShader *>::iterator GetPointLightingShadersBegin(void)	{ return point_lighting_shaders.begin(); }
 		std::vector<tPointLightingShader *>::iterator GetPointLightingShadersEnd(void)		{ return point_lighting_shaders.end(); }
-		tColorShader *GetColorShader(void)									{ return color_shader; }
 		tSSAOShader *GetSSAOShader(void)									{ return ssao_shader; }
 		tCubeMapBlurShader *GetCubeMapBlurShader(void)						{ return cube_map_blur_shader; }
 

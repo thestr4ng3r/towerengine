@@ -199,7 +199,7 @@ int operator==(const tVector a, const tVector b)
     return 0;
 }
 
-double Dot(const tVector &a, const tVector &b)
+float Dot(const tVector &a, const tVector &b)
 {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
@@ -260,7 +260,7 @@ tVector Rotate(const tVector &vec, const tVector &axis, float angle)
 	return vec.x * x + vec.y * y + vec.z * z;
 }
 
-double Det(const tVector &v1, const tVector &v2, const tVector &v3)
+float Det(const tVector &v1, const tVector &v2, const tVector &v3)
 {
 	return v1.x * v2.y * v3.z + v2.x * v3.y * v1.z + v3.x * v3.y * v2.z - v1.x * v3.y * v2.z - v2.x * v1.y * v3.z - v3.x * v2.y * v1.z;
 }

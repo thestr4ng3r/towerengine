@@ -109,4 +109,7 @@ void tForwardRenderer::RenderForward()
 
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
+
+
+	current_rendering_render_space->ForwardPass(this);
 }

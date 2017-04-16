@@ -44,7 +44,7 @@ tMesh *ConvertOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderModel
 
 	mesh->AddMaterial("render_model", material);
 
-	for(int i=0; i<render_model->unVertexCount; i++)
+	for(unsigned int i=0; i<render_model->unVertexCount; i++)
 	{
 		tVertex v;
 
@@ -62,7 +62,7 @@ tMesh *ConvertOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderModel
 		mesh->AddVertex(v);
 	}
 
-	for(int i=0; i<render_model->unTriangleCount; i++)
+	for(unsigned int i=0; i<render_model->unTriangleCount; i++)
 	{
 		tTriangle t;
 		t.v[0] = render_model->rIndexData[i * 3 + 0];
@@ -185,7 +185,7 @@ void tVRContextOpenVR::RenderHiddenAreaStencil(void)
 	for(int eye = 0; eye < 2; eye++)
 	{
 		int offset = (eye == 1 ? hidden_area_mesh[0].unTriangleCount * 3 * 2 : 0);
-		for(int v = 0; v < hidden_area_mesh[eye].unTriangleCount * 3; v++)
+		for(unsigned int v = 0; v < hidden_area_mesh[eye].unTriangleCount * 3; v++)
 		{
 			vertex_data[offset + v * 2 + 0] = hidden_area_mesh[eye].pVertexData[v].v[0] + (eye == 0 ? -1.0f : 0.0f);
 			vertex_data[offset + v * 2 + 1] = hidden_area_mesh[eye].pVertexData[v].v[1] * 2.0f - 1.0f;

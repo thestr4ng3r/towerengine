@@ -140,7 +140,7 @@ void tMeshObject::GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflec
 	mesh->GeometryPass(renderer, replace_materials);
 }
 
-void tMeshObject::ForwardPass(tDeferredRenderer *renderer)
+void tMeshObject::ForwardPass(tRenderer *renderer)
 {
 	if(!visible || alpha <= 0.0 || !mesh)
 		return;

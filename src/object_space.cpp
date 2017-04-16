@@ -31,7 +31,7 @@ void tObjectSpace::GeometryPass(tDeferredRenderer *renderer, bool cube_map_refle
 		object->GeometryPass(renderer, cube_map_reflection_enabled);
 }
 
-void tObjectSpace::ForwardPass(tDeferredRenderer *renderer)
+void tObjectSpace::ForwardPass(tRenderer *renderer)
 {
 	for(tObject *object : objects)
 		object->ForwardPass(renderer);

@@ -95,7 +95,6 @@ void tDeferredRenderer::InitShaders(void)
 	point_lighting_shaders.push_back(new tPointLightingShader(1, gbuffer));
 	//}
 
-	simple_forward_shader = new tSimpleForwardShader();
 	refraction_shader = new tRefractionShader();
 
 #ifndef TOWERENGINE_DISABLE_BINDLESS_TEXTURE
@@ -122,7 +121,6 @@ void tDeferredRenderer::InitShaders(void)
 	ambient_lighting_shader = new tAmbientLightingShader(gbuffer, false);
 	//}
 
-	color_shader = new tColorShader();
 	post_process_shader = new tPostProcessShader();
 	particle_forward_shader = new tParticleForwardShader(gbuffer);
 	particle_deferred_shader = new tParticleDeferredShader(gbuffer);
@@ -140,7 +138,6 @@ tDeferredRenderer::~tDeferredRenderer(void)
 	delete gbuffer;
 
 	delete geometry_pass_shader;
-	delete simple_forward_shader;
 	delete refraction_shader;
 	delete ambient_lighting_shader;
 	delete directional_lighting_shader;
@@ -155,7 +152,6 @@ tDeferredRenderer::~tDeferredRenderer(void)
 	delete ssao_ambient_lighting_shader;
 	delete ssao_shader;
 
-	delete color_shader;
 	delete post_process_shader;
 	delete fog_shader;
 

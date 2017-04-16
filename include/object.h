@@ -19,7 +19,7 @@ class tObject
 		virtual void DepthPrePass(tRenderer *) {}
 		virtual void ShadowPass(tRenderer *) {}
 		virtual void GeometryPass(tDeferredRenderer *, bool cube_map_reflection_enabled) {}
-		virtual void ForwardPass(tDeferredRenderer *) {}
+		virtual void ForwardPass(tRenderer *) {}
 		virtual void RefractionPass(tDeferredRenderer *) {}
 		virtual void StandardForwardPass(tForwardRenderer *) {}
 		virtual tBoundingBox GetBoundingBox(void)	{ return tBoundingBox::Infinite(); };

@@ -14,7 +14,7 @@ struct tObjectSpace
 	void DepthPrePass(tRenderer *renderer);
 	void ShadowPass(tRenderer *renderer);
 	void GeometryPass(tDeferredRenderer *renderer, bool cube_map_reflection_enabled = true);
-	void ForwardPass(tDeferredRenderer *renderer);
+	void ForwardPass(tRenderer *renderer);
 	void RefractionPass(tDeferredRenderer *renderer);
 	void StandardForwardPass(tForwardRenderer *renderer);
 };

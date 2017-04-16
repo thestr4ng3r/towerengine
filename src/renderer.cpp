@@ -49,6 +49,8 @@ void tRenderer::InitRenderer(tWorld *world)
 
 void tRenderer::InitShaders()
 {
+	color_shader = new tColorShader();
+	simple_forward_shader = new tSimpleForwardShader();
 	depth_pass_shader = new tDepthPassShader();
 	point_shadow_shader = new tPointShadowShader();
 	point_shadow_blur_shader = new tPointShadowBlurShader();
@@ -64,6 +66,8 @@ tRenderer::~tRenderer()
 	delete directional_shadow_shader;
 	delete directional_shadow_blur_shader;
 	delete skybox_shader;
+	delete color_shader;
+	delete simple_forward_shader;
 
 	delete screen_quad_vbo;
 	delete screen_quad_vao;

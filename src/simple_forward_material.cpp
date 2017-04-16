@@ -54,7 +54,7 @@ void tSimpleForwardMaterial::SetTexture(GLuint gl_tex)
 	this->tex = gl_tex;
 }
 
-bool tSimpleForwardMaterial::InitForwardPass(tDeferredRenderer *renderer, float *transform)
+bool tSimpleForwardMaterial::InitForwardPass(tRenderer *renderer, float *transform)
 {
 	switch(blend_mode)
 	{

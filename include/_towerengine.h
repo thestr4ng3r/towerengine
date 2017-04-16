@@ -71,6 +71,7 @@ class t2DRenderer;
 #include "object.h"
 #include "meshobject.h"
 #include "utilobjects.h"
+#include "bullet_debug_object.h"
 #include "heightmap.h"
 #include "terrain.h"
 #include "terrainobject.h"

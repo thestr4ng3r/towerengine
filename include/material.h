@@ -13,7 +13,7 @@ class tMaterial
 		virtual bool InitShadowPass(tRenderer *renderer)								{ return false; }
 		virtual bool InitGeometryPass(tDeferredRenderer *renderer)						{ return false; }
 		virtual bool InitStandardForwardPass(tForwardRenderer *renderer)				{ return false; }
-		virtual bool InitForwardPass(tDeferredRenderer *renderer, float *transform)		{ return false; }
+		virtual bool InitForwardPass(tRenderer *renderer, float *transform)				{ return false; }
 		virtual bool InitRefractionPass(tDeferredRenderer *renderer, float *transform)	{ return false; }
 
 		virtual bool GetCubeMapReflectionEnabled(void)	{ return false; }
