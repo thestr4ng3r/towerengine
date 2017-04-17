@@ -111,15 +111,15 @@ void tCamera::CalculateFrustumPlanes(void)
 	points[1] = pos + dir * far_clip;
 	normals[1] = -dir;
 
-	aux = (points[0] + vvec * near_clip * fov.bottom) - pos;
-	aux.Normalize();
-	normals[2] = Cross(aux, hvec);
-	points[2] = points[0] + vvec * near_clip * fov.bottom;
-
 	aux = (points[0] + vvec * near_clip * fov.top) - pos;
 	aux.Normalize();
+	normals[2] = Cross(aux, hvec);
+	points[2] = points[0] + vvec * near_clip * fov.top;
+
+	aux = (points[0] + vvec * near_clip * fov.bottom) - pos;
+	aux.Normalize();
 	normals[3] = Cross(hvec, aux);
-	points[3] = points[0] + vvec * near_clip * fov.top;
+	points[3] = points[0] + vvec * near_clip * fov.bottom;
 
 	aux = (points[0] + hvec * near_clip * fov.left) - pos;
 	aux.Normalize();
@@ -201,7 +201,7 @@ void tCamera::CalculateModelViewProjectionMatrix(void)
 									fov.right * near_clip, 
 									fov.bottom * near_clip,
 									fov.top * near_clip, 
-									near_clip, 
+									near_clip,
 									far_clip);
 
 	modelview_projection_matrix = projection_matrix * modelview_matrix;

@@ -57,6 +57,8 @@ class tVRContextOpenVR : public tVRContext
 
 		void BlitMirrorFrame(GLint dst_x0, GLint dst_y0, GLint dst_x1, GLint dst_y1);
 
+		vr::IVRSystem *GetOpenVRSystem() const		{ return system; }
+
 		void GetOpenVRControllerStates(tVector src_pos, vr::TrackedDevicePose_t *poses, vr::VRControllerState_t *controller_states, tMesh **render_model_meshes);
 };
 

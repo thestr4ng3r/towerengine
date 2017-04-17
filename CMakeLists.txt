@@ -301,6 +301,7 @@ if(TOWERENGINE_BUILD_OPENVR)
 	target_link_libraries(towerengine ${OPENVR_LIBRARIES})
 endif(TOWERENGINE_BUILD_OPENVR)
 
+
 if(TOWERENGINE_BUILD_OCULUS)
 	find_package(OculusSDK REQUIRED)
 	include_directories(${OCULUS_SDK_INCLUDE_DIRS})
