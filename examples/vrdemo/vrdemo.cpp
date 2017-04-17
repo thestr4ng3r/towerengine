@@ -8,6 +8,10 @@
 
 #include <GLFW/glfw3.h>
 
+#ifdef TOWERENGINE_ENABLE_IMGUI
+#include <imgui.h>
+#endif
+
 
 #define MASK_DEFAULT (1 << 0)
 #define MASK_TELEPORT (1 << 1)
@@ -39,6 +43,7 @@ void InitGLFW();
 void InitEngine();
 void InitScene();
 void MainLoop();
+void RenderGUI(float delta_time);
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void Cleanup();
 
@@ -80,6 +85,10 @@ void InitEngine()
 		Cleanup();
 		exit(1);
 	}
+
+#ifdef TOWERENGINE_ENABLE_IMGUI
+	tImGui::Init();
+#endif
 
 	vr_context = new tVRContextOpenVR(1.0f);
 }
@@ -180,11 +189,13 @@ void MainLoop()
 		//show_crosshair = controller_states[0].rAxis[1].x > 0.1 || controller_states[1].rAxis[1].x > 0.1;
 
 		world->Step(delta_time, 8, 1.0f / 240.0f);
+
 		renderer->Render(vr_context->GetFBO());
 		vr_context->FinishFrame();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		vr_context->BlitMirrorFrame(0, 0, screen_width, screen_height);
+		RenderGUI(delta_time);
 		glfwSwapBuffers(window);
 
 		glfwPollEvents();
@@ -194,6 +205,17 @@ void MainLoop()
 		delta_time = delta_time_duration.count();
 	}
 }
+
+
+void RenderGUI(float delta_time)
+{
+#ifdef TOWERENGINE_ENABLE_IMGUI
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	tImGui::BeginFrame(delta_time, screen_width, screen_height);
+	ImGui::Render();
+#endif
+}
+
 
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -216,6 +238,11 @@ void Cleanup()
 
 	delete small_cube_object;
 	delete small_cube_mesh;
+
+
+#ifdef TOWERENGINE_ENABLE_IMGUI
+	tImGui::Shutdown();
+#endif
 
 	delete vr_context;
 	glfwTerminate();

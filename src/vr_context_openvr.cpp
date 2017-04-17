@@ -2,6 +2,7 @@
 #include "towerengine.h"
 #include "vr_context_openvr.h"
 
+
 using namespace std;
 
 tMatrix4 ConvertOpenVRMatrix(const vr::HmdMatrix34_t &mat)
@@ -112,7 +113,7 @@ tVRContextOpenVR::tVRContextOpenVR(float resolution_scale)
 
 	system->GetProjectionRaw(vr::Eye_Left, &fov[0].left, &fov[0].right, &fov[0].top, &fov[0].bottom);
 	system->GetProjectionRaw(vr::Eye_Right, &fov[1].left, &fov[1].right, &fov[1].top, &fov[1].bottom);
-
+		
 	eye_matrix[0] = ConvertOpenVRMatrix(system->GetEyeToHeadTransform(vr::Eye_Left));
 	eye_matrix[1] = ConvertOpenVRMatrix(system->GetEyeToHeadTransform(vr::Eye_Right));
 
@@ -294,8 +295,8 @@ void tVRContextOpenVR::StartFrame(tVector2 cam_rot, tVector src_pos, tVector &ce
 		tVector pos = src_pos + tVec(data[3], data[7], data[11]);
 		tVector dir = -tVec(data[2], data[6], data[10]);
 		tVector up = tVec(data[1], data[5], data[9]);
-
-		camera[i]->SetFOV(fov[i].left, fov[i].right, fov[i].bottom, fov[i].top);
+		
+		camera[i]->SetFOV(fov[i].left, fov[i].right, fov[i].top, fov[i].bottom);
 		camera[i]->SetPosition(pos);
 		camera[i]->SetDirection(dir);
 		camera[i]->SetUp(up);
