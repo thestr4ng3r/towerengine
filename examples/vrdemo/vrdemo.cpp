@@ -15,7 +15,6 @@
 #include "common.h"
 #include "vrcontroller.h"
 
-
 #define MASK_DEFAULT (1 << 0)
 #define MASK_TELEPORT (1 << 1)
 
@@ -48,6 +47,7 @@ void InitGLFW();
 void InitEngine();
 void InitScene();
 void MainLoop();
+void RenderGUI(float delta_time);
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void Cleanup();
 
@@ -175,6 +175,7 @@ void MainLoop()
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		vr_context->BlitMirrorFrame(0, 0, screen_width, screen_height);
+
 		RenderGUI();
 		glfwSwapBuffers(window);
 
