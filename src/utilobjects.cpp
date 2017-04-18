@@ -1,6 +1,93 @@
 
 #include "towerengine.h"
 
+tLineObject::tLineObject(tVector position_a, tVector position_b)
+{
+	this->positions[0] = position_a;
+	this->positions[1] = position_b;
+	this->colors[0] = tVec(1.0f, 1.0f, 1.0f);
+	this->colors[1] = tVec(1.0f, 1.0f, 1.0f);
+	line_width = 1.0f;
+
+	vao = new tVAO();
+	vao->Bind();
+
+	vertex_vbo = new tVBO<float>(3, 2);
+	vertex_vbo->SetAttribute(tShader::vertex_attribute, GL_FLOAT);
+
+	color_vbo = new tVBO<float>(4, 2);
+	color_vbo->SetAttribute(tColorShader::color_attribute, GL_FLOAT);
+
+	UpdateVertexVBO();
+	UpdateColorVBO();
+}
+
+tLineObject::~tLineObject()
+{
+	delete vao;
+	delete vertex_vbo;
+	delete color_vbo;
+}
+
+void tLineObject::SetPositions(tVector position_a, tVector position_b)
+{
+	this->positions[0] = position_a;
+	this->positions[1] = position_b;
+	UpdateVertexVBO();
+}
+
+void tLineObject::SetColor(tVector color)
+{
+	this->colors[0] = color;
+	this->colors[1] = color;
+	UpdateColorVBO();
+}
+
+void tLineObject::SetColors(tVector color_a, tVector color_b)
+{
+	this->colors[0] = color_a;
+	this->colors[1] = color_b;
+	UpdateColorVBO();
+}
+
+void tLineObject::ForwardPass(tRenderer *renderer)
+{
+	glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	renderer->GetColorShader()->Bind();
+	renderer->GetColorShader()->SetModelViewProjectionmatrix(renderer->GetCurrentRenderingCamera()->GetModelViewProjectionMatrix().GetData());
+	renderer->GetColorShader()->SetTransformation(tMatrix4::identity_matrix);
+
+	glLineWidth(line_width);
+
+	vao->Draw(GL_LINES, 0, 2);
+}
+
+tBoundingBox tLineObject::GetBoundingBox(void)
+{
+	return tBoundingBox(positions[0], positions[1]);
+}
+
+void tLineObject::UpdateVertexVBO()
+{
+	memcpy(vertex_vbo->GetData(), positions, sizeof(float) * 6);
+	vertex_vbo->AssignData();
+}
+
+void tLineObject::UpdateColorVBO()
+{
+	float *data = color_vbo->GetData();
+	memcpy(data, colors, sizeof(float) * 3);
+	data[3] = 1.0f;
+	memcpy(data + 4, colors + 1, sizeof(float) * 3);
+	data[7] = 1.0f;
+	color_vbo->AssignData();
+}
+
+
+
+// ------------------------------------------------------------
 
 tCoordinateSystemObject::tCoordinateSystemObject(bool depth_test) : tObject()
 {

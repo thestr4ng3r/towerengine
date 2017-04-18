@@ -130,7 +130,7 @@ struct tPNGImage
 		data = (png_bytep)png_malloc(png_ptr, row_bytes * height);
 		
 		rows = (png_bytepp)png_malloc(png_ptr, sizeof(png_bytep) * height);
-		for(int i=0; i<height; i++)
+		for(unsigned int i=0; i<height; i++)
 			rows[i] = &(data[row_bytes * (mirror_y ? (height - i - 1) : i)]);
 
 #ifdef _WIN32
