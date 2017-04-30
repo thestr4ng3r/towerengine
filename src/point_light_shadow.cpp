@@ -50,7 +50,7 @@ tPointLightShadow::tPointLightShadow(tPointLight *light, int size, bool blur_ena
 
 
 	this->blur_enabled = blur_enabled;
-	this->blur_size = 1.0 / (float)size;
+	this->blur_size = 1.0f / (float)size;
 
 	if(!blur_enabled)
 		return;

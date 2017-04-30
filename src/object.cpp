@@ -1,10 +1,10 @@
 
 #include "towerengine.h"
 
-tObject::tObject(void)
+tObject::tObject()
 {
-	//tag = "";
 	world = 0;
+	enabled = true;
 }
 
 void tObject::AddedObjectToWorld(tWorld *world)

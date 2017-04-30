@@ -7,6 +7,7 @@ class tObject
 {
 	private:
 		tWorld *world;
+		bool enabled;
 
 	protected:
 		virtual void AddedToWorld(tWorld *world) {}
@@ -28,6 +29,9 @@ class tObject
 		void RemovedObjectFromWorld(tWorld *world);
 
 		tWorld *GetWorld(void)	{ return world; }
+
+		bool GetEnabled() const			{ return enabled; }
+		void SetEnabled(bool enabled)	{ this->enabled = enabled; }
 };
 
 class tTransformObject : public tObject

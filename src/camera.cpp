@@ -217,7 +217,7 @@ void tCamera::SetFOV(float left, float right, float bottom, float top)
 
 void tCamera::SetFOVVerticalAngle(float angle, float aspect)
 {
-	fov.bottom = tan(degtorad(angle) * 0.5);
+	fov.bottom = tan(degtorad(angle) * 0.5f);
 	fov.top = -fov.bottom;
 	fov.right = fov.bottom * aspect;
 	fov.left = -fov.right;

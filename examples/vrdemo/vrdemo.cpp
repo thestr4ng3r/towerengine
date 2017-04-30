@@ -14,6 +14,7 @@
 
 #include "common.h"
 #include "vrcontroller.h"
+#include "vrplayer.h"
 
 #define MASK_DEFAULT (1 << 0)
 #define MASK_TELEPORT (1 << 1)
@@ -40,6 +41,7 @@ btDefaultMotionState *ground_motion_state = 0;
 btRigidBody *ground_rigid_body = 0;
 
 
+VRPlayer *vr_player;
 VRController *vr_controllers[2];
 
 
@@ -53,9 +55,13 @@ void Cleanup();
 
 int main()
 {
+	printf("InitGLFW\n");
 	InitGLFW();
+	printf("InitEngine\n");
 	InitEngine();
+	printf("InitScene\n");
 	InitScene();
+	printf("MainLoop\n");
 	MainLoop();
 	Cleanup();
 	return 0;
@@ -124,8 +130,11 @@ void InitScene()
 		4,
 		world);
 
+
+	vr_player = new VRPlayer(tVec(0.0f, 0.0f, 0.0f));
+
 	for (int i = 0; i<2; i++)
-		vr_controllers[i] = new VRController(world);
+		vr_controllers[i] = new VRController(world, vr_player);
 
 	//tCoordinateSystemObject *coo = new tCoordinateSystemObject();
 	//world->AddObject(coo);
@@ -150,7 +159,6 @@ void InitScene()
 }
 
 
-tVector player_origin = tVec(0.0f, 0.0f, 0.0f);
 float delta_time = 1.0f / 90.0f;
 
 void UpdateControllers();
@@ -164,9 +172,16 @@ void MainLoop()
 
 		tVector center_pos;
 		tVector center_dir;
-		vr_context->StartFrame(tVec(0.0f, 0.0f), player_origin, center_pos, center_dir, renderer->GetCameras());
+		vr_context->StartFrame(tVec(0.0f, 0.0f), vr_player->GetOrigin(), center_pos, center_dir, renderer->GetCameras());
+		vr_player->UpdatePosition(center_pos, center_dir);
 
 		UpdateControllers();
+
+
+		vr_player->Update();
+		for (int i = 0; i < 2; i++)
+			vr_controllers[i]->Update();
+
 
 		world->Step(delta_time, 8, 1.0f / 240.0f);
 
@@ -193,15 +208,10 @@ void UpdateControllers()
 	vr::TrackedDevicePose_t controller_poses[2];
 	vr::VRControllerState_t controller_states[2];
 	tMesh *controller_mesh[2];
-	vr_context->GetOpenVRControllerStates(player_origin, controller_poses, controller_states, controller_mesh);
+	vr_context->GetOpenVRControllerStates(vr_player->GetOrigin(), controller_poses, controller_states, controller_mesh);
 
 	for (int i = 0; i < 2; i++)
-		vr_controllers[i]->Update(&player_origin, controller_poses[i], controller_states[i], controller_mesh[i]);
-
-	//vr_last_buttons_pressed = vr_current_buttons_pressed;
-	//vr_current_buttons_pressed = controller_states[0].ulButtonPressed | controller_states[1].ulButtonPressed;
-
-	//show_crosshair = controller_states[0].rAxis[1].x > 0.1 || controller_states[1].rAxis[1].x > 0.1;
+		vr_controllers[i]->UpdateController(controller_poses[i], controller_states[i], controller_mesh[i]);
 }
 
 void RenderGUI()

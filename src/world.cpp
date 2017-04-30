@@ -90,6 +90,9 @@ void tWorld::FillObjectSpace(tObjectSpace *space, tCulling *culling, bool clear,
 
 	for(tObject *object : objects)
 	{
+		if(!object->GetEnabled())
+			continue;
+
 		tBoundingBox bounding_box = object->GetBoundingBox();
 		if(culling->TestBoundingBoxCulling(bounding_box))
 			continue;
