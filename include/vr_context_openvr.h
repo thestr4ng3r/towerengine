@@ -59,11 +59,33 @@ class tVRContextOpenVR : public tVRContext
 
 		vr::IVRSystem *GetOpenVRSystem() const		{ return system; }
 
-		void GetOpenVRControllerStates(tVector src_pos, vr::TrackedDevicePose_t *poses, vr::VRControllerState_t *controller_states, tMesh **render_model_meshes);
+		unsigned int GetOpenVRControllerStates(tVector src_pos,
+									   unsigned int max_controller_count,
+									   vr::TrackedDeviceIndex_t *device_indexes,
+									   vr::TrackedDevicePose_t *poses,
+									   vr::VRControllerState_t *controller_states,
+									   tMesh **render_model_meshes);
 };
 
-tMatrix4 ConvertOpenVRMatrix(const vr::HmdMatrix34_t &mat);
-tMatrix4 ConvertOpenVRMatrix(const vr::HmdMatrix44_t &mat);
-tMesh *ConvertOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderModel_TextureMap_t *texture);
+inline tVector tVectorFromOpenVR(const vr::HmdVector3_t &vec)
+{
+	return tVec(vec.v[0], vec.v[1], vec.v[2]);
+}
+
+inline tMatrix4 tMatrix4FromOpenVR(const vr::HmdMatrix34_t &mat)
+{
+	float v[16] = { mat.m[0][0],	mat.m[0][1],	mat.m[0][2],	mat.m[0][3],
+					mat.m[1][0],	mat.m[1][1],	mat.m[1][2],	mat.m[1][3],
+					mat.m[2][0],	mat.m[2][1],	mat.m[2][2],	mat.m[2][3],
+					0.0f,			0.0f,			0.0f,			1.0f };
+	return tMatrix4(v);
+}
+
+inline tMatrix4 tMatrix4FromOpenVR(const vr::HmdMatrix44_t &mat)
+{
+	return tMatrix4((float *)mat.m);
+}
+
+tMesh *tMeshFromOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderModel_TextureMap_t *texture);
 
 #endif

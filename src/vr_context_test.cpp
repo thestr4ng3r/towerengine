@@ -10,8 +10,8 @@ tVRContextTest::tVRContextTest(unsigned int eye_render_width, unsigned int eye_r
 	//openvr.system->GetProjectionRaw(vr::Eye_Left, &openvr.fov[0].left, &openvr.fov[0].right, &openvr.fov[0].top, &openvr.fov[0].bottom);
 	//openvr.system->GetProjectionRaw(vr::Eye_Right, &openvr.fov[1].left, &openvr.fov[1].right, &openvr.fov[1].top, &openvr.fov[1].bottom);
 
-	//openvr.eye_matrix[0] = ConvertOpenVRMatrix(openvr.system->GetEyeToHeadTransform(vr::Eye_Left));
-	//openvr.eye_matrix[1] = ConvertOpenVRMatrix(openvr.system->GetEyeToHeadTransform(vr::Eye_Right));
+	//openvr.eye_matrix[0] = tMatrix4FromOpenVR(openvr.system->GetEyeToHeadTransform(vr::Eye_Left));
+	//openvr.eye_matrix[1] = tMatrix4FromOpenVR(openvr.system->GetEyeToHeadTransform(vr::Eye_Right));
 
 
 	glGenTextures(1, &render_tex);

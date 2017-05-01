@@ -33,5 +33,4 @@ void VRPlayer::Teleport(tVector target_pos)
 
 void VRPlayer::Update()
 {
-
 }

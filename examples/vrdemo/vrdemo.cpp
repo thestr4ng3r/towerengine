@@ -16,8 +16,8 @@
 #include "vrcontroller.h"
 #include "vrplayer.h"
 
-#define MASK_DEFAULT (1 << 0)
-#define MASK_TELEPORT (1 << 1)
+
+#define MAX_CONTROLLERS 2
 
 
 const int screen_width = 1280;
@@ -33,6 +33,8 @@ tScene *scene = 0;
 
 tVRForwardRenderer *renderer = 0;
 
+tBulletDebugObject *bullet_debug_object = 0;
+
 tMesh *small_cube_mesh = 0;
 tMeshObject *small_cube_object = 0;
 
@@ -41,8 +43,9 @@ btDefaultMotionState *ground_motion_state = 0;
 btRigidBody *ground_rigid_body = 0;
 
 
-VRPlayer *vr_player;
-VRController *vr_controllers[2];
+VRPlayer *vr_player = 0;
+unsigned int controllers_count = 0;
+VRController *vr_controllers[MAX_CONTROLLERS] = { 0, 0 };
 
 
 void InitGLFW();
@@ -55,13 +58,9 @@ void Cleanup();
 
 int main()
 {
-	printf("InitGLFW\n");
 	InitGLFW();
-	printf("InitEngine\n");
 	InitEngine();
-	printf("InitScene\n");
 	InitScene();
-	printf("MainLoop\n");
 	MainLoop();
 	Cleanup();
 	return 0;
@@ -107,7 +106,7 @@ void InitScene()
 {
 	world = new tWorld();
 	scene = new tScene(world);
-	if (!scene->LoadFromFile("assets/vr.tes"))
+	if(!scene->LoadFromFile("assets/vr.tes"))
 	{
 		fprintf(stderr, "Failed to load scene. Make sure to run this program in the examples/ directory.\n");
 		Cleanup();
@@ -115,9 +114,9 @@ void InitScene()
 	}
 	scene->AddToWorld();
 
-	for (tObject *object : world->GetObjects()) 
+	for(tObject *object : world->GetObjects())
 	{
-		if (tPointLight *point_light = dynamic_cast<tPointLight *>(object))
+		if(tPointLight *point_light = dynamic_cast<tPointLight *>(object))
 		{
 			point_light->InitShadow(256, true);
 		}
@@ -133,14 +132,15 @@ void InitScene()
 
 	vr_player = new VRPlayer(tVec(0.0f, 0.0f, 0.0f));
 
-	for (int i = 0; i<2; i++)
+	for(unsigned int i = 0; i<MAX_CONTROLLERS; i++)
 		vr_controllers[i] = new VRController(world, vr_player);
 
 	//tCoordinateSystemObject *coo = new tCoordinateSystemObject();
 	//world->AddObject(coo);
 
-	tBulletDebugObject *bullet_debug_object = new tBulletDebugObject();
+	bullet_debug_object = new tBulletDebugObject();
 	world->AddObject(bullet_debug_object);
+	bullet_debug_object->SetEnabled(false);
 
 
 	small_cube_mesh = new tMesh("assets/meshes/SmallCube.tem");
@@ -150,12 +150,19 @@ void InitScene()
 	small_cube_object->SetTransform(t);
 	small_cube_object->InitBoxRigidBody(tVec(0.1f, 0.1f, 0.1f), 1.0f);
 	world->AddObject(small_cube_object);
+	world->GetDynamicsWorld()->removeRigidBody(small_cube_object->GetRigidBody());
+	world->GetDynamicsWorld()->addRigidBody(small_cube_object->GetRigidBody(),
+											btBroadphaseProxy::DefaultFilter | MASK_PICKABLE,
+											btBroadphaseProxy::AllFilter);
+	small_cube_object->GetRigidBody()->setUserPointer(small_cube_object->GetRigidBody());
 	
 
 	ground_shape = new btBoxShape(btVector3(10.0f, 0.5f, 10.0f)); 
 	ground_motion_state = new btDefaultMotionState(btTransform(btMatrix3x3::getIdentity(), btVector3(0.0f, -0.5f, 0.0f)));
 	ground_rigid_body = new btRigidBody(0.0f, ground_motion_state, ground_shape);
-	world->GetDynamicsWorld()->addRigidBody(ground_rigid_body, MASK_TELEPORT | MASK_DEFAULT, MASK_DEFAULT);
+	world->GetDynamicsWorld()->addRigidBody(ground_rigid_body,
+											btBroadphaseProxy::DefaultFilter | MASK_TELEPORT,
+											btBroadphaseProxy::AllFilter);
 }
 
 
@@ -166,7 +173,7 @@ void RenderGUI();
 
 void MainLoop()
 {
-	while (!glfwWindowShouldClose(window))
+	while(!glfwWindowShouldClose(window))
 	{
 		auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -179,7 +186,7 @@ void MainLoop()
 
 
 		vr_player->Update();
-		for (int i = 0; i < 2; i++)
+		for (unsigned int i = 0; i < controllers_count; i++)
 			vr_controllers[i]->Update();
 
 
@@ -205,13 +212,19 @@ void MainLoop()
 
 void UpdateControllers()
 {
-	vr::TrackedDevicePose_t controller_poses[2];
-	vr::VRControllerState_t controller_states[2];
-	tMesh *controller_mesh[2];
-	vr_context->GetOpenVRControllerStates(vr_player->GetOrigin(), controller_poses, controller_states, controller_mesh);
+	vr::TrackedDeviceIndex_t controller_indexes[MAX_CONTROLLERS];
+	vr::TrackedDevicePose_t controller_poses[MAX_CONTROLLERS];
+	vr::VRControllerState_t controller_states[MAX_CONTROLLERS];
+	tMesh *controller_mesh[MAX_CONTROLLERS];
+	controllers_count = vr_context->GetOpenVRControllerStates(vr_player->GetOrigin(),
+										  MAX_CONTROLLERS,
+										  controller_indexes,
+										  controller_poses,
+										  controller_states,
+										  controller_mesh);
 
-	for (int i = 0; i < 2; i++)
-		vr_controllers[i]->UpdateController(controller_poses[i], controller_states[i], controller_mesh[i]);
+	for(unsigned int i = 0; i < controllers_count; i++)
+		vr_controllers[i]->UpdateController(controller_indexes[i], controller_poses[i], controller_states[i], controller_mesh[i]);
 }
 
 void RenderGUI()
@@ -226,9 +239,9 @@ void RenderGUI()
 
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-	if (action == GLFW_PRESS)
+	if(action == GLFW_PRESS)
 	{
-		if (key == GLFW_KEY_ESCAPE)
+		if(key == GLFW_KEY_ESCAPE)
 			glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 }
@@ -246,6 +259,10 @@ void Cleanup()
 	delete small_cube_object;
 	delete small_cube_mesh;
 
+	delete bullet_debug_object;
+
+	for(unsigned int i = 0; i < controllers_count; i++)
+		delete vr_controllers[i];
 
 #ifdef TOWERENGINE_ENABLE_IMGUI
 	tImGui::Shutdown();

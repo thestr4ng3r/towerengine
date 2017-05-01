@@ -5,22 +5,7 @@
 
 using namespace std;
 
-tMatrix4 ConvertOpenVRMatrix(const vr::HmdMatrix34_t &mat)
-{
-	float v[16] = { mat.m[0][0],	mat.m[0][1],	mat.m[0][2],	mat.m[0][3],
-					mat.m[1][0],	mat.m[1][1],	mat.m[1][2],	mat.m[1][3],
-					mat.m[2][0],	mat.m[2][1],	mat.m[2][2],	mat.m[2][3],
-					0.0f,			0.0f,			0.0f,			1.0f };
-	return tMatrix4(v);
-}
-
-tMatrix4 ConvertOpenVRMatrix(const vr::HmdMatrix44_t &mat)
-{
-	return tMatrix4((float *)mat.m);
-}
-
-
-tMesh *ConvertOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderModel_TextureMap_t *texture)
+tMesh *tMeshFromOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderModel_TextureMap_t *texture)
 {
 	tMesh *mesh = new tMesh();
 
@@ -114,8 +99,8 @@ tVRContextOpenVR::tVRContextOpenVR(float resolution_scale)
 	system->GetProjectionRaw(vr::Eye_Left, &fov[0].left, &fov[0].right, &fov[0].top, &fov[0].bottom);
 	system->GetProjectionRaw(vr::Eye_Right, &fov[1].left, &fov[1].right, &fov[1].top, &fov[1].bottom);
 		
-	eye_matrix[0] = ConvertOpenVRMatrix(system->GetEyeToHeadTransform(vr::Eye_Left));
-	eye_matrix[1] = ConvertOpenVRMatrix(system->GetEyeToHeadTransform(vr::Eye_Right));
+	eye_matrix[0] = tMatrix4FromOpenVR(system->GetEyeToHeadTransform(vr::Eye_Left));
+	eye_matrix[1] = tMatrix4FromOpenVR(system->GetEyeToHeadTransform(vr::Eye_Right));
 
 	glGenTextures(1, &render_tex);
 	glBindTexture(GL_TEXTURE_2D, render_tex);
@@ -229,9 +214,14 @@ void tVRContextOpenVR::RenderHiddenAreaStencil(void)
 
 
 
-void tVRContextOpenVR::GetOpenVRControllerStates(tVector src_pos, vr::TrackedDevicePose_t *poses, vr::VRControllerState_t *controller_states, tMesh **_render_model_meshes)
+unsigned int tVRContextOpenVR::GetOpenVRControllerStates(tVector src_pos,
+												 unsigned int max_controller_count,
+												 vr::TrackedDeviceIndex_t *device_indexes,
+												 vr::TrackedDevicePose_t *poses,
+												 vr::VRControllerState_t *controller_states,
+												 tMesh **_render_model_meshes)
 {
-	int controller_index = 0;
+	unsigned int controller_index = 0;
 	for(vr::TrackedDeviceIndex_t i=vr::k_unTrackedDeviceIndex_Hmd+1; i<vr::k_unMaxTrackedDeviceCount; i++)
 	{
 		if(!tracked_device_pose[i].bDeviceIsConnected)
@@ -240,11 +230,10 @@ void tVRContextOpenVR::GetOpenVRControllerStates(tVector src_pos, vr::TrackedDev
 		if(system->GetTrackedDeviceClass(i) != vr::TrackedDeviceClass_Controller)
 			continue;
 
-		if(controller_index > 1)
-		{
-			printf("too many controllers\n");
+		if(controller_index >= max_controller_count)
 			break;
-		}
+
+		device_indexes[controller_index] = i;
 
 		poses[controller_index] = tracked_device_pose[i];
 		system->GetControllerState(i, &controller_states[controller_index], sizeof(controller_states[controller_index]));
@@ -263,12 +252,14 @@ void tVRContextOpenVR::GetOpenVRControllerStates(tVector src_pos, vr::TrackedDev
 		controller_index++;
 	}
 
-	for(int i=controller_index; i<2; i++)
+	for(unsigned int i=controller_index; i<2; i++)
 	{
 		memset(&poses[i], 0, sizeof(vr::TrackedDevicePose_t));
 		memset(&controller_states[i], 0, sizeof(vr::VRControllerState_t));
 		_render_model_meshes[i] = 0;
 	}
+
+	return controller_index;
 }
 
 
@@ -279,7 +270,7 @@ void tVRContextOpenVR::StartFrame(tVector2 cam_rot, tVector src_pos, tVector &ce
 	vr::TrackedDevicePose_t hmd_pose = tracked_device_pose[vr::k_unTrackedDeviceIndex_Hmd];
 	if(hmd_pose.bPoseIsValid)
 	{
-		hmd_matrix = ConvertOpenVRMatrix(hmd_pose.mDeviceToAbsoluteTracking);
+		hmd_matrix = tMatrix4FromOpenVR(hmd_pose.mDeviceToAbsoluteTracking);
 	}
 
 	float *data = hmd_matrix.GetData();
@@ -338,7 +329,7 @@ void tVRContextOpenVR::StartFrame(tVector2 cam_rot, tVector src_pos, tVector &ce
 			//Sleep(1);
 		}
 
-		tMesh *mesh = ConvertOpenVRRenderModel(render_model, render_model_tex);
+		tMesh *mesh = tMeshFromOpenVRRenderModel(render_model, render_model_tex);
 		render_models->FreeRenderModel(render_model);
 		render_models->FreeTexture(render_model_tex);
 		render_model_meshes.insert(pair<string, tMesh *>(string(buffer), mesh));

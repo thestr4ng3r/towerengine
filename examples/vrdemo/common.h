@@ -2,7 +2,11 @@
 #ifndef _TOWERENGINE_VRDEMO_COMMON_H
 #define _TOWERENGINE_VRDEMO_COMMON_H
 
-#define MASK_DEFAULT (1 << 0)
-#define MASK_TELEPORT (1 << 1)
+#include <towerengine.h>
+
+#define MASK_TELEPORT 64
+#define MASK_PICKABLE 128
+
+extern tBulletDebugObject *bullet_debug_object;
 
 #endif
