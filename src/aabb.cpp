@@ -3,27 +3,27 @@
 
 using namespace std;
 
-tBoundingBox::tBoundingBox(tVector a, tVector b, bool infinite)
+tAABB::tAABB(tVector a, tVector b, bool infinite)
 {
 	SetBounds(a, b);
 	this->infinite = infinite;
 }
 
-tBoundingBox::tBoundingBox(bool infinite)
+tAABB::tAABB(bool infinite)
 {
 	minv = tVec(0.0f, 0.0f, 0.0f);
 	maxv = tVec(0.0f, 0.0f, 0.0f);
 	this->infinite = infinite;
 }
 
-tBoundingBox::tBoundingBox(void)
+tAABB::tAABB(void)
 {
 	minv = tVec(0.0f, 0.0f, 0.0f);
 	maxv = tVec(0.0f, 0.0f, 0.0f);
-	this->infinite = false;
+	this->infinite = true;
 }
 
-void tBoundingBox::SetBounds(tVector a, tVector b)
+void tAABB::SetBounds(tVector a, tVector b)
 {
 	minv.x = min(a.x, b.x);
 	minv.y = min(a.y, b.y);
@@ -34,7 +34,7 @@ void tBoundingBox::SetBounds(tVector a, tVector b)
 	maxv.z = max(a.z, b.z);
 }
 
-void tBoundingBox::AddPoint(tVector p)
+void tAABB::AddPoint(tVector p)
 {
 	minv.x = min(minv.x, p.x);
 	minv.y = min(minv.y, p.y);
@@ -45,7 +45,7 @@ void tBoundingBox::AddPoint(tVector p)
 	maxv.z = max(maxv.z, p.z);
 }
 
-void tBoundingBox::GetCornerPoints(tVector *p)
+void tAABB::GetCornerPoints(tVector *p)
 {
 	p[0] = tVec(minv.x, maxv.y, minv.z);
 	p[1] = tVec(minv.x, maxv.y, maxv.z);
@@ -57,7 +57,7 @@ void tBoundingBox::GetCornerPoints(tVector *p)
 	p[7] = tVec(maxv.x, minv.y, minv.z);
 }
 
-bool tBoundingBox::ContainsPoint(tVector p)
+bool tAABB::ContainsPoint(tVector p)
 {
 	return infinite ||
 			(p.x >= minv.x && p.x <= maxv.x
@@ -65,7 +65,7 @@ bool tBoundingBox::ContainsPoint(tVector p)
 			&& p.z >= minv.z && p.z <= maxv.z);
 }
 
-tVector tBoundingBox::GetNormalizedDistanceToCenter(tVector pos)
+tVector tAABB::GetNormalizedDistanceToCenter(tVector pos)
 {
 	tVector center = (maxv + minv) * 0.5;
 	tVector dist = pos - center;
@@ -75,13 +75,13 @@ tVector tBoundingBox::GetNormalizedDistanceToCenter(tVector pos)
 	return dist;
 }
 
-float tBoundingBox::GetNormalizedBoxDistanceToCenter(tVector pos)
+float tAABB::GetNormalizedBoxDistanceToCenter(tVector pos)
 {
 	tVector dist = GetNormalizedDistanceToCenter(pos);
 	return max(max(abs(dist.x), abs(dist.y)), abs(dist.z));
 }
 
-tBoundingBox operator+(tBoundingBox a, const tVector &b)
+tAABB operator+(tAABB a, const tVector &b)
 {
-	return tBoundingBox(a.GetMin() + b, a.GetMax() + b);
+	return tAABB(a.GetMin() + b, a.GetMax() + b);
 }

@@ -23,7 +23,7 @@ class tObject
 		virtual void ForwardPass(tRenderer *) {}
 		virtual void RefractionPass(tDeferredRenderer *) {}
 		virtual void StandardForwardPass(tForwardRenderer *) {}
-		virtual tBoundingBox GetBoundingBox(void)	{ return tBoundingBox::Infinite(); };
+		virtual tAABB GetAABB(void)			{ return tAABB(); };
 
 		void AddedObjectToWorld(tWorld *world);
 		void RemovedObjectFromWorld(tWorld *world);

@@ -14,9 +14,9 @@ void tTerrainObject::GeometryPass(tDeferredRenderer *renderer, bool cube_map_ref
 	terrain->Paint(renderer);
 }
 
-tBoundingBox tTerrainObject::GetBoundingBox(void)
+tAABB tTerrainObject::GetAABB(void)
 {
-	return terrain->GetBoundingBox();
+	return terrain->GetAABB();
 }
 
 

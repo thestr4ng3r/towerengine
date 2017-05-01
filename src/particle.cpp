@@ -60,7 +60,7 @@ struct ParticleCompare
 
 void tParticleSystem::Render(tDeferredRenderer *renderer, tParticleShader *shader)
 {
-	unsigned int particles_count = particles.size();
+	unsigned int particles_count = (unsigned int)particles.size();
 
 	if(particles_count == 0)
 		return;
@@ -205,8 +205,8 @@ void tDefaultParticleSystem::Step(float time)
 		}
 	}
 
-	int particles_count = particles.size();
-	for(int i=0; i<particles_count; i++)
+	unsigned int particles_count = (unsigned int)particles.size();
+	for(unsigned int i=0; i<particles_count; i++)
 	{
 		tParticle &particle = particles[i];
 

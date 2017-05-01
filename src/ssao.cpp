@@ -48,7 +48,7 @@ tSSAO::tSSAO(tDeferredRenderer *renderer, int kernel_size, float radius, int noi
 		{
 			noise_tex_data[y*noise_tex_size*3 + x*3 + 0] = (GLubyte)(RandomFloat() * 255.0);
 			noise_tex_data[y*noise_tex_size*3 + x*3 + 1] = (GLubyte)(RandomFloat() * 255.0);
-			noise_tex_data[y*noise_tex_size*3 + x*3 + 2] = 0.0;
+			noise_tex_data[y*noise_tex_size*3 + x*3 + 2] = 0;
 		}
 	}
 

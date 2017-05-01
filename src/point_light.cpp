@@ -62,7 +62,7 @@ bool tPointLight::TestSphereCulling(tVector center, float radius)
 	return (center - pos).SquaredLen() > (distance * distance + radius * radius);
 }
 
-bool tPointLight::TestBoundingBoxCulling(tBoundingBox b)
+bool tPointLight::TestAABBCulling(tAABB b)
 {
 	tVector minv = b.GetMin();
 	tVector maxv = b.GetMax();

@@ -11,7 +11,7 @@ tMesh::tMesh(const char *file, tMaterialManager *material_manager)
 {
 	vao = 0;
 	physics_triangle_mesh = 0;
-	bounding_box = tBoundingBox();
+	aabb = tAABB();
 
 	refresh_vbos = true;
 	refresh_ibos = true;
@@ -232,13 +232,13 @@ void tMesh::CalculateTangents(const tTriangle &t)
 	vert0.bitang = vert1.bitang = vert2.bitang = bitang;
 }
 
-void tMesh::GenerateBoundingBox(void)
+void tMesh::GenerateAABB(void)
 {
 	vector<tVertex>::iterator i;
-	bounding_box = tBoundingBox();
+	aabb = tAABB();
 
 	for(i=vertices.begin(); i!=vertices.end(); i++)
-		bounding_box.AddPoint((*i).pos);
+		aabb.AddPoint((*i).pos);
 }
 
 btTriangleMesh *tMesh::GeneratePhysicsMesh(void)
@@ -653,7 +653,7 @@ bool tMesh::LoadFromXML(xml_document<> *doc, string path, tMaterialManager *mate
 
 	CalculateAllTangents();
 
-	GenerateBoundingBox();
+	GenerateAABB();
 	GeneratePhysicsMesh();
 
 	refresh_vbos = true;
@@ -913,7 +913,7 @@ tSimpleForwardMaterial *tMesh::ParseXMLSimpleForwardMaterialNode(xml_node<> *cur
 	if(tex_mode == TEXTURE_FILE)
 		r->LoadTexture(path + tex_file);
 	else if(tex_mode == TEXTURE_DATA)
-		r->LoadTexture(tex_ext, tex_data, tex_size);
+		r->LoadTexture(tex_ext, tex_data, (unsigned int)tex_size);
 
 	return r;
 }
@@ -1029,12 +1029,12 @@ tRefractionMaterial *tMesh::ParseXMLRefractionMaterialNode(xml_node<> *cur, stri
 	if(color_tex_mode == TEXTURE_FILE)
 		r->LoadColorTexture(path + color_tex_file);
 	else if(color_tex_mode == TEXTURE_DATA)
-		r->LoadColorTexture(color_tex_ext, color_tex_data, color_tex_size);
+		r->LoadColorTexture(color_tex_ext, color_tex_data, (unsigned int)color_tex_size);
 
 	if(normal_tex_mode == TEXTURE_FILE)
 		r->LoadNormalTexture(path + normal_tex_file);
 	else if(normal_tex_mode == TEXTURE_DATA)
-		r->LoadNormalTexture(normal_tex_ext, normal_tex_data, normal_tex_size);
+		r->LoadNormalTexture(normal_tex_ext, normal_tex_data, (unsigned int)normal_tex_size);
 
 	return r;
 }

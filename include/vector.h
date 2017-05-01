@@ -72,7 +72,6 @@ inline tVector tVec(const btVector3 &v)
 
 
 inline btVector3 BtVec(tVector a)		{ return btVector3(a.x, a.y, a.z); }
-tVector NullVec(void);
 tVector operator+(const tVector &a, const tVector &b);
 tVector operator-(const tVector &a, const tVector &b);
 tVector operator*(const tVector &a, float scalar);
@@ -83,21 +82,6 @@ int operator==(const tVector a, const tVector b);
 float Dot(const tVector &a, const tVector &b);
 tVector Cross(const tVector &a, const tVector &b);
 tVector tVec(const tVector2 &v, float y);
-tVector Rotate(const tVector &vec, const tVector &axis, float angle);
-float Det(const tVector &v1, const tVector &v2, const tVector &v3);
-tVector Mix(const tVector v1, const tVector v2, float mix);
-tVector Mix(const tVector v[], const float a[], int count, float mix);
 
-
-int IsInside(tVector2 c[4], const tVector2 &p);
-void DistToPlane(const tVector &a, const tVector &b, const tVector &c, const tVector &point, double *dist, tVector *dir);
-void DistToPlane(const tVector &a, const tVector &b, const tVector &c, const tVector &d, const tVector &point, double *min_dist, tVector *min_dir);
-
-tVector PointToLine(tVector p, tVector r, tVector n);
-float DistToLine(tVector p, tVector r, tVector n);
-
-int PointInRange(tVector p, tVector s, tVector b);
-
-//tVector RandVec(void);
 
 #endif

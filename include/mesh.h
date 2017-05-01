@@ -59,7 +59,7 @@ class tMesh
 
 		std::map<tMaterial *, tMaterialIBO *> material_ibos;
 
-		tBoundingBox bounding_box;
+		tAABB aabb;
 
 		std::set<tVertex *> outdated_vertices;
 
@@ -124,7 +124,7 @@ class tMesh
 
 		std::map<std::string, tEntity *> GetEntitiesInGroup(const char *group = "");
 
-		tBoundingBox GetBoundingBox(void)			{ return bounding_box; }
+		tAABB GetAABB(void)							{ return aabb; }
 
 		tVertexIndex AddVertex(tVertex v);
 		void AddTriangle(tTriangle t);
@@ -140,7 +140,7 @@ class tMesh
 		void ClearVertices();
 		void ClearTriangles();
 
-		void GenerateBoundingBox(void);
+		void GenerateAABB(void);
 
 		btTriangleMesh *GeneratePhysicsMesh(void);
 		btTriangleMesh *GetPhysicsMesh(void)		{ return physics_triangle_mesh; }

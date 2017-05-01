@@ -64,9 +64,9 @@ void tLineObject::ForwardPass(tRenderer *renderer)
 	vao->Draw(GL_LINES, 0, 2);
 }
 
-tBoundingBox tLineObject::GetBoundingBox(void)
+tAABB tLineObject::GetAABB(void)
 {
-	return tBoundingBox(positions[0], positions[1]);
+	return tAABB(positions[0], positions[1]);
 }
 
 void tLineObject::UpdateVertexVBO()
@@ -155,7 +155,7 @@ void tCoordinateSystemObject::ForwardPass(tRenderer *renderer)
 	vao->Draw(GL_LINES, 0, 6);
 }
 
-tBoundingBox tCoordinateSystemObject::GetBoundingBox(void)
+tAABB tCoordinateSystemObject::GetAABB(void)
 {
-	return tBoundingBox(pos, pos + size);
+	return tAABB(pos, pos + size);
 }

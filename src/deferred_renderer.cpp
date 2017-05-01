@@ -504,7 +504,7 @@ void tDeferredRenderer::LegacyLightPass(void)
 		point_lights.push_back(light);
 	}
 
-	int point_lights_count = point_lights.size();
+	unsigned int point_lights_count = (unsigned int)point_lights.size();
 	float *point_lights_pos = new float[point_lights_count*3];
 	float *point_lights_color = new float[point_lights_count*3];
 	float *point_lights_dist = new float[point_lights_count];
@@ -539,7 +539,7 @@ void tDeferredRenderer::LegacyLightPass(void)
 	{
 		tPointLightingShader *shader = *shader_i;
 
-		if(shader->GetLightsCount() > point_lights_count - point_lights_rendered)
+		if(shader->GetLightsCount() > (int)(point_lights_count - point_lights_rendered))
 			continue;
 
 		shader_passes = (point_lights_count - point_lights_rendered) / shader->GetLightsCount();

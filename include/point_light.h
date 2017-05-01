@@ -45,7 +45,7 @@ class tPointLight: public tObject, public tComparable<float>, public tCulling
 
 		bool TestPointCulling(tVector point);
 		bool TestSphereCulling(tVector center, float radius);
-		bool TestBoundingBoxCulling(tBoundingBox b);
+		bool TestAABBCulling(tAABB b);
 };
 
 #endif

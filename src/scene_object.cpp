@@ -45,7 +45,7 @@ float tSceneObject::GetAttributeFloat(string name, float default_v)
 	map<string, string>::iterator i = attributes.find(name);
 
 	if(i != attributes.end())
-		return atof(i->second.c_str());
+		return (float)atof(i->second.c_str());
 
 	return default_v;
 }

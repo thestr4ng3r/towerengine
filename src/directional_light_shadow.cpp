@@ -149,7 +149,7 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 
 		c_log = cam_near * pow(cam_far / cam_near, (float)(s+1) / (float)splits);
 		c_uni = cam_near + (cam_far - cam_near) * ((float)(s+1) / (float)splits);
-		splits_z[s+1] = c_log * 0.8 + c_uni * 0.2;
+		splits_z[s+1] = c_log * 0.8f + c_uni * 0.2f;
 
 		//splits_z[s+1] = world->GetCamera()->GetNearClip() +
 		//		(world->GetCamera()->GetFarClip() - world->GetCamera()->GetNearClip()) * pow(2, -(splits - (s+1)));
@@ -181,8 +181,8 @@ void tDirectionalLightShadow::Render(tCamera *camera, tRenderer *renderer)
 		//top += 0.5;
 		//bottom -= 0.5;
 
-		h_blur[s] = 1.0 / (right - left);
-		v_blur[s] = 1.0 / (top - bottom);
+		h_blur[s] = 1.0f / (right - left);
+		v_blur[s] = 1.0f / (top - bottom);
 
 		modelview_matrix.SetLookAt(cam_pos, light_to, light_up);
 		projection_matrix.SetOrtho(left, right, bottom, top, near_clip, far_clip);

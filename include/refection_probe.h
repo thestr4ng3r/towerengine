@@ -7,7 +7,7 @@ class tReflectionProbe: public tObject
 {
 	private:
 		tVector position;
-		tBoundingBox extent;
+		tAABB extent;
 
 		unsigned int resolution;
 		unsigned int resolution_log;
@@ -40,7 +40,7 @@ class tReflectionProbe: public tObject
 		void Invalidate(void)			{ invalid = true; }
 
 		tVector GetPosition(void)		{ return position; }
-		tBoundingBox GetExtent(void)	{ return extent; }
+		tAABB GetExtent(void)	{ return extent; }
 
 		GLuint GetCubeMapTexture(void)	{ return color_tex; }
 

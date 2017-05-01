@@ -50,8 +50,8 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 			bitang_data[d + 2] = 1.0;
 
 			d = y * map_size * 2 + x * 2;
-			uvcoord_data[d + 0] = ((float)x / (float)map_size) * 50.0;
-			uvcoord_data[d + 1] = ((float)y / (float)map_size) * 50.0;
+			uvcoord_data[d + 0] = ((float)x / (float)map_size) * 50.0f;
+			uvcoord_data[d + 1] = ((float)y / (float)map_size) * 50.0f;
 		}
 	}
 
@@ -138,7 +138,7 @@ tTerrain::tTerrain(tHeightMap *height_map, float size, float height, tTerrainMat
 				}
 			}
 
-			n *= 1.0 / (float)n_count;
+			n *= 1.0f / (float)n_count;
 
 			memcpy(normal_data + y * map_size * 3 + x * 3, n.v, sizeof(float) * 3);
 		}
@@ -193,10 +193,10 @@ void tTerrain::Paint(tDeferredRenderer *renderer)
 	ibo->Draw(GL_TRIANGLES);
 }
 
-tBoundingBox tTerrain::GetBoundingBox(void)
+tAABB tTerrain::GetAABB(void)
 {
-	return tBoundingBox(tVec(-size / 2.0, height, -size / 2.0),
-							tVec(size / 2.0, 0.0, size / 2.0));
+	return tAABB(tVec(-size / 2.0f, height, -size / 2.0f),
+							tVec(size / 2.0f, 0.0, size / 2.0f));
 }
 
 

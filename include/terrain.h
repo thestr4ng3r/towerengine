@@ -30,7 +30,7 @@ class tTerrain
 	public:
 		tTerrain(tHeightMap *height_map, float size = 10.0, float height = 1.0, tTerrainMaterial *material = 0);
 
-		tBoundingBox GetBoundingBox(void);
+		tAABB GetAABB(void);
 
 		void SetMaterial(tTerrainMaterial *material) { this->material = material; }
 

@@ -275,7 +275,7 @@ void tScene::ParseCubeMapAssetNode(xml_node<> *cur)
 	GLuint cubemap;
 
 	if(file_data)
-		cubemap = LoadGLCubeMapBinary(file_ext, file_data, file_size);
+		cubemap = LoadGLCubeMapBinary(file_ext, file_data, (unsigned int)file_size);
 	else
 	{
 		cubemap = LoadGLCubeMap((load_path + "/" + file).c_str());

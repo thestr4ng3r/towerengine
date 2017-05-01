@@ -93,8 +93,8 @@ void tWorld::FillObjectSpace(tObjectSpace *space, tCulling *culling, bool clear,
 		if(!object->GetEnabled())
 			continue;
 
-		tBoundingBox bounding_box = object->GetBoundingBox();
-		if(culling->TestBoundingBoxCulling(bounding_box))
+		tAABB aabb = object->GetAABB();
+		if(culling->TestAABBCulling(aabb))
 			continue;
 
 		space->AddObject(object);

@@ -157,7 +157,7 @@ bool tCamera::TestSphereCulling(tVector center, float radius)
 	return false;
 }
 
-bool tCamera::TestBoundingBoxCulling(tBoundingBox b)
+bool tCamera::TestAABBCulling(tAABB b)
 {
 	if(b.GetInfinite())
 		return false;
@@ -217,7 +217,7 @@ void tCamera::SetFOV(float left, float right, float bottom, float top)
 
 void tCamera::SetFOVVerticalAngle(float angle, float aspect)
 {
-	fov.bottom = tan(degtorad(angle) * 0.5f);
+	fov.bottom = (float)tan(degtorad(angle) * 0.5f);
 	fov.top = -fov.bottom;
 	fov.right = fov.bottom * aspect;
 	fov.left = -fov.right;

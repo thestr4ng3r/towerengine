@@ -38,7 +38,7 @@ void tVRContextTest::StartFrame(tVector2 cam_rot, tVector src_pos, tVector &cent
 	//center_dir = -Vec(data[2], data[6], data[10]);
 
 	double cy = cos(cam_rot.y);
-	center_dir = tVec(cos(cam_rot.x) * cy, sin(cam_rot.y), sin(cam_rot.x) * cy);
+	center_dir = tVec((float)(cos(cam_rot.x) * cy), sin(cam_rot.y), (float)(sin(cam_rot.x) * cy));
 
 	for(int i=0; i<2; i++)
 	{

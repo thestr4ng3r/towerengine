@@ -31,7 +31,7 @@ class tLineObject : public tObject
 
 		void ForwardPass(tRenderer *renderer);
 
-		tBoundingBox GetBoundingBox(void);
+		tAABB GetAABB(void);
 };
 
 
@@ -55,7 +55,7 @@ class tCoordinateSystemObject : public tObject
 
 		void ForwardPass(tRenderer *renderer);
 
-		tBoundingBox GetBoundingBox(void);
+		tAABB GetAABB(void);
 };
 
 

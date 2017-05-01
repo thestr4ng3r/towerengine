@@ -145,7 +145,7 @@ inline bool InverseMatrix4(const float m[16], float invOut[16])
     if (det == 0)
         return false;
 
-    det = 1.0 / det;
+    det = 1.0f / det;
 
     for(i = 0; i < 16; i++)
         invOut[i] = inv[i] * det;
@@ -210,9 +210,9 @@ void tMatrix4::SetOrtho(float left, float right, float top, float bottom, float 
 {
 	SetIdentity();
 
-	v[0] = 2.0 / (right - left);				v[3] = -((right + left) / (right - left));
-	v[5] = 2.0 / (top - bottom);				v[7] = -((top + bottom) / (top - bottom));
-	v[10] = -2.0 / (far_clip - near_clip);		v[11] = -((far_clip + near_clip) / (far_clip - near_clip));
+	v[0] = 2.0f / (right - left);				v[3] = -((right + left) / (right - left));
+	v[5] = 2.0f / (top - bottom);				v[7] = -((top + bottom) / (top - bottom));
+	v[10] = -2.0f / (far_clip - near_clip);		v[11] = -((far_clip + near_clip) / (far_clip - near_clip));
 	//v[15] = 1.0;
 }
 
@@ -220,13 +220,13 @@ void tMatrix4::SetPerspective(float fovy, float aspect, float near_clip, float f
 {
 	SetIdentity();
 
-	float f = 1.0 / tan(degtorad(fovy) / 2.0);
+	float f = 1.0f / (float)tan(degtorad(fovy) / 2.0f);
 
 	v[0] = f / aspect;
 	v[5] = f;
 	v[10] = (far_clip + near_clip) / (near_clip - far_clip);	v[11] = (2 * far_clip * near_clip) / (near_clip - far_clip);
-	v[14] = -1.0;
-	v[15] = 0.0;
+	v[14] = -1.0f;
+	v[15] = 0.0f;
 }
 
 void tMatrix4::SetFrustum(float left, float right, float bottom, float top, float near_clip, float far_clip)

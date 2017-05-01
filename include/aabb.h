@@ -1,20 +1,20 @@
 
-#ifndef _BOUNDINGBOX_H
-#define _BOUNDINGBOX_H
+#ifndef _TOWERENGINE_AABB_H
+#define _TOWERENGINE_AABB_H
 
 
-class tBoundingBox
+class tAABB
 {
 	private:
 		tVector minv, maxv;
 		bool infinite;
 
 	public:
-		tBoundingBox(void);
-		tBoundingBox(bool infinite);
-		tBoundingBox(tVector a, tVector b, bool infinite = false);
+		tAABB(void);
+		tAABB(bool infinite);
+		tAABB(tVector a, tVector b, bool infinite = false);
 
-		static tBoundingBox Infinite() 			{ return tBoundingBox(true); }
+		static tAABB Infinite() 			{ return tAABB(true); }
 
 		const tVector &GetMin(void) const		{ return minv; }
 		const tVector &GetMax(void) const		{ return maxv; }
@@ -31,6 +31,6 @@ class tBoundingBox
 		float GetNormalizedBoxDistanceToCenter(tVector pos);
 };
 
-tBoundingBox operator+(tBoundingBox a, const tVector &b);
+tAABB operator+(tAABB a, const tVector &b);
 
 #endif

@@ -1,6 +1,6 @@
 
-#ifndef _CULLING_H
-#define _CULLING_H
+#ifndef _TOWERENGINE_CULLING_H
+#define _TOWERENGINE_CULLING_H
 
 /// Base class for different types of Culling Algorithms/Volumes
 ///
@@ -26,7 +26,7 @@ class tCulling
 		/// Test whether an axis aligned bounding box should be culled
 		/// \param point
 		/// \return true if the box lies fully outside the culling and should not be rendered
-		virtual bool TestBoundingBoxCulling(tBoundingBox b) =0;
+		virtual bool TestAABBCulling(tAABB b) =0;
 };
 
 class tCullingCompound: public tCulling
@@ -45,7 +45,7 @@ class tCullingCompound: public tCulling
 		virtual void InitCulling(void);
 		virtual bool TestPointCulling(tVector point);
 		virtual bool TestSphereCulling(tVector center, float radius);
-		virtual bool TestBoundingBoxCulling(tBoundingBox b);
+		virtual bool TestAABBCulling(tAABB b);
 };
 
 

@@ -57,15 +57,15 @@ void tMeshObject::RemovedFromWorld(tWorld *world)
 }
 
 
-tBoundingBox tMeshObject::GetBoundingBox(void)
+tAABB tMeshObject::GetAABB(void)
 {
-	tBoundingBox b;
+	tAABB b;
 
 	if(!mesh)
 		return b;
 
 	tVector p[8];
-	mesh->GetBoundingBox().GetCornerPoints(p);
+	mesh->GetAABB().GetCornerPoints(p);
 
 	//btTransform trans(btMatrix3x3(mat[0], mat[1], mat[2], mat[4], mat[5], mat[6], mat[8], mat[9], mat[10]), btVector3(mat[3], mat[7], mat[11]));
 	//rigid_body->setWorldTransform(trans);

@@ -52,7 +52,7 @@ class tCamera : public tCulling
 		void InitCulling(void);
 		bool TestPointCulling(tVector point);
 		bool TestSphereCulling(tVector center, float radius);
-		bool TestBoundingBoxCulling(tBoundingBox b);
+		bool TestAABBCulling(tAABB b);
 
 		void SetPosition(tVector p)		{ pos = p; }
 		void SetDirection(tVector d)	{ dir = d; }

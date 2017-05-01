@@ -9,7 +9,7 @@ tReflectionProbe::tReflectionProbe(tVector position, tVector extent_a, tVector e
 	this->resolution = 0;
 	this->position = position;
 
-	this->extent = tBoundingBox(extent_a, extent_b);
+	this->extent = tAABB(extent_a, extent_b);
 
 	camera = new tCamera();
 	camera->SetFOV(-1.0f, 1.0f, 1.0f, -1.0f);
@@ -225,7 +225,7 @@ void tReflectionProbe::RenderLightPass(tDeferredRenderer *renderer, int side, tW
 		point_lights.push_back(light);
 	}
 
-	int point_lights_count = point_lights.size();
+	unsigned int point_lights_count = (unsigned int)point_lights.size();
 	float *point_lights_pos = new float[point_lights_count * 3];
 	float *point_lights_color = new float[point_lights_count * 3];
 	float *point_lights_dist = new float[point_lights_count];
@@ -254,13 +254,13 @@ void tReflectionProbe::RenderLightPass(tDeferredRenderer *renderer, int side, tW
 		}
 	}
 
-	int point_lights_rendered = 0;
+	unsigned int point_lights_rendered = 0;
 	int shader_passes;
 	for(vector<tPointLightingShader *>::iterator shader_i=renderer->GetPointLightingShadersBegin(); shader_i!=renderer->GetPointLightingShadersEnd(); shader_i++)
 	{
 		tPointLightingShader *shader = *shader_i;
 
-		if(shader->GetLightsCount() > point_lights_count - point_lights_rendered)
+		if(shader->GetLightsCount() > (int)(point_lights_count - point_lights_rendered))
 			continue;
 
 		shader_passes = (point_lights_count - point_lights_rendered) / shader->GetLightsCount();

@@ -58,7 +58,7 @@ tMesh *tMeshFromOpenVRRenderModel(vr::RenderModel_t *render_model, vr::RenderMod
 		mesh->AddTriangle(t);
 	}
 
-	mesh->GenerateBoundingBox();
+	mesh->GenerateAABB();
 	mesh->GeneratePhysicsMesh();
 
 	return mesh;

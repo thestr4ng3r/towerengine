@@ -295,7 +295,7 @@ class TowerEngineMeshConverter(MeshConverter):
 
 	def _finish(self):
 		self.tmesh.CalculateAllTangents()
-		self.tmesh.GenerateBoundingBox()
+		self.tmesh.GenerateAABB()
 
 
 class TowerEngineMaterialConverter(MaterialConverter):

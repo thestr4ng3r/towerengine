@@ -60,9 +60,6 @@ bool tEngine::Init(std::string *error)
 
 	tShader::InitSource();
 
-
-	srand(time(0));
-
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);

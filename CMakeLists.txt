@@ -87,8 +87,8 @@ set(TOWERENGINE_SRC
 	src/buffers.cpp 
 	src/camera.cpp 
 	src/engine.cpp 
-	src/entity.cpp 
-	src/boundingbox.cpp
+	src/entity.cpp
+		src/aabb.cpp
 	src/transform.cpp
 	src/geometry_pass_shader.cpp
 	src/screen_shader.cpp

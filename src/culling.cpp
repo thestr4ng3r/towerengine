@@ -63,13 +63,13 @@ bool tCullingCompound::TestSphereCulling(tVector center, float radius)
 	}
 }
 
-bool tCullingCompound::TestBoundingBoxCulling(tBoundingBox b)
+bool tCullingCompound::TestAABBCulling(tAABB b)
 {
 	if(operation == INTERSECTION)
 	{
 		for(tCulling *culling : cullings)
 		{
-			if(culling->TestBoundingBoxCulling(b))
+			if(culling->TestAABBCulling(b))
 				return true;
 		}
 		return false;
@@ -78,7 +78,7 @@ bool tCullingCompound::TestBoundingBoxCulling(tBoundingBox b)
 	{
 		for(tCulling *culling : cullings)
 		{
-			if(!culling->TestBoundingBoxCulling(b))
+			if(!culling->TestAABBCulling(b))
 				return false;
 		}
 		return true;

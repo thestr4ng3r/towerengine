@@ -76,7 +76,7 @@ void tBulletDebugObject::ForwardPass(tRenderer *renderer)
 	glLineWidth(1.0);
 
 	glBindVertexArray(line_vao);
-	glDrawArrays(GL_LINES, 0, line_position.size());
+	glDrawArrays(GL_LINES, 0, (GLsizei)line_position.size());
 }
 
 void tBulletDebugObject::AddedToWorld(tWorld *world)

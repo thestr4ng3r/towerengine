@@ -182,15 +182,15 @@ class tShaderSourceForLoop : public tShaderSourceBlock
 			source.erase(begin, end-begin+1);
 
 			int d = to < from ? -1 : 1;
-			int loop_offset = 0;
+			unsigned int loop_offset = 0;
 			for(int i=from; i<=to; i+=d)
 			{
 				string var_set = var_name + " = " + itos(i) + ";\n";
 				source.insert(begin + loop_offset, var_set);
-				loop_offset += var_set.length();
+				loop_offset += (unsigned int)var_set.length();
 
 				source.insert(begin + loop_offset, inside);
-				loop_offset += inside.length();
+				loop_offset += (unsigned int)inside.length();
 			}
 
 			offset += loop_offset - (end - begin);
