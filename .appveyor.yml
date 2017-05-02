@@ -56,5 +56,5 @@ install:
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="%glew_install_prefix%;%bullet_install_prefix%" -DTOWERENGINE_BUILD_DEVIL=OFF -DTOWERENGINE_BUILD_LIBPNG=OFF ..
+  - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DTOWERENGINE_ENABLE_COTIRE=OFF -DCMAKE_PREFIX_PATH="%glew_install_prefix%;%bullet_install_prefix%" -DTOWERENGINE_BUILD_DEVIL=OFF -DTOWERENGINE_BUILD_LIBPNG=OFF ..
   - nmake

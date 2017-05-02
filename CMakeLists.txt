@@ -10,7 +10,7 @@ set(LIB_INSTALL_DIR lib)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 
 option(TOWERENGINE_BUILD_STATIC "Build static instead of shared" OFF)
@@ -25,6 +25,13 @@ option(TOWERENGINE_SWIG_PYTHON "Generate Python Bindings using SWIG." OFF)
 option(TOWERENGINE_BLENDER_ADDON "Package Blender Addon." OFF)
 
 option(TOWERENGINE_BUILD_EXAMPLES "Build TowerEngine examples" OFF)
+
+option(TOWERENGINE_ENABLE_COTIRE "Use Cotire to speed up build." OFF)
+
+
+if(TOWERENGINE_ENABLE_COTIRE)
+	include(cotire)
+endif()
 
 
 # the following if-clause was copied from BulletPhysics' CMakeLists.txt
@@ -88,7 +95,7 @@ set(TOWERENGINE_SRC
 	src/camera.cpp 
 	src/engine.cpp 
 	src/entity.cpp
-		src/aabb.cpp
+	src/aabb.cpp
 	src/transform.cpp
 	src/geometry_pass_shader.cpp
 	src/screen_shader.cpp
@@ -233,7 +240,7 @@ set_target_properties(towerengine PROPERTIES
 
 set(RESOURCE_GENERATOR_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ResourceGenerator.cmake")
 
-include(${RESOURCE_GENERATOR_INCLUDE})
+include(ResourceGenerator)
 
 file(MAKE_DIRECTORY ${RESOURCES_SRC_DIR})
 include_directories(${RESOURCES_SRC_DIR})
@@ -307,6 +314,11 @@ if(TOWERENGINE_BUILD_OCULUS)
 	include_directories(${OCULUS_SDK_INCLUDE_DIRS})
 	target_link_libraries(towerengine ${OCULUS_SDK_LIBRARY})
 endif(TOWERENGINE_BUILD_OCULUS)
+
+
+if(TOWERENGINE_ENABLE_COTIRE)
+	cotire(towerengine)
+endif()
 
 
 install(TARGETS towerengine
