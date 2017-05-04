@@ -45,4 +45,5 @@ void tDefaultForwardRenderer::Render(GLuint dst_fbo, int viewport_x, int viewpor
 	if(dst_fbo != 0)
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	glDepthMask(GL_TRUE);
 }
