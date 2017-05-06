@@ -129,7 +129,7 @@ class TowerEngineContext:
 		else:
 			tlight = tPointLight()
 			tlight.InitShadow(512, True)
-			self.world.AddPointLight(tlight)
+			self.world.AddObject(tlight)
 
 		lamp = o.data
 		tlight.SetPosition(vec_te(o.location))
