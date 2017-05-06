@@ -255,9 +255,9 @@ btTriangleMesh *tMesh::GeneratePhysicsMesh(void)
 		physics_triangle_mesh = new btTriangleMesh();
 
 		for(i=triangles.begin(); i!=triangles.end(); i++)
-			physics_triangle_mesh->addTriangle(BtVec(vertices[(*i).v[0]].pos),
-											   BtVec(vertices[(*i).v[1]].pos),
-											   BtVec(vertices[(*i).v[2]].pos));
+			physics_triangle_mesh->addTriangle(vertices[(*i).v[0]].pos.ToBtVector3(),
+											   vertices[(*i).v[1]].pos.ToBtVector3(),
+											   vertices[(*i).v[2]].pos.ToBtVector3());
 	}
 
 	return physics_triangle_mesh;

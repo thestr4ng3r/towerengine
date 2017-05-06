@@ -79,15 +79,12 @@ tScene::~tScene(void)
 
 bool tScene::LoadFromFile(string file)
 {
-	char * data = ReadFile(file.c_str());
+	char *data = ReadFile(file.c_str());
 	if(!data)
 		return false;
 
 	xml_document<> *doc = new xml_document<>();
 	doc->parse<0>(data);
-
-	if(!doc)
-		return false;
 
 	xml_node<> *cur;
 
@@ -335,6 +332,36 @@ void tScene::ParseObjectsNode(xml_node<> *cur)
 	}
 }
 
+
+enum CollisionShapeType { SHAPE_MESH, SHAPE_CONVEX, SHAPE_BOX, SHAPE_COMPOUND };
+
+static inline CollisionShapeType GetCollisionShapeType(const char *str)
+{
+	if(strcmp(str, "mesh") == 0)
+		return SHAPE_MESH;
+	else if(strcmp(str, "convex") == 0)
+		return SHAPE_CONVEX;
+	else if(strcmp(str, "box") == 0)
+		return SHAPE_BOX;
+	else if(strcmp(str, "compound") == 0)
+		return SHAPE_COMPOUND;
+
+	return SHAPE_MESH; // fallback
+}
+
+
+static inline tVector ParseHalfExtentsNode(xml_node<> *node)
+{
+	if(!node)
+		return tVec(0.0f, 0.0f, 0.0f);
+
+	tVector r;
+	r.x = GetXMLAttribute<float>(node, "x", 0.0);
+	r.y = GetXMLAttribute<float>(node, "y", 0.0);
+	r.z = GetXMLAttribute<float>(node, "z", 0.0);
+	return r;
+}
+
 tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 {
 	string mesh_asset_name;
@@ -342,8 +369,9 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 	xml_attribute<> *attr;
 	bool rigid_body_enabled = false;
 	float rigid_body_mass = 0.0;
-	enum { MESH, CONVEX, BOX } collision_shape_type = MESH;
+	CollisionShapeType collision_shape_type = SHAPE_MESH;
 	tVector collision_shape_half_extents;
+	btCompoundShape *collision_shape_compound = 0;
 
 	xml_node<> *child = cur->first_node();
 	for(; child; child = child->next_sibling())
@@ -367,23 +395,34 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 			if(collision_shape_node)
 			{
 				if((attr = collision_shape_node->first_attribute("type")))
-				{
-					if(strcmp(attr->value(), "mesh") == 0)
-						collision_shape_type = MESH;
-					else if(strcmp(attr->value(), "convex") == 0)
-						collision_shape_type = CONVEX;
-					else if(strcmp(attr->value(), "box") == 0)
-						collision_shape_type = BOX;
-				}
+					collision_shape_type = GetCollisionShapeType(attr->value());
 
-				if(collision_shape_type == BOX)
+				if(collision_shape_type == SHAPE_BOX)
 				{
-					xml_node<> *half_extents_node = collision_shape_node->first_node("half_extents");
-					if(half_extents_node)
+					collision_shape_half_extents = ParseHalfExtentsNode(collision_shape_node->first_node("half_extents"));
+				}
+				else if(collision_shape_type == SHAPE_COMPOUND)
+				{
+					collision_shape_compound = new btCompoundShape();
+
+					for(xml_node<> *compound_child = collision_shape_node->first_node(); compound_child; compound_child=compound_child->next_sibling())
 					{
-						collision_shape_half_extents.x = GetXMLAttribute<float>(half_extents_node, "x", 0.0);
-						collision_shape_half_extents.y = GetXMLAttribute<float>(half_extents_node, "y", 0.0);
-						collision_shape_half_extents.z = GetXMLAttribute<float>(half_extents_node, "z", 0.0);
+						if(strcmp(compound_child->name(), "collision_shape") != 0)
+							continue;
+
+						if(!(attr = compound_child->first_attribute("type")))
+							continue;
+
+						CollisionShapeType shape_type = GetCollisionShapeType(attr->value());
+						tTransform transform = ParseTransformNode(compound_child->first_node("transform"));
+
+						if(shape_type == SHAPE_BOX)
+						{
+							tVector half_extents = ParseHalfExtentsNode(compound_child->first_node("half_extents"));
+
+							btBoxShape *child_shape = new btBoxShape(half_extents.ToBtVector3());
+							collision_shape_compound->addChildShape(transform.ToBtTransform(), child_shape);
+						}
 					}
 				}
 			}
@@ -407,10 +446,16 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 	object->SetTransform(transform);
 	if(rigid_body_enabled)
 	{
-		if(collision_shape_type == MESH || collision_shape_type == CONVEX)
-			object->InitMeshRigidBody(rigid_body_mass, collision_shape_type == CONVEX);
-		else if(collision_shape_type == BOX)
+		if(collision_shape_type == SHAPE_MESH || collision_shape_type == SHAPE_CONVEX)
+			object->InitMeshRigidBody(rigid_body_mass, collision_shape_type == SHAPE_CONVEX);
+		else if(collision_shape_type == SHAPE_BOX)
 			object->InitBoxRigidBody(collision_shape_half_extents, rigid_body_mass);
+		else if(collision_shape_type == SHAPE_COMPOUND)
+		{
+			btVector3 inertia;
+			collision_shape_compound->calculateLocalInertia(rigid_body_mass, inertia);
+			object->InitRigidBody(collision_shape_compound, rigid_body_mass, inertia);
+		}
 		object->UpdateRigidBodyTransformation();
 	}
 	tObjectSceneObject *scene_object = new tObjectSceneObject(object);
@@ -551,6 +596,9 @@ float tScene::ParseFloatNode(xml_node<> *node, const char *p)
 
 tTransform tScene::ParseTransformNode(xml_node<> *cur)
 {
+	if(!cur)
+		return tTransform::GetIdentity();
+
 	tVector position;
 	tMatrix3 basis;
 

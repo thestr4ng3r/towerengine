@@ -32,13 +32,13 @@ class tTransform
 
 		btTransform ToBtTransform(void)
 		{
-			return btTransform(basis.ToBtMatrix(), BtVec(position));
+			return btTransform(basis.ToBtMatrix3x3(), position.ToBtVector3());
 		}
 
 		btTransform &ToBtTransform(btTransform &bt_trans)
 		{
 			bt_trans.getOrigin().setValue(position.x, position.y, position.z);
-			basis.ToBtMatrix(bt_trans.getBasis());
+			basis.toBtMatrix3x3(bt_trans.getBasis());
 			return bt_trans;
 		}
 

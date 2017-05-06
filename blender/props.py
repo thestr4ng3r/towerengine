@@ -24,7 +24,8 @@ class TowerEngineObjectPropertyGroup(bpy.types.PropertyGroup):
 	attributes = bpy.props.CollectionProperty(name="attributes", type = TowerEngineAttribute)
 	attribute_index = bpy.props.IntProperty(name="attribute_index", default = 0)
 
-
+	disable_mesh = bpy.props.BoolProperty(name="Do not export as Mesh Object")
+	compound_shape = bpy.props.BoolProperty(name="Compound shape from children", default=False)
 
 # mesh texture slot
 
@@ -56,10 +57,17 @@ class TowerEngineMaterialPropertyGroup(bpy.types.PropertyGroup):
 	refraction_edge_color = bpy.props.FloatVectorProperty(name="Edge", subtype="COLOR", size=4, default=(0.0, 0.0, 0.0, 0.0), min=0.0, max=1.0)
 	blend_mode = bpy.props.EnumProperty(name="BlendMode", items=MaterialBlendModeItems, default="ALPHA")
 
+
+
 # mesh
 
 class TowerEngineMeshPropertyGroup(bpy.types.PropertyGroup):
 	vertices_only = bpy.props.BoolProperty(name="Vertices only", default=False)
+
+
+
+
+
 
 
 reg_classes = [TowerEngineAttribute,
@@ -81,3 +89,5 @@ def register():
 def unregister():
 	for c in reg_classes:
 		bpy.utils.unregister_class(c)
+
+

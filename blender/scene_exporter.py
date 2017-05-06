@@ -65,7 +65,7 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 		# collect meshes
 		self.meshes = dict()		
 		for obj in self.objects.values():
-			if obj.type == "MESH":
+			if obj.type == "MESH" and not obj.towerengine.disable_mesh:
 				mesh = obj.data
 				self.meshes[mesh.name] = mesh
 			
@@ -172,7 +172,7 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 				print("Exporting objects of type \"" + obj.type + "\" is not supported")
 				continue
 				
-			if obj_node != None:
+			if obj_node is not None:
 				obj_node.setAttribute("name", obj_name)
 				if hasattr(obj, "towerengine"):
 					obj_node.setAttribute("tag", obj.towerengine.tag)
@@ -193,7 +193,7 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 	def __save_scene_xml(self):
 		scene_node = self.xml_doc.createElement("scene")
 		
-		if self.scene_cubemap != None:
+		if self.scene_cubemap is not None:
 			scene_node.setAttribute("sky_cubemap", self.scene_cubemap)
 			
 		self.xml_root.appendChild(scene_node)
@@ -201,6 +201,9 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 		
 	
 	def __save_mesh_object_xml(self, obj):
+		if obj.towerengine.disable_mesh:
+			return None
+
 		obj_node = self.xml_doc.createElement("mesh")
 		
 		obj_node.appendChild(self.__create_transform_node_xml(obj.matrix_world))
@@ -210,9 +213,72 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 		obj_node.appendChild(mesh_asset_node)
 		
 		if obj.rigid_body:
-			obj_node.appendChild(utils.xml_rigid_body_node(self.xml_doc, obj))
+			obj_node.appendChild(self.__save_rigid_body_xml(obj))
 		
 		return obj_node
+
+
+	def __save_rigid_body_xml(self, obj):
+		rigid_body = obj.rigid_body
+
+		rigid_body_node = self.xml_doc.createElement("rigid_body")
+
+		collision_shape_node = self.__save_collision_shape_xml(obj)
+		rigid_body_node.appendChild(collision_shape_node)
+
+		mass = rigid_body.mass
+		if rigid_body.type == "PASSIVE":
+			mass = 0.0
+		rigid_body_node.setAttribute("mass", str(mass))
+
+		return rigid_body_node
+
+
+	def __save_collision_shape_xml(self, obj, compound_child=False):
+		rigid_body = obj.rigid_body
+
+		if obj.towerengine.compound_shape and not compound_child:
+			collision_shape_node = self.xml_doc.createElement("collision_shape")
+			collision_shape_node.setAttribute("type", "compound")
+			for child in obj.children:
+				child_node = self.__save_collision_shape_xml(child, True)
+				if child_node is not None:
+					collision_shape_node.appendChild(child_node)
+
+		elif rigid_body.collision_shape == "MESH" and not compound_child:
+			collision_shape_node = self.xml_doc.createElement("collision_shape")
+			collision_shape_node.setAttribute("type", "mesh")
+
+		elif rigid_body.collision_shape == "CONVEX_HULL" and not compound_child:
+			collision_shape_node = self.xml_doc.createElement("collision_shape")
+			collision_shape_node.setAttribute("type", "convex")
+
+		elif rigid_body.collision_shape == "BOX":
+			collision_shape_node = self.xml_doc.createElement("collision_shape")
+			collision_shape_node.setAttribute("type", "box")
+
+			bounds = utils.bound_box_minmax(obj.bound_box)
+			half_extents_node = self.xml_doc.createElement("half_extents")
+			half_extents_node.setAttribute("x", str((bounds[1][0] - bounds[0][0]) * 0.5))
+			half_extents_node.setAttribute("y", str((bounds[1][2] - bounds[0][2]) * 0.5))
+			half_extents_node.setAttribute("z", str((bounds[1][1] - bounds[0][1]) * 0.5))
+			collision_shape_node.appendChild(half_extents_node)
+
+		elif not compound_child:
+			collision_shape_node = self.xml_doc.createElement("collision_shape")
+			print(
+				"Collision Shape type " + rigid_body.collision_shape + " is currently not supported. Using mesh instead.")
+			collision_shape_node.setAttribute("type", "mesh")
+
+		else:
+			return None
+
+		if compound_child:
+			collision_shape_node.appendChild(self.__create_transform_node_xml(obj.matrix_local))
+
+		return collision_shape_node
+
+
 	
 	def __save_lamp_object_xml(self, obj):
 		obj_node = None

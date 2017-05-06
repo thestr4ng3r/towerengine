@@ -52,9 +52,9 @@ class TowerEngineAttributeListDeleteItem(bpy.types.Operator):
 		return{ 'FINISHED'}
 
 
-class TowerEngineAttributesPanel(TowerEnginePanel):
+class TowerEngineObjectPanel(TowerEnginePanel):
 	bl_idname = "OBJECT_PT_towerengine"
-	bl_label = "Attributes (TowerEngine)"
+	bl_label = "TowerEngine"
 	bl_space_type = "PROPERTIES"
 	bl_region_type = "WINDOW"
 	bl_context = "object"
@@ -64,8 +64,12 @@ class TowerEngineAttributesPanel(TowerEnginePanel):
 		if not obj:
 			return
 		layout = self.layout
+
+		layout.prop(obj.towerengine, "disable_mesh")
+
 		layout.prop(obj.towerengine, 'tag')
 
+		layout.label("Attributes:")
 		layout.template_list("TowerEngineAttributeList", "TowerEngine Attribute List", obj.towerengine, "attributes", obj.towerengine, "attribute_index")
 
 		row = layout.row()
@@ -231,31 +235,61 @@ class TowerEngineMeshPanel(TowerEnginePanel):
 		layout.prop(mesh.towerengine, 'vertices_only')
 
 
+class TowerEnginePhysicsPanel(TowerEnginePanel):
+	bl_idname = "PHYSICS_PT_towerengine"
+	bl_label = "TowerEngine"
+	bl_space_type = "PROPERTIES"
+	bl_region_type = "WINDOW"
+	bl_context = "physics"
+
+	def draw(self, context):
+		obj = context.object
+
+		if not obj:
+			return
+
+		layout = self.layout
+		layout.prop(obj.towerengine, 'disable_mesh')
+		layout.prop(obj.towerengine, 'compound_shape')
+
+		if obj.towerengine.compound_shape and not obj.rigid_body:
+			layout.label("Warning: Compund Shape need a rigid body to be created.")
+
+
 
 reg_classes = [TowerEngineMeshPanel,
 			   TowerEngineMaterialContextPanel,
 			   TowerEngineMaterialPanel,
 			   TowerEngineTexturePanel,
-			   TowerEngineAttributesPanel,
+			   TowerEngineObjectPanel,
 			   TowerEngineAttributeList,
 			   TowerEngineAttributeListAddItem,
 			   TowerEngineAttributeListDeleteItem,
+			   TowerEnginePhysicsPanel,
 			   TowerEngineMaterialTextureSlotInitOperator]
+
+import bl_ui
+compat = [bl_ui.properties_texture.TEXTURE_PT_context_texture,
+		  bl_ui.properties_texture.TEXTURE_PT_image,
+		  bl_ui.properties_texture.TEXTURE_PT_image_sampling,
+		  bl_ui.properties_physics_rigidbody.PHYSICS_PT_rigid_body,
+		  bl_ui.properties_physics_rigidbody.PHYSICS_PT_rigid_body_collisions,
+		  bl_ui.properties_physics_rigidbody.PHYSICS_PT_rigid_body_dynamics,
+		  bl_ui.properties_physics_common.PHYSICS_PT_add]
+
 
 def register():
 	for c in reg_classes:
 		bpy.utils.register_class(c)
 
-	from bl_ui import properties_texture
-	properties_texture.TEXTURE_PT_context_texture.COMPAT_ENGINES.add(TowerEngineRenderEngine.bl_idname)
-	properties_texture.TEXTURE_PT_image.COMPAT_ENGINES.add(TowerEngineRenderEngine.bl_idname)
-	properties_texture.TEXTURE_PT_image_sampling.COMPAT_ENGINES.add(TowerEngineRenderEngine.bl_idname)
+	for item in compat:
+		item.COMPAT_ENGINES.add(TowerEngineRenderEngine.bl_idname)
+
 
 def unregister():
 	for c in reg_classes:
 		bpy.utils.unregister_class(c)
 
 	from bl_ui import properties_texture
-	properties_texture.TEXTURE_PT_context_texture.COMPAT_ENGINES.remove(TowerEngineRenderEngine.bl_idname)
-	properties_texture.TEXTURE_PT_image.COMPAT_ENGINES.remove(TowerEngineRenderEngine.bl_idname)
-	properties_texture.TEXTURE_PT_image_sampling.COMPAT_ENGINES.remove(TowerEngineRenderEngine.bl_idname)
+	for item in compat:
+		item.COMPAT_ENGINES.remove(TowerEngineRenderEngine.bl_idname)

@@ -6,8 +6,8 @@ bl_info = {
 	"blender":		(2,7,0),
 	"version":		(0,0,5),
 	"location":		"File > Import-Export",
-	"description":	"Support for exporting TowerEngine Meshes and Scenes",
-	"category":		"Import-Export"
+	"description":	"Support for exporting TowerEngine Meshes and Scenes and Engine Viewport",
+	"category":		"Game Engine"
 }
 
 __all__ = ["mesh_exporter", "scene_exporter", "ui", "props", "renderer"]

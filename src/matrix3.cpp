@@ -50,14 +50,14 @@ tVector tMatrix3::ApplyToVector(tVector v) const
 	//return x * v.x + y * v.y + z * v.z;
 }
 
-btMatrix3x3 tMatrix3::ToBtMatrix(void)
+btMatrix3x3 tMatrix3::ToBtMatrix3x3(void)
 {
 	return btMatrix3x3(	x.x, x.y, x.z,
 						y.x, y.y, y.z,
 						z.x, z.y, z.z);
 }
 
-btMatrix3x3 &tMatrix3::ToBtMatrix(btMatrix3x3 &bt_matrix)
+btMatrix3x3 &tMatrix3::toBtMatrix3x3(btMatrix3x3 &bt_matrix)
 {
 	bt_matrix.setValue(x.x, x.y, x.z,
 					   y.x, y.y, y.z,

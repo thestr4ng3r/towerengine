@@ -229,13 +229,22 @@ void tMeshObject::InitBoxRigidBody(tVector half_extents, float mass)
 	if(rigid_body)
 		return;
 
-	collision_shape = new btBoxShape(BtVec(half_extents));
+	collision_shape = new btBoxShape(half_extents.ToBtVector3());
 
 	btVector3 inertia;
 	collision_shape->calculateLocalInertia(mass, inertia);
 
 	collision_shape->setMargin(0.01);
 
+	CreateRigidBody(mass, inertia);
+}
+
+void tMeshObject::InitRigidBody(btCollisionShape *shape, float mass, btVector3 inertia)
+{
+	if(rigid_body)
+		return;
+
+	this->collision_shape = shape;
 	CreateRigidBody(mass, inertia);
 }
 

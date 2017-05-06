@@ -52,6 +52,7 @@ class tMeshObject : public tTransformObject
 
 		void InitMeshRigidBody(float mass, bool convex, bool hull = true);
 		void InitBoxRigidBody(tVector half_extents, float mass);
+		void InitRigidBody(btCollisionShape *shape, float mass, btVector3 inertia);
 		void UpdateRigidBodyTransformation(void);
 
 		void DepthPrePass(tRenderer *renderer);

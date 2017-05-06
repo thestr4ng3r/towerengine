@@ -21,8 +21,8 @@ struct tMatrix3
 
 	tVector ApplyToVector(tVector v) const;
 
-	btMatrix3x3 ToBtMatrix(void);
-	btMatrix3x3 &ToBtMatrix(btMatrix3x3 &bt_matrix);
+	btMatrix3x3 ToBtMatrix3x3(void);
+	btMatrix3x3 &toBtMatrix3x3(btMatrix3x3 &bt_matrix);
 
 	static tMatrix3 GetIdentity(void)		{ return tMatrix3(); }
 	static tMatrix3 GetEuler(tVector rot)	{ tMatrix3 r; r.SetEuler(rot); return r; }
