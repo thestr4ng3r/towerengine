@@ -1,5 +1,13 @@
 version: 1.0.{build}
+
+environment:
+  rsa_key_secret:
+    secure: 70j87wGCHbd0LVwMJIemhFSJPW3iuEcXiUC1kUsnm0p2KyofSwHn3mi74yALaAYw
+
 install:
+  - nuget install secure-file -ExcludeVersion
+  - cinst winscp
+
   - set root_dir=%cd%
   - C:\"Program Files (x86)"\"Microsoft Visual Studio 14.0"\VC\vcvarsall.bat amd64
   - set PATH=%PATH%;C:\"Program Files (x86)"\7-zip
@@ -51,10 +59,46 @@ install:
   - cmake -P cmake_install.cmake
 
 
+  - REM ---------------------------------
+  - REM SWIG
+  - REM ---------------------------------
+
+  - SET swig_url="https://netix.dl.sourceforge.net/project/swig/swigwin/swigwin-3.0.12/swigwin-3.0.12.zip"
+  - SET swig_zip="%root_dir%\third_party\swigwin-3.0.12.zip"
+  - SET swig_dir="%root_dir%\third_party\swigwin-3.0.12"
+
+  - echo "Downloading %swig_url%"
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('%swig_url%', '%swig_zip%')"
+  - echo "Extracting %swig_zip%"
+  - 7z x -o"%root_dir%/third_party" "%swig_zip%"
+
+
   - cd %root_dir%
 
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DTOWERENGINE_ENABLE_COTIRE=OFF -DCMAKE_PREFIX_PATH="%glew_install_prefix%;%bullet_install_prefix%" -DTOWERENGINE_BUILD_DEVIL=OFF -DTOWERENGINE_BUILD_LIBPNG=OFF ..
+  - cmake -G "NMake Makefiles"
+      -DCMAKE_BUILD_TYPE=Release
+      -DTOWERENGINE_ENABLE_COTIRE=OFF
+      -DCMAKE_PREFIX_PATH="%glew_install_prefix%;%bullet_install_prefix%"
+      -DTOWERENGINE_BUILD_DEVIL=OFF
+      -DTOWERENGINE_BUILD_LIBPNG=OFF
+      -DTOWERENGINE_BUILD_STATIC=ON
+      -DTOWERENGINE_SWIG_PYTHON=ON
+      -DTOWERENGINE_BLENDER_ADDON=ON
+      -DSWIG_DIR="%swig_dir%"
+      -DSWIG_EXECUTABLE="%swig_dir%\swig.exe"
+      ..
   - nmake
+  - nmake blender-addon
+  - cd %root_dir%
+
+
+deploy_script:
+  - secure-file\tools\secure-file -decrypt .appveyor_rsa.ppk.enc -secret %rsa_key_secret% -out appveyor_rsa.ppk
+  - C:\"Program Files (x86)"\WinSCP\WinSCP.com /ini=nul /command
+     "open sftp://ci@ci.metallic.software -privatekey=appveyor_rsa.ppk -hostkey=""ecdsa-sha2-nistp256 256 3f:da:44:3d:c5:a2:b6:72:c0:a9:06:2c:16:85:a4:9e"""
+     "cd build/towerengine"
+     "put build\blender\towerengine-blender.zip ./towerengine-blender-%APPVEYOR_REPO_COMMIT:~0,7%-windows-amd64.zip"
+     "exit"
