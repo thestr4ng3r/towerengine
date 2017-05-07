@@ -324,7 +324,7 @@ void tScene::ParseObjectsNode(xml_node<> *cur)
 				if(!cube_map_reflection_object)
 					continue;
 
-				reflection_probe_scene_objects.insert(pair<string, tReflectionProbeSceneObject *>(attr_value, cube_map_reflection_object));
+				reflection_probe_scene_objects.insert(pair<string, tReflectionProbeSceneObject *>(string(attr_value), cube_map_reflection_object));
 			}
 		}
 

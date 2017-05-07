@@ -234,7 +234,7 @@ void tMeshObject::InitBoxRigidBody(tVector half_extents, float mass)
 	btVector3 inertia;
 	collision_shape->calculateLocalInertia(mass, inertia);
 
-	collision_shape->setMargin(0.01);
+	//collision_shape->setMargin(0.01);
 
 	CreateRigidBody(mass, inertia);
 }
