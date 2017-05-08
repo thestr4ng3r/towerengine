@@ -82,6 +82,8 @@ build_script:
       -DCMAKE_BUILD_TYPE=Release
       -DTOWERENGINE_ENABLE_COTIRE=OFF
       -DCMAKE_PREFIX_PATH="%glew_install_prefix%;%bullet_install_prefix%"
+      -DPYTHON_LIBRARY=C:/Python35-x64/libs/python35.lib
+      -DPYTHON_INCLUDE_DIR=C:/Python35-x64/include
       -DTOWERENGINE_BUILD_DEVIL=OFF
       -DTOWERENGINE_BUILD_LIBPNG=OFF
       -DTOWERENGINE_BUILD_STATIC=ON
@@ -89,6 +91,7 @@ build_script:
       -DTOWERENGINE_BLENDER_ADDON=ON
       -DSWIG_DIR="%swig_dir%"
       -DSWIG_EXECUTABLE="%swig_dir%\swig.exe"
+      -DTOWERENGINE_BLENDER_ADDON_PACK_ADDITIONAL_FILES="%glew_install_prefix%\bin\glew32.dll"
       ..
   - nmake
   - nmake blender-addon
