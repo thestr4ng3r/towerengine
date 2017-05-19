@@ -13,8 +13,6 @@ class tMeshObject : public tTransformObject
 
 		bool visible;
 
-		std::string pose;
-
 		tVector color;
 		float alpha;
 
@@ -23,11 +21,12 @@ class tMeshObject : public tTransformObject
 		btCollisionShape *collision_shape;
 		btRigidBody *rigid_body;
 		btMotionState *motion_state;
+		int rigid_body_group;
+		int rigid_body_mask;
 
 		std::map<tMaterial *, tMaterial *> *replace_materials;
 
 		void CreateRigidBody(btScalar &mass, btVector3 &inertia);
-
 
 	protected:
 		void TransformChanged(void);
@@ -39,7 +38,7 @@ class tMeshObject : public tTransformObject
 		tMeshObject(tMesh *mesh);
 		~tMeshObject(void);
 
-		void SetMesh(tMesh *mesh)						{ this->mesh = mesh; }
+		void SetMesh(tMesh *mesh) 						{ this->mesh = mesh; }
 
 		void SetColor(tVector c)						{ color = c; }
 		void SetAlpha(float a)							{ alpha = a; }
@@ -53,6 +52,10 @@ class tMeshObject : public tTransformObject
 		void InitMeshRigidBody(float mass, bool convex, bool hull = true);
 		void InitBoxRigidBody(tVector half_extents, float mass);
 		void InitRigidBody(btCollisionShape *shape, float mass, btVector3 inertia);
+		void SetRigidBodyGroup(int group)				{ this->rigid_body_group = group; }
+		int GetRigidBodyGroup() const 					{ return rigid_body_group; }
+		void SetRigidBodyMask(int mask)					{ this->rigid_body_mask = mask; }
+		int GetRigidBodyMask() const 					{ return rigid_body_mask; }
 		void UpdateRigidBodyTransformation(void);
 
 		void DepthPrePass(tRenderer *renderer);

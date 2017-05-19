@@ -3,8 +3,8 @@
 bl_info = {
 	"name":			"TowerEngine Support for Blender",
 	"author":		"Florian Märkl",
-	"blender":		(2,7,0),
-	"version":		(0,0,5),
+	"blender":		(2, 7, 8),
+	"version":		(0, 1, 0),
 	"location":		"File > Import-Export",
 	"description":	"Support for exporting TowerEngine Meshes and Scenes and Engine Viewport",
 	"category":		"Game Engine"

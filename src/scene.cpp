@@ -369,6 +369,7 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 	xml_attribute<> *attr;
 	bool rigid_body_enabled = false;
 	float rigid_body_mass = 0.0;
+	int rigid_body_group = 1;
 	CollisionShapeType collision_shape_type = SHAPE_MESH;
 	tVector collision_shape_half_extents;
 	btCompoundShape *collision_shape_compound = 0;
@@ -389,6 +390,9 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 				rigid_body_mass = (float)atof(attr->value());
 			else
 				continue;
+
+			if((attr = child->first_attribute("group")))
+				rigid_body_group = atoi(attr->value());
 
 			xml_node<> *collision_shape_node = child->first_node("collision_shape");
 
@@ -456,6 +460,7 @@ tSceneObject *tScene::ParseMeshObjectNode(xml_node<> *cur)
 			collision_shape_compound->calculateLocalInertia(rigid_body_mass, inertia);
 			object->InitRigidBody(collision_shape_compound, rigid_body_mass, inertia);
 		}
+		object->SetRigidBodyGroup(rigid_body_group);
 		object->UpdateRigidBodyTransformation();
 	}
 	tObjectSceneObject *scene_object = new tObjectSceneObject(object);

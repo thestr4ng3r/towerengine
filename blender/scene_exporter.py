@@ -231,6 +231,12 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 			mass = 0.0
 		rigid_body_node.setAttribute("mass", str(mass))
 
+		group = 0
+		for i in range(0, 20):
+			if rigid_body.collision_groups[i]:
+				group |= (1 << i)
+		rigid_body_node.setAttribute("group", str(group))
+
 		return rigid_body_node
 
 

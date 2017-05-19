@@ -21,6 +21,9 @@ tMeshObject::tMeshObject(tMesh *mesh) : tTransformObject()
 	replace_materials = 0;
 
 	cube_map_reflection = 0;
+
+	rigid_body_group = 1;
+	rigid_body_mask = btBroadphaseProxy::AllFilter;
 }
 
 tMeshObject::~tMeshObject(void)
@@ -47,7 +50,7 @@ void tMeshObject::SetTransformWithoutRigidBody(tTransform transform)
 void tMeshObject::AddedToWorld(tWorld *world)
 {
 	if(rigid_body)
-		world->GetDynamicsWorld()->addRigidBody(rigid_body);
+		world->GetDynamicsWorld()->addRigidBody(rigid_body, rigid_body_group, rigid_body_mask);
 }
 
 void tMeshObject::RemovedFromWorld(tWorld *world)
@@ -255,9 +258,13 @@ void tMeshObject::CreateRigidBody(btScalar &mass, btVector3 &inertia)
 	rigid_body = new btRigidBody(info);
 	rigid_body->setUserPointer(this);
 
+	bool dynamic = !(rigid_body->isStaticObject() || rigid_body->isKinematicObject());
+	rigid_body_group = dynamic ? btBroadphaseProxy::DefaultFilter : btBroadphaseProxy::StaticFilter;
+	rigid_body_mask = dynamic ? btBroadphaseProxy::AllFilter : (btBroadphaseProxy::AllFilter ^ btBroadphaseProxy::StaticFilter);
+
 	tWorld *world = GetWorld();
 	if(world)
-		world->GetDynamicsWorld()->addRigidBody(rigid_body);
+		world->GetDynamicsWorld()->addRigidBody(rigid_body, rigid_body_group, rigid_body_mask);
 }
 
 
