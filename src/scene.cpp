@@ -280,6 +280,9 @@ void tScene::ParseCubeMapAssetNode(xml_node<> *cur)
 	assets.insert(pair<string, tAsset *>(name, (tAsset *)(new tCubeMapAsset(cubemap))));
 }
 
+
+#define REFLECTION_PROBE_OBJECT_NAME "reflection_probe"
+
 void tScene::ParseObjectsNode(xml_node<> *cur)
 {
 	for(xml_node<> *child = cur->first_node(); child; child=child->next_sibling())
@@ -297,7 +300,7 @@ void tScene::ParseObjectsNode(xml_node<> *cur)
 			scene_object = ParseDirectionalLightObjectNode(child);
 		else if(strcmp(child->name(), "point_light") == 0)
 			scene_object = ParsePointLightObjectNode(child);
-		else if(strcmp(child->name(), "empty") == 0)
+		else if(strcmp(child->name(), "empty") == 0 || strcmp(child->name(), REFLECTION_PROBE_OBJECT_NAME) == 0)
 			scene_object = ParseEmptyObjectNode(child);
 
 		if(!scene_object)
@@ -518,11 +521,7 @@ tSceneObject *tScene::ParseEmptyObjectNode(xml_node<> *cur)
 	tVector delta_position = tVec(0.0, 0.0, 0.0);
 	xml_attribute<> *attr;
 
-	bool reflection_probe = false;
-
-	if((attr = cur->first_attribute("tag")))
-		if(strcmp(attr->value(), "T_reflection_probe") == 0)
-			reflection_probe = true;
+	bool reflection_probe = strcmp(cur->name(), REFLECTION_PROBE_OBJECT_NAME) == 0;
 
 	xml_node<> *child = cur->first_node();
 	for(; child; child = child->next_sibling())
@@ -642,7 +641,6 @@ tVector tScene::ParseVectorNode(xml_node<> *cur, const char *x_p, const char *y_
 
 void tScene::AddObject(string name, tSceneObject *object)
 {
-	//printf("AddObject %s\n", name.c_str());
 	objects.insert(pair<string, tSceneObject *>(name, object));
 }
 

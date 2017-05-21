@@ -21,11 +21,16 @@ class TowerEngineAttribute(bpy.types.PropertyGroup):
 class TowerEngineObjectPropertyGroup(bpy.types.PropertyGroup):
 	tag = bpy.props.StringProperty(name="Tag")
 	
-	attributes = bpy.props.CollectionProperty(name="attributes", type = TowerEngineAttribute)
-	attribute_index = bpy.props.IntProperty(name="attribute_index", default = 0)
+	attributes = bpy.props.CollectionProperty(name="attributes", type=TowerEngineAttribute)
+	attribute_index = bpy.props.IntProperty(name="attribute_index", default=0)
 
 	disable_mesh = bpy.props.BoolProperty(name="Do not export as Mesh Object")
 	compound_shape = bpy.props.BoolProperty(name="Compound shape from children", default=False)
+
+	object_type = bpy.props.EnumProperty(items=[("DEFAULT", "Default", "Default type from Blender object", 0),
+												("REFLECTION_PROBE", "Reflection Probe", "Reflection Probe for TowerEngine", 1)],
+										 name="Object Type",
+										 default="DEFAULT")
 
 # mesh texture slot
 

@@ -65,7 +65,10 @@ class TowerEngineObjectPanel(TowerEnginePanel):
 			return
 		layout = self.layout
 
-		layout.prop(obj.towerengine, "disable_mesh")
+		if obj.type == "MESH":
+			layout.prop(obj.towerengine, "disable_mesh")
+		elif obj.type == "EMPTY":
+			layout.prop(obj.towerengine, "object_type")
 
 		layout.prop(obj.towerengine, 'tag')
 

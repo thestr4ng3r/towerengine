@@ -320,7 +320,10 @@ class TowerEngineSceneExporter(bpy.types.Operator, ExportHelper):
 	
 	
 	def __save_empty_object_xml(self, obj):
-		obj_node = self.xml_doc.createElement("empty")
+		name = "empty"
+		if obj.towerengine.object_type == "REFLECTION_PROBE":
+			name = "reflection_probe"
+		obj_node = self.xml_doc.createElement(name)
 		obj_node.appendChild(self.__create_transform_node_xml(obj.matrix_world))
 		obj_node.appendChild(self.__create_delta_transform_node_xml(obj))
 		return obj_node
