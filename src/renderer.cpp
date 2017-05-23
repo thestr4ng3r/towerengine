@@ -81,6 +81,9 @@ void tRenderer::PrepareRender(tCamera *camera, tRenderObjectSpace *render_space)
 	current_rendering_camera = camera;
 	current_rendering_render_space = render_space;
 
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+
 	RenderShadowMaps();
 }
 

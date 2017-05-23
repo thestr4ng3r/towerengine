@@ -106,6 +106,9 @@ class TowerEngineContext:
 
 
 	def __update_mesh_object(self, context, o):
+		if o.towerengine.disable_mesh:
+			return
+
 		tmesh = self.__update_mesh(context, o)
 
 		if o in self.objects:
@@ -191,6 +194,9 @@ class TowerEngineContext:
 
 
 		for o in context.scene.objects:
+			if not o.is_visible(context.scene):
+				continue
+
 			visible = False
 			for layer in range(len(context.scene.layers)):
 				if context.scene.layers[layer] and o.layers[layer]:
@@ -236,7 +242,7 @@ class TowerEngineContext:
 		view_matrix_inv = view_matrix.inverted()
 
 		cam_pos = view_matrix_inv * Vector((0.0, 0.0, 0.0))
-		cam_dir = region3d.view_location - cam_pos
+		cam_dir = (view_matrix_inv * Vector((0.0, 0.0, -1.0))) - cam_pos
 
 		cam_pos_te = vec_te(cam_pos)
 		self.camera.SetPosition(cam_pos_te)
